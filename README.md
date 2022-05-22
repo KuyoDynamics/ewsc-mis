@@ -17,6 +17,7 @@ A Management Information System for Eastern Water and Sewerage Company.
 - Reactjs
 - Apollo GraphQL Client
 - Material UI
+- Rechartjs
 
 ## Troubleshooting
 
