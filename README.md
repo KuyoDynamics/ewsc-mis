@@ -31,3 +31,5 @@ A Management Information System for Eastern Water and Sewerage Company.
 
 3. You may want to immediately reload your .zshrc settings:
    `source ~/.zshrc`
+
+## Setting up development environment
