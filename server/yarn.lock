@@ -457,19 +457,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apollo-server@npm:^3.7.0":
-  version: 3.7.0
-  resolution: "apollo-server@npm:3.7.0"
-  dependencies:
-    apollo-server-core: ^3.7.0
-    apollo-server-express: ^3.7.0
-    express: ^4.17.1
-  peerDependencies:
-    graphql: ^15.3.0 || ^16.0.0
-  checksum: a922fc29694d5105c97f802995ac56b3546dc7af290b886e46de3d90a2b42a740a1c70b6ca06b859fd68d852c7e56a4875423f7ec94828fede390d390628dec2
-  languageName: node
-  linkType: hard
-
 "array-flatten@npm:1.1.1":
   version: 1.1.1
   resolution: "array-flatten@npm:1.1.1"
@@ -628,7 +615,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.17.1":
+"express@npm:^4.18.1":
   version: 4.18.1
   resolution: "express@npm:4.18.1"
   dependencies:
@@ -1048,7 +1035,9 @@ __metadata:
   resolution: "server@workspace:."
   dependencies:
     "@prisma/client": ^3.14.0
-    apollo-server: ^3.7.0
+    apollo-server-core: ^3.7.0
+    apollo-server-express: ^3.7.0
+    express: ^4.18.1
     graphql: ^16.5.0
     prisma: ^3.14.0
   languageName: unknown
