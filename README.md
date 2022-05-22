@@ -8,7 +8,7 @@ A Management Information System for Eastern Water and Sewerage Company.
 
 - Nodejs `v16.13.1`
 - Expressjs
-- Apollo GraphQL Server `v3.7.0`
+- Apollo Server `v3.7.0`
 - GraphQL `v16.5.0`
 - Prisma `^3.14.0`
 - Postgres
