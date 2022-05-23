@@ -13,5 +13,5 @@ datasource db {
 model Organisation {
   id String @id @default(cuid())
   Name String @unique
-  LogUrl String 
+  LogoUrl String 
 }
