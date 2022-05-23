@@ -182,7 +182,7 @@ model WaterNetwork {
   // Relation fields
   plantId                     String
   waterTreatmentPlant         WaterTreatmentPlant          @relation(fields: [plantId], references: [id])
-  type                        WaterNetworkType
+  type                        NetworkOwnershipType
   serviceAreaWaterConnections ServiceAreaWaterConnection[]
 
   // Timestamps
@@ -245,9 +245,30 @@ model SewerTreatmentPlant {
   // Relation Fields
   organisationDistrictId String               @map("organisation_district_id")
   district               OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
+  sewerNetworks          SewerNetwork[]
 
   // Constraints
   @@unique([name, organisationDistrictId])
+}
+
+model SewerNetwork {
+  id   String @id @default(uuid())
+  name String
+
+  // Relation fields
+  plantId             String
+  sewerTreatmentPlant SewerTreatmentPlant  @relation(fields: [plantId], references: [id])
+  type                NetworkOwnershipType
+  // serviceAreaSewerConnections ServiceAreaSewerConnection[]
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@unique([name, plantId])
 }
 
 enum ServiceAreaType {
@@ -258,7 +279,7 @@ enum ServiceAreaType {
   RURAL        @map("rural")
 }
 
-enum WaterNetworkType {
+enum NetworkOwnershipType {
   INDEPENDENT  @map("independent")
   INTERNAL     @map("internal")
 }
