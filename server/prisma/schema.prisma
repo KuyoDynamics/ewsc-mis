@@ -179,9 +179,10 @@ model WaterNetwork {
   name String
 
   // Relation fields
-  plantId             String
-  waterTreatmentPlant WaterTreatmentPlant @relation(fields: [plantId], references: [id])
-  type                WaterNetworkType
+  plantId                     String
+  waterTreatmentPlant         WaterTreatmentPlant          @relation(fields: [plantId], references: [id])
+  type                        WaterNetworkType
+  serviceAreaWaterConnections ServiceAreaWaterConnection[]
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -197,12 +198,11 @@ model ServiceArea {
   id                 String          @id @default(uuid())
   name               String
   costClassification ServiceAreaType @map("cost_classification")
-  waterConnections   BigInt          @map("water_connections")
-  sewerConnections   BigInt          @map("sewer_connections")
 
   // Relation Fields
-  organisationDistrictId String               @map("organisation_district_id")
-  district               OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
+  organisationDistrictId      String                       @map("organisation_district_id")
+  district                    OrganisationDistrict         @relation(fields: [organisationDistrictId], references: [id])
+  serviceAreaWaterConnections ServiceAreaWaterConnection[]
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -214,6 +214,28 @@ model ServiceArea {
   @@unique([name, organisationDistrictId])
 }
 
+model ServiceAreaWaterConnection {
+
+  connections BigInt
+
+  // Relation Fields
+  waterNetowrkId String
+  waterNetwork   WaterNetwork @relation(fields: [waterNetowrkId], references: [id])
+
+  serviceAreaId String
+  serviceArea   ServiceArea @relation(fields: [serviceAreaId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+
+  @@id([waterNetowrkId, serviceAreaId])
+}
+
 enum ServiceAreaType {
   HIGH_COST    @map("high-cost")
   LOW_COST     @map("low-cost")
@@ -223,8 +245,8 @@ enum ServiceAreaType {
 }
 
 enum WaterNetworkType {
-  INDEPENDENT      @map("independent")
-  INTERNAL         @map("internal")
+  INDEPENDENT  @map("independent")
+  INTERNAL     @map("internal")
 }
 
 enum WaterStorageTankType {
