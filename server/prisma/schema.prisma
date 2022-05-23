@@ -204,6 +204,7 @@ model ServiceArea {
   organisationDistrictId      String                       @map("organisation_district_id")
   district                    OrganisationDistrict         @relation(fields: [organisationDistrictId], references: [id])
   serviceAreaWaterConnections ServiceAreaWaterConnection[]
+  serviceAreaSewerConnections ServiceAreaSewerConnection[]
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -259,7 +260,7 @@ model SewerNetwork {
   plantId             String
   sewerTreatmentPlant SewerTreatmentPlant  @relation(fields: [plantId], references: [id])
   type                NetworkOwnershipType
-  // serviceAreaSewerConnections ServiceAreaSewerConnection[]
+  serviceAreaSewerConnections ServiceAreaSewerConnection[]
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -269,6 +270,26 @@ model SewerNetwork {
 
   // Constraints
   @@unique([name, plantId])
+}
+
+model ServiceAreaSewerConnection {
+  connections BigInt
+
+  // Relation Fields
+  sewerNetowrkId String
+  sewerNetwork   SewerNetwork @relation(fields: [sewerNetowrkId], references: [id])
+
+  serviceAreaId String
+  serviceArea   ServiceArea @relation(fields: [serviceAreaId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@id([sewerNetowrkId, serviceAreaId])
 }
 
 enum ServiceAreaType {
