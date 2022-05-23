@@ -97,6 +97,7 @@ model OrganisationDistrict {
   district             District              @relation(fields: [districtId], references: [id])
   waterTreatmentPlants WaterTreatmentPlant[]
   serviceAreas         ServiceArea[]
+  sewerTreatmentPlants SewerTreatmentPlant[]
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -215,7 +216,6 @@ model ServiceArea {
 }
 
 model ServiceAreaWaterConnection {
-
   connections BigInt
 
   // Relation Fields
@@ -232,8 +232,22 @@ model ServiceAreaWaterConnection {
   lastModifiedBy String
 
   // Constraints
-
   @@id([waterNetowrkId, serviceAreaId])
+}
+
+model SewerTreatmentPlant {
+  id       String  @id @default(uuid())
+  name     String
+  capacity Float
+  ponds    Int
+  gps      String?
+
+  // Relation Fields
+  organisationDistrictId String               @map("organisation_district_id")
+  district               OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
+
+  // Constraints
+  @@unique([name, organisationDistrictId])
 }
 
 enum ServiceAreaType {
