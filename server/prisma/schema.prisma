@@ -10,4 +10,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+model Organisation {
+  id String @id @default(cuid())
+  Name String @unique
+  LogUrl String 
+}
