@@ -40,7 +40,6 @@ model Province {
   country   Country    @relation(fields: [countryId], references: [id])
   districts District[]
 
-
   // Timestamps
   createdAt      DateTime @default(now())
   createdBy      String
@@ -61,7 +60,6 @@ model District {
   provinceId    String
   province      Province               @relation(fields: [provinceId], references: [id])
   organisations OrganisationDistrict[]
-
 
   // Timestamps
   createdAt      DateTime @default(now())
