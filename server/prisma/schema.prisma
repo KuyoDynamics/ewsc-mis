@@ -122,6 +122,7 @@ model WaterTreatmentPlant {
   // Relation Fields
   organisationDistrictId String @map("organisation_district_id")
   district       OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
+  waterProductionSites WaterProductionSite[]
 
   // Timestamps
   createdAt      DateTime @default(now()) 
@@ -132,6 +133,34 @@ model WaterTreatmentPlant {
   // Constraints
   @@unique([name, organisationDistrictId])
   @@index([name, id])
+}
+
+
+model WaterProductionSite {
+  id String @id @default(uuid())
+  name String
+  staticSuctionHead Float @map("static_suction_head")
+  staticDischargeHead Float @map("static_discharge_head")
+  gps String?
+  type WaterProductionSiteType
+
+  // Relation Fields
+  plantId String 
+  waterTreatmentPlant WaterTreatmentPlant @relation(fields: [plantId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime @default(now()) 
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@index([id,type])
+}
+
+enum WaterProductionSiteType {
+  BOREHOLE @map("borehole")
+  DAM @map("dam")
 }
 
 enum WaterSource {
