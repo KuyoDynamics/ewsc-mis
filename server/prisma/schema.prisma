@@ -94,18 +94,47 @@ model Organisation {
 
 model OrganisationDistrict {
   // Relation Fields
-  organisationId String
-  districtId     String
-  organisation   Organisation @relation(fields: [organisationId], references: [id])
-  district       District     @relation(fields: [districtId], references: [id])
+  id String @id @default(uuid())
+  organisationId       String                @map("organisation_id")
+  districtId           String                @map("district_id")
+  organisation         Organisation          @relation(fields: [organisationId], references: [id])
+  district             District              @relation(fields: [districtId], references: [id])
+  waterTreatmentPlants WaterTreatmentPlant[]
 
   // Timestamps
-  createdAt      DateTime @default(now())
+  createdAt      DateTime @default(now()) 
   createdBy      String
   lastModifiedAt DateTime @updatedAt
   lastModifiedBy String
 
   // Constraints
-  @@id([organisationId, districtId])
+  @@unique([organisationId, districtId])
   @@index([districtId])
+}
+
+model WaterTreatmentPlant {
+  id                 String      @id @default(uuid())
+  name               String
+  waterSource        WaterSource @map("water_source")
+  productionCapacity Float @map("production_capacity")
+  gps                String?
+
+  // Relation Fields
+  organisationDistrictId String @map("organisation_district_id")
+  district       OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime @default(now()) 
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@unique([name, organisationDistrictId])
+  @@index([name, id])
+}
+
+enum WaterSource {
+  SURFACE  @map("surface")
+  GROUND   @map("ground")
 }
