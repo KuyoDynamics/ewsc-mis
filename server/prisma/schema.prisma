@@ -10,4 +10,102 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Country {
+  id   String @id @default(uuid())
+  code String @unique
+  name String @unique
+  flag Bytes  @db.ByteA
 
+  // Relation Fields
+  provinces     Province[]
+  organisations Organisation[]
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@index([name])
+}
+
+model Province {
+  id   String @id @default(uuid())
+  code String @unique
+  name String @unique
+
+  // Relation Fields
+  countryId String
+  country   Country    @relation(fields: [countryId], references: [id])
+  districts District[]
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@unique([code, name, countryId])
+  @@index([code, name])
+}
+
+model District {
+  id   String @id @default(uuid())
+  name String
+  code String
+
+  // Relation Fields
+  provinceId    String
+  province      Province               @relation(fields: [provinceId], references: [id])
+  organisations OrganisationDistrict[]
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@unique([name, code, provinceId])
+  @@index([name])
+}
+
+model Organisation {
+  id   String @id @default(uuid())
+  name String @unique
+  logo Bytes? @db.ByteA
+
+  // Relation Fields
+  countryId String
+  country   Country                @relation(fields: [countryId], references: [id])
+  districts OrganisationDistrict[]
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@index([id, name])
+}
+
+model OrganisationDistrict {
+  // Relation Fields
+  organisationId String
+  districtId     String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  district       District     @relation(fields: [districtId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@id([organisationId, districtId])
+  @@index([districtId])
+}
