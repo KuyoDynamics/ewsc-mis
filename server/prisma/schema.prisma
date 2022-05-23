@@ -96,6 +96,7 @@ model OrganisationDistrict {
   organisation         Organisation          @relation(fields: [organisationId], references: [id])
   district             District              @relation(fields: [districtId], references: [id])
   waterTreatmentPlants WaterTreatmentPlant[]
+  serviceAreas         ServiceArea[]
 
   // Timestamps
   createdAt      DateTime @default(now())
@@ -192,9 +193,38 @@ model WaterNetwork {
   @@unique([name, plantId])
 }
 
+model ServiceArea {
+  id                 String          @id @default(uuid())
+  name               String
+  costClassification ServiceAreaType @map("cost_classification")
+  waterConnections   BigInt          @map("water_connections")
+  sewerConnections   BigInt          @map("sewer_connections")
+
+  // Relation Fields
+  organisationDistrictId String               @map("organisation_district_id")
+  district               OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@unique([name, organisationDistrictId])
+}
+
+enum ServiceAreaType {
+  HIGH_COST    @map("high-cost")
+  LOW_COST     @map("low-cost")
+  MEDIUM_COST  @map("medium-cost")
+  PERI_URBAN   @map("peri-urban")
+  RURAL        @map("rural")
+}
+
 enum WaterNetworkType {
-  INDEPENDENT  @map("independent")
-  EWSC         @map("ewsc")
+  INDEPENDENT      @map("independent")
+  INTERNAL         @map("internal")
 }
 
 enum WaterStorageTankType {
