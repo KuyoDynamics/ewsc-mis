@@ -90,7 +90,7 @@ model Organisation {
 
 model OrganisationDistrict {
   // Relation Fields
-  id String @id @default(uuid())
+  id                   String                @id @default(uuid())
   organisationId       String                @map("organisation_id")
   districtId           String                @map("district_id")
   organisation         Organisation          @relation(fields: [organisationId], references: [id])
@@ -98,7 +98,7 @@ model OrganisationDistrict {
   waterTreatmentPlants WaterTreatmentPlant[]
 
   // Timestamps
-  createdAt      DateTime @default(now()) 
+  createdAt      DateTime @default(now())
   createdBy      String
   lastModifiedAt DateTime @updatedAt
   lastModifiedBy String
@@ -111,17 +111,18 @@ model WaterTreatmentPlant {
   id                 String      @id @default(uuid())
   name               String
   waterSource        WaterSource @map("water_source")
-  productionCapacity Float @map("production_capacity")
+  productionCapacity Float       @map("production_capacity")
   gps                String?
 
   // Relation Fields
-  organisationDistrictId String @map("organisation_district_id")
-  district       OrganisationDistrict @relation(fields: [organisationDistrictId], references: [id])
-  waterProductionSites WaterProductionSite[]
-  waterStorageTanks WaterStorageTank[]
+  organisationDistrictId String                @map("organisation_district_id")
+  district               OrganisationDistrict  @relation(fields: [organisationDistrictId], references: [id])
+  waterProductionSites   WaterProductionSite[]
+  waterStorageTanks      WaterStorageTank[]
+  waterNetworks          WaterNetwork[]
 
   // Timestamps
-  createdAt      DateTime @default(now()) 
+  createdAt      DateTime @default(now())
   createdBy      String
   lastModifiedAt DateTime @updatedAt
   lastModifiedBy String
@@ -130,21 +131,20 @@ model WaterTreatmentPlant {
   @@unique([name, organisationDistrictId])
 }
 
-
 model WaterProductionSite {
-  id String @id @default(uuid())
-  name String
-  staticSuctionHead Float @map("static_suction_head")
-  staticDischargeHead Float @map("static_discharge_head")
-  gps String?
-  type WaterProductionSiteType
+  id                  String                  @id @default(uuid())
+  name                String
+  staticSuctionHead   Float                   @map("static_suction_head")
+  staticDischargeHead Float                   @map("static_discharge_head")
+  gps                 String?
+  type                WaterProductionSiteType
 
   // Relation Fields
-  plantId String 
+  plantId             String
   waterTreatmentPlant WaterTreatmentPlant @relation(fields: [plantId], references: [id])
 
   // Timestamps
-  createdAt      DateTime @default(now()) 
+  createdAt      DateTime @default(now())
   createdBy      String
   lastModifiedAt DateTime @updatedAt
   lastModifiedBy String
@@ -153,18 +153,18 @@ model WaterProductionSite {
 }
 
 model WaterStorageTank {
-  id String @id @default(uuid())
-  name String
-  type WaterStorageTankType
-  storageCapacity Float @map("storage_capacity")
-  gps String?
+  id              String               @id @default(uuid())
+  name            String
+  type            WaterStorageTankType
+  storageCapacity Float                @map("storage_capacity")
+  gps             String?
 
   // Relation Fields
-  plantId String
+  plantId             String
   waterTreatmentPlant WaterTreatmentPlant @relation(fields: [plantId], references: [id])
 
   // Timestamps
-  createdAt      DateTime @default(now()) 
+  createdAt      DateTime @default(now())
   createdBy      String
   lastModifiedAt DateTime @updatedAt
   lastModifiedBy String
@@ -173,14 +173,38 @@ model WaterStorageTank {
   @@unique([name, plantId])
 }
 
+model WaterNetwork {
+  id   String @id @default(uuid())
+  name String
+
+  // Relation fields
+  plantId             String
+  waterTreatmentPlant WaterTreatmentPlant @relation(fields: [plantId], references: [id])
+  type                WaterNetworkType
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  createdBy      String
+  lastModifiedAt DateTime @updatedAt
+  lastModifiedBy String
+
+  // Constraints
+  @@unique([name, plantId])
+}
+
+enum WaterNetworkType {
+  INDEPENDENT  @map("independent")
+  EWSC         @map("ewsc")
+}
+
 enum WaterStorageTankType {
-  PRODUCTION
-  DISTRIBUTION
+  PRODUCTION    @map("production")
+  DISTRIBUTION  @map("distribution")
 }
 
 enum WaterProductionSiteType {
-  BOREHOLE @map("borehole")
-  DAM @map("dam")
+  BOREHOLE  @map("borehole")
+  DAM       @map("dam")
 }
 
 enum WaterSource {
