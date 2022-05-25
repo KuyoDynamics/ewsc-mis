@@ -334,6 +334,8 @@ model Report {
   catchment_area_id  String?                @db.Uuid
   reporting_district OrganisationCatchment? @relation(fields: [catchment_area_id], references: [id])
 
+  indicator_reports IndicatorReport[]
+
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
   created_by       String
@@ -341,6 +343,7 @@ model Report {
   last_modified_by String
 
   // Constraints
+  @@unique([reporting_period, report_type_id, catchment_area_id])
   @@map("report")
 }
 
@@ -394,6 +397,8 @@ model Indicator {
   indicator_unit_id String        @db.Uuid
   indicator_unit    IndicatorUnit @relation(fields: [indicator_unit_id], references: [id])
 
+  indicator_reports IndicatorReport[]
+
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
   created_by       String
@@ -402,6 +407,30 @@ model Indicator {
 
   // Constraints
   @@map("indicator")
+}
+
+model IndicatorReport {
+  id       String  @id @default(uuid()) @db.Uuid
+  target   Float?
+  achieved Float
+  comment  String?
+
+  // Relation Fields
+  report_id String @db.Uuid
+  report    Report @relation(fields: [report_id], references: [id])
+
+  indicator_id String    @db.Uuid
+  indicator    Indicator @relation(fields: [indicator_id], references: [id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@unique([report_id, indicator_id])
+  @@map("indicator_report")
 }
 
 //===============ENUMS=================================
