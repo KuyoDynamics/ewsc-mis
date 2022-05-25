@@ -449,6 +449,8 @@ model ReportApproval {
   report_id String @db.Uuid
   report    Report @relation(fields: [report_id], references: [id])
 
+  comments ReportApprovalComment[]
+
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
   created_by       String
@@ -458,6 +460,27 @@ model ReportApproval {
   // Constraints
   @@unique([report_id])
   @@map("report_approval")
+}
+
+model ReportApprovalComment {
+  id           String   @id @default(uuid()) @db.Uuid
+  comment      String
+  comment_date DateTime
+
+  // Relation Fields
+  commented_by String @db.Uuid
+
+  report_id String         @db.Uuid
+  report    ReportApproval @relation(fields: [report_id], references: [report_id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("report_approval_comment")
 }
 
 //===============ENUMS=================================
