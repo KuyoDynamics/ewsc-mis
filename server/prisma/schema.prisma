@@ -351,7 +351,8 @@ model ReportType {
   window    Int
 
   // Relation Fields
-  reports Report[]
+  reports    Report[]
+  indicators Indicator[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -369,6 +370,7 @@ model IndicatorUnit {
   display_name String @unique
 
   // Relation Fields
+  indicators Indicator[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -378,6 +380,28 @@ model IndicatorUnit {
 
   // Constraints
   @@map("indicator_unit")
+}
+
+model Indicator {
+  id          String @id @default(uuid()) @db.Uuid
+  description String @unique
+  category    String
+
+  // Relation Fields
+  report_type_id String     @db.Uuid
+  report_type    ReportType @relation(fields: [report_type_id], references: [id])
+
+  indicator_unit_id String        @db.Uuid
+  indicator_unit    IndicatorUnit @relation(fields: [indicator_unit_id], references: [id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("indicator")
 }
 
 //===============ENUMS=================================
