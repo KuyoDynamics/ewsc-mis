@@ -318,6 +318,23 @@ model ServiceAreaSewerConnection {
   @@map("service_area_sewer_connection")
 }
 
+
+//================REPORTS==============================
+
+model Report {
+  id String @id @default(uuid()) @db.Uuid
+  reporting_period String
+  due_date DateTime @db.Timestamptz()
+  reporting_date DateTime @db.Timestamptz()
+
+  @@map("report")
+}
+
+
+
+//===============ENUMS=================================
+
+
 enum ServiceAreaType {
   HIGH_COST    @map("high-cost")
   LOW_COST     @map("low-cost")
