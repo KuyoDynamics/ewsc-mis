@@ -61,9 +61,9 @@ model District {
   code String
 
   // Relation Fields
-  province_id   String                  @db.Uuid
-  province      Province                @relation(fields: [province_id], references: [id])
-  organisations OrganisationCatchment[]
+  province_id   String                 @db.Uuid
+  province      Province               @relation(fields: [province_id], references: [id])
+  organisations OrganisationDistrict[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -82,9 +82,11 @@ model Organisation {
   logo Bytes? @db.ByteA
 
   // Relation Fields
-  country_id          String                  @db.Uuid
-  country             Country                 @relation(fields: [country_id], references: [id])
-  catchment_districts OrganisationCatchment[]
+  country_id          String                 @db.Uuid
+  country             Country                @relation(fields: [country_id], references: [id])
+  catchment_districts OrganisationDistrict[]
+  users               OrganisationUser[]
+
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -97,7 +99,54 @@ model Organisation {
   @@map("organisation")
 }
 
-model OrganisationCatchment {
+model User {
+  id                          String                 @id @default(uuid()) @db.Uuid
+  first_name                  String
+  last_name                   String
+  email                       String                 @unique
+  password                    String
+  hashed_confirmation_token   String
+  confirmed_at                DateTime               @db.Timestamptz()
+  hashed_password_reset_token String
+  last_login                  DateTime               @db.Timestamptz()
+  theme                       String
+
+  // Relation Fields
+  user_organisations OrganisationUser[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("user")
+}
+
+model OrganisationUser {
+  id String @id @db.Uuid
+
+  user_id String @db.Uuid
+  user    User   @relation(fields: [user_id], references: [id])
+
+  organisation_id String       @db.Uuid
+  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+
+  is_owner Boolean @default(false)
+
+  // Timestamps
+  invited_at       DateTime           @default(now()) @db.Timestamptz()
+  invited_by       String             @db.Uuid
+  invitation_mode  UserInvitationMode
+  last_modified_at DateTime           @updatedAt @db.Timestamptz()
+  last_modified_by String             @db.Uuid
+
+  @@unique([user_id, organisation_id])
+  @@map("organisation_user")
+}
+
+model OrganisationDistrict {
   // Relation Fields
   id                     String                @id @default(uuid()) @db.Uuid
   organisation_id        String                @db.Uuid
@@ -129,7 +178,7 @@ model WaterTreatmentPlant {
 
   // Relation Fields
   district_id            String                @db.Uuid
-  district               OrganisationCatchment @relation(fields: [district_id], references: [id])
+  district               OrganisationDistrict  @relation(fields: [district_id], references: [id])
   water_production_sites WaterProductionSite[]
   water_storage_tanks    WaterStorageTank[]
   water_network          WaterNetwork?
@@ -218,7 +267,7 @@ model ServiceArea {
 
   // Relation Fields
   district_id                    String                       @db.Uuid
-  district                       OrganisationCatchment        @relation(fields: [district_id], references: [id])
+  district                       OrganisationDistrict         @relation(fields: [district_id], references: [id])
   service_area_water_connections ServiceAreaWaterConnection[]
   service_area_sewer_connections ServiceAreaSewerConnection[]
 
@@ -262,8 +311,8 @@ model SewerTreatmentPlant {
   gps      String?
 
   // Relation Fields
-  district_id   String                @db.Uuid
-  district      OrganisationCatchment @relation(fields: [district_id], references: [id])
+  district_id   String               @db.Uuid
+  district      OrganisationDistrict @relation(fields: [district_id], references: [id])
   sewer_network SewerNetwork?
 
   // Timestamps
@@ -331,8 +380,8 @@ model Report {
   report_type_id String?     @db.Uuid
   report_type    ReportType? @relation(fields: [report_type_id], references: [id])
 
-  reporting_district_id String?                @db.Uuid
-  reporting_district    OrganisationCatchment? @relation(fields: [reporting_district_id], references: [id])
+  reporting_district_id String?               @db.Uuid
+  reporting_district    OrganisationDistrict? @relation(fields: [reporting_district_id], references: [id])
 
   indicator_reports IndicatorReport[]
 
@@ -484,6 +533,13 @@ model ReportApprovalComment {
 }
 
 //===============ENUMS=================================
+
+enum UserInvitationMode {
+  SYSTEM  @map("system_initiated")
+  USER    @map("user_initiated")
+
+  @@map("user_invitation_mode")
+}
 
 enum ApprovalStatus {
   PENDING      @map("pending")
