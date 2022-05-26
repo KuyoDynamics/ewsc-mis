@@ -595,15 +595,19 @@ model ReportApprovalComment {
 //===============ENUMS=================================
 
 enum PermissionType {
-  VIEW
-  CREATE
-  UPDATE
-  DELETE
+  VIEW    @map("view")
+  CREATE  @map("create")
+  UPDATE  @map("update")
+  DELETE  @map("delete")
+
+  @@map("permission_type")
 }
 
 enum RoleScopeLevel {
   ORGANISATION  @map("organisation")
   DISTRICT      @map("district")
+
+  @@map("role_scope_level")
 }
 
 enum UserRoleType {
