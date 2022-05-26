@@ -133,6 +133,8 @@ model UserRole {
   user_id String @db.Uuid
   user    User   @relation(fields: [user_id], references: [id])
 
+  role_scopes UserRoleScope[]
+
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
   created_by       String
@@ -141,6 +143,20 @@ model UserRole {
 
   // Constraints
   @@map("user_role")
+}
+
+model UserRoleScope {
+  id             String         @id @default(uuid()) @db.Uuid
+  scope_level    RoleScopeLevel
+  scope_level_id String         @db.Uuid
+
+  // Relations Fields
+  user_role_id String   @db.Uuid
+  user_role    UserRole @relation(fields: [user_role_id], references: [id])
+
+
+  @@unique([scope_level, scope_level_id, user_role_id])
+  @@map("user_role_scope")
 }
 
 model OrganisationUser {
@@ -155,10 +171,6 @@ model OrganisationUser {
   organisation    Organisation @relation(fields: [organisation_id], references: [id])
 
   district_users DistrictUser[]
-
-
-
-
 
   // Timestamps
   invited_at       DateTime           @default(now()) @db.Timestamptz()
@@ -580,6 +592,11 @@ model ReportApprovalComment {
 }
 
 //===============ENUMS=================================
+
+enum RoleScopeLevel {
+  ORGANISATION  @map("organisation")
+  DISTRICT      @map("district")
+}
 
 enum UserRoleType {
   SUPPORT     @map("support")
