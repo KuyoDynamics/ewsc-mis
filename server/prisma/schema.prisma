@@ -121,9 +121,9 @@ model OrganisationCatchment {
 }
 
 model WaterTreatmentPlant {
-  id                  String      @id @default(uuid()) @db.Uuid
+  id                  String          @id @default(uuid()) @db.Uuid
   name                String
-  water_source        WaterSource
+  water_source        WaterSourceType
   production_capacity Float
   gps                 String?
 
@@ -351,7 +351,7 @@ model Report {
 
 model ReportType {
   id        String             @id @default(uuid()) @db.Uuid
-  type      ReportTypeOptions
+  type      ReportTypeOption
   frequency ReportingFrequency
   window    Int
 
@@ -490,9 +490,11 @@ enum ApprovalStatus {
   IN_PROGRESS  @map("in_progress")
   APPROVED     @map("approved")
   REJECTED     @map("rejected")
+
+  @@map("approval_status")
 }
 
-enum ReportTypeOptions {
+enum ReportTypeOption {
   PUBLIC_RELATIONS  @map("public_relations")
   COMMERCIAL        @map("commercial")
   TECHNICAL         @map("technical")
@@ -502,6 +504,7 @@ enum ReportTypeOptions {
   IT                @map("it")
   INVENTORY         @map("inventory")
 
+  @@map("report_type_option")
 }
 
 enum ReportingFrequency {
@@ -510,6 +513,8 @@ enum ReportingFrequency {
   QUARTERLY   @map("quarterly")
   BI_ANNUALY  @map("bi_annually")
   ANNUALLY    @map("annually")
+
+  @@map("reporting_frequency")
 }
 
 enum ServiceAreaType {
@@ -518,24 +523,34 @@ enum ServiceAreaType {
   MEDIUM_COST  @map("medium-cost")
   PERI_URBAN   @map("peri-urban")
   RURAL        @map("rural")
+
+  @@map("service_area_type")
 }
 
 enum NetworkOwnershipType {
   INDEPENDENT  @map("independent")
   INTERNAL     @map("internal")
+
+  @@map("network_ownership_type")
 }
 
 enum WaterStorageTankType {
   PRODUCTION    @map("production")
   DISTRIBUTION  @map("distribution")
+
+  @@map("water_storage_tank_type")
 }
 
 enum WaterProductionSiteType {
   BOREHOLE  @map("borehole")
   DAM       @map("dam")
+
+  @@map("water_production_site_type")
 }
 
-enum WaterSource {
+enum WaterSourceType {
   SURFACE  @map("surface")
   GROUND   @map("ground")
+
+  @@map("water_source_type")
 }
