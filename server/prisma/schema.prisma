@@ -113,6 +113,7 @@ model User {
 
   // Relation Fields
   user_organisations OrganisationUser[]
+  user_roles         UserRole[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -124,9 +125,29 @@ model User {
   @@map("user")
 }
 
-model OrganisationUser {
-  id String @id @db.Uuid
+model UserRole {
+  id   String       @id @default(uuid()) @db.Uuid
+  role UserRoleType
 
+  // Relation Fields
+  user_id String @db.Uuid
+  user    User   @relation(fields: [user_id], references: [id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("user_role")
+}
+
+model OrganisationUser {
+  id       String  @id @db.Uuid
+  is_owner Boolean @default(false)
+
+  // Relation Fields
   user_id String @db.Uuid
   user    User   @relation(fields: [user_id], references: [id])
 
@@ -135,7 +156,9 @@ model OrganisationUser {
 
   district_users DistrictUser[]
 
-  is_owner Boolean @default(false)
+
+
+
 
   // Timestamps
   invited_at       DateTime           @default(now()) @db.Timestamptz()
@@ -557,6 +580,16 @@ model ReportApprovalComment {
 }
 
 //===============ENUMS=================================
+
+enum UserRoleType {
+  SUPPORT     @map("support")
+  ADMIN       @map("admin")
+  APPROVER    @map("approver")
+  DATA_ENTRY  @map("data_entry")
+  USER        @map("user")
+
+  @@map("user_role_type")
+}
 
 enum UserInvitationMode {
   SYSTEM  @map("system_initiated")
