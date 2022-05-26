@@ -100,15 +100,15 @@ model Organisation {
 }
 
 model User {
-  id                          String                 @id @default(uuid()) @db.Uuid
+  id                          String   @id @default(uuid()) @db.Uuid
   first_name                  String
   last_name                   String
-  email                       String                 @unique
+  email                       String   @unique
   password                    String
   hashed_confirmation_token   String
-  confirmed_at                DateTime               @db.Timestamptz()
+  confirmed_at                DateTime @db.Timestamptz()
   hashed_password_reset_token String
-  last_login                  DateTime               @db.Timestamptz()
+  last_login                  DateTime @db.Timestamptz()
   theme                       String
 
   // Relation Fields
@@ -133,6 +133,8 @@ model OrganisationUser {
   organisation_id String       @db.Uuid
   organisation    Organisation @relation(fields: [organisation_id], references: [id])
 
+  district_users DistrictUser[]
+
   is_owner Boolean @default(false)
 
   // Timestamps
@@ -146,6 +148,27 @@ model OrganisationUser {
   @@map("organisation_user")
 }
 
+model DistrictUser {
+  id String @id @db.Uuid
+
+  // Relation Fields
+  user_id String           @db.Uuid
+  user    OrganisationUser @relation(fields: [user_id], references: [id])
+
+  district_id String               @db.Uuid
+  district    OrganisationDistrict @relation(fields: [district_id], references: [id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@unique([user_id, district_id])
+  @@map("district_user")
+}
+
 model OrganisationDistrict {
   // Relation Fields
   id                     String                @id @default(uuid()) @db.Uuid
@@ -157,6 +180,7 @@ model OrganisationDistrict {
   service_areas          ServiceArea[]
   sewer_treatment_plants SewerTreatmentPlant[]
   reports                Report[]
+  users                  DistrictUser[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
