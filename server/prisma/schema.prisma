@@ -146,9 +146,10 @@ model UserRole {
 }
 
 model UserRoleScope {
-  id             String         @id @default(uuid()) @db.Uuid
-  scope_level    RoleScopeLevel
-  scope_level_id String         @db.Uuid
+  id                String           @id @default(uuid()) @db.Uuid
+  scope_level       RoleScopeLevel
+  scope_level_id    String           @db.Uuid
+  scope_permissions PermissionType[]
 
   // Relations Fields
   user_role_id String   @db.Uuid
@@ -592,6 +593,13 @@ model ReportApprovalComment {
 }
 
 //===============ENUMS=================================
+
+enum PermissionType {
+  VIEW
+  CREATE
+  UPDATE
+  DELETE
+}
 
 enum RoleScopeLevel {
   ORGANISATION  @map("organisation")
