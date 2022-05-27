@@ -61,9 +61,9 @@ model District {
   code String
 
   // Relation Fields
-  province_id   String                 @db.Uuid
-  province      Province               @relation(fields: [province_id], references: [id])
-  organisations OrganisationDistrict[]
+  province_id               String              @db.Uuid
+  province                  Province            @relation(fields: [province_id], references: [id])
+  organisations_in_district CatchmentDistrict[] @relation("organisations_in_district")
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -82,9 +82,9 @@ model Organisation {
   logo Bytes? @db.ByteA
 
   // Relation Fields
-  country_id          String                 @db.Uuid
-  country             Country                @relation(fields: [country_id], references: [id])
-  catchment_districts OrganisationDistrict[]
+  country_id          String              @db.Uuid
+  country             Country             @relation(fields: [country_id], references: [id])
+  catchment_districts CatchmentDistrict[]
   users               OrganisationUser[]
 
 
@@ -188,11 +188,11 @@ model DistrictUser {
   id String @id @db.Uuid
 
   // Relation Fields
-  user_id String           @db.Uuid
-  user    OrganisationUser @relation(fields: [user_id], references: [id])
+  organisation_user_id String           @map("organisation_user_id") @db.Uuid
+  organisation_user    OrganisationUser @relation(fields: [organisation_user_id], references: [id])
 
-  district_id String               @db.Uuid
-  district    OrganisationDistrict @relation(fields: [district_id], references: [id])
+  catchment_district_id String            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -201,17 +201,20 @@ model DistrictUser {
   last_modified_by String
 
   // Constraints
-  @@unique([user_id, district_id])
+  @@unique([organisation_user_id, catchment_district_id])
   @@map("district_user")
 }
 
-model OrganisationDistrict {
+model CatchmentDistrict {
+  id String @id @default(uuid()) @db.Uuid
+
   // Relation Fields
-  id                     String                @id @default(uuid()) @db.Uuid
-  organisation_id        String                @db.Uuid
-  district_id            String                @db.Uuid
-  organisation           Organisation          @relation(fields: [organisation_id], references: [id])
-  district               District              @relation(fields: [district_id], references: [id])
+  district_id String   @db.Uuid
+  district    District @relation("organisations_in_district", fields: [district_id], references: [id])
+
+  organisation_id String       @db.Uuid
+  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+
   water_treatment_plants WaterTreatmentPlant[]
   service_areas          ServiceArea[]
   sewer_treatment_plants SewerTreatmentPlant[]
@@ -226,7 +229,7 @@ model OrganisationDistrict {
 
   // Constraints
   @@unique([organisation_id, district_id])
-  @@map("organisation_district")
+  @@map("catchment_district")
 }
 
 model WaterTreatmentPlant {
@@ -237,8 +240,9 @@ model WaterTreatmentPlant {
   gps                 String?
 
   // Relation Fields
-  district_id            String                @db.Uuid
-  district               OrganisationDistrict  @relation(fields: [district_id], references: [id])
+  catchment_district_id String            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
+
   water_production_sites WaterProductionSite[]
   water_storage_tanks    WaterStorageTank[]
   water_network          WaterNetwork?
@@ -250,7 +254,7 @@ model WaterTreatmentPlant {
   last_modified_by String
 
   // Constraints
-  @@unique([name, district_id])
+  @@unique([name, catchment_district_id])
   @@map("water_treatment_plant")
 }
 
@@ -321,13 +325,14 @@ model WaterNetwork {
 }
 
 model ServiceArea {
-  id                  String          @id @default(uuid()) @db.Uuid
+  id                  String                    @id @default(uuid()) @db.Uuid
   name                String
-  cost_classification ServiceAreaType
+  cost_classification ServiceAreaClassification
 
   // Relation Fields
-  district_id                    String                       @db.Uuid
-  district                       OrganisationDistrict         @relation(fields: [district_id], references: [id])
+  catchment_district_id String            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
+
   service_area_water_connections ServiceAreaWaterConnection[]
   service_area_sewer_connections ServiceAreaSewerConnection[]
 
@@ -338,7 +343,7 @@ model ServiceArea {
   last_modified_by String
 
   // Constraints
-  @@unique([name, district_id])
+  @@unique([name, catchment_district_id])
   @@map("service_area")
 }
 
@@ -371,9 +376,9 @@ model SewerTreatmentPlant {
   gps      String?
 
   // Relation Fields
-  district_id   String               @db.Uuid
-  district      OrganisationDistrict @relation(fields: [district_id], references: [id])
-  sewer_network SewerNetwork?
+  catchment_district_id String            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
+  sewer_network         SewerNetwork?
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -382,7 +387,7 @@ model SewerTreatmentPlant {
   last_modified_by String
 
   // Constraints
-  @@unique([name, district_id])
+  @@unique([name, catchment_district_id])
   @@map("sewer_treatment_plant")
 }
 
@@ -391,8 +396,9 @@ model SewerNetwork {
   name String
 
   // Relation fields
-  plant_id                       String                       @unique @db.Uuid
-  sewer_treatment_plant          SewerTreatmentPlant          @relation(fields: [plant_id], references: [id])
+  plant_id              String              @unique @db.Uuid
+  sewer_treatment_plant SewerTreatmentPlant @relation(fields: [plant_id], references: [id])
+
   type                           NetworkOwnershipType
   service_area_sewer_connections ServiceAreaSewerConnection[]
 
@@ -431,21 +437,22 @@ model ServiceAreaSewerConnection {
 //================REPORTS==============================
 
 model Report {
-  id               String   @id @default(uuid()) @db.Uuid
-  reporting_period String
-  due_date         DateTime @db.Timestamptz()
-  reporting_date   DateTime @db.Timestamptz()
+  id                          String   @id @default(uuid()) @db.Uuid
+  reporting_period            String
+  reporting_period_start_date DateTime
+  reporting_period_end_date   DateTime
+  report_due_date             DateTime @db.Timestamptz()
+  reporting_date              DateTime @db.Timestamptz()
 
   // Relation Fields
   report_type_id String?     @db.Uuid
   report_type    ReportType? @relation(fields: [report_type_id], references: [id])
 
-  reporting_district_id String?               @db.Uuid
-  reporting_district    OrganisationDistrict? @relation(fields: [reporting_district_id], references: [id])
+  catchment_district_id String?            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict? @relation(fields: [catchment_district_id], references: [id])
 
   indicator_reports IndicatorReport[]
-
-  report_approvals ReportApproval[]
+  report_approvals  ReportApproval[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -454,7 +461,7 @@ model Report {
   last_modified_by String
 
   // Constraints
-  @@unique([reporting_period, report_type_id, reporting_district_id])
+  @@unique([reporting_period, report_type_id, catchment_district_id])
   @@map("report")
 }
 
@@ -521,7 +528,8 @@ model Indicator {
 }
 
 model IndicatorReport {
-  id       String  @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
+
   target   Float?
   achieved Float
   comment  String?
@@ -659,14 +667,14 @@ enum ReportingFrequency {
   @@map("reporting_frequency")
 }
 
-enum ServiceAreaType {
+enum ServiceAreaClassification {
   HIGH_COST    @map("high-cost")
   LOW_COST     @map("low-cost")
   MEDIUM_COST  @map("medium-cost")
   PERI_URBAN   @map("peri-urban")
   RURAL        @map("rural")
 
-  @@map("service_area_type")
+  @@map("service_area_classification")
 }
 
 enum NetworkOwnershipType {
