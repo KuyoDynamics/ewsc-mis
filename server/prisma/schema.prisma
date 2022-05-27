@@ -575,7 +575,7 @@ model ReportApprovalComment {
 
 model Indicator {
   id               String @id @default(uuid()) @db.Uuid
-  indicator_number String
+  indicator_number String @unique
   description      String @unique
   category         String
 
