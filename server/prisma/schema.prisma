@@ -506,6 +506,12 @@ model IndicatorReport {
   indicator_id String    @db.Uuid
   indicator    Indicator @relation(fields: [indicator_id], references: [id])
 
+  disaggregate_id String       @db.Uuid
+  disaggegate     Disaggregate @relation(fields: [disaggregate_id], references: [id])
+
+  disaggregate_option_set_id String                @db.Uuid
+  disaggregate_option_set    DisaggregateOptionSet @relation(fields: [disaggregate_option_set_id], references: [id])
+
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
   created_by       String
@@ -615,11 +621,13 @@ model IndicatorUnit {
 model Disaggregate {
   id   String           @id @default(uuid()) @db.Uuid
   name String           @unique
-  type DisaggregateType //default the table with one number disaggregate and users should not be allowed to create a disaggregate of this type
+  type DisaggregateType //default the table with one row of number disaggregate and users should not be allowed to create a disaggregate of this type
 
   // Relation Fields
   option_set DisaggregateOptionSet[]
   indicators Indicator[]
+
+  indicator_reports IndicatorReport[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -638,8 +646,10 @@ model DisaggregateOptionSet {
   disaggregate_id String       @db.Uuid
   disaggregate    Disaggregate @relation(fields: [disaggregate_id], references: [id])
 
-  option_id String             @db.Uuid
-  option    DisaggregateOption @relation(fields: [option_id], references: [id])
+  disaggregate_option_id String             @db.Uuid
+  disaggregate_option    DisaggregateOption @relation(fields: [disaggregate_option_id], references: [id])
+
+  indictor_reports IndicatorReport[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
