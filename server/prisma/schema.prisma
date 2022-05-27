@@ -14,6 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//====================SYSTEM TABLES===================
 model Country {
   id   String @id @default(uuid()) @db.Uuid
   code String @unique
@@ -232,6 +233,8 @@ model CatchmentDistrict {
   @@map("catchment_district")
 }
 
+//=============================WATER====================================
+
 model WaterTreatmentPlant {
   id                  String          @id @default(uuid()) @db.Uuid
   name                String
@@ -324,6 +327,8 @@ model WaterNetwork {
   @@map("water_network")
 }
 
+//======================SERVICE AREA====================================
+
 model ServiceArea {
   id                  String                    @id @default(uuid()) @db.Uuid
   name                String
@@ -367,6 +372,8 @@ model ServiceAreaWaterConnection {
   @@id([water_netowrk_id, service_area_id])
   @@map("service_area_water_connection")
 }
+
+//=========================SEWER================================
 
 model SewerTreatmentPlant {
   id       String  @id @default(uuid()) @db.Uuid
@@ -485,48 +492,6 @@ model ReportType {
   @@map("report_type")
 }
 
-model IndicatorUnit {
-  id           String @id @default(uuid()) @db.Uuid
-  unit         String @unique
-  display_name String @unique
-
-  // Relation Fields
-  indicators Indicator[]
-
-  // Timestamps
-  created_at       DateTime @default(now()) @db.Timestamptz()
-  created_by       String
-  last_modified_at DateTime @updatedAt @db.Timestamptz()
-  last_modified_by String
-
-  // Constraints
-  @@map("indicator_unit")
-}
-
-model Indicator {
-  id          String @id @default(uuid()) @db.Uuid
-  description String @unique
-  category    String
-
-  // Relation Fields
-  report_type_id String     @db.Uuid
-  report_type    ReportType @relation(fields: [report_type_id], references: [id])
-
-  indicator_unit_id String        @db.Uuid
-  indicator_unit    IndicatorUnit @relation(fields: [indicator_unit_id], references: [id])
-
-  indicator_reports IndicatorReport[]
-
-  // Timestamps
-  created_at       DateTime @default(now()) @db.Timestamptz()
-  created_by       String
-  last_modified_at DateTime @updatedAt @db.Timestamptz()
-  last_modified_by String
-
-  // Constraints
-  @@map("indicator")
-}
-
 model IndicatorReport {
   id String @id @default(uuid()) @db.Uuid
 
@@ -600,7 +565,117 @@ model ReportApprovalComment {
   @@map("report_approval_comment")
 }
 
+//==============================INDICATORS================================
+
+model Indicator {
+  id          String @id @default(uuid()) @db.Uuid
+  description String @unique
+  category    String
+
+  // Relation Fields
+  report_type_id String     @db.Uuid
+  report_type    ReportType @relation(fields: [report_type_id], references: [id])
+
+  indicator_unit_id String        @db.Uuid
+  indicator_unit    IndicatorUnit @relation(fields: [indicator_unit_id], references: [id])
+
+  disaggregate_id String       @db.Uuid
+  disaggregate    Disaggregate @relation(fields: [disaggregate_id], references: [id])
+
+  indicator_reports IndicatorReport[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("indicator")
+}
+
+model IndicatorUnit {
+  id           String @id @default(uuid()) @db.Uuid
+  unit         String @unique
+  display_name String @unique
+
+  // Relation Fields
+  indicators Indicator[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("indicator_unit")
+}
+
+model Disaggregate {
+  id   String           @id @default(uuid()) @db.Uuid
+  name String           @unique
+  type DisaggregateType //default the table with one number disaggregate and users should not be allowed to create a disaggregate of this type
+
+  // Relation Fields
+  option_set DisaggregateOptionSet[]
+  indicators Indicator[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("disaggregate")
+}
+
+model DisaggregateOptionSet {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Relation Fields
+  disaggregate_id String       @db.Uuid
+  disaggregate    Disaggregate @relation(fields: [disaggregate_id], references: [id])
+
+  option_id String             @db.Uuid
+  option    DisaggregateOption @relation(fields: [option_id], references: [id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("disaggregate_option_set")
+}
+
+model DisaggregateOption {
+  id          String @id @default(uuid()) @db.Uuid
+  option_name String @unique
+
+  // Relation Fields
+  option_set DisaggregateOptionSet[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("disaggregate_option")
+}
+
 //===============ENUMS=================================
+
+enum DisaggregateType {
+  NUMBER           @map("number")
+  WITH_PARAMETERS  @map("with_parameters")
+
+  @@map("disaggregate_type")
+}
 
 enum PermissionType {
   VIEW    @map("view")
