@@ -1,39 +1,84 @@
+import fs from "fs";
+import path from "path";
 import { ApolloServer } from "apollo-server-express";
-
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
-import {PrismaClient} from "@prisma/client"
-
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
+import { PrismaClient } from "@prisma/client";
 import express from "express";
-
 import http from "http";
+import * as Query from "./api/resolvers/Query.js";
+import * as Mutation from "./api/resolvers/Mutation.js";
+import * as Subscription from "./api/resolvers/Subscription.js";
 
-async function startApolloServer(typeDefs, resolvers) {
-  // Required logic for integrating with Express
+const prisma = new PrismaClient();
+const pubSub = "";
 
+const resolvers = {
+  Query,
+  // Mutation,
+  // Subscription,
+};
+
+const typeDefs = fs.readFileSync(
+  path.join(path.resolve(), "src/domain/schema.graphql"),
+  "utf-8"
+);
+
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+async function startApolloServer(schema, prisma) {
   const app = express();
+
+  // 1. Http Server
   const httpServer = http.createServer(app);
 
-  // Same ApolloServer initialization as before, plus the drain plugin
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    csrfPrevention: true,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  // 2. Websocket Server
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/",
   });
 
-  //   More required logic for integrating with Express
+  const wsServerCleanup = useServer({ schema }, wsServer);
+
+  // 3. Apollo Server
+  const server = new ApolloServer({
+    schema,
+    context: ({ req }) => {
+      return {
+        ...req,
+        prisma,
+        //pubsub,
+        //userId: req && req.headers.authorization ? getUserId(req) : null,
+      };
+    },
+    csrfPrevention: true,
+    plugins: [
+      // Proper shutdown for the HTTP server.
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+
+      // Proper shutdown for the websocket server
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await wsServerCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
+  });
+
   await server.start();
   server.applyMiddleware({
     app,
-
-    // By default, apollo-server hosts its GraphQL at the
-    // server root. However, *other* Apollo Server packages host it at
-    // /graphql. Optionally provide this to match apollo-server.
-
-    path: "/",
   });
 
   //   Modified server startup
   await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
 }
+
+startApolloServer(schema, prisma);
