@@ -8,9 +8,10 @@ import { useServer } from "graphql-ws/lib/use/ws";
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import http from "http";
-import * as Query from "./api/resolvers/Query.js";
-import * as Mutation from "./api/resolvers/Mutation.js";
-import * as Subscription from "./api/resolvers/Subscription.js";
+import Query from "./api/resolvers/Query";
+// import Mutation from "./api/resolvers/Mutation";
+// import Subscription from "./api/resolvers/Subscription";
+import { GraphQLSchema } from "graphql";
 
 const prisma = new PrismaClient();
 const pubSub = "";
@@ -28,7 +29,7 @@ const typeDefs = fs.readFileSync(
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-async function startApolloServer(schema, prisma) {
+async function startApolloServer(schema: GraphQLSchema, prisma: PrismaClient) {
   const app = express();
 
   // 1. Http Server
@@ -77,7 +78,9 @@ async function startApolloServer(schema, prisma) {
   });
 
   //   Modified server startup
-  await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
+  await new Promise<any>((resolve: any) =>
+    httpServer.listen({ port: 4000 }, resolve)
+  );
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
 }
 

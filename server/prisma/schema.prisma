@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+   previewFeatures = ["fullTextSearch"]
 }
 
 // generator erd {
@@ -421,7 +422,7 @@ model SewerNetwork {
 }
 
 model ServiceAreaSewerConnection {
-  connections BigInt
+  connections Int
 
   // Relation Fields
   sewer_netowrk_id String       @db.Uuid
