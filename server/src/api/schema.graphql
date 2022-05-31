@@ -1,0 +1,49 @@
+type Query {
+  country(id: ID!): Country!
+  allCountries: [Country!]!
+  province(id: ID!): Province!
+  provincesByCountry(country_id: ID!): [Province!]!
+}
+
+type Country {
+  id: ID!
+  code: String!
+  name: String!
+  provinces: [Province!]!
+  created_at: DateTime!
+  created_by: String!
+  last_modified_at: DateTime!
+  last_modified_by: String!
+}
+
+type Province {
+  id: ID!
+  code: String!
+  name: String!
+
+  country_id: String
+  country: Country
+  districts: [District!]!
+
+  created_at: DateTime!
+  created_by: String!
+  last_modified_at: DateTime!
+  last_modified_by: String!
+}
+
+type District {
+  id: ID!
+  name: String!
+  code: String!
+
+  province_id: String!
+  province: Province!
+  # organisations_in_district CatchmentDistrict[]
+
+  created_at: DateTime!
+  created_by: String!
+  last_modified_at: DateTime!
+  last_modified_by: String!
+}
+
+scalar DateTime

@@ -8,12 +8,33 @@ import { useServer } from "graphql-ws/lib/use/ws";
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import http from "http";
+import {
+  typeDefs as scalarTypeDefs,
+  resolvers as scalarResolvers,
+} from "graphql-scalars";
 import Query from "./api/resolvers/Query";
+
 // import Mutation from "./api/resolvers/Mutation";
 // import Subscription from "./api/resolvers/Subscription";
 import { GraphQLSchema } from "graphql";
 
 const prisma = new PrismaClient();
+// Prisma middleware for logging
+prisma.$use(async (params, next) => {
+  console.log("params", params);
+  const before = Date.now();
+
+  const result = await next(params);
+
+  const after = Date.now();
+
+  console.log(
+    `Query ${params.model}.${params.action} took ${after - before}ms`
+  );
+
+  return result;
+});
+
 const pubSub = "";
 
 const resolvers = {
@@ -23,13 +44,21 @@ const resolvers = {
 };
 
 const typeDefs = fs.readFileSync(
-  path.join(path.resolve(), "src/domain/schema.graphql"),
+  path.join(path.resolve(), "src/api/schema.graphql"),
   "utf-8"
 );
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+console.log("typeOf Schema", typeof typeDefs);
 
-async function startApolloServer(schema: GraphQLSchema, prisma: PrismaClient) {
+const schema = makeExecutableSchema({
+  typeDefs: [typeDefs, ...scalarTypeDefs],
+  resolvers: { ...resolvers, ...scalarResolvers },
+});
+
+async function startApolloServer(
+  _schema: GraphQLSchema,
+  _prisma: PrismaClient
+) {
   const app = express();
 
   // 1. Http Server
@@ -41,7 +70,7 @@ async function startApolloServer(schema: GraphQLSchema, prisma: PrismaClient) {
     path: "/",
   });
 
-  const wsServerCleanup = useServer({ schema }, wsServer);
+  const wsServerCleanup = useServer({ schema: _schema }, wsServer);
 
   // 3. Apollo Server
   const server = new ApolloServer({
@@ -49,7 +78,7 @@ async function startApolloServer(schema: GraphQLSchema, prisma: PrismaClient) {
     context: ({ req }) => {
       return {
         ...req,
-        prisma,
+        prisma: _prisma,
         //pubsub,
         //userId: req && req.headers.authorization ? getUserId(req) : null,
       };

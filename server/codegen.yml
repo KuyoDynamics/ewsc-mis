@@ -1,0 +1,8 @@
+schema: ./src/api/schema.graphql
+generates:
+  ./src/libs/resolvers-types.ts:
+    config:
+      useIndexSignature: true
+    plugins:
+      - typescript
+      - typescript-resolvers
