@@ -12,14 +12,11 @@ import {
   typeDefs as scalarTypeDefs,
   resolvers as scalarResolvers,
 } from "graphql-scalars";
-import Query from "./api/resolvers/Query";
-
-// import Mutation from "./api/resolvers/Mutation";
-// import Subscription from "./api/resolvers/Subscription";
 import { GraphQLSchema } from "graphql";
+import { resolvers } from "./api/resolvers";
 
 const prisma = new PrismaClient();
-// Prisma middleware for logging
+
 prisma.$use(async (params, next) => {
   console.log("params", params);
   const before = Date.now();
@@ -36,12 +33,6 @@ prisma.$use(async (params, next) => {
 });
 
 const pubSub = "";
-
-const resolvers = {
-  Query,
-  // Mutation,
-  // Subscription,
-};
 
 const typeDefs = fs.readFileSync(
   path.join(path.resolve(), "src/api/schema.graphql"),
@@ -77,7 +68,7 @@ async function startApolloServer(
     schema,
     context: ({ req }) => {
       return {
-        ...req,
+        req,
         prisma: _prisma,
         //pubsub,
         //userId: req && req.headers.authorization ? getUserId(req) : null,
