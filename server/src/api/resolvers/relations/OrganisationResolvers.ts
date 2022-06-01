@@ -28,14 +28,16 @@ export const organisationResolvers: OrganisationResolvers = {
 
     return result;
   },
-  // TODO
   catchment_districts: async ({ id }: Organisation, _args, context) => {
-    const result = await context.prisma.CatchmentDistrict.findMany({
+    const districts = await context.prisma.district.findMany({
       where: {
-        organisation_id: id,
+        organisations_in_district: {
+          some: {
+            organisation_id: id,
+          },
+        },
       },
-      select: { district: true },
     });
-    return result.map((item: any) => item?.district);
+    return districts;
   },
 };
