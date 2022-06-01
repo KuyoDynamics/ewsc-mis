@@ -80,12 +80,12 @@ export type ProvinceDistrictsArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  allCountries: Array<Country>;
+  countries: Array<Country>;
   country?: Maybe<Country>;
   district: District;
-  districtsByProvince: Array<District>;
+  districts: Array<District>;
   province: Province;
-  provincesByCountry: Array<Province>;
+  provinces: Array<Province>;
 };
 
 
@@ -102,7 +102,7 @@ export type QueryDistrictArgs = {
 };
 
 
-export type QueryDistrictsByProvinceArgs = {
+export type QueryDistrictsArgs = {
   province_id: Scalars['ID'];
 };
 
@@ -112,7 +112,7 @@ export type QueryProvinceArgs = {
 };
 
 
-export type QueryProvincesByCountryArgs = {
+export type QueryProvincesArgs = {
   country_id: Scalars['ID'];
 };
 
@@ -278,12 +278,12 @@ export type ProvinceResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  allCountries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
+  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
   country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType, Partial<QueryCountryArgs>>;
   district?: Resolver<ResolversTypes['District'], ParentType, ContextType, Partial<QueryDistrictArgs>>;
-  districtsByProvince?: Resolver<Array<ResolversTypes['District']>, ParentType, ContextType, RequireFields<QueryDistrictsByProvinceArgs, 'province_id'>>;
+  districts?: Resolver<Array<ResolversTypes['District']>, ParentType, ContextType, RequireFields<QueryDistrictsArgs, 'province_id'>>;
   province?: Resolver<ResolversTypes['Province'], ParentType, ContextType, RequireFields<QueryProvinceArgs, 'id'>>;
-  provincesByCountry?: Resolver<Array<ResolversTypes['Province']>, ParentType, ContextType, RequireFields<QueryProvincesByCountryArgs, 'country_id'>>;
+  provinces?: Resolver<Array<ResolversTypes['Province']>, ParentType, ContextType, RequireFields<QueryProvincesArgs, 'country_id'>>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{

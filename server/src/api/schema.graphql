@@ -1,10 +1,10 @@
 type Query {
   country(id: ID, code: String, name: String): Country
-  allCountries: [Country!]!
+  countries: [Country!]!
   province(id: ID!): Province!
-  provincesByCountry(country_id: ID!): [Province!]!
+  provinces(country_id: ID!): [Province!]!
   district(id: ID, code: String): District!
-  districtsByProvince(province_id: ID!): [District!]!
+  districts(province_id: ID!): [District!]!
 }
 
 type Country {
