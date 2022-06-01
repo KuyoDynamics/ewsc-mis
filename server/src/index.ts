@@ -6,7 +6,7 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import { PrismaClient } from "@prisma/client";
-import express from "express";
+import express, { Request } from "express";
 import http from "http";
 import {
   typeDefs as scalarTypeDefs,
@@ -16,6 +16,21 @@ import { GraphQLSchema } from "graphql";
 import { resolvers } from "./api/resolvers/resolvers";
 
 const prisma = new PrismaClient();
+
+export type GraphQLContext = {
+  req: Request;
+  prisma: PrismaClient;
+};
+
+export async function createContext(
+  req: Request,
+  prismaClient: PrismaClient
+): Promise<GraphQLContext> {
+  return {
+    req,
+    prisma: prismaClient,
+  };
+}
 
 prisma.$use(async (params, next) => {
   console.log("params", params);
@@ -32,8 +47,6 @@ prisma.$use(async (params, next) => {
   return result;
 });
 
-const pubSub = "";
-
 const typeDefs = fs.readFileSync(
   path.join(path.resolve(), "src/api/schema.graphql"),
   "utf-8"
@@ -47,8 +60,8 @@ const schema = makeExecutableSchema({
 });
 
 async function startApolloServer(
-  _schema: GraphQLSchema,
-  _prisma: PrismaClient
+  gqlSchema: GraphQLSchema,
+  prismaClient: PrismaClient
 ) {
   const app = express();
 
@@ -61,18 +74,14 @@ async function startApolloServer(
     path: "/",
   });
 
-  const wsServerCleanup = useServer({ schema: _schema }, wsServer);
+  const wsServerCleanup = useServer({ schema: gqlSchema }, wsServer);
 
   // 3. Apollo Server
   const server = new ApolloServer({
     schema,
     context: ({ req }) => {
-      return {
-        req,
-        prisma: _prisma,
-        //pubsub,
-        //userId: req && req.headers.authorization ? getUserId(req) : null,
-      };
+      // createContext()
+      return createContext(req, prismaClient);
     },
     csrfPrevention: true,
     plugins: [
