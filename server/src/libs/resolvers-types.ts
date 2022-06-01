@@ -12,6 +12,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Byte: any;
   DateTime: any;
 };
 
@@ -20,11 +21,13 @@ export type Country = {
   code: Scalars['String'];
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
+  flag?: Maybe<Scalars['Byte']>;
   id: Scalars['ID'];
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   name: Scalars['String'];
-  provinces: Array<Province>;
+  organisations?: Maybe<Array<Maybe<Organisation>>>;
+  provinces?: Maybe<Array<Maybe<Province>>>;
 };
 
 export type District = {
@@ -36,8 +39,24 @@ export type District = {
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   name: Scalars['String'];
+  organisations_in_district?: Maybe<Array<Maybe<Organisation>>>;
   province: Province;
   province_id: Scalars['String'];
+};
+
+export type Organisation = {
+  __typename?: 'Organisation';
+  catchment_districts?: Maybe<Array<Maybe<District>>>;
+  catchment_provinces?: Maybe<Array<Maybe<Province>>>;
+  country: Country;
+  country_id: Scalars['String'];
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  id: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  logo?: Maybe<Scalars['Byte']>;
+  name: Scalars['String'];
 };
 
 export type Province = {
@@ -47,24 +66,44 @@ export type Province = {
   country_id?: Maybe<Scalars['String']>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
-  districts: Array<District>;
+  districts?: Maybe<Array<District>>;
   id: Scalars['ID'];
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   name: Scalars['String'];
 };
 
+
+export type ProvinceDistrictsArgs = {
+  catchment_only?: InputMaybe<Scalars['Boolean']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   allCountries: Array<Country>;
-  country: Country;
+  country?: Maybe<Country>;
+  district: District;
+  districtsByProvince: Array<District>;
   province: Province;
   provincesByCountry: Array<Province>;
 };
 
 
 export type QueryCountryArgs = {
-  id: Scalars['ID'];
+  code?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryDistrictArgs = {
+  code?: InputMaybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type QueryDistrictsByProvinceArgs = {
+  province_id: Scalars['ID'];
 };
 
 
@@ -148,10 +187,12 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Byte: ResolverTypeWrapper<Scalars['Byte']>;
   Country: ResolverTypeWrapper<Country>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
   District: ResolverTypeWrapper<District>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  Organisation: ResolverTypeWrapper<Organisation>;
   Province: ResolverTypeWrapper<Province>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -160,24 +201,32 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'];
+  Byte: Scalars['Byte'];
   Country: Country;
   DateTime: Scalars['DateTime'];
   District: District;
   ID: Scalars['ID'];
+  Organisation: Organisation;
   Province: Province;
   Query: {};
   String: Scalars['String'];
 }>;
 
+export interface ByteScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Byte'], any> {
+  name: 'Byte';
+}
+
 export type CountryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = ResolversObject<{
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  flag?: Resolver<Maybe<ResolversTypes['Byte']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  provinces?: Resolver<Array<ResolversTypes['Province']>, ParentType, ContextType>;
+  organisations?: Resolver<Maybe<Array<Maybe<ResolversTypes['Organisation']>>>, ParentType, ContextType>;
+  provinces?: Resolver<Maybe<Array<Maybe<ResolversTypes['Province']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -193,8 +242,24 @@ export type DistrictResolvers<ContextType = any, ParentType extends ResolversPar
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisations_in_district?: Resolver<Maybe<Array<Maybe<ResolversTypes['Organisation']>>>, ParentType, ContextType>;
   province?: Resolver<ResolversTypes['Province'], ParentType, ContextType>;
   province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type OrganisationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Organisation'] = ResolversParentTypes['Organisation']> = ResolversObject<{
+  catchment_districts?: Resolver<Maybe<Array<Maybe<ResolversTypes['District']>>>, ParentType, ContextType>;
+  catchment_provinces?: Resolver<Maybe<Array<Maybe<ResolversTypes['Province']>>>, ParentType, ContextType>;
+  country?: Resolver<ResolversTypes['Country'], ParentType, ContextType>;
+  country_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  logo?: Resolver<Maybe<ResolversTypes['Byte']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -204,7 +269,7 @@ export type ProvinceResolvers<ContextType = any, ParentType extends ResolversPar
   country_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  districts?: Resolver<Array<ResolversTypes['District']>, ParentType, ContextType>;
+  districts?: Resolver<Maybe<Array<ResolversTypes['District']>>, ParentType, ContextType, Partial<ProvinceDistrictsArgs>>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -214,15 +279,19 @@ export type ProvinceResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   allCountries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
-  country?: Resolver<ResolversTypes['Country'], ParentType, ContextType, RequireFields<QueryCountryArgs, 'id'>>;
+  country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType, Partial<QueryCountryArgs>>;
+  district?: Resolver<ResolversTypes['District'], ParentType, ContextType, Partial<QueryDistrictArgs>>;
+  districtsByProvince?: Resolver<Array<ResolversTypes['District']>, ParentType, ContextType, RequireFields<QueryDistrictsByProvinceArgs, 'province_id'>>;
   province?: Resolver<ResolversTypes['Province'], ParentType, ContextType, RequireFields<QueryProvinceArgs, 'id'>>;
   provincesByCountry?: Resolver<Array<ResolversTypes['Province']>, ParentType, ContextType, RequireFields<QueryProvincesByCountryArgs, 'country_id'>>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  Byte?: GraphQLScalarType;
   Country?: CountryResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   District?: DistrictResolvers<ContextType>;
+  Organisation?: OrganisationResolvers<ContextType>;
   Province?: ProvinceResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 }>;

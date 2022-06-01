@@ -13,7 +13,11 @@ A Management Information System for Eastern Water and Sewerage Company.
 - Prisma `^3.14.0`
 - Postgres `14.3`
 - Cubejs
-- Yarn `3.2.1`
+- NPM `8.5.5`
+
+#### Connecting to Postgres database in docker from host machine
+
+`psql -h localhost -p 5432 -d ewsc-mis -U postgres --password`
 
 ### Frontend
 
