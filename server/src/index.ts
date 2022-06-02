@@ -15,7 +15,12 @@ import {
 import { GraphQLSchema } from "graphql";
 import { resolvers } from "./api/resolvers/resolvers";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  rejectOnNotFound: {
+    findUnique: true,
+    findFirst: true,
+  },
+});
 
 export type GraphQLContext = {
   req: Request;

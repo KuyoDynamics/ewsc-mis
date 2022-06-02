@@ -1,15 +1,17 @@
 import { OrganisationResolvers } from "../../../libs/resolvers-types";
 
 export const organisationResolvers: OrganisationResolvers = {
-  country: ({ country_id }, _args, context) => {
-    return context.prisma.country.findUnique({
-      where: {
-        id: country_id,
-      },
-    });
+  country: ({ id }, _args, context) => {
+    return context.prisma.organisation
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .country();
   },
-  catchment_provinces: async ({ id }, _args, context) => {
-    const result = await context.prisma.province.findMany({
+  catchment_provinces: ({ id }, _args, context) => {
+    return context.prisma.province.findMany({
       where: {
         districts: {
           some: {
@@ -22,11 +24,9 @@ export const organisationResolvers: OrganisationResolvers = {
         },
       },
     });
-
-    return result;
   },
   catchment_districts: async ({ id }, _args, context) => {
-    const districts = await context.prisma.district.findMany({
+    return context.prisma.district.findMany({
       where: {
         organisations_in_district: {
           some: {
@@ -35,6 +35,5 @@ export const organisationResolvers: OrganisationResolvers = {
         },
       },
     });
-    return districts;
   },
 };

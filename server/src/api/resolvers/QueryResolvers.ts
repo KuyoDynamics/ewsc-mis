@@ -2,7 +2,8 @@ import { QueryResolvers } from "../../libs/resolvers-types";
 
 export const queryResolvers: QueryResolvers = {
   country: async (_root, { id, code, name }, context) => {
-    const res = await context.prisma.country.findFirst({
+    if (!(id || code || name)) return null;
+    return context.prisma.country.findFirst({
       where: {
         id: id || undefined,
         code: code
@@ -19,7 +20,6 @@ export const queryResolvers: QueryResolvers = {
           : undefined,
       },
     });
-    return res;
   },
   countries: (_root, _args, context) => {
     return context.prisma.country.findMany({});

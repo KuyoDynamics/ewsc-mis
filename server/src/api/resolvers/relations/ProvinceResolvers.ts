@@ -1,12 +1,14 @@
 import { ProvinceResolvers } from "../../../libs/resolvers-types";
 
 export const provinceResolvers: ProvinceResolvers = {
-  country: ({ country_id }, _args, context) => {
-    return context.prisma.country.findUnique({
-      where: {
-        id: country_id,
-      },
-    });
+  country: ({ id }, _args, context) => {
+    return context.prisma.province
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .country();
   },
   districts: async ({ id }, { catchment_only }, context) => {
     const where = catchment_only
@@ -23,8 +25,14 @@ export const provinceResolvers: ProvinceResolvers = {
           province_id: id,
         };
 
-    return context.prisma.district.findMany({
-      where,
-    });
+    return context.prisma.province
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .districts({
+        where,
+      });
   },
 };
