@@ -1,9 +1,9 @@
 type Query {
-  country(id: ID, code: String, name: String): Country
+  country(id: ID, code: String, name: String): Country!
   countries: [Country!]!
   province(id: ID!): Province
   provinces(country_id: ID!): [Province!]!
-  district(id: ID, code: String): District
+  district(id: ID!): District
   districts(province_id: ID!): [District!]!
 }
 
@@ -24,7 +24,7 @@ type Province {
   id: ID!
   code: String!
   name: String!
-  country_id: String
+  country_id: String!
   country: Country
   districts(catchment_only: Boolean): [District!]!
   created_at: DateTime!

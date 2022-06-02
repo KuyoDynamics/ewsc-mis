@@ -1,17 +1,22 @@
+import { GraphQLContext } from "../../..";
 import {
   Organisation,
   OrganisationResolvers,
 } from "../../../libs/resolvers-types";
 
-export const organisationResolvers: OrganisationResolvers = {
-  country: ({ country_id }: Organisation, _args, context) => {
+export const organisationResolvers: OrganisationResolvers<GraphQLContext> = {
+  country: ({ country_id }: Organisation, _args, context): Promise<any> => {
     return context.prisma.country.findUnique({
       where: {
         id: country_id,
       },
     });
   },
-  catchment_provinces: async ({ id }: Organisation, _args, context) => {
+  catchment_provinces: async (
+    { id }: Organisation,
+    _args,
+    context
+  ): Promise<any> => {
     const result = await context.prisma.province.findMany({
       where: {
         districts: {
@@ -28,7 +33,11 @@ export const organisationResolvers: OrganisationResolvers = {
 
     return result;
   },
-  catchment_districts: async ({ id }: Organisation, _args, context) => {
+  catchment_districts: async (
+    { id }: Organisation,
+    _args,
+    context
+  ): Promise<any> => {
     const districts = await context.prisma.district.findMany({
       where: {
         organisations_in_district: {

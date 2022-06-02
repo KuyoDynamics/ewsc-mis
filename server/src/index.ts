@@ -22,10 +22,10 @@ export type GraphQLContext = {
   prisma: PrismaClient;
 };
 
-export async function createContext(
+export function createContext(
   req: Request,
   prismaClient: PrismaClient
-): Promise<GraphQLContext> {
+): GraphQLContext {
   return {
     req,
     prisma: prismaClient,
