@@ -6,6 +6,7 @@
     "sourceRoot": ".",
     "outDir": "dist",
     "strict": true,
+    "noImplicitAny": true,
     "lib": ["ESNext"],
     "esModuleInterop": true,
     "moduleResolution": "Node"

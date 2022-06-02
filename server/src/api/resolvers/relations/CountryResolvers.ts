@@ -1,22 +1,12 @@
 import { CountryResolvers } from "../../../libs/resolvers-types";
+import {
+  getOrganisationsByCountryId,
+  getProvincesByCountryId,
+} from "../../queries";
 
 export const countryResolvers: CountryResolvers = {
-  provinces: async ({ id }, _args, context) => {
-    return context.prisma.country
-      .findUnique({
-        where: {
-          id,
-        },
-      })
-      .provinces();
-  },
-  organisations: ({ id }, _args, context) => {
-    return context.prisma.country
-      .findUnique({
-        where: {
-          id,
-        },
-      })
-      .organisations();
-  },
+  provinces: async ({ id }, _args, context) =>
+    getProvincesByCountryId(id, context),
+  organisations: ({ id }, _args, context) =>
+    getOrganisationsByCountryId(id, context),
 };
