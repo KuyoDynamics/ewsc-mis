@@ -13,7 +13,7 @@ import {
   resolvers as scalarResolvers,
 } from "graphql-scalars";
 import { GraphQLSchema } from "graphql";
-import { resolvers } from "./api/resolvers/resolvers";
+import { resolvers } from "./api/resolvers";
 
 const prisma = new PrismaClient({
   rejectOnNotFound: {
