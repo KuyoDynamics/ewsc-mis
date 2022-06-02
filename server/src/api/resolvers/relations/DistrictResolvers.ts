@@ -1,13 +1,6 @@
 import { DistrictResolvers } from "../../../libs/resolvers-types";
+import { getProvinceByDistrictId } from "../../queries";
 
 export const districtResolvers: DistrictResolvers = {
-  province: ({ id }, _args, context) => {
-    return context.prisma.district
-      .findUnique({
-        where: {
-          id,
-        },
-      })
-      .province();
-  },
+  province: ({ id }, _args, context) => getProvinceByDistrictId(id, context),
 };
