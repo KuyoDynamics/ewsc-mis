@@ -1,8 +1,7 @@
-import { GraphQLContext } from "../../..";
-import { District, DistrictResolvers } from "../../../libs/resolvers-types";
+import { DistrictResolvers } from "../../../libs/resolvers-types";
 
-export const districtResolvers: DistrictResolvers<GraphQLContext> = {
-  province: ({ province_id }: District, _args, context): Promise<any> => {
+export const districtResolvers: DistrictResolvers = {
+  province: ({ province_id }, _args, context) => {
     return context.prisma.province.findUnique({
       where: {
         id: province_id,

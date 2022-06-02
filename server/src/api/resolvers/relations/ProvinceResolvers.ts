@@ -1,19 +1,14 @@
-import { GraphQLContext } from "../../..";
-import { Province, ProvinceResolvers } from "../../../libs/resolvers-types";
+import { ProvinceResolvers } from "../../../libs/resolvers-types";
 
-export const provinceResolvers: ProvinceResolvers<GraphQLContext> = {
-  country: ({ country_id }: Province, _args, context): Promise<any> => {
+export const provinceResolvers: ProvinceResolvers = {
+  country: ({ country_id }, _args, context) => {
     return context.prisma.country.findUnique({
       where: {
         id: country_id,
       },
     });
   },
-  districts: async (
-    { id }: Province,
-    { catchment_only },
-    context
-  ): Promise<any> => {
+  districts: async ({ id }, { catchment_only }, context) => {
     const where = catchment_only
       ? {
           organisations_in_district: {

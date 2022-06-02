@@ -157,7 +157,6 @@ model UserRoleScope {
   user_role_id String   @db.Uuid
   user_role    UserRole @relation(fields: [user_role_id], references: [id])
 
-
   @@unique([scope_level, scope_level_id, user_role_id])
   @@map("user_role_scope")
 }

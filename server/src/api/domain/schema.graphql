@@ -1,10 +1,10 @@
 type Query {
-  country(id: ID, code: String, name: String): Country!
-  countries: [Country!]!
+  country(id: ID, code: String, name: String): Country
+  countries: [Country!]
   province(id: ID!): Province
-  provinces(country_id: ID!): [Province!]!
+  provinces(country_id: ID!): [Province!]
   district(id: ID!): District
-  districts(province_id: ID!): [District!]!
+  districts(province_id: ID!): [District!]
 }
 
 type Country {
@@ -12,8 +12,8 @@ type Country {
   code: String!
   name: String!
   flag: Byte
-  provinces: [Province!]!
-  organisations: [Organisation!]!
+  provinces: [Province!]
+  organisations: [Organisation!]
   created_at: DateTime!
   created_by: String!
   last_modified_at: DateTime!
@@ -26,7 +26,7 @@ type Province {
   name: String!
   country_id: String!
   country: Country
-  districts(catchment_only: Boolean): [District!]!
+  districts(catchment_only: Boolean): [District!]
   created_at: DateTime!
   created_by: String!
   last_modified_at: DateTime!
@@ -38,8 +38,8 @@ type District {
   name: String!
   code: String!
   province_id: String!
-  province: Province!
-  organisations_in_district: [Organisation!]!
+  province: Province
+  organisations_in_district: [Organisation!]
   created_at: DateTime!
   created_by: String!
   last_modified_at: DateTime!
@@ -51,9 +51,9 @@ type Organisation {
   name: String!
   logo: Byte
   country_id: String!
-  country: Country!
-  catchment_districts: [District!]!
-  catchment_provinces: [Province!]!
+  country: Country
+  catchment_districts: [District!]
+  catchment_provinces: [Province!]
   # users: [User]
   created_at: DateTime!
   created_by: String!

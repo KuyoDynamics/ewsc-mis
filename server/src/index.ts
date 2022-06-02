@@ -48,11 +48,9 @@ prisma.$use(async (params, next) => {
 });
 
 const typeDefs = fs.readFileSync(
-  path.join(path.resolve(), "src/api/schema.graphql"),
+  path.join(path.resolve(), "src/api/domain/schema.graphql"),
   "utf-8"
 );
-
-console.log("typeOf Schema", typeof typeDefs);
 
 const schema = makeExecutableSchema({
   typeDefs: [typeDefs, ...scalarTypeDefs],
@@ -80,7 +78,6 @@ async function startApolloServer(
   const server = new ApolloServer({
     schema,
     context: ({ req }) => {
-      // createContext()
       return createContext(req, prismaClient);
     },
     csrfPrevention: true,
@@ -106,7 +103,6 @@ async function startApolloServer(
     app,
   });
 
-  //   Modified server startup
   await new Promise<any>((resolve: any) =>
     httpServer.listen({ port: 4000 }, resolve)
   );
