@@ -5,6 +5,7 @@ function getCatchmentProvincesByOrganisationId(
   id: string,
   context: GraphQLContext
 ) {
+  // TODO: Refactor this too. Use findUnique so Prisma can batch
   return context.prisma.province.findMany({
     where: {
       districts: {
@@ -37,6 +38,8 @@ function getDistrictsByProvinceId(
   context: GraphQLContext,
   catchment_only: InputMaybe<boolean> | undefined
 ) {
+  // TODO: Re-think this logic later
+  // For now focus on other tables
   const where = catchment_only
     ? {
         organisations_in_district: {
@@ -57,9 +60,7 @@ function getDistrictsByProvinceId(
         id,
       },
     })
-    .districts({
-      where,
-    });
+    .districts();
 }
 
 export {

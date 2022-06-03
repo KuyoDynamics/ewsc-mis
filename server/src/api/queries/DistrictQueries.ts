@@ -11,7 +11,7 @@ function getDistrictById(id: string, context: GraphQLContext) {
 function getProvinceByDistrictId(id: string, context: GraphQLContext) {
   return getDistrictById(id, context).province();
 }
-
+// TODO: Refactor this
 function getCatchmentDistrictsByOrganisationId(
   id: string,
   context: GraphQLContext

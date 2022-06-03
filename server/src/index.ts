@@ -20,6 +20,31 @@ const prisma = new PrismaClient({
     findUnique: true,
     findFirst: true,
   },
+  log: [
+    {
+      emit: "event",
+      level: "query",
+    },
+    {
+      emit: "stdout",
+      level: "error",
+    },
+    {
+      emit: "stdout",
+      level: "info",
+    },
+    {
+      emit: "stdout",
+      level: "warn",
+    },
+  ],
+});
+
+prisma.$on("query", (e) => {
+  console.log("Query: " + e.query);
+  console.log("Params: " + e.params);
+  console.log("Duration: " + e.duration + "ms");
+  console.log("\n===================================");
 });
 
 export type GraphQLContext = {
@@ -36,21 +61,6 @@ export function createContext(
     prisma: prismaClient,
   };
 }
-
-prisma.$use(async (params, next) => {
-  console.log("params", params);
-  const before = Date.now();
-
-  const result = await next(params);
-
-  const after = Date.now();
-
-  console.log(
-    `Query ${params.model}.${params.action} took ${after - before}ms`
-  );
-
-  return result;
-});
 
 const typeDefs = fs.readFileSync(
   path.join(path.resolve(), "src/api/domain/schema.graphql"),

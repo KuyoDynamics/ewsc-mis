@@ -1,5 +1,5 @@
 type Query {
-  country(id: ID, code: String, name: String): Country
+  country(id: ID!): Country
   countries: [Country!]
   province(id: ID!): Province
   provinces(country_id: ID!): [Province!]

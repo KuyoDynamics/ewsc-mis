@@ -1,23 +1,10 @@
 import { QueryResolvers } from "../../libs/resolvers-types";
 
 export const queryResolvers: QueryResolvers = {
-  country: async (_root, { id, code, name }, context) => {
-    if (!(id || code || name)) return null;
-    return context.prisma.country.findFirst({
+  country: async (_root, { id }, context) => {
+    return context.prisma.country.findUnique({
       where: {
-        id: id || undefined,
-        code: code
-          ? {
-              equals: code,
-              mode: "insensitive",
-            }
-          : undefined,
-        name: name
-          ? {
-              equals: name,
-              mode: "insensitive",
-            }
-          : undefined,
+        id,
       },
     });
   },
@@ -32,11 +19,13 @@ export const queryResolvers: QueryResolvers = {
     });
   },
   provinces: (_root, { country_id }, context) => {
-    return context.prisma.province.findMany({
-      where: {
-        country_id,
-      },
-    });
+    return context.prisma.country
+      .findUnique({
+        where: {
+          id: country_id,
+        },
+      })
+      .provinces();
   },
   district: (_root, { id }, context) => {
     return context.prisma.district.findUnique({
@@ -46,10 +35,12 @@ export const queryResolvers: QueryResolvers = {
     });
   },
   districts: (_root, { province_id }, context) => {
-    return context.prisma.district.findMany({
-      where: {
-        province_id,
-      },
-    });
+    return context.prisma.province
+      .findUnique({
+        where: {
+          id: province_id,
+        },
+      })
+      .districts();
   },
 };
