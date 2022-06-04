@@ -1,5 +1,8 @@
 import { GraphQLContext } from "../..";
 
+function getCountries(context: GraphQLContext) {
+  return context.prisma.country.findMany({});
+}
 function getCountryById(id: string, context: GraphQLContext) {
   return context.prisma.country.findUnique({
     where: {
@@ -15,4 +18,9 @@ function getProvincesByCountryId(id: string, context: GraphQLContext) {
 function getOrganisationsByCountryId(id: string, context: GraphQLContext) {
   return getCountryById(id, context).organisations();
 }
-export { getProvincesByCountryId, getOrganisationsByCountryId, getCountryById };
+export {
+  getCountries,
+  getProvincesByCountryId,
+  getOrganisationsByCountryId,
+  getCountryById,
+};

@@ -1,46 +1,39 @@
 import { GraphQLContext } from "../..";
-import { PrismaSelect } from "@paljs/plugins";
-import { GraphQLResolveInfo } from "graphql";
 
-function getDistrictById(
-  id: string,
-  context: GraphQLContext,
-  info: GraphQLResolveInfo
-) {
-  const select = new PrismaSelect(info).value;
+function getDistrictById(id: string, context: GraphQLContext) {
   return context.prisma.district.findUnique({
     where: {
       id,
     },
-    ...select,
   });
 }
 
-function getProvinceByDistrictId(
-  id: string,
-  context: GraphQLContext,
-  info: GraphQLResolveInfo
-) {
-  return getDistrictById(id, context, info).province();
-}
-// TODO: Refactor this
-function getCatchmentDistrictsByOrganisationId(
-  id: string,
-  context: GraphQLContext
-) {
-  return context.prisma.district.findMany({
-    where: {
-      organisations_in_district: {
-        some: {
-          organisation_id: id,
-        },
+function getProvinceDistricts(id: string, context: GraphQLContext) {
+  return context.prisma.province
+    .findUnique({
+      where: {
+        id,
       },
-    },
-  });
+    })
+    .districts();
 }
 
-export {
-  getProvinceByDistrictId,
-  getDistrictById,
-  getCatchmentDistrictsByOrganisationId,
-};
+function getOrganisationsInDistrict(id: string, context: GraphQLContext) {
+  return context.prisma.district
+    .findUnique({
+      where: {
+        id,
+      },
+    })
+    .organisations_in_district();
+}
+
+function getDistrictsByProvinceId(id: string, context: GraphQLContext) {
+  return getProvinceDistricts(id, context);
+}
+
+function getDistrictProvince(id: string, context: GraphQLContext) {
+  return getDistrictById(id, context).province();
+}
+
+export { getDistrictProvince, getDistrictById, getDistrictsByProvinceId };

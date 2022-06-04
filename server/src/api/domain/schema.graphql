@@ -1,12 +1,13 @@
 type Query {
-  country(id: ID!): Country
   countries: [Country!]
-  province(id: ID!): Province
+  country(id: ID!): Country
   provinces(country_id: ID!): [Province!]
-  district(id: ID!): District
+  province(id: ID!): Province
   districts(province_id: ID!): [District!]
+  district(id: ID!): District
 }
 
+#===============SYSTEM TABLES==============
 type Country {
   id: ID!
   code: String!
@@ -26,7 +27,7 @@ type Province {
   name: String!
   country_id: String!
   country: Country
-  districts(catchment_only: Boolean): [District!]
+  districts: [District!]
   created_at: DateTime!
   created_by: String!
   last_modified_at: DateTime!
@@ -39,22 +40,58 @@ type District {
   code: String!
   province_id: String!
   province: Province
-  organisations_in_district: [Organisation!]
+  # organisations_in_district: [Organisation!]
   created_at: DateTime!
   created_by: String!
   last_modified_at: DateTime!
   last_modified_by: String!
 }
 
+#===============ORGANISATION MODELS===============
 type Organisation {
-  id: String!
+  id: ID!
   name: String!
   logo: Byte
   country_id: String!
   country: Country
-  catchment_districts: [District!]
-  catchment_provinces: [Province!]
+  catchment_provinces: [CatchmentProvince!]
   # users: [User]
+  created_at: DateTime!
+  created_by: String!
+  last_modified_at: DateTime!
+  last_modified_by: String!
+}
+
+type CatchmentProvince {
+  id: ID!
+  province_id: String!
+  province_name: String!
+  province: Province
+  organisation_id: String!
+  organisation_name: String!
+  organisation: Organisation
+  catchment_districts: [CatchmentDistrict!]
+
+  created_at: DateTime
+  created_by: String
+  last_modified_at: DateTime
+  last_modified_by: String
+}
+
+type CatchmentDistrict {
+  id: ID!
+  district_id: String!
+  district_name: String!
+  district: District
+  catchment_province_id: String!
+  catchment_province_name: String!
+  catchment_province: CatchmentProvince
+  # water_treatment_plants WaterTreatmentPlant[]
+  # service_areas          ServiceArea[]
+  # sewer_treatment_plants SewerTreatmentPlant[]
+  # reports                Report[]
+  # users                  DistrictUser[]
+
   created_at: DateTime!
   created_by: String!
   last_modified_at: DateTime!

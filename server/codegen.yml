@@ -1,4 +1,4 @@
-schema: http://localhost:4000/graphql
+schema: ./src/api/domain/schema.graphql
 generates:
   ./src/libs/resolvers-types.ts:
     config:

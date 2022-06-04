@@ -6,6 +6,7 @@ import {
 
 export const provinceResolvers: ProvinceResolvers = {
   country: ({ id }, _args, context) => getCountryByProvinceId(id, context),
-  districts: async ({ id }, { catchment_only }, context) =>
-    getDistrictsByProvinceId(id, context, catchment_only),
+  districts: (parent, _args, context) => {
+    return getDistrictsByProvinceId(parent.id, context);
+  },
 };

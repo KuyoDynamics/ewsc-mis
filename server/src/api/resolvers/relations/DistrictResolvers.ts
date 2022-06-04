@@ -1,7 +1,8 @@
 import { DistrictResolvers } from "../../../libs/resolvers-types";
-import { getProvinceByDistrictId } from "../../queries";
+import { getDistrictProvince } from "../../queries";
 
 export const districtResolvers: DistrictResolvers = {
-  province: ({ id }, _args, context, info) =>
-    getProvinceByDistrictId(id, context, info),
+  province: ({ id }, _args, context) => getDistrictProvince(id, context),
+  // organisations_in_district: ({ id }, _args, context) =>
+  //   getOrganisationsInDistrict(id, context),
 };

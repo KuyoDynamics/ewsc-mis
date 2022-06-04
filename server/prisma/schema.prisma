@@ -45,6 +45,7 @@ model Province {
   country_id String     @db.Uuid
   country    Country    @relation(fields: [country_id], references: [id])
   districts  District[]
+  organisations_in_province CatchmentProvince[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -65,7 +66,7 @@ model District {
   // Relation Fields
   province_id               String              @db.Uuid
   province                  Province            @relation(fields: [province_id], references: [id])
-  organisations_in_district CatchmentDistrict[] @relation("organisations_in_district")
+  organisations_in_district CatchmentDistrict[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -86,7 +87,7 @@ model Organisation {
   // Relation Fields
   country_id          String              @db.Uuid
   country             Country             @relation(fields: [country_id], references: [id])
-  catchment_districts CatchmentDistrict[]
+  catchment_provinces CatchmentProvince[]
   users               OrganisationUser[]
 
 
@@ -211,10 +212,10 @@ model CatchmentDistrict {
 
   // Relation Fields
   district_id String   @db.Uuid
-  district    District @relation("organisations_in_district", fields: [district_id], references: [id])
+  district    District @relation(fields: [district_id], references: [id])
 
-  organisation_id String       @db.Uuid
-  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+  catchment_province_id String       @db.Uuid
+  catchment_province    CatchmentProvince @relation(fields: [catchment_province_id], references: [id])
 
   water_treatment_plants WaterTreatmentPlant[]
   service_areas          ServiceArea[]
@@ -229,9 +230,35 @@ model CatchmentDistrict {
   last_modified_by String
 
   // Constraints
-  @@unique([organisation_id, district_id])
+  @@unique([catchment_province_id, district_id])
   @@map("catchment_district")
 }
+
+model CatchmentProvince {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Relation Fields
+  province_id String   @db.Uuid
+  province    Province @relation(fields: [province_id], references: [id])
+
+  organisation_id String       @db.Uuid
+  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+
+  catchment_districts CatchmentDistrict[]
+
+
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  // @@unique([organisation_id, district_id])
+  @@map("catchment_province")
+}
+
 
 //=============================WATER====================================
 

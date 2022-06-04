@@ -1,5 +1,7 @@
 import { Resolvers } from "../../libs/resolvers-types";
 import { queryResolvers } from "./QueryResolvers";
+import { catchmentDistrictResolvers } from "./relations/CatchmentDistrictResolvers";
+import { catchmentProvinceResolvers } from "./relations/CatchmentProvinceResolvers";
 import { countryResolvers } from "./relations/CountryResolvers";
 import { districtResolvers } from "./relations/DistrictResolvers";
 import { organisationResolvers } from "./relations/OrganisationResolvers";
@@ -13,4 +15,6 @@ export const resolvers: Resolvers = {
   Province: provinceResolvers,
   District: districtResolvers,
   Organisation: organisationResolvers,
+  CatchmentProvince: catchmentProvinceResolvers,
+  CatchmentDistrict: catchmentDistrictResolvers,
 };
