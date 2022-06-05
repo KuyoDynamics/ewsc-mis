@@ -1,14 +1,16 @@
 import { Resolvers } from "../../libs/resolvers-types";
+import { mutationResolvers } from "./MutationResolvers";
 import { queryResolvers } from "./QueryResolvers";
-import { catchmentDistrictResolvers } from "./relations/CatchmentDistrictResolvers";
-import { catchmentProvinceResolvers } from "./relations/CatchmentProvinceResolvers";
-import { countryResolvers } from "./relations/CountryResolvers";
-import { districtResolvers } from "./relations/DistrictResolvers";
-import { organisationResolvers } from "./relations/OrganisationResolvers";
-import { provinceResolvers } from "./relations/ProvinceResolvers";
+import { catchmentDistrictResolvers } from "./relation fields/CatchmentDistrictResolvers";
+import { catchmentProvinceResolvers } from "./relation fields/CatchmentProvinceResolvers";
+import { countryResolvers } from "./relation fields/CountryResolvers";
+import { districtResolvers } from "./relation fields/DistrictResolvers";
+import { organisationResolvers } from "./relation fields/OrganisationResolvers";
+import { provinceResolvers } from "./relation fields/ProvinceResolvers";
 
 export const resolvers: Resolvers = {
   Query: queryResolvers,
+  Mutation: mutationResolvers,
 
   //==================Relation Fields Resolvers===================
   Country: countryResolvers,
