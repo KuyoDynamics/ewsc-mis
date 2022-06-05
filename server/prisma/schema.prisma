@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+   previewFeatures = ["fullTextSearch"]
 }
 
 // generator erd {
@@ -37,13 +38,14 @@ model Country {
 
 model Province {
   id   String @id @default(uuid()) @db.Uuid
-  code String
+  code String @unique
   name String
 
   // Relation Fields
   country_id String     @db.Uuid
   country    Country    @relation(fields: [country_id], references: [id])
   districts  District[]
+  organisations_in_province CatchmentProvince[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -52,19 +54,19 @@ model Province {
   last_modified_by String
 
   // Constraints
-  @@unique([code, name, country_id])
+  @@unique([name, country_id])
   @@map("province")
 }
 
 model District {
   id   String @id @default(uuid()) @db.Uuid
   name String
-  code String
+  code String @unique
 
   // Relation Fields
   province_id               String              @db.Uuid
   province                  Province            @relation(fields: [province_id], references: [id])
-  organisations_in_district CatchmentDistrict[] @relation("organisations_in_district")
+  organisations_in_district CatchmentDistrict[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -73,7 +75,7 @@ model District {
   last_modified_by String
 
   // Constraints
-  @@unique([name, code, province_id])
+  @@unique([name, province_id])
   @@map("district")
 }
 
@@ -85,7 +87,7 @@ model Organisation {
   // Relation Fields
   country_id          String              @db.Uuid
   country             Country             @relation(fields: [country_id], references: [id])
-  catchment_districts CatchmentDistrict[]
+  catchment_provinces CatchmentProvince[]
   users               OrganisationUser[]
 
 
@@ -106,11 +108,11 @@ model User {
   last_name                   String
   email                       String   @unique
   password                    String
-  hashed_confirmation_token   String
+  hashed_confirmation_token   String?
   confirmed_at                DateTime @db.Timestamptz()
-  hashed_password_reset_token String
+  hashed_password_reset_token String?
   last_login                  DateTime @db.Timestamptz()
-  theme                       String
+  theme                       String?
 
   // Relation Fields
   user_organisations OrganisationUser[]
@@ -128,7 +130,7 @@ model User {
 
 model UserRole {
   id   String       @id @default(uuid()) @db.Uuid
-  role UserRoleType
+  role UserRoleType @default(USER)
 
   // Relation Fields
   user_id String @db.Uuid
@@ -155,7 +157,6 @@ model UserRoleScope {
   // Relations Fields
   user_role_id String   @db.Uuid
   user_role    UserRole @relation(fields: [user_role_id], references: [id])
-
 
   @@unique([scope_level, scope_level_id, user_role_id])
   @@map("user_role_scope")
@@ -211,10 +212,10 @@ model CatchmentDistrict {
 
   // Relation Fields
   district_id String   @db.Uuid
-  district    District @relation("organisations_in_district", fields: [district_id], references: [id])
+  district    District @relation(fields: [district_id], references: [id])
 
-  organisation_id String       @db.Uuid
-  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+  catchment_province_id String       @db.Uuid
+  catchment_province    CatchmentProvince @relation(fields: [catchment_province_id], references: [id])
 
   water_treatment_plants WaterTreatmentPlant[]
   service_areas          ServiceArea[]
@@ -229,9 +230,35 @@ model CatchmentDistrict {
   last_modified_by String
 
   // Constraints
-  @@unique([organisation_id, district_id])
+  @@unique([catchment_province_id, district_id])
   @@map("catchment_district")
 }
+
+model CatchmentProvince {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Relation Fields
+  province_id String   @db.Uuid
+  province    Province @relation(fields: [province_id], references: [id])
+
+  organisation_id String       @db.Uuid
+  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+
+  catchment_districts CatchmentDistrict[]
+
+
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  // @@unique([organisation_id, district_id])
+  @@map("catchment_province")
+}
+
 
 //=============================WATER====================================
 
@@ -421,7 +448,7 @@ model SewerNetwork {
 }
 
 model ServiceAreaSewerConnection {
-  connections BigInt
+  connections Int
 
   // Relation Fields
   sewer_netowrk_id String       @db.Uuid
