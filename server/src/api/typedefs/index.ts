@@ -1,3 +1,4 @@
+import { typeDefs as scalarTypeDefs } from "graphql-scalars";
 import { CountryTypeDefs } from "../country/index";
 import { ProvinceTypeDefs } from "../province/index";
 import { DistrictTypeDefs } from "../district/index";
@@ -12,4 +13,5 @@ export default [
   OrganisationTypeDefs,
   CatchmentProvinceTypeDefs,
   CatchmentDistrictTypeDefs,
+  scalarTypeDefs,
 ];

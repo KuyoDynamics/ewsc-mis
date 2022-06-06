@@ -69,7 +69,6 @@ const typeDefs = gql`
 `;
 
 const resolvers: Resolvers = {
-  Query: {},
   Mutation: {
     createProvince: (_, args, context) => createProvince(args, context),
     deleteProvince: (_, args, context) =>

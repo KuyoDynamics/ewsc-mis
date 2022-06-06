@@ -1,6 +1,17 @@
-export { CountryResolvers } from "../country/index";
-export { ProvinceResolvers } from "../province/index";
-export { DistrictResolvers } from "../district/index";
-export { OrganisationResolvers } from "../organisation/index";
-export { CatchmentProvinceResolvers } from "../catchment-province/index";
-export { CatchmentDistrictResolvers } from "../catchment-district/index";
+import { resolvers as scalarResolvers } from "graphql-scalars";
+import { CountryResolvers } from "../country/index";
+import { ProvinceResolvers } from "../province/index";
+import { DistrictResolvers } from "../district/index";
+import { OrganisationResolvers } from "../organisation/index";
+import { CatchmentProvinceResolvers } from "../catchment-province/index";
+import { CatchmentDistrictResolvers } from "../catchment-district/index";
+
+export default [
+  CountryResolvers,
+  ProvinceResolvers,
+  DistrictResolvers,
+  OrganisationResolvers,
+  CatchmentProvinceResolvers,
+  CatchmentDistrictResolvers,
+  scalarResolvers,
+];

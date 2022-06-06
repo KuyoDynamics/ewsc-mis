@@ -1,29 +1,11 @@
-import {
-  typeDefs as scalarTypeDefs,
-  resolvers as scalarResolvers,
-} from "graphql-scalars";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import { mergeResolvers } from "@graphql-tools/merge";
 import typeDefs from "../typedefs";
-import {
-  CountryResolvers,
-  ProvinceResolvers,
-  DistrictResolvers,
-  CatchmentDistrictResolvers,
-  CatchmentProvinceResolvers,
-  OrganisationResolvers,
-} from "../resolvers";
+import resolvers from "../resolvers";
 
 const schema = makeExecutableSchema({
-  typeDefs: [...typeDefs, ...scalarTypeDefs],
-  resolvers: {
-    ...CountryResolvers,
-    ...ProvinceResolvers,
-    ...DistrictResolvers,
-    ...OrganisationResolvers,
-    ...CatchmentDistrictResolvers,
-    ...CatchmentProvinceResolvers,
-    ...scalarResolvers,
-  },
+  typeDefs: [...typeDefs],
+  resolvers: mergeResolvers(resolvers),
 });
 
 export default schema;
