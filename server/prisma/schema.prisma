@@ -109,10 +109,10 @@ model User {
   email                       String   @unique
   password                    String
   hashed_confirmation_token   String?
-  confirmed_at                DateTime @db.Timestamptz()
+  confirmed_at                DateTime? @db.Timestamptz()
   hashed_password_reset_token String?
-  last_login                  DateTime @db.Timestamptz()
-  theme                       String?
+  last_login                  DateTime? @db.Timestamptz()
+  theme                       UserTheme? @default(LIGHT)
 
   // Relation Fields
   user_organisations OrganisationUser[]
@@ -816,4 +816,11 @@ enum WaterSourceType {
   GROUND   @map("ground")
 
   @@map("water_source_type")
+}
+
+enum UserTheme {
+  DARK @map("dark")
+  LIGHT @map("light")
+
+  @@map("user_theme")
 }

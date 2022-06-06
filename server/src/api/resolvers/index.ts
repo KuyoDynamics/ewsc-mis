@@ -1,22 +1,6 @@
-import { Resolvers } from "../../libs/resolvers-types";
-import { mutationResolvers } from "./MutationResolvers";
-import { queryResolvers } from "./QueryResolvers";
-import { catchmentDistrictResolvers } from "./relation fields/CatchmentDistrictResolvers";
-import { catchmentProvinceResolvers } from "./relation fields/CatchmentProvinceResolvers";
-import { countryResolvers } from "./relation fields/CountryResolvers";
-import { districtResolvers } from "./relation fields/DistrictResolvers";
-import { organisationResolvers } from "./relation fields/OrganisationResolvers";
-import { provinceResolvers } from "./relation fields/ProvinceResolvers";
-
-export const resolvers: Resolvers = {
-  Query: queryResolvers,
-  Mutation: mutationResolvers,
-
-  //==================Relation Fields Resolvers===================
-  Country: countryResolvers,
-  Province: provinceResolvers,
-  District: districtResolvers,
-  Organisation: organisationResolvers,
-  CatchmentProvince: catchmentProvinceResolvers,
-  CatchmentDistrict: catchmentDistrictResolvers,
-};
+export { CountryResolvers } from "../country/index";
+export { ProvinceResolvers } from "../province/index";
+export { DistrictResolvers } from "../district/index";
+export { OrganisationResolvers } from "../organisation/index";
+export { CatchmentProvinceResolvers } from "../catchment-province/index";
+export { CatchmentDistrictResolvers } from "../catchment-district/index";
