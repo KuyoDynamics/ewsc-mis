@@ -24,12 +24,12 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
-  extend type Query {
+  type Query {
     countries: [Country!]
     country(id: ID!): Country
   }
 
-  extend type Mutation {
+  type Mutation {
     createCountry(input: CreateCountryInput!): CreateCountryPayload
     deleteCountry(input: DeleteCountryInput!): DeleteCountryPayload
     updateCountry(input: UpdateCountryInput!): UpdateCountryPayload

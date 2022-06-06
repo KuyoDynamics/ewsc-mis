@@ -3,12 +3,27 @@ import {
   resolvers as scalarResolvers,
 } from "graphql-scalars";
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import * as typeDefs from "../typedefs";
-import * as resolvers from "../resolvers";
+import typeDefs from "../typedefs";
+import {
+  CountryResolvers,
+  ProvinceResolvers,
+  DistrictResolvers,
+  CatchmentDistrictResolvers,
+  CatchmentProvinceResolvers,
+  OrganisationResolvers,
+} from "../resolvers";
 
 const schema = makeExecutableSchema({
   typeDefs: [...typeDefs, ...scalarTypeDefs],
-  resolvers: { ...resolvers, ...scalarResolvers },
+  resolvers: {
+    ...CountryResolvers,
+    ...ProvinceResolvers,
+    ...DistrictResolvers,
+    ...OrganisationResolvers,
+    ...CatchmentDistrictResolvers,
+    ...CatchmentProvinceResolvers,
+    ...scalarResolvers,
+  },
 });
 
 export default schema;

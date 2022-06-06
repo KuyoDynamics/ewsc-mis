@@ -6,6 +6,7 @@ import {
 } from "../../libs/resolvers-types";
 
 function getCountries(context: GraphQLContext) {
+  console.log("Chaiwa,is this called");
   return context.prisma.country.findMany({});
 }
 function getCountryById(id: string, context: GraphQLContext) {
