@@ -14,7 +14,7 @@ import {
 const typeDefs = gql`
   type CatchmentProvince {
     id: ID!
-    active: Boolean!
+    disabled: Boolean!
     province_id: String!
     province_name: String!
     province: Province
@@ -61,7 +61,7 @@ const typeDefs = gql`
   }
 
   input CatchmentProvinceUpdateInput {
-    active: Boolean!
+    disabled: Boolean!
   }
 
   type UpdateCatchmentProvincePayload {

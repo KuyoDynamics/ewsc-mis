@@ -83,7 +83,7 @@ async function updateCatchmentProvince(
       id: args.input.id,
     },
     data: {
-      active: args.input.update.active,
+      disabled: args.input.update.disabled,
       last_modified_by: context.user.email,
     },
     include: {

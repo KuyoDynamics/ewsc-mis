@@ -209,6 +209,7 @@ model DistrictUser {
 
 model CatchmentDistrict {
   id String @id @default(uuid()) @db.Uuid
+  disabled Boolean @default(true)
 
   // Relation Fields
   district_id String   @db.Uuid
@@ -236,7 +237,7 @@ model CatchmentDistrict {
 
 model CatchmentProvince {
   id String @id @default(uuid()) @db.Uuid
-  active Boolean @default(true)
+  disabled Boolean @default(true)
 
   // Relation Fields
   province_id String   @db.Uuid
