@@ -1,22 +1,17 @@
-import { Resolvers } from "../../libs/resolvers-types";
-import { mutationResolvers } from "./MutationResolvers";
-import { queryResolvers } from "./QueryResolvers";
-import { catchmentDistrictResolvers } from "./relation fields/CatchmentDistrictResolvers";
-import { catchmentProvinceResolvers } from "./relation fields/CatchmentProvinceResolvers";
-import { countryResolvers } from "./relation fields/CountryResolvers";
-import { districtResolvers } from "./relation fields/DistrictResolvers";
-import { organisationResolvers } from "./relation fields/OrganisationResolvers";
-import { provinceResolvers } from "./relation fields/ProvinceResolvers";
+import { resolvers as scalarResolvers } from "graphql-scalars";
+import { CountryResolvers } from "../country/index";
+import { ProvinceResolvers } from "../province/index";
+import { DistrictResolvers } from "../district/index";
+import { OrganisationResolvers } from "../organisation/index";
+import { CatchmentProvinceResolvers } from "../catchment-province/index";
+import { CatchmentDistrictResolvers } from "../catchment-district/index";
 
-export const resolvers: Resolvers = {
-  Query: queryResolvers,
-  Mutation: mutationResolvers,
-
-  //==================Relation Fields Resolvers===================
-  Country: countryResolvers,
-  Province: provinceResolvers,
-  District: districtResolvers,
-  Organisation: organisationResolvers,
-  CatchmentProvince: catchmentProvinceResolvers,
-  CatchmentDistrict: catchmentDistrictResolvers,
-};
+export default [
+  CountryResolvers,
+  ProvinceResolvers,
+  DistrictResolvers,
+  OrganisationResolvers,
+  CatchmentProvinceResolvers,
+  CatchmentDistrictResolvers,
+  scalarResolvers,
+];

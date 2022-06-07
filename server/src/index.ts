@@ -1,19 +1,13 @@
-import fs from "fs";
-import path from "path";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
-import { makeExecutableSchema } from "@graphql-tools/schema";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import express, { Request } from "express";
 import http from "http";
-import {
-  typeDefs as scalarTypeDefs,
-  resolvers as scalarResolvers,
-} from "graphql-scalars";
+
 import { GraphQLSchema } from "graphql";
-import { resolvers } from "./api/resolvers";
+import { schema } from "./api/schema";
 
 const prisma = new PrismaClient({
   rejectOnNotFound: {
@@ -50,6 +44,7 @@ prisma.$on("query", (e) => {
 export type GraphQLContext = {
   req: Request;
   prisma: PrismaClient;
+  user: User;
 };
 
 export function createContext(
@@ -59,18 +54,25 @@ export function createContext(
   return {
     req,
     prisma: prismaClient,
+    // Replace this currently logged-in user
+    user: {
+      id: "f37beb05-fd36-4046-81a2-33b7051d1ff6",
+      first_name: "Berian",
+      last_name: "Chaiwa",
+      last_login: new Date(),
+      last_modified_at: new Date(),
+      created_at: new Date(),
+      created_by: "chaiwa@kuyodynamics.com",
+      email: "chaiwa@kuyodynamics.com",
+      last_modified_by: "chaiwa@kuyodynamics.com",
+      password: "password",
+      theme: null,
+      confirmed_at: null,
+      hashed_confirmation_token: null,
+      hashed_password_reset_token: null,
+    },
   };
 }
-
-const typeDefs = fs.readFileSync(
-  path.join(path.resolve(), "src/api/domain/schema.graphql"),
-  "utf-8"
-);
-
-const schema = makeExecutableSchema({
-  typeDefs: [typeDefs, ...scalarTypeDefs],
-  resolvers: { ...resolvers, ...scalarResolvers },
-});
 
 async function startApolloServer(
   gqlSchema: GraphQLSchema,

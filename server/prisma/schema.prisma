@@ -109,10 +109,10 @@ model User {
   email                       String   @unique
   password                    String
   hashed_confirmation_token   String?
-  confirmed_at                DateTime @db.Timestamptz()
+  confirmed_at                DateTime? @db.Timestamptz()
   hashed_password_reset_token String?
-  last_login                  DateTime @db.Timestamptz()
-  theme                       String?
+  last_login                  DateTime? @db.Timestamptz()
+  theme                       UserTheme? @default(LIGHT)
 
   // Relation Fields
   user_organisations OrganisationUser[]
@@ -236,6 +236,7 @@ model CatchmentDistrict {
 
 model CatchmentProvince {
   id String @id @default(uuid()) @db.Uuid
+  active Boolean @default(true)
 
   // Relation Fields
   province_id String   @db.Uuid
@@ -255,7 +256,7 @@ model CatchmentProvince {
   last_modified_by String
 
   // Constraints
-  // @@unique([organisation_id, district_id])
+  @@unique([organisation_id, province_id])
   @@map("catchment_province")
 }
 
@@ -816,4 +817,11 @@ enum WaterSourceType {
   GROUND   @map("ground")
 
   @@map("water_source_type")
+}
+
+enum UserTheme {
+  DARK @map("dark")
+  LIGHT @map("light")
+
+  @@map("user_theme")
 }
