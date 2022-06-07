@@ -236,6 +236,7 @@ model CatchmentDistrict {
 
 model CatchmentProvince {
   id String @id @default(uuid()) @db.Uuid
+  active Boolean @default(true)
 
   // Relation Fields
   province_id String   @db.Uuid
@@ -255,7 +256,7 @@ model CatchmentProvince {
   last_modified_by String
 
   // Constraints
-  // @@unique([organisation_id, district_id])
+  @@unique([organisation_id, province_id])
   @@map("catchment_province")
 }
 

@@ -1,6 +1,15 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getCatchmentProvinces, getCountryByOrganisationId } from "../queries";
+import {
+  createOrganisation,
+  deleteOrganisation,
+  getAllOrganisations,
+  getCatchmentProvinces,
+  getCountryByOrganisationId,
+  getOrganisationById,
+  getOrganisationsByCountryId,
+  updateOrganisation,
+} from "../queries";
 
 const typeDefs = gql`
   type Organisation {
@@ -17,6 +26,24 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
+  type Query {
+    allOrganisations: [Organisation!]
+    organisations(country_id: ID!): [Organisation!]
+    organisation(id: ID!): Organisation
+  }
+
+  type Mutation {
+    createOrganisation(
+      input: CreateOrganisationInput!
+    ): CreateOrganisationPayload
+    updateOrganisation(
+      input: UpdateOrganisationInput!
+    ): UpdateOrganisationPayload
+    deleteOrganisation(
+      input: DeleteOrganisationInput!
+    ): DeleteOrganisationPayload
+  }
+
   input CreateOrganisationInput {
     name: String!
     logo: Byte
@@ -25,11 +52,50 @@ const typeDefs = gql`
     # users: [User]
   }
 
+  type CreateOrganisationPayload {
+    organisation: Organisation
+  }
+
+  input UpdateOrganisationInput {
+    id: ID!
+    update: OrganisationUpdateInput!
+  }
+
+  input OrganisationUpdateInput {
+    name: String
+    logo: Byte
+  }
+
+  type UpdateOrganisationPayload {
+    organisation: Organisation
+  }
+
+  input DeleteOrganisationInput {
+    id: ID!
+  }
+
+  type DeleteOrganisationPayload {
+    organisation: Organisation
+  }
+
   scalar DateTime
   scalar Byte
 `;
 
 const resolvers: Resolvers = {
+  Query: {
+    allOrganisations: (_, _args, context) => getAllOrganisations(context),
+    organisations: (_, args, context) =>
+      getOrganisationsByCountryId(args.country_id, context),
+    organisation: (_, args, context) => getOrganisationById(args.id, context),
+  },
+
+  Mutation: {
+    createOrganisation: (_, args, context) => createOrganisation(args, context),
+    updateOrganisation: (_, args, context) => updateOrganisation(args, context),
+    deleteOrganisation: (_, args, context) =>
+      deleteOrganisation(args.input.id, context),
+  },
   Organisation: {
     country: (parent, _args, context) =>
       getCountryByOrganisationId(parent.id, context),

@@ -8,4 +8,4 @@ const schema = makeExecutableSchema({
   resolvers: mergeResolvers(resolvers),
 });
 
-export default schema;
+export { schema };

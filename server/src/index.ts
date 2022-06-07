@@ -7,7 +7,7 @@ import express, { Request } from "express";
 import http from "http";
 
 import { GraphQLSchema } from "graphql";
-import schema from "./api/schema";
+import { schema } from "./api/schema";
 
 const prisma = new PrismaClient({
   rejectOnNotFound: {

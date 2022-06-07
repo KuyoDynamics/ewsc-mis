@@ -5,6 +5,8 @@ import {
   deleteProvince,
   getCountryByProvinceId,
   getDistrictsByProvinceId,
+  getProvinceById,
+  getProvincesByCountryId,
   updateProvince,
 } from "../queries";
 
@@ -69,6 +71,11 @@ const typeDefs = gql`
 `;
 
 const resolvers: Resolvers = {
+  Query: {
+    provinces: (_, args, context) =>
+      getProvincesByCountryId(args.country_id, context),
+    province: (_, args, context) => getProvinceById(args.id, context),
+  },
   Mutation: {
     createProvince: (_, args, context) => createProvince(args, context),
     deleteProvince: (_, args, context) =>
