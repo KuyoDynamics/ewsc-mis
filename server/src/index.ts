@@ -81,7 +81,6 @@ async function startApolloServer(
   prismaClient: PrismaClient
 ) {
   dotenv.config();
-  console.log("process.env", process.env);
 
   const app = express();
 
