@@ -5,8 +5,9 @@ import { useServer } from "graphql-ws/lib/use/ws";
 import { PrismaClient, User } from "@prisma/client";
 import express, { Request } from "express";
 import http from "http";
-
 import { GraphQLSchema } from "graphql";
+import dotenv from "dotenv";
+
 import { schema } from "./api/schema";
 
 const prisma = new PrismaClient({
@@ -70,6 +71,7 @@ export function createContext(
       confirmed_at: null,
       hashed_confirmation_token: null,
       hashed_password_reset_token: null,
+      disabled: false,
     },
   };
 }
@@ -78,6 +80,9 @@ async function startApolloServer(
   gqlSchema: GraphQLSchema,
   prismaClient: PrismaClient
 ) {
+  dotenv.config();
+  console.log("process.env", process.env);
+
   const app = express();
 
   // 1. Http Server
@@ -121,7 +126,7 @@ async function startApolloServer(
   });
 
   await new Promise<any>((resolve: any) =>
-    httpServer.listen({ port: 4000 }, resolve)
+    httpServer.listen({ port: process.env.PORT }, resolve)
   );
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`);
 }
