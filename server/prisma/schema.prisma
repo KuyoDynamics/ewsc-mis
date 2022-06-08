@@ -145,6 +145,7 @@ model UserRole {
   last_modified_by String
 
   // Constraints
+  @@unique([role, user_id])
   @@map("user_role")
 }
 

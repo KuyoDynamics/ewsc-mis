@@ -1,5 +1,6 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
+import { getUserRoles } from "../user-role/queries";
 import {
   createUser,
   deleteUser,
@@ -17,7 +18,7 @@ const typeDefs = gql`
     email: String!
     disabled: Boolean
     # user_organisations: [OrganisationUser!]
-    # user_roles: [UserRole!]
+    user_roles: [UserRole!]
     # hashed_confirmation_token: String
     confirmed_at: DateTime
     # hashed_password_reset_token: String
@@ -96,6 +97,10 @@ const typeDefs = gql`
 `;
 
 const resolvers: Resolvers = {
+  User: {
+    user_roles: (parent, _args, context) =>
+      getUserRoles({ user_id: parent.id }, context),
+  },
   Query: {
     users: (_, _args, context) => getUsers(context),
     user: (_, args, context) => getUser(args, context),
