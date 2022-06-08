@@ -5,6 +5,7 @@ import { DistrictResolvers } from "../district/index";
 import { OrganisationResolvers } from "../organisation/index";
 import { CatchmentProvinceResolvers } from "../catchment-province/index";
 import { CatchmentDistrictResolvers } from "../catchment-district/index";
+import { UserResolvers } from "../user";
 
 export default [
   CountryResolvers,
@@ -13,5 +14,6 @@ export default [
   OrganisationResolvers,
   CatchmentProvinceResolvers,
   CatchmentDistrictResolvers,
+  UserResolvers,
   scalarResolvers,
 ];
