@@ -300,21 +300,12 @@ export type CreateUserInput = {
   first_name: Scalars['String'];
   last_name: Scalars['String'];
   password: Scalars['String'];
+  user_roles: Array<UserRoleType>;
 };
 
 export type CreateUserPayoad = {
   __typename?: 'CreateUserPayoad';
   user?: Maybe<User>;
-};
-
-export type CreateUserRoleInput = {
-  role: UserRoleType;
-  user_id: Scalars['String'];
-};
-
-export type CreateUserRolePayload = {
-  __typename?: 'CreateUserRolePayload';
-  user_role?: Maybe<UserRole>;
 };
 
 export type DeleteCatchmentDistrictInput = {
@@ -380,15 +371,6 @@ export type DeleteUserPayload = {
   user?: Maybe<User>;
 };
 
-export type DeleteUserRoleInput = {
-  id: Scalars['ID'];
-};
-
-export type DeleteUserRolePayload = {
-  __typename?: 'DeleteUserRolePayload';
-  user_role?: Maybe<UserRole>;
-};
-
 export type DisableUserInput = {
   id: Scalars['ID'];
   update: UserDisableInput;
@@ -426,7 +408,6 @@ export type Mutation = {
   createOrganisation?: Maybe<CreateOrganisationPayload>;
   createProvince?: Maybe<CreateProvincePayload>;
   createUser?: Maybe<CreateUserPayoad>;
-  createUserRole?: Maybe<CreateUserRolePayload>;
   deleteCatchmentDistrict?: Maybe<DeleteCatchmentDistrictPayload>;
   deleteCatchmentProvince?: Maybe<DeleteCatchmentProvincePayload>;
   deleteCountry?: Maybe<DeleteCountryPayload>;
@@ -434,7 +415,6 @@ export type Mutation = {
   deleteOrganisation?: Maybe<DeleteOrganisationPayload>;
   deleteProvince?: Maybe<DeleteProvincePayload>;
   deleteUser?: Maybe<DeleteUserPayload>;
-  deleteUserRole?: Maybe<DeleteUserRolePayload>;
   disableUser?: Maybe<DisableUserPayload>;
   updateCatchmentDistrict?: Maybe<UpdateCatchmentDistrictPayload>;
   updateCatchmentProvince?: Maybe<UpdateCatchmentProvincePayload>;
@@ -481,11 +461,6 @@ export type MutationCreateUserArgs = {
 };
 
 
-export type MutationCreateUserRoleArgs = {
-  input: CreateUserRoleInput;
-};
-
-
 export type MutationDeleteCatchmentDistrictArgs = {
   input: DeleteCatchmentDistrictInput;
 };
@@ -518,11 +493,6 @@ export type MutationDeleteProvinceArgs = {
 
 export type MutationDeleteUserArgs = {
   input: DeleteUserInput;
-};
-
-
-export type MutationDeleteUserRoleArgs = {
-  input: DeleteUserRoleInput;
 };
 
 
@@ -619,8 +589,6 @@ export type Query = {
   province?: Maybe<Province>;
   provinces?: Maybe<Array<Province>>;
   user?: Maybe<User>;
-  user_role?: Maybe<UserRole>;
-  user_roles?: Maybe<Array<UserRole>>;
   users?: Maybe<Array<User>>;
 };
 
@@ -682,16 +650,6 @@ export type QueryProvincesArgs = {
 
 export type QueryUserArgs = {
   id: Scalars['ID'];
-};
-
-
-export type QueryUser_RoleArgs = {
-  role_id: Scalars['ID'];
-};
-
-
-export type QueryUser_RolesArgs = {
-  user_id: Scalars['ID'];
 };
 
 export type UpdateCatchmentDistrictInput = {
@@ -778,23 +736,11 @@ export type User = {
   last_modified_by: Scalars['String'];
   last_name: Scalars['String'];
   theme?: Maybe<UserTheme>;
-  user_roles?: Maybe<Array<UserRole>>;
+  user_roles: Array<UserRoleType>;
 };
 
 export type UserDisableInput = {
   disabled: Scalars['Boolean'];
-};
-
-export type UserRole = {
-  __typename?: 'UserRole';
-  created_at: Scalars['DateTime'];
-  created_by: Scalars['String'];
-  id: Scalars['ID'];
-  last_modified_at: Scalars['DateTime'];
-  last_modified_by: Scalars['String'];
-  role?: Maybe<UserRoleType>;
-  user?: Maybe<User>;
-  user_id: Scalars['String'];
 };
 
 export enum UserRoleType {
@@ -814,6 +760,7 @@ export type UserUpdateInput = {
   first_name?: InputMaybe<Scalars['String']>;
   last_name?: InputMaybe<Scalars['String']>;
   theme?: InputMaybe<UserTheme>;
+  user_roles?: InputMaybe<Array<UserRoleType>>;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -911,8 +858,6 @@ export type ResolversTypes = ResolversObject<{
   CreateProvincePayload: ResolverTypeWrapper<CreateProvincePayload>;
   CreateUserInput: CreateUserInput;
   CreateUserPayoad: ResolverTypeWrapper<CreateUserPayoad>;
-  CreateUserRoleInput: CreateUserRoleInput;
-  CreateUserRolePayload: ResolverTypeWrapper<CreateUserRolePayload>;
   Currency: ResolverTypeWrapper<Scalars['Currency']>;
   DID: ResolverTypeWrapper<Scalars['DID']>;
   Date: ResolverTypeWrapper<Scalars['Date']>;
@@ -931,8 +876,6 @@ export type ResolversTypes = ResolversObject<{
   DeleteProvincePayload: ResolverTypeWrapper<DeleteProvincePayload>;
   DeleteUserInput: DeleteUserInput;
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>;
-  DeleteUserRoleInput: DeleteUserRoleInput;
-  DeleteUserRolePayload: ResolverTypeWrapper<DeleteUserRolePayload>;
   DisableUserInput: DisableUserInput;
   DisableUserPayload: ResolverTypeWrapper<DisableUserPayload>;
   District: ResolverTypeWrapper<District>;
@@ -1009,7 +952,6 @@ export type ResolversTypes = ResolversObject<{
   UpdateUserPayload: ResolverTypeWrapper<UpdateUserPayload>;
   User: ResolverTypeWrapper<User>;
   UserDisableInput: UserDisableInput;
-  UserRole: ResolverTypeWrapper<UserRole>;
   UserRoleType: UserRoleType;
   UserTheme: UserTheme;
   UserUpdateInput: UserUpdateInput;
@@ -1044,8 +986,6 @@ export type ResolversParentTypes = ResolversObject<{
   CreateProvincePayload: CreateProvincePayload;
   CreateUserInput: CreateUserInput;
   CreateUserPayoad: CreateUserPayoad;
-  CreateUserRoleInput: CreateUserRoleInput;
-  CreateUserRolePayload: CreateUserRolePayload;
   Currency: Scalars['Currency'];
   DID: Scalars['DID'];
   Date: Scalars['Date'];
@@ -1064,8 +1004,6 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteProvincePayload: DeleteProvincePayload;
   DeleteUserInput: DeleteUserInput;
   DeleteUserPayload: DeleteUserPayload;
-  DeleteUserRoleInput: DeleteUserRoleInput;
-  DeleteUserRolePayload: DeleteUserRolePayload;
   DisableUserInput: DisableUserInput;
   DisableUserPayload: DisableUserPayload;
   District: District;
@@ -1142,7 +1080,6 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateUserPayload: UpdateUserPayload;
   User: User;
   UserDisableInput: UserDisableInput;
-  UserRole: UserRole;
   UserUpdateInput: UserUpdateInput;
   UtcOffset: Scalars['UtcOffset'];
   Void: Scalars['Void'];
@@ -1246,11 +1183,6 @@ export type CreateUserPayoadResolvers<ContextType = GraphQLContext, ParentType e
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CreateUserRolePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateUserRolePayload'] = ResolversParentTypes['CreateUserRolePayload']> = ResolversObject<{
-  user_role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export interface CurrencyScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Currency'], any> {
   name: 'Currency';
 }
@@ -1299,11 +1231,6 @@ export type DeleteProvincePayloadResolvers<ContextType = GraphQLContext, ParentT
 
 export type DeleteUserPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DeleteUserPayload'] = ResolversParentTypes['DeleteUserPayload']> = ResolversObject<{
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type DeleteUserRolePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DeleteUserRolePayload'] = ResolversParentTypes['DeleteUserRolePayload']> = ResolversObject<{
-  user_role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1425,7 +1352,6 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createOrganisation?: Resolver<Maybe<ResolversTypes['CreateOrganisationPayload']>, ParentType, ContextType, RequireFields<MutationCreateOrganisationArgs, 'input'>>;
   createProvince?: Resolver<Maybe<ResolversTypes['CreateProvincePayload']>, ParentType, ContextType, RequireFields<MutationCreateProvinceArgs, 'input'>>;
   createUser?: Resolver<Maybe<ResolversTypes['CreateUserPayoad']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
-  createUserRole?: Resolver<Maybe<ResolversTypes['CreateUserRolePayload']>, ParentType, ContextType, RequireFields<MutationCreateUserRoleArgs, 'input'>>;
   deleteCatchmentDistrict?: Resolver<Maybe<ResolversTypes['DeleteCatchmentDistrictPayload']>, ParentType, ContextType, RequireFields<MutationDeleteCatchmentDistrictArgs, 'input'>>;
   deleteCatchmentProvince?: Resolver<Maybe<ResolversTypes['DeleteCatchmentProvincePayload']>, ParentType, ContextType, RequireFields<MutationDeleteCatchmentProvinceArgs, 'input'>>;
   deleteCountry?: Resolver<Maybe<ResolversTypes['DeleteCountryPayload']>, ParentType, ContextType, RequireFields<MutationDeleteCountryArgs, 'input'>>;
@@ -1433,7 +1359,6 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteOrganisation?: Resolver<Maybe<ResolversTypes['DeleteOrganisationPayload']>, ParentType, ContextType, RequireFields<MutationDeleteOrganisationArgs, 'input'>>;
   deleteProvince?: Resolver<Maybe<ResolversTypes['DeleteProvincePayload']>, ParentType, ContextType, RequireFields<MutationDeleteProvinceArgs, 'input'>>;
   deleteUser?: Resolver<Maybe<ResolversTypes['DeleteUserPayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'input'>>;
-  deleteUserRole?: Resolver<Maybe<ResolversTypes['DeleteUserRolePayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserRoleArgs, 'input'>>;
   disableUser?: Resolver<Maybe<ResolversTypes['DisableUserPayload']>, ParentType, ContextType, RequireFields<MutationDisableUserArgs, 'input'>>;
   updateCatchmentDistrict?: Resolver<Maybe<ResolversTypes['UpdateCatchmentDistrictPayload']>, ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;
   updateCatchmentProvince?: Resolver<Maybe<ResolversTypes['UpdateCatchmentProvincePayload']>, ParentType, ContextType, RequireFields<MutationUpdateCatchmentProvinceArgs, 'input'>>;
@@ -1539,8 +1464,6 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   province?: Resolver<Maybe<ResolversTypes['Province']>, ParentType, ContextType, RequireFields<QueryProvinceArgs, 'id'>>;
   provinces?: Resolver<Maybe<Array<ResolversTypes['Province']>>, ParentType, ContextType, RequireFields<QueryProvincesArgs, 'country_id'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
-  user_role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType, RequireFields<QueryUser_RoleArgs, 'role_id'>>;
-  user_roles?: Resolver<Maybe<Array<ResolversTypes['UserRole']>>, ParentType, ContextType, RequireFields<QueryUser_RolesArgs, 'user_id'>>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
 }>;
 
@@ -1640,19 +1563,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   last_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
-  user_roles?: Resolver<Maybe<Array<ResolversTypes['UserRole']>>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type UserRoleResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserRole'] = ResolversParentTypes['UserRole']> = ResolversObject<{
-  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  role?: Resolver<Maybe<ResolversTypes['UserRoleType']>, ParentType, ContextType>;
-  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  user_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user_roles?: Resolver<Array<ResolversTypes['UserRoleType']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1679,7 +1590,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   CreateOrganisationPayload?: CreateOrganisationPayloadResolvers<ContextType>;
   CreateProvincePayload?: CreateProvincePayloadResolvers<ContextType>;
   CreateUserPayoad?: CreateUserPayoadResolvers<ContextType>;
-  CreateUserRolePayload?: CreateUserRolePayloadResolvers<ContextType>;
   Currency?: GraphQLScalarType;
   DID?: GraphQLScalarType;
   Date?: GraphQLScalarType;
@@ -1691,7 +1601,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   DeleteOrganisationPayload?: DeleteOrganisationPayloadResolvers<ContextType>;
   DeleteProvincePayload?: DeleteProvincePayloadResolvers<ContextType>;
   DeleteUserPayload?: DeleteUserPayloadResolvers<ContextType>;
-  DeleteUserRolePayload?: DeleteUserRolePayloadResolvers<ContextType>;
   DisableUserPayload?: DisableUserPayloadResolvers<ContextType>;
   District?: DistrictResolvers<ContextType>;
   Duration?: GraphQLScalarType;
@@ -1754,7 +1663,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   UpdateProvicePayload?: UpdateProvicePayloadResolvers<ContextType>;
   UpdateUserPayload?: UpdateUserPayloadResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
-  UserRole?: UserRoleResolvers<ContextType>;
   UtcOffset?: GraphQLScalarType;
   Void?: GraphQLScalarType;
 }>;

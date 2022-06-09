@@ -10,6 +10,7 @@ import {
   QueryUserArgs,
   UpdateUserPayload,
   User,
+  UserRoleType,
 } from "../../libs/resolvers-types";
 import { encryptPassword } from "../../utils";
 
@@ -35,13 +36,17 @@ async function createUser(
   args: MutationCreateUserArgs,
   context: GraphQLContext
 ): Promise<CreateUserPayoad> {
-  const { email, first_name, last_name, password } = args.input;
+  const { email, first_name, last_name, password, user_roles } = args.input;
 
   const requiredFields = {
     email,
     first_name,
     last_name,
     password: await encryptPassword(password),
+    user_roles:
+      user_roles.length === 0
+        ? [UserRoleType.User]
+        : [...new Set([...user_roles, UserRoleType.User])],
     created_by: context.user.email,
     last_modified_by: context.user.email,
   };
@@ -59,6 +64,7 @@ async function updateUser(
   args: MutationUpdateUserArgs,
   context: GraphQLContext
 ): Promise<UpdateUserPayload> {
+  const { user_roles } = args.input.update;
   const user = await context.prisma.user.update({
     where: {
       id: args.input.id,
@@ -67,6 +73,11 @@ async function updateUser(
       first_name: args.input.update.first_name || undefined,
       last_name: args.input.update.last_name || undefined,
       theme: args.input.update.theme || undefined,
+      user_roles:
+        !user_roles || user_roles?.length === 0
+          ? undefined
+          : [...new Set([...user_roles, UserRoleType.User])],
+      last_modified_by: context.user.email,
     },
   });
 
