@@ -7,6 +7,7 @@ import { CatchmentProvinceTypeDefs } from "../catchment-province/index";
 import { CatchmentDistrictTypeDefs } from "../catchment-district/index";
 import { UserTypeDefs } from "../user";
 import { UserRoleTypeDefs } from "../user-role";
+import { UserRoleScopeTypeDefs } from "../user-role-scope";
 
 export default [
   CountryTypeDefs,
@@ -17,5 +18,6 @@ export default [
   CatchmentDistrictTypeDefs,
   UserTypeDefs,
   UserRoleTypeDefs,
+  UserRoleScopeTypeDefs,
   scalarTypeDefs,
 ];

@@ -5,6 +5,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -317,6 +318,18 @@ export type CreateUserRolePayload = {
   user_role?: Maybe<UserRole>;
 };
 
+export type CreateUserRoleScopeInput = {
+  scope_level: RoleScopeLevel;
+  scope_level_id: Scalars['String'];
+  scope_permissions: Array<PermissionType>;
+  user_role_id: Scalars['String'];
+};
+
+export type CreateUserRoleScopePayload = {
+  __typename?: 'CreateUserRoleScopePayload';
+  user_role_scope?: Maybe<UserRoleScope>;
+};
+
 export type DeleteCatchmentDistrictInput = {
   id: Scalars['ID'];
 };
@@ -427,6 +440,7 @@ export type Mutation = {
   createProvince?: Maybe<CreateProvincePayload>;
   createUser?: Maybe<CreateUserPayoad>;
   createUserRole?: Maybe<CreateUserRolePayload>;
+  createUserRoleScope?: Maybe<CreateUserRoleScopePayload>;
   deleteCatchmentDistrict?: Maybe<DeleteCatchmentDistrictPayload>;
   deleteCatchmentProvince?: Maybe<DeleteCatchmentProvincePayload>;
   deleteCountry?: Maybe<DeleteCountryPayload>;
@@ -483,6 +497,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationCreateUserRoleArgs = {
   input: CreateUserRoleInput;
+};
+
+
+export type MutationCreateUserRoleScopeArgs = {
+  input: CreateUserRoleScopeInput;
 };
 
 
@@ -584,6 +603,13 @@ export type OrganisationUpdateInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export enum PermissionType {
+  Create = 'CREATE',
+  Delete = 'DELETE',
+  Update = 'UPDATE',
+  View = 'VIEW'
+}
+
 export type Province = {
   __typename?: 'Province';
   code: Scalars['String'];
@@ -618,6 +644,8 @@ export type Query = {
   organisations?: Maybe<Array<Organisation>>;
   province?: Maybe<Province>;
   provinces?: Maybe<Array<Province>>;
+  role_scope?: Maybe<UserRoleScope>;
+  role_scopes?: Maybe<Array<UserRoleScope>>;
   user?: Maybe<User>;
   user_role?: Maybe<UserRole>;
   user_roles?: Maybe<Array<UserRole>>;
@@ -680,6 +708,16 @@ export type QueryProvincesArgs = {
 };
 
 
+export type QueryRole_ScopeArgs = {
+  role_scope_id: Scalars['ID'];
+};
+
+
+export type QueryRole_ScopesArgs = {
+  user_role_id: Scalars['ID'];
+};
+
+
 export type QueryUserArgs = {
   id: Scalars['ID'];
 };
@@ -693,6 +731,13 @@ export type QueryUser_RoleArgs = {
 export type QueryUser_RolesArgs = {
   user_id: Scalars['ID'];
 };
+
+export enum RoleScopeLevel {
+  District = 'DISTRICT',
+  Organisation = 'ORGANISATION'
+}
+
+export type ScopeLevelObject = District | Organisation;
 
 export type UpdateCatchmentDistrictInput = {
   id: Scalars['ID'];
@@ -793,8 +838,20 @@ export type UserRole = {
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   role?: Maybe<UserRoleType>;
+  role_scopes?: Maybe<Array<UserRoleScope>>;
   user?: Maybe<User>;
   user_id: Scalars['String'];
+};
+
+export type UserRoleScope = {
+  __typename?: 'UserRoleScope';
+  id: Scalars['ID'];
+  scope_level: RoleScopeLevel;
+  scope_level_id: Scalars['String'];
+  scope_level_object?: Maybe<ScopeLevelObject>;
+  scope_permissions: Array<PermissionType>;
+  user_role?: Maybe<UserRole>;
+  user_role_id: Scalars['String'];
 };
 
 export enum UserRoleType {
@@ -913,6 +970,8 @@ export type ResolversTypes = ResolversObject<{
   CreateUserPayoad: ResolverTypeWrapper<CreateUserPayoad>;
   CreateUserRoleInput: CreateUserRoleInput;
   CreateUserRolePayload: ResolverTypeWrapper<CreateUserRolePayload>;
+  CreateUserRoleScopeInput: CreateUserRoleScopeInput;
+  CreateUserRoleScopePayload: ResolverTypeWrapper<CreateUserRoleScopePayload>;
   Currency: ResolverTypeWrapper<Scalars['Currency']>;
   DID: ResolverTypeWrapper<Scalars['DID']>;
   Date: ResolverTypeWrapper<Scalars['Date']>;
@@ -972,6 +1031,7 @@ export type ResolversTypes = ResolversObject<{
   ObjectID: ResolverTypeWrapper<Scalars['ObjectID']>;
   Organisation: ResolverTypeWrapper<Organisation>;
   OrganisationUpdateInput: OrganisationUpdateInput;
+  PermissionType: PermissionType;
   PhoneNumber: ResolverTypeWrapper<Scalars['PhoneNumber']>;
   Port: ResolverTypeWrapper<Scalars['Port']>;
   PositiveFloat: ResolverTypeWrapper<Scalars['PositiveFloat']>;
@@ -982,8 +1042,10 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   RGB: ResolverTypeWrapper<Scalars['RGB']>;
   RGBA: ResolverTypeWrapper<Scalars['RGBA']>;
+  RoleScopeLevel: RoleScopeLevel;
   RoutingNumber: ResolverTypeWrapper<Scalars['RoutingNumber']>;
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']>;
+  ScopeLevelObject: ResolversTypes['District'] | ResolversTypes['Organisation'];
   String: ResolverTypeWrapper<Scalars['String']>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
   TimeZone: ResolverTypeWrapper<Scalars['TimeZone']>;
@@ -1010,6 +1072,7 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>;
   UserDisableInput: UserDisableInput;
   UserRole: ResolverTypeWrapper<UserRole>;
+  UserRoleScope: ResolverTypeWrapper<Omit<UserRoleScope, 'scope_level_object'> & { scope_level_object?: Maybe<ResolversTypes['ScopeLevelObject']> }>;
   UserRoleType: UserRoleType;
   UserTheme: UserTheme;
   UserUpdateInput: UserUpdateInput;
@@ -1046,6 +1109,8 @@ export type ResolversParentTypes = ResolversObject<{
   CreateUserPayoad: CreateUserPayoad;
   CreateUserRoleInput: CreateUserRoleInput;
   CreateUserRolePayload: CreateUserRolePayload;
+  CreateUserRoleScopeInput: CreateUserRoleScopeInput;
+  CreateUserRoleScopePayload: CreateUserRoleScopePayload;
   Currency: Scalars['Currency'];
   DID: Scalars['DID'];
   Date: Scalars['Date'];
@@ -1117,6 +1182,7 @@ export type ResolversParentTypes = ResolversObject<{
   RGBA: Scalars['RGBA'];
   RoutingNumber: Scalars['RoutingNumber'];
   SafeInt: Scalars['SafeInt'];
+  ScopeLevelObject: ResolversParentTypes['District'] | ResolversParentTypes['Organisation'];
   String: Scalars['String'];
   Time: Scalars['Time'];
   TimeZone: Scalars['TimeZone'];
@@ -1143,6 +1209,7 @@ export type ResolversParentTypes = ResolversObject<{
   User: User;
   UserDisableInput: UserDisableInput;
   UserRole: UserRole;
+  UserRoleScope: Omit<UserRoleScope, 'scope_level_object'> & { scope_level_object?: Maybe<ResolversParentTypes['ScopeLevelObject']> };
   UserUpdateInput: UserUpdateInput;
   UtcOffset: Scalars['UtcOffset'];
   Void: Scalars['Void'];
@@ -1248,6 +1315,11 @@ export type CreateUserPayoadResolvers<ContextType = GraphQLContext, ParentType e
 
 export type CreateUserRolePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateUserRolePayload'] = ResolversParentTypes['CreateUserRolePayload']> = ResolversObject<{
   user_role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CreateUserRoleScopePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateUserRoleScopePayload'] = ResolversParentTypes['CreateUserRoleScopePayload']> = ResolversObject<{
+  user_role_scope?: Resolver<Maybe<ResolversTypes['UserRoleScope']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1426,6 +1498,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createProvince?: Resolver<Maybe<ResolversTypes['CreateProvincePayload']>, ParentType, ContextType, RequireFields<MutationCreateProvinceArgs, 'input'>>;
   createUser?: Resolver<Maybe<ResolversTypes['CreateUserPayoad']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   createUserRole?: Resolver<Maybe<ResolversTypes['CreateUserRolePayload']>, ParentType, ContextType, RequireFields<MutationCreateUserRoleArgs, 'input'>>;
+  createUserRoleScope?: Resolver<Maybe<ResolversTypes['CreateUserRoleScopePayload']>, ParentType, ContextType, RequireFields<MutationCreateUserRoleScopeArgs, 'input'>>;
   deleteCatchmentDistrict?: Resolver<Maybe<ResolversTypes['DeleteCatchmentDistrictPayload']>, ParentType, ContextType, RequireFields<MutationDeleteCatchmentDistrictArgs, 'input'>>;
   deleteCatchmentProvince?: Resolver<Maybe<ResolversTypes['DeleteCatchmentProvincePayload']>, ParentType, ContextType, RequireFields<MutationDeleteCatchmentProvinceArgs, 'input'>>;
   deleteCountry?: Resolver<Maybe<ResolversTypes['DeleteCountryPayload']>, ParentType, ContextType, RequireFields<MutationDeleteCountryArgs, 'input'>>;
@@ -1538,6 +1611,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   organisations?: Resolver<Maybe<Array<ResolversTypes['Organisation']>>, ParentType, ContextType, RequireFields<QueryOrganisationsArgs, 'country_id'>>;
   province?: Resolver<Maybe<ResolversTypes['Province']>, ParentType, ContextType, RequireFields<QueryProvinceArgs, 'id'>>;
   provinces?: Resolver<Maybe<Array<ResolversTypes['Province']>>, ParentType, ContextType, RequireFields<QueryProvincesArgs, 'country_id'>>;
+  role_scope?: Resolver<Maybe<ResolversTypes['UserRoleScope']>, ParentType, ContextType, RequireFields<QueryRole_ScopeArgs, 'role_scope_id'>>;
+  role_scopes?: Resolver<Maybe<Array<ResolversTypes['UserRoleScope']>>, ParentType, ContextType, RequireFields<QueryRole_ScopesArgs, 'user_role_id'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
   user_role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType, RequireFields<QueryUser_RoleArgs, 'role_id'>>;
   user_roles?: Resolver<Maybe<Array<ResolversTypes['UserRole']>>, ParentType, ContextType, RequireFields<QueryUser_RolesArgs, 'user_id'>>;
@@ -1559,6 +1634,10 @@ export interface RoutingNumberScalarConfig extends GraphQLScalarTypeConfig<Resol
 export interface SafeIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['SafeInt'], any> {
   name: 'SafeInt';
 }
+
+export type ScopeLevelObjectResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ScopeLevelObject'] = ResolversParentTypes['ScopeLevelObject']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'District' | 'Organisation', ParentType, ContextType>;
+}>;
 
 export interface TimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Time'], any> {
   name: 'Time';
@@ -1651,8 +1730,20 @@ export type UserRoleResolvers<ContextType = GraphQLContext, ParentType extends R
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<Maybe<ResolversTypes['UserRoleType']>, ParentType, ContextType>;
+  role_scopes?: Resolver<Maybe<Array<ResolversTypes['UserRoleScope']>>, ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   user_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserRoleScopeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserRoleScope'] = ResolversParentTypes['UserRoleScope']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  scope_level?: Resolver<ResolversTypes['RoleScopeLevel'], ParentType, ContextType>;
+  scope_level_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  scope_level_object?: Resolver<Maybe<ResolversTypes['ScopeLevelObject']>, ParentType, ContextType>;
+  scope_permissions?: Resolver<Array<ResolversTypes['PermissionType']>, ParentType, ContextType>;
+  user_role?: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>;
+  user_role_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1680,6 +1771,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   CreateProvincePayload?: CreateProvincePayloadResolvers<ContextType>;
   CreateUserPayoad?: CreateUserPayoadResolvers<ContextType>;
   CreateUserRolePayload?: CreateUserRolePayloadResolvers<ContextType>;
+  CreateUserRoleScopePayload?: CreateUserRoleScopePayloadResolvers<ContextType>;
   Currency?: GraphQLScalarType;
   DID?: GraphQLScalarType;
   Date?: GraphQLScalarType;
@@ -1738,6 +1830,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   RGBA?: GraphQLScalarType;
   RoutingNumber?: GraphQLScalarType;
   SafeInt?: GraphQLScalarType;
+  ScopeLevelObject?: ScopeLevelObjectResolvers<ContextType>;
   Time?: GraphQLScalarType;
   TimeZone?: GraphQLScalarType;
   Timestamp?: GraphQLScalarType;
@@ -1755,6 +1848,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   UpdateUserPayload?: UpdateUserPayloadResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserRole?: UserRoleResolvers<ContextType>;
+  UserRoleScope?: UserRoleScopeResolvers<ContextType>;
   UtcOffset?: GraphQLScalarType;
   Void?: GraphQLScalarType;
 }>;

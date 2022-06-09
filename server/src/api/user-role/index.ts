@@ -1,5 +1,6 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
+import { getUserRoleScopes } from "../user-role-scope/queries";
 import { getUser } from "../user/queries";
 import {
   createUserRole,
@@ -14,7 +15,7 @@ const typeDefs = gql`
     role: UserRoleType
     user_id: String!
     user: User
-    # role_scopes: [UserRoleScope!]
+    role_scopes: [UserRoleScope!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -65,6 +66,8 @@ const resolvers: Resolvers = {
   },
   UserRole: {
     user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
+    role_scopes: (parent, _args, context) =>
+      getUserRoleScopes(parent.id, context),
   },
   Mutation: {
     createUserRole: (_, args, context) => createUserRole(args, context),

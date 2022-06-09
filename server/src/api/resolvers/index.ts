@@ -7,6 +7,7 @@ import { CatchmentProvinceResolvers } from "../catchment-province/index";
 import { CatchmentDistrictResolvers } from "../catchment-district/index";
 import { UserResolvers } from "../user";
 import { UserRoleResolvers } from "../user-role";
+import { UserRoleScopeResolvers } from "../user-role-scope";
 
 export default [
   CountryResolvers,
@@ -17,5 +18,6 @@ export default [
   CatchmentDistrictResolvers,
   UserResolvers,
   UserRoleResolvers,
+  UserRoleScopeResolvers,
   scalarResolvers,
 ];
