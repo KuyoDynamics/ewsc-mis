@@ -69,6 +69,7 @@ export function createContext(
       password: "password",
       theme: null,
       confirmed_at: null,
+      user_roles: ["USER"],
       hashed_confirmation_token: null,
       hashed_password_reset_token: null,
       disabled: false,
