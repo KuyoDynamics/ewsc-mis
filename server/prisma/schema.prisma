@@ -152,7 +152,7 @@ model OrganisationUser {
 }
 
 model DistrictUser {
-  id String @id @db.Uuid
+  id       String  @id @default(uuid()) @db.Uuid
 
   // Relation Fields
   organisation_user_id String           @map("organisation_user_id") @db.Uuid
