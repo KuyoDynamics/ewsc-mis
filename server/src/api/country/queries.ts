@@ -6,7 +6,6 @@ import {
 } from "../../libs/resolvers-types";
 
 function getCountries(context: GraphQLContext) {
-  console.log("Chaiwa,is this called");
   return context.prisma.country.findMany({});
 }
 function getCountryById(id: string, context: GraphQLContext) {
@@ -24,7 +23,7 @@ function getProvincesByCountryId(id: string, context: GraphQLContext) {
 function getOrganisationsByCountryId(id: string, context: GraphQLContext) {
   return getCountryById(id, context).organisations();
 }
-// Mutations
+
 async function createCountry(
   args: MutationCreateCountryArgs,
   context: GraphQLContext
