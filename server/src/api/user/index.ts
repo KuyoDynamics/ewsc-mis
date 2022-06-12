@@ -1,10 +1,12 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
+  createInvitedUser,
   createUser,
   deleteUser,
   disableUser,
   getUser,
+  getUserOrganisations,
   getUsers,
   updateUser,
 } from "./queries";
@@ -16,7 +18,7 @@ const typeDefs = gql`
     last_name: String!
     email: String!
     disabled: Boolean
-    # user_organisations: [OrganisationUser!]
+    user_organisations: [Organisation!]
     user_roles: [UserRoleType!]!
     # hashed_confirmation_token: String
     confirmed_at: DateTime
@@ -36,9 +38,21 @@ const typeDefs = gql`
 
   extend type Mutation {
     createUser(input: CreateUserInput!): CreateUserPayoad
+    createInvitedUser(input: CreateInvitedUserInput!): CreateInvitedUserPayload
     deleteUser(input: DeleteUserInput!): DeleteUserPayload
     disableUser(input: DisableUserInput!): DisableUserPayload
     updateUser(input: UpdateUserInput!): UpdateUserPayload
+  }
+
+  input CreateInvitedUserInput {
+    user_invitation_id: ID!
+    organisation_id: ID!
+    catchment_district_ids: [ID!]!
+    user_details: CreateUserInput!
+  }
+
+  type CreateInvitedUserPayload {
+    user: User
   }
 
   input CreateUserInput {
@@ -106,12 +120,19 @@ const typeDefs = gql`
 `;
 
 const resolvers: Resolvers = {
+  User: {
+    user_organisations: (parent, _args, context) =>
+      getUserOrganisations(parent.id, context),
+  },
   Query: {
     users: (_, _args, context) => getUsers(context),
     user: (_, args, context) => getUser(args, context),
   },
   Mutation: {
     createUser: (_, args, context) => createUser(args, context),
+    createInvitedUser: (_, args, context) => {
+      return createInvitedUser(args, context);
+    },
     deleteUser: (_, args, context) => deleteUser(args, context),
     disableUser: (_, args, context) => disableUser(args, context),
     updateUser: (_, args, context) => updateUser(args, context),

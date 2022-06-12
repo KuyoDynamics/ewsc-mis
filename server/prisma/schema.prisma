@@ -134,7 +134,7 @@ model OrganisationUser {
 
   // Relation Fields
   user_id String @db.Uuid
-  user    User   @relation(fields: [user_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   organisation_id String       @db.Uuid
   organisation    Organisation @relation(fields: [organisation_id], references: [id])
@@ -152,11 +152,11 @@ model OrganisationUser {
 }
 
 model DistrictUser {
-  id       String  @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
   // Relation Fields
   organisation_user_id String           @map("organisation_user_id") @db.Uuid
-  organisation_user    OrganisationUser @relation(fields: [organisation_user_id], references: [id])
+  organisation_user    OrganisationUser @relation(fields: [organisation_user_id], references: [id], onDelete: Cascade)
 
   catchment_district_id String            @map("catchment_district_id") @db.Uuid
   catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
@@ -170,6 +170,17 @@ model DistrictUser {
   // Constraints
   @@unique([organisation_user_id, catchment_district_id])
   @@map("district_user")
+}
+
+model UserInvitation {
+  id               String   @id @db.Uuid
+  ttl              DateTime
+  email            String
+  organisation_id  String   @db.Uuid
+  district_ids     String[] @db.Uuid
+  invitation_token String   @unique
+
+  @@map("user_invitation")
 }
 
 model CatchmentDistrict {

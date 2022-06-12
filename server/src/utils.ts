@@ -8,4 +8,8 @@ async function isValidPassword(passwordText: string, passwordhash: string) {
   return compare(passwordText, passwordhash);
 }
 
-export { encryptPassword, isValidPassword };
+function addDays(date: Date, days: number) {
+  return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
+}
+
+export { encryptPassword, isValidPassword, addDays };
