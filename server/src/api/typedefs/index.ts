@@ -8,6 +8,7 @@ import { CatchmentDistrictTypeDefs } from "../catchment-district/index";
 import { UserTypeDefs } from "../user";
 import { OrganisationUserTypeDefs } from "../organisation-user";
 import { DistrictUserTypeDefs } from "../district-user";
+import { UserInvitationTypeDefs } from "../user-invitation";
 
 export default [
   CountryTypeDefs,
@@ -19,5 +20,6 @@ export default [
   UserTypeDefs,
   OrganisationUserTypeDefs,
   DistrictUserTypeDefs,
+  UserInvitationTypeDefs,
   scalarTypeDefs,
 ];

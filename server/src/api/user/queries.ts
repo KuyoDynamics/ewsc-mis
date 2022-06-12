@@ -1,12 +1,15 @@
 import { GraphQLContext } from "../..";
 import {
+  CreateInvitedUserPayload,
   CreateUserPayoad,
   DeleteUserPayload,
   DisableUserPayload,
+  MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
   MutationDeleteUserArgs,
   MutationDisableUserArgs,
   MutationUpdateUserArgs,
+  Organisation,
   QueryUserArgs,
   UpdateUserPayload,
   User,
@@ -32,6 +35,37 @@ async function getUser(
   return user as User;
 }
 
+async function getUserOrganisations(
+  user_id: string,
+  context: GraphQLContext
+): Promise<Organisation[]> {
+  const user_organisations = await context.prisma.user
+    .findUnique({
+      where: {
+        id: user_id,
+      },
+    })
+    .user_organisations({
+      include: {
+        organisation: true,
+      },
+    });
+
+  return user_organisations.map((value) => value.organisation);
+}
+
+function prepareUserRolesForUpdate(new_user_roles: UserRoleType[] | undefined) {
+  return !new_user_roles?.length
+    ? undefined
+    : [...new Set([...new_user_roles, UserRoleType.User])];
+}
+
+function prepareUserRolesForCreate(user_roles: UserRoleType[]) {
+  return !user_roles?.length
+    ? [UserRoleType.User]
+    : [...new Set([...user_roles, UserRoleType.User])];
+}
+
 async function createUser(
   args: MutationCreateUserArgs,
   context: GraphQLContext
@@ -43,10 +77,7 @@ async function createUser(
     first_name,
     last_name,
     password: await encryptPassword(password),
-    user_roles:
-      user_roles.length === 0
-        ? [UserRoleType.User]
-        : [...new Set([...user_roles, UserRoleType.User])],
+    user_roles: prepareUserRolesForCreate(user_roles),
     created_by: context.user.email,
     last_modified_by: context.user.email,
   };
@@ -58,6 +89,48 @@ async function createUser(
   return {
     user,
   } as CreateUserPayoad;
+}
+
+async function createInvitedUser(
+  args: MutationCreateInvitedUserArgs,
+  context: GraphQLContext
+): Promise<CreateInvitedUserPayload> {
+  const { email, first_name, last_name, password, user_roles } =
+    args.input.user_details;
+  const { catchment_district_ids, organisation_id } = args.input;
+
+  const user_districts = catchment_district_ids.map((id) => ({
+    catchment_district_id: id,
+    created_by: context.user.email,
+    last_modified_by: context.user.email,
+  }));
+
+  const user = await context.prisma.user.create({
+    data: {
+      first_name,
+      last_name,
+      email,
+      password: await encryptPassword(password),
+      user_roles: prepareUserRolesForCreate(user_roles),
+      created_by: context.user.email,
+      last_modified_by: context.user.email,
+      user_organisations: {
+        create: {
+          organisation_id,
+          created_by: context.user.email,
+          last_modified_by: context.user.email,
+          district_users: {
+            createMany: {
+              data: user_districts,
+              skipDuplicates: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return { user } as CreateInvitedUserPayload;
 }
 
 async function updateUser(
@@ -73,10 +146,7 @@ async function updateUser(
       first_name: args.input.update.first_name || undefined,
       last_name: args.input.update.last_name || undefined,
       theme: args.input.update.theme || undefined,
-      user_roles:
-        !user_roles || user_roles?.length === 0
-          ? undefined
-          : [...new Set([...user_roles, UserRoleType.User])],
+      user_roles: prepareUserRolesForUpdate(user_roles!),
       last_modified_by: context.user.email,
     },
   });
@@ -114,4 +184,13 @@ async function disableUser(
   return { user } as DisableUserPayload;
 }
 
-export { createUser, getUsers, deleteUser, getUser, disableUser, updateUser };
+export {
+  createUser,
+  getUsers,
+  deleteUser,
+  getUser,
+  disableUser,
+  updateUser,
+  getUserOrganisations,
+  createInvitedUser,
+};

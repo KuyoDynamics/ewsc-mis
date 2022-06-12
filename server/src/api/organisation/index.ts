@@ -1,6 +1,10 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
+  getOrganisationUser,
+  getOrganisationUsers,
+} from "../organisation-user/queries";
+import {
   createOrganisation,
   deleteOrganisation,
   getAllOrganisations,
@@ -19,7 +23,7 @@ const typeDefs = gql`
     country_id: String!
     country: Country
     catchment_provinces: [CatchmentProvince!]
-    # users: [User]
+    users: [OrganisationUser!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -101,6 +105,8 @@ const resolvers: Resolvers = {
       getCountryByOrganisationId(parent.id, context),
     catchment_provinces: (parent, _args, context) =>
       getCatchmentProvinces(parent.id, context),
+    users: (parent, _args, context) =>
+      getOrganisationUsers({ organisation_id: parent.id }, context),
   },
 };
 
