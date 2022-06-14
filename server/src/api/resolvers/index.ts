@@ -11,6 +11,7 @@ import { DistrictUserResolvers } from "../district-user";
 import { UserInvitationResolvers } from "../user-invitation";
 import { ResidenceResolvers } from "../residence";
 import { ServiceAreaResolvers } from "../service-area";
+import { WaterTreatmentPlantResolvers } from "../water-treatment-plant";
 
 export default [
   CountryResolvers,
@@ -25,5 +26,6 @@ export default [
   UserInvitationResolvers,
   ResidenceResolvers,
   ServiceAreaResolvers,
+  WaterTreatmentPlantResolvers,
   scalarResolvers,
 ];
