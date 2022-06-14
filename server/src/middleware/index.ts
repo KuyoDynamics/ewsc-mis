@@ -1,15 +1,10 @@
-import { GraphQLContext } from "..";
+import { GraphQLContext } from "../utils";
 import { MutationCreateInvitedUserArgs } from "../libs/resolvers-types";
 
 const deleteUserInvitationMiddleware = {
   Mutation: {
     createInvitedUser: async (
-      resolve: (
-        arg0: any,
-        arg1: MutationCreateInvitedUserArgs,
-        arg2: GraphQLContext,
-        arg3: any
-      ) => any,
+      resolve: any,
       parent: any,
       args: MutationCreateInvitedUserArgs,
       context: GraphQLContext,

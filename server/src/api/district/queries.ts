@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   MutationCreateDistrictArgs,
   MutationUpdateDistrictArgs,
@@ -50,8 +50,8 @@ async function createDistrict(
     code: args.input.code,
     name: args.input.name,
     province_id: args.input.province_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
   const district = await context.prisma.district.create({
     data: requiredInput,
@@ -73,7 +73,7 @@ async function updateDistrict(
     data: {
       name: args.input.update.name || undefined,
       code: args.input.update.code || undefined,
-      last_modified_by: context.user.email,
+      last_modified_by: context.user?.email,
     },
   });
 

@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { GraphQLContext } from '../../src/index';
+import { GraphQLContext } from '../../src/utils';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -483,6 +483,16 @@ export type DistrictUser = {
   organisation_user_id: Scalars['ID'];
 };
 
+export type LoginInput = {
+  email: Scalars['EmailAddress'];
+  password: Scalars['String'];
+};
+
+export type LoginPayload = {
+  __typename?: 'LoginPayload';
+  accessToken?: Maybe<Scalars['JWT']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createCatchmentDistrict?: Maybe<CreateCatchmentDistrictPayload>;
@@ -507,6 +517,13 @@ export type Mutation = {
   deleteUser?: Maybe<DeleteUserPayload>;
   deleteUserInvitation?: Maybe<DeleteUserInvitationPayload>;
   disableUser?: Maybe<DisableUserPayload>;
+  login?: Maybe<LoginPayload>;
+  /**
+   *   Create takes an object with an email and generates a hashed_password_reset_token
+   * for the requesting user. It sends an email to the user with the reset token.
+   */
+  requestPasswordReset?: Maybe<PasswordResetRequestPayload>;
+  resetPassword?: Maybe<PasswordResetPayload>;
   updateCatchmentDistrict?: Maybe<UpdateCatchmentDistrictPayload>;
   updateCatchmentProvince?: Maybe<UpdateCatchmentProvincePayload>;
   updateCountry?: Maybe<UpdateCountryPayload>;
@@ -628,6 +645,21 @@ export type MutationDisableUserArgs = {
 };
 
 
+export type MutationLoginArgs = {
+  input: LoginInput;
+};
+
+
+export type MutationRequestPasswordResetArgs = {
+  input: PasswordResetRequestInput;
+};
+
+
+export type MutationResetPasswordArgs = {
+  input: PasswordResetInput;
+};
+
+
 export type MutationUpdateCatchmentDistrictArgs = {
   input: UpdateCatchmentDistrictInput;
 };
@@ -705,6 +737,25 @@ export type OrganisationUserUpdateInput = {
   is_owner: Scalars['Boolean'];
 };
 
+export type PasswordResetInput = {
+  hashed_password_reset_token: Scalars['String'];
+  password: Scalars['String'];
+};
+
+export type PasswordResetPayload = {
+  __typename?: 'PasswordResetPayload';
+  user: User;
+};
+
+export type PasswordResetRequestInput = {
+  email: Scalars['EmailAddress'];
+};
+
+export type PasswordResetRequestPayload = {
+  __typename?: 'PasswordResetRequestPayload';
+  hashed_password_reset_token: Scalars['String'];
+};
+
 export type Province = {
   __typename?: 'Province';
   code: Scalars['String'];
@@ -737,6 +788,7 @@ export type Query = {
   district_user?: Maybe<DistrictUser>;
   district_users?: Maybe<Array<DistrictUser>>;
   districts?: Maybe<Array<District>>;
+  me: User;
   organisation?: Maybe<Organisation>;
   organisation_user?: Maybe<OrganisationUser>;
   organisation_users?: Maybe<Array<OrganisationUser>>;
@@ -927,6 +979,7 @@ export type User = {
   disabled?: Maybe<Scalars['Boolean']>;
   email: Scalars['String'];
   first_name: Scalars['String'];
+  hashed_password_reset_token?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   last_login?: Maybe<Scalars['DateTime']>;
   last_modified_at: Scalars['DateTime'];
@@ -1130,6 +1183,8 @@ export type ResolversTypes = ResolversObject<{
   LocalEndTime: ResolverTypeWrapper<Scalars['LocalEndTime']>;
   LocalTime: ResolverTypeWrapper<Scalars['LocalTime']>;
   Locale: ResolverTypeWrapper<Scalars['Locale']>;
+  LoginInput: LoginInput;
+  LoginPayload: ResolverTypeWrapper<LoginPayload>;
   Long: ResolverTypeWrapper<Scalars['Long']>;
   Longitude: ResolverTypeWrapper<Scalars['Longitude']>;
   MAC: ResolverTypeWrapper<Scalars['MAC']>;
@@ -1146,6 +1201,10 @@ export type ResolversTypes = ResolversObject<{
   OrganisationUpdateInput: OrganisationUpdateInput;
   OrganisationUser: ResolverTypeWrapper<OrganisationUser>;
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
+  PasswordResetInput: PasswordResetInput;
+  PasswordResetPayload: ResolverTypeWrapper<PasswordResetPayload>;
+  PasswordResetRequestInput: PasswordResetRequestInput;
+  PasswordResetRequestPayload: ResolverTypeWrapper<PasswordResetRequestPayload>;
   PhoneNumber: ResolverTypeWrapper<Scalars['PhoneNumber']>;
   Port: ResolverTypeWrapper<Scalars['Port']>;
   PositiveFloat: ResolverTypeWrapper<Scalars['PositiveFloat']>;
@@ -1279,6 +1338,8 @@ export type ResolversParentTypes = ResolversObject<{
   LocalEndTime: Scalars['LocalEndTime'];
   LocalTime: Scalars['LocalTime'];
   Locale: Scalars['Locale'];
+  LoginInput: LoginInput;
+  LoginPayload: LoginPayload;
   Long: Scalars['Long'];
   Longitude: Scalars['Longitude'];
   MAC: Scalars['MAC'];
@@ -1295,6 +1356,10 @@ export type ResolversParentTypes = ResolversObject<{
   OrganisationUpdateInput: OrganisationUpdateInput;
   OrganisationUser: OrganisationUser;
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
+  PasswordResetInput: PasswordResetInput;
+  PasswordResetPayload: PasswordResetPayload;
+  PasswordResetRequestInput: PasswordResetRequestInput;
+  PasswordResetRequestPayload: PasswordResetRequestPayload;
   PhoneNumber: Scalars['PhoneNumber'];
   Port: Scalars['Port'];
   PositiveFloat: Scalars['PositiveFloat'];
@@ -1637,6 +1702,11 @@ export interface LocaleScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
   name: 'Locale';
 }
 
+export type LoginPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoginPayload'] = ResolversParentTypes['LoginPayload']> = ResolversObject<{
+  accessToken?: Resolver<Maybe<ResolversTypes['JWT']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export interface LongScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Long'], any> {
   name: 'Long';
 }
@@ -1672,6 +1742,9 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteUser?: Resolver<Maybe<ResolversTypes['DeleteUserPayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'input'>>;
   deleteUserInvitation?: Resolver<Maybe<ResolversTypes['DeleteUserInvitationPayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserInvitationArgs, 'input'>>;
   disableUser?: Resolver<Maybe<ResolversTypes['DisableUserPayload']>, ParentType, ContextType, RequireFields<MutationDisableUserArgs, 'input'>>;
+  login?: Resolver<Maybe<ResolversTypes['LoginPayload']>, ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
+  requestPasswordReset?: Resolver<Maybe<ResolversTypes['PasswordResetRequestPayload']>, ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
+  resetPassword?: Resolver<Maybe<ResolversTypes['PasswordResetPayload']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'input'>>;
   updateCatchmentDistrict?: Resolver<Maybe<ResolversTypes['UpdateCatchmentDistrictPayload']>, ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;
   updateCatchmentProvince?: Resolver<Maybe<ResolversTypes['UpdateCatchmentProvincePayload']>, ParentType, ContextType, RequireFields<MutationUpdateCatchmentProvinceArgs, 'input'>>;
   updateCountry?: Resolver<Maybe<ResolversTypes['UpdateCountryPayload']>, ParentType, ContextType, RequireFields<MutationUpdateCountryArgs, 'input'>>;
@@ -1743,6 +1816,16 @@ export type OrganisationUserResolvers<ContextType = GraphQLContext, ParentType e
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PasswordResetPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PasswordResetPayload'] = ResolversParentTypes['PasswordResetPayload']> = ResolversObject<{
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PasswordResetRequestPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PasswordResetRequestPayload'] = ResolversParentTypes['PasswordResetRequestPayload']> = ResolversObject<{
+  hashed_password_reset_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export interface PhoneNumberScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PhoneNumber'], any> {
   name: 'PhoneNumber';
 }
@@ -1789,6 +1872,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   district_user?: Resolver<Maybe<ResolversTypes['DistrictUser']>, ParentType, ContextType, RequireFields<QueryDistrict_UserArgs, 'district_user_id'>>;
   district_users?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType, RequireFields<QueryDistrict_UsersArgs, 'catchment_district_id'>>;
   districts?: Resolver<Maybe<Array<ResolversTypes['District']>>, ParentType, ContextType, RequireFields<QueryDistrictsArgs, 'province_id'>>;
+  me?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   organisation?: Resolver<Maybe<ResolversTypes['Organisation']>, ParentType, ContextType, RequireFields<QueryOrganisationArgs, 'id'>>;
   organisation_user?: Resolver<Maybe<ResolversTypes['OrganisationUser']>, ParentType, ContextType, RequireFields<QueryOrganisation_UserArgs, 'organisation_user_id'>>;
   organisation_users?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType, RequireFields<QueryOrganisation_UsersArgs, 'organisation_id'>>;
@@ -1896,6 +1980,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   disabled?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   first_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  hashed_password_reset_token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   last_login?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -1981,6 +2066,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   LocalEndTime?: GraphQLScalarType;
   LocalTime?: GraphQLScalarType;
   Locale?: GraphQLScalarType;
+  LoginPayload?: LoginPayloadResolvers<ContextType>;
   Long?: GraphQLScalarType;
   Longitude?: GraphQLScalarType;
   MAC?: GraphQLScalarType;
@@ -1995,6 +2081,8 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   ObjectID?: GraphQLScalarType;
   Organisation?: OrganisationResolvers<ContextType>;
   OrganisationUser?: OrganisationUserResolvers<ContextType>;
+  PasswordResetPayload?: PasswordResetPayloadResolvers<ContextType>;
+  PasswordResetRequestPayload?: PasswordResetRequestPayloadResolvers<ContextType>;
   PhoneNumber?: GraphQLScalarType;
   Port?: GraphQLScalarType;
   PositiveFloat?: GraphQLScalarType;
