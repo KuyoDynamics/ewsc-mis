@@ -373,6 +373,20 @@ export type CreateUserPayoad = {
   user?: Maybe<User>;
 };
 
+export type CreateWaterProductionSiteInput = {
+  gps?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  plant_id: Scalars['String'];
+  static_discharge_head: Scalars['Float'];
+  static_suction_head: Scalars['Float'];
+  type: WaterProductionSiteType;
+};
+
+export type CreateWaterProductionSitePayload = {
+  __typename?: 'CreateWaterProductionSitePayload';
+  water_production_site: WaterProductionSite;
+};
+
 export type CreateWaterStorageTankInput = {
   gps?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
@@ -507,6 +521,15 @@ export type DeleteUserPayload = {
   user?: Maybe<User>;
 };
 
+export type DeleteWaterProductionSiteInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteWaterProductionSitePayload = {
+  __typename?: 'DeleteWaterProductionSitePayload';
+  water_production_site: WaterProductionSite;
+};
+
 export type DeleteWaterStorageTankInput = {
   id: Scalars['ID'];
 };
@@ -592,6 +615,7 @@ export type Mutation = {
   createServiceArea?: Maybe<CreateServiceAreaPayload>;
   createUser?: Maybe<CreateUserPayoad>;
   createUserInvitation?: Maybe<CreateUserInvitationPayload>;
+  createWaterProductionSite?: Maybe<CreateWaterProductionSitePayload>;
   createWaterStorageTank?: Maybe<CreateWaterStorageTankPayload>;
   createWaterTreatmentPlant?: Maybe<CreateWaterTreatmentPlantPayload>;
   deleteCatchmentDistrict?: Maybe<DeleteCatchmentDistrictPayload>;
@@ -606,6 +630,7 @@ export type Mutation = {
   deleteServiceArea?: Maybe<DeleteServiceAreaPayload>;
   deleteUser?: Maybe<DeleteUserPayload>;
   deleteUserInvitation?: Maybe<DeleteUserInvitationPayload>;
+  deleteWaterProductionSite?: Maybe<DeleteWaterProductionSitePayload>;
   deleteWaterStorageTank?: Maybe<DeleteWaterStorageTankPayload>;
   deleteWaterTreatmentPlants?: Maybe<DeleteWaterTreatmentPlantsPayload>;
   disableUser?: Maybe<DisableUserPayload>;
@@ -625,6 +650,7 @@ export type Mutation = {
   updateProvince?: Maybe<UpdateProvicePayload>;
   updateResidence?: Maybe<UpdateResidencePayload>;
   updateUser?: Maybe<UpdateUserPayload>;
+  updateWaterProductionSite?: Maybe<UpdateWaterProductionSitePayload>;
   updateWaterStorageTank?: Maybe<UpdateWaterStorageTankPayload>;
   updateWaterTreatmentPlant?: Maybe<UpdateWaterTreatmentPlantPayload>;
 };
@@ -695,6 +721,11 @@ export type MutationCreateUserInvitationArgs = {
 };
 
 
+export type MutationCreateWaterProductionSiteArgs = {
+  input: CreateWaterProductionSiteInput;
+};
+
+
 export type MutationCreateWaterStorageTankArgs = {
   input: CreateWaterStorageTankInput;
 };
@@ -762,6 +793,11 @@ export type MutationDeleteUserArgs = {
 
 export type MutationDeleteUserInvitationArgs = {
   input: DeleteUserInvitationInput;
+};
+
+
+export type MutationDeleteWaterProductionSiteArgs = {
+  input: DeleteWaterProductionSiteInput;
 };
 
 
@@ -837,6 +873,11 @@ export type MutationUpdateResidenceArgs = {
 
 export type MutationUpdateUserArgs = {
   input: UpdateUserInput;
+};
+
+
+export type MutationUpdateWaterProductionSiteArgs = {
+  input: UpdateWaterProductionSiteInput;
 };
 
 
@@ -953,6 +994,8 @@ export type Query = {
   user_invitation?: Maybe<UserInvitation>;
   user_invitations?: Maybe<Array<UserInvitation>>;
   users?: Maybe<Array<User>>;
+  water_production_site?: Maybe<WaterProductionSite>;
+  water_production_sites?: Maybe<Array<WaterProductionSite>>;
   water_storage_tank: WaterStorageTank;
   water_storage_tanks?: Maybe<Array<WaterStorageTank>>;
   water_treatment_plant?: Maybe<WaterTreatmentPlant>;
@@ -1067,6 +1110,16 @@ export type QueryUser_InvitationArgs = {
 
 export type QueryUser_InvitationsArgs = {
   args: UserInvitationsArgsInput;
+};
+
+
+export type QueryWater_Production_SiteArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryWater_Production_SitesArgs = {
+  plant_id: Scalars['ID'];
 };
 
 
@@ -1220,6 +1273,16 @@ export type UpdateUserPayload = {
   user?: Maybe<User>;
 };
 
+export type UpdateWaterProductionSiteInput = {
+  id: Scalars['ID'];
+  update: WaterProductionSiteUpdateInput;
+};
+
+export type UpdateWaterProductionSitePayload = {
+  __typename?: 'UpdateWaterProductionSitePayload';
+  water_production_site: WaterProductionSite;
+};
+
 export type UpdateWaterStorageTankInput = {
   id: Scalars['ID'];
   update: WaterStorageTankUpdateInput;
@@ -1299,6 +1362,35 @@ export type UserUpdateInput = {
   user_roles?: InputMaybe<Array<UserRoleType>>;
 };
 
+export type WaterProductionSite = {
+  __typename?: 'WaterProductionSite';
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  gps?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  name: Scalars['String'];
+  plant_id: Scalars['String'];
+  static_discharge_head: Scalars['Float'];
+  static_suction_head: Scalars['Float'];
+  type: WaterProductionSiteType;
+  water_treatment_plant?: Maybe<WaterTreatmentPlant>;
+};
+
+export enum WaterProductionSiteType {
+  Borehole = 'BOREHOLE',
+  Dam = 'DAM'
+}
+
+export type WaterProductionSiteUpdateInput = {
+  gps?: InputMaybe<Scalars['String']>;
+  name: Scalars['String'];
+  static_discharge_head: Scalars['Float'];
+  static_suction_head: Scalars['Float'];
+  type: WaterProductionSiteType;
+};
+
 export enum WaterSourceType {
   Ground = 'GROUND',
   Surface = 'SURFACE'
@@ -1344,7 +1436,9 @@ export type WaterTreatmentPlant = {
   last_modified_by: Scalars['String'];
   name: Scalars['String'];
   production_capacity: Scalars['Float'];
+  water_production_sites?: Maybe<Array<WaterProductionSite>>;
   water_source: WaterSourceType;
+  water_storage_tanks?: Maybe<Array<WaterStorageTank>>;
 };
 
 export type WaterTreatmentPlantUpdateInput = {
@@ -1461,6 +1555,8 @@ export type ResolversTypes = ResolversObject<{
   CreateUserInvitationInput: CreateUserInvitationInput;
   CreateUserInvitationPayload: ResolverTypeWrapper<CreateUserInvitationPayload>;
   CreateUserPayoad: ResolverTypeWrapper<CreateUserPayoad>;
+  CreateWaterProductionSiteInput: CreateWaterProductionSiteInput;
+  CreateWaterProductionSitePayload: ResolverTypeWrapper<CreateWaterProductionSitePayload>;
   CreateWaterStorageTankInput: CreateWaterStorageTankInput;
   CreateWaterStorageTankPayload: ResolverTypeWrapper<CreateWaterStorageTankPayload>;
   CreateWaterTreatmentPlantInput: CreateWaterTreatmentPlantInput;
@@ -1493,6 +1589,8 @@ export type ResolversTypes = ResolversObject<{
   DeleteUserInvitationInput: DeleteUserInvitationInput;
   DeleteUserInvitationPayload: ResolverTypeWrapper<DeleteUserInvitationPayload>;
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>;
+  DeleteWaterProductionSiteInput: DeleteWaterProductionSiteInput;
+  DeleteWaterProductionSitePayload: ResolverTypeWrapper<DeleteWaterProductionSitePayload>;
   DeleteWaterStorageTankInput: DeleteWaterStorageTankInput;
   DeleteWaterStorageTankPayload: ResolverTypeWrapper<DeleteWaterStorageTankPayload>;
   DeleteWaterTreatmentPlantsInput: DeleteWaterTreatmentPlantsInput;
@@ -1589,6 +1687,8 @@ export type ResolversTypes = ResolversObject<{
   UpdateResidencePayload: ResolverTypeWrapper<UpdateResidencePayload>;
   UpdateUserInput: UpdateUserInput;
   UpdateUserPayload: ResolverTypeWrapper<UpdateUserPayload>;
+  UpdateWaterProductionSiteInput: UpdateWaterProductionSiteInput;
+  UpdateWaterProductionSitePayload: ResolverTypeWrapper<UpdateWaterProductionSitePayload>;
   UpdateWaterStorageTankInput: UpdateWaterStorageTankInput;
   UpdateWaterStorageTankPayload: ResolverTypeWrapper<UpdateWaterStorageTankPayload>;
   UpdateWaterTreatmentPlantInput: UpdateWaterTreatmentPlantInput;
@@ -1602,6 +1702,9 @@ export type ResolversTypes = ResolversObject<{
   UserUpdateInput: UserUpdateInput;
   UtcOffset: ResolverTypeWrapper<Scalars['UtcOffset']>;
   Void: ResolverTypeWrapper<Scalars['Void']>;
+  WaterProductionSite: ResolverTypeWrapper<WaterProductionSite>;
+  WaterProductionSiteType: WaterProductionSiteType;
+  WaterProductionSiteUpdateInput: WaterProductionSiteUpdateInput;
   WaterSourceType: WaterSourceType;
   WaterStorageTank: ResolverTypeWrapper<WaterStorageTank>;
   WaterStorageTankType: WaterStorageTankType;
@@ -1649,6 +1752,8 @@ export type ResolversParentTypes = ResolversObject<{
   CreateUserInvitationInput: CreateUserInvitationInput;
   CreateUserInvitationPayload: CreateUserInvitationPayload;
   CreateUserPayoad: CreateUserPayoad;
+  CreateWaterProductionSiteInput: CreateWaterProductionSiteInput;
+  CreateWaterProductionSitePayload: CreateWaterProductionSitePayload;
   CreateWaterStorageTankInput: CreateWaterStorageTankInput;
   CreateWaterStorageTankPayload: CreateWaterStorageTankPayload;
   CreateWaterTreatmentPlantInput: CreateWaterTreatmentPlantInput;
@@ -1681,6 +1786,8 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteUserInvitationInput: DeleteUserInvitationInput;
   DeleteUserInvitationPayload: DeleteUserInvitationPayload;
   DeleteUserPayload: DeleteUserPayload;
+  DeleteWaterProductionSiteInput: DeleteWaterProductionSiteInput;
+  DeleteWaterProductionSitePayload: DeleteWaterProductionSitePayload;
   DeleteWaterStorageTankInput: DeleteWaterStorageTankInput;
   DeleteWaterStorageTankPayload: DeleteWaterStorageTankPayload;
   DeleteWaterTreatmentPlantsInput: DeleteWaterTreatmentPlantsInput;
@@ -1776,6 +1883,8 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateResidencePayload: UpdateResidencePayload;
   UpdateUserInput: UpdateUserInput;
   UpdateUserPayload: UpdateUserPayload;
+  UpdateWaterProductionSiteInput: UpdateWaterProductionSiteInput;
+  UpdateWaterProductionSitePayload: UpdateWaterProductionSitePayload;
   UpdateWaterStorageTankInput: UpdateWaterStorageTankInput;
   UpdateWaterStorageTankPayload: UpdateWaterStorageTankPayload;
   UpdateWaterTreatmentPlantInput: UpdateWaterTreatmentPlantInput;
@@ -1787,6 +1896,8 @@ export type ResolversParentTypes = ResolversObject<{
   UserUpdateInput: UserUpdateInput;
   UtcOffset: Scalars['UtcOffset'];
   Void: Scalars['Void'];
+  WaterProductionSite: WaterProductionSite;
+  WaterProductionSiteUpdateInput: WaterProductionSiteUpdateInput;
   WaterStorageTank: WaterStorageTank;
   WaterStorageTankUpdateInput: WaterStorageTankUpdateInput;
   WaterTreatmentPlant: WaterTreatmentPlant;
@@ -1922,6 +2033,11 @@ export type CreateUserPayoadResolvers<ContextType = GraphQLContext, ParentType e
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type CreateWaterProductionSitePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateWaterProductionSitePayload'] = ResolversParentTypes['CreateWaterProductionSitePayload']> = ResolversObject<{
+  water_production_site?: Resolver<ResolversTypes['WaterProductionSite'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type CreateWaterStorageTankPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateWaterStorageTankPayload'] = ResolversParentTypes['CreateWaterStorageTankPayload']> = ResolversObject<{
   water_storage_tank?: Resolver<ResolversTypes['WaterStorageTank'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -2005,6 +2121,11 @@ export type DeleteUserInvitationPayloadResolvers<ContextType = GraphQLContext, P
 
 export type DeleteUserPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DeleteUserPayload'] = ResolversParentTypes['DeleteUserPayload']> = ResolversObject<{
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type DeleteWaterProductionSitePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DeleteWaterProductionSitePayload'] = ResolversParentTypes['DeleteWaterProductionSitePayload']> = ResolversObject<{
+  water_production_site?: Resolver<ResolversTypes['WaterProductionSite'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -2160,6 +2281,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createServiceArea?: Resolver<Maybe<ResolversTypes['CreateServiceAreaPayload']>, ParentType, ContextType, RequireFields<MutationCreateServiceAreaArgs, 'input'>>;
   createUser?: Resolver<Maybe<ResolversTypes['CreateUserPayoad']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
   createUserInvitation?: Resolver<Maybe<ResolversTypes['CreateUserInvitationPayload']>, ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
+  createWaterProductionSite?: Resolver<Maybe<ResolversTypes['CreateWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterProductionSiteArgs, 'input'>>;
   createWaterStorageTank?: Resolver<Maybe<ResolversTypes['CreateWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterStorageTankArgs, 'input'>>;
   createWaterTreatmentPlant?: Resolver<Maybe<ResolversTypes['CreateWaterTreatmentPlantPayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterTreatmentPlantArgs, 'input'>>;
   deleteCatchmentDistrict?: Resolver<Maybe<ResolversTypes['DeleteCatchmentDistrictPayload']>, ParentType, ContextType, RequireFields<MutationDeleteCatchmentDistrictArgs, 'input'>>;
@@ -2174,6 +2296,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteServiceArea?: Resolver<Maybe<ResolversTypes['DeleteServiceAreaPayload']>, ParentType, ContextType, RequireFields<MutationDeleteServiceAreaArgs, 'input'>>;
   deleteUser?: Resolver<Maybe<ResolversTypes['DeleteUserPayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'input'>>;
   deleteUserInvitation?: Resolver<Maybe<ResolversTypes['DeleteUserInvitationPayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserInvitationArgs, 'input'>>;
+  deleteWaterProductionSite?: Resolver<Maybe<ResolversTypes['DeleteWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationDeleteWaterProductionSiteArgs, 'input'>>;
   deleteWaterStorageTank?: Resolver<Maybe<ResolversTypes['DeleteWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationDeleteWaterStorageTankArgs, 'input'>>;
   deleteWaterTreatmentPlants?: Resolver<Maybe<ResolversTypes['DeleteWaterTreatmentPlantsPayload']>, ParentType, ContextType, RequireFields<MutationDeleteWaterTreatmentPlantsArgs, 'filter'>>;
   disableUser?: Resolver<Maybe<ResolversTypes['DisableUserPayload']>, ParentType, ContextType, RequireFields<MutationDisableUserArgs, 'input'>>;
@@ -2189,6 +2312,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateProvince?: Resolver<Maybe<ResolversTypes['UpdateProvicePayload']>, ParentType, ContextType, RequireFields<MutationUpdateProvinceArgs, 'input'>>;
   updateResidence?: Resolver<Maybe<ResolversTypes['UpdateResidencePayload']>, ParentType, ContextType, RequireFields<MutationUpdateResidenceArgs, 'input'>>;
   updateUser?: Resolver<Maybe<ResolversTypes['UpdateUserPayload']>, ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'input'>>;
+  updateWaterProductionSite?: Resolver<Maybe<ResolversTypes['UpdateWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationUpdateWaterProductionSiteArgs, 'input'>>;
   updateWaterStorageTank?: Resolver<Maybe<ResolversTypes['UpdateWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationUpdateWaterStorageTankArgs, 'input'>>;
   updateWaterTreatmentPlant?: Resolver<Maybe<ResolversTypes['UpdateWaterTreatmentPlantPayload']>, ParentType, ContextType, RequireFields<MutationUpdateWaterTreatmentPlantArgs, 'input'>>;
 }>;
@@ -2325,6 +2449,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   user_invitation?: Resolver<Maybe<ResolversTypes['UserInvitation']>, ParentType, ContextType, RequireFields<QueryUser_InvitationArgs, 'id'>>;
   user_invitations?: Resolver<Maybe<Array<ResolversTypes['UserInvitation']>>, ParentType, ContextType, RequireFields<QueryUser_InvitationsArgs, 'args'>>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
+  water_production_site?: Resolver<Maybe<ResolversTypes['WaterProductionSite']>, ParentType, ContextType, RequireFields<QueryWater_Production_SiteArgs, 'id'>>;
+  water_production_sites?: Resolver<Maybe<Array<ResolversTypes['WaterProductionSite']>>, ParentType, ContextType, RequireFields<QueryWater_Production_SitesArgs, 'plant_id'>>;
   water_storage_tank?: Resolver<ResolversTypes['WaterStorageTank'], ParentType, ContextType, RequireFields<QueryWater_Storage_TankArgs, 'id'>>;
   water_storage_tanks?: Resolver<Maybe<Array<ResolversTypes['WaterStorageTank']>>, ParentType, ContextType, RequireFields<QueryWater_Storage_TanksArgs, 'plant_id'>>;
   water_treatment_plant?: Resolver<Maybe<ResolversTypes['WaterTreatmentPlant']>, ParentType, ContextType, RequireFields<QueryWater_Treatment_PlantArgs, 'id'>>;
@@ -2451,6 +2577,11 @@ export type UpdateUserPayloadResolvers<ContextType = GraphQLContext, ParentType 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UpdateWaterProductionSitePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UpdateWaterProductionSitePayload'] = ResolversParentTypes['UpdateWaterProductionSitePayload']> = ResolversObject<{
+  water_production_site?: Resolver<ResolversTypes['WaterProductionSite'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type UpdateWaterStorageTankPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UpdateWaterStorageTankPayload'] = ResolversParentTypes['UpdateWaterStorageTankPayload']> = ResolversObject<{
   water_storage_tank?: Resolver<ResolversTypes['WaterStorageTank'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -2498,6 +2629,22 @@ export interface VoidScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Void';
 }
 
+export type WaterProductionSiteResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['WaterProductionSite'] = ResolversParentTypes['WaterProductionSite']> = ResolversObject<{
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  gps?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  plant_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  static_discharge_head?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  static_suction_head?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['WaterProductionSiteType'], ParentType, ContextType>;
+  water_treatment_plant?: Resolver<Maybe<ResolversTypes['WaterTreatmentPlant']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type WaterStorageTankResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['WaterStorageTank'] = ResolversParentTypes['WaterStorageTank']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -2524,7 +2671,9 @@ export type WaterTreatmentPlantResolvers<ContextType = GraphQLContext, ParentTyp
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   production_capacity?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  water_production_sites?: Resolver<Maybe<Array<ResolversTypes['WaterProductionSite']>>, ParentType, ContextType>;
   water_source?: Resolver<ResolversTypes['WaterSourceType'], ParentType, ContextType>;
+  water_storage_tanks?: Resolver<Maybe<Array<ResolversTypes['WaterStorageTank']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -2549,6 +2698,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   CreateServiceAreaPayload?: CreateServiceAreaPayloadResolvers<ContextType>;
   CreateUserInvitationPayload?: CreateUserInvitationPayloadResolvers<ContextType>;
   CreateUserPayoad?: CreateUserPayoadResolvers<ContextType>;
+  CreateWaterProductionSitePayload?: CreateWaterProductionSitePayloadResolvers<ContextType>;
   CreateWaterStorageTankPayload?: CreateWaterStorageTankPayloadResolvers<ContextType>;
   CreateWaterTreatmentPlantPayload?: CreateWaterTreatmentPlantPayloadResolvers<ContextType>;
   Currency?: GraphQLScalarType;
@@ -2567,6 +2717,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   DeleteServiceAreaPayload?: DeleteServiceAreaPayloadResolvers<ContextType>;
   DeleteUserInvitationPayload?: DeleteUserInvitationPayloadResolvers<ContextType>;
   DeleteUserPayload?: DeleteUserPayloadResolvers<ContextType>;
+  DeleteWaterProductionSitePayload?: DeleteWaterProductionSitePayloadResolvers<ContextType>;
   DeleteWaterStorageTankPayload?: DeleteWaterStorageTankPayloadResolvers<ContextType>;
   DeleteWaterTreatmentPlantsPayload?: DeleteWaterTreatmentPlantsPayloadResolvers<ContextType>;
   DisableUserPayload?: DisableUserPayloadResolvers<ContextType>;
@@ -2639,12 +2790,14 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   UpdateProvicePayload?: UpdateProvicePayloadResolvers<ContextType>;
   UpdateResidencePayload?: UpdateResidencePayloadResolvers<ContextType>;
   UpdateUserPayload?: UpdateUserPayloadResolvers<ContextType>;
+  UpdateWaterProductionSitePayload?: UpdateWaterProductionSitePayloadResolvers<ContextType>;
   UpdateWaterStorageTankPayload?: UpdateWaterStorageTankPayloadResolvers<ContextType>;
   UpdateWaterTreatmentPlantPayload?: UpdateWaterTreatmentPlantPayloadResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserInvitation?: UserInvitationResolvers<ContextType>;
   UtcOffset?: GraphQLScalarType;
   Void?: GraphQLScalarType;
+  WaterProductionSite?: WaterProductionSiteResolvers<ContextType>;
   WaterStorageTank?: WaterStorageTankResolvers<ContextType>;
   WaterTreatmentPlant?: WaterTreatmentPlantResolvers<ContextType>;
 }>;
