@@ -12,6 +12,7 @@ import { UserInvitationTypeDefs } from "../user-invitation";
 import { ResidenceTypeDefs } from "../residence";
 import { ServiceAreaTypeDefs } from "../service-area";
 import { WaterTreatmentPlantTypeDefs } from "../water-treatment-plant";
+import { WaterStorageTankTypeDefs } from "../water-storage-tank";
 
 export default [
   CountryTypeDefs,
@@ -27,5 +28,6 @@ export default [
   ResidenceTypeDefs,
   ServiceAreaTypeDefs,
   WaterTreatmentPlantTypeDefs,
+  WaterStorageTankTypeDefs,
   scalarTypeDefs,
 ];
