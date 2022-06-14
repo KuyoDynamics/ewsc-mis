@@ -1,5 +1,4 @@
-import {} from "@prisma/client/runtime";
-import { ApolloError, AuthenticationError } from "apollo-server-core";
+import { AuthenticationError } from "apollo-server-core";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { encryptPassword, isValidPassword, GraphQLContext } from "../../utils";

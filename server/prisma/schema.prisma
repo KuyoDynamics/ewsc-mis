@@ -67,6 +67,7 @@ model District {
   province_id               String              @db.Uuid
   province                  Province            @relation(fields: [province_id], references: [id])
   organisations_in_district CatchmentDistrict[]
+  residences Residence[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -78,6 +79,54 @@ model District {
   @@unique([name, province_id])
   @@map("district")
 }
+
+//======================RESIDENCE AND SERVICE AREA====================================
+model Residence {
+  id                  String                    @id @default(uuid()) @db.Uuid
+  name                String
+  cost_classification ResidenceClassification
+
+  // Relation Fields
+  district_id String            @map("district_id") @db.Uuid
+  district    District @relation(fields: [district_id], references: [id])
+
+  service_areas ServiceArea[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@unique([name, district_id])
+  @@map("residence")
+}
+
+model ServiceArea {
+  id                  String                    @id @default(uuid()) @db.Uuid
+
+  // Relation Fields
+  residence_id String @db.Uuid
+  residence Residence @relation(fields: [residence_id], references: [id])
+
+  catchment_district_id String            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
+
+  service_area_water_connections ServiceAreaWaterConnection[]
+  service_area_sewer_connections ServiceAreaSewerConnection[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@unique([residence_id, catchment_district_id])
+  @@map("service_area")
+}
+
 
 model Organisation {
   id   String @id @default(uuid()) @db.Uuid
@@ -327,31 +376,6 @@ model WaterNetwork {
   // Constraints
   @@unique([name, plant_id])
   @@map("water_network")
-}
-
-//======================SERVICE AREA====================================
-
-model ServiceArea {
-  id                  String                    @id @default(uuid()) @db.Uuid
-  name                String
-  cost_classification ServiceAreaClassification
-
-  // Relation Fields
-  catchment_district_id String            @map("catchment_district_id") @db.Uuid
-  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
-
-  service_area_water_connections ServiceAreaWaterConnection[]
-  service_area_sewer_connections ServiceAreaSewerConnection[]
-
-  // Timestamps
-  created_at       DateTime @default(now()) @db.Timestamptz()
-  created_by       String
-  last_modified_at DateTime @updatedAt @db.Timestamptz()
-  last_modified_by String
-
-  // Constraints
-  @@unique([name, catchment_district_id])
-  @@map("service_area")
 }
 
 model ServiceAreaWaterConnection {
@@ -732,14 +756,14 @@ enum ReportingFrequency {
   @@map("reporting_frequency")
 }
 
-enum ServiceAreaClassification {
+enum ResidenceClassification {
   HIGH_COST    @map("high-cost")
   LOW_COST     @map("low-cost")
   MEDIUM_COST  @map("medium-cost")
   PERI_URBAN   @map("peri-urban")
   RURAL        @map("rural")
 
-  @@map("service_area_classification")
+  @@map("residence_classification")
 }
 
 enum NetworkOwnershipType {
