@@ -1,14 +1,14 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getDistrictById } from "../queries";
-import { getResidenceServiceAreas } from "../service-area/queries";
 import {
+  getDistrictById,
   createResidence,
   deleteResidence,
   getResidence,
   getResidences,
   updateResidence,
-} from "./queries";
+  getResidenceServiceAreas,
+} from "../queries";
 
 const typeDefs = gql`
   type Residence {
