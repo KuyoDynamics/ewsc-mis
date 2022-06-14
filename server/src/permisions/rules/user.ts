@@ -2,8 +2,11 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { rule, and, or, not } from "graphql-shield";
 import { JsonWebTokenError, TokenExpiredError, verify } from "jsonwebtoken";
 
-import { GraphQLContext } from "../..";
-import { MutationCreateInvitedUserArgs } from "../../libs/resolvers-types";
+import { GraphQLContext } from "../../utils";
+import {
+  MutationCreateInvitedUserArgs,
+  UserRoleType,
+} from "../../libs/resolvers-types";
 
 const isValidUserInvitation = rule()(
   async (_, args: MutationCreateInvitedUserArgs, ctx: GraphQLContext) => {
@@ -18,7 +21,11 @@ const isValidUserInvitation = rule()(
         },
       });
 
-      verify(userInvitation?.invitation_token!, process.env.JWT_SECRET!, {
+      if (!userInvitation) {
+        return "Invitation Not Found.";
+      }
+
+      verify(userInvitation.invitation_token, process.env.JWT_SECRET!, {
         audience: catchment_district_ids,
         issuer: organisation_id,
         subject: email,
@@ -29,7 +36,7 @@ const isValidUserInvitation = rule()(
         return "Invitation expired.";
       }
       if (error instanceof JsonWebTokenError) {
-        return "You provided Invalid Details for this invitation.";
+        return "Invalid Details for this invitation.";
       }
 
       if (error instanceof PrismaClientKnownRequestError) {
@@ -48,4 +55,58 @@ const isValidUserInvitation = rule()(
   }
 );
 
-export { isValidUserInvitation };
+const authenticated = rule({ cache: "contextual" })(
+  (_parent, _args, ctx: GraphQLContext) => {
+    return !!ctx.user;
+  }
+);
+
+const isUserDisabled = rule({ cache: "contextual" })(
+  (_parent, _args, ctx: GraphQLContext) => {
+    return !!ctx.user.disabled;
+  }
+);
+
+const isAuthenticated = and(authenticated, not(isUserDisabled));
+
+const isAdmin = rule({ cache: "contextual" })(
+  (_parent, _args, ctx: GraphQLContext, _info) => {
+    return ctx.user.user_roles.some((role) => role === UserRoleType.Admin);
+  }
+);
+
+const canSeeUserSensitiveData = rule({ cache: "strict" })(
+  async (parent, args, ctx, info) => {
+    /* The id of observed User matches the id of authenticated viewer. */
+    return ctx.user.id === parent.id;
+  }
+);
+
+// const isUserSensitiveData = rule()(
+//   async (parent,args,ctx,info)=>{
+//     return
+//   }
+// )
+
+// const canEditUserSensitiveData = rule({ cache: "strict" })(
+//   async (parent, args, ctx, info) => {
+
+//     return or(and(isAdmin, isAuthenticated), canSeeUserSensitiveData);
+//   }
+// );
+
+// const isEditor = rule()(async (parent, args, ctx, info) => {
+//   return ctx.user.role === UserRoleType.Data_Entry
+// })
+
+// const isOwner = rule()(async (parent, args, ctx, info) => {
+//   return ctx.user.items.some((id) => id === parent.id)
+// })
+
+export {
+  isValidUserInvitation,
+  isAuthenticated,
+  isUserDisabled,
+  isAdmin,
+  canSeeUserSensitiveData,
+};

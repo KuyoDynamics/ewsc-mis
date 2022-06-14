@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   CatchmentProvince,
   MutationCreateOrganisationArgs,
@@ -61,8 +61,8 @@ async function createOrganisation(
     code: args.input.logo || undefined,
     name: args.input.name,
     country_id: args.input.country_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
   const organisation = await context.prisma.organisation.create({
     data: requiredInput,
@@ -82,7 +82,7 @@ async function updateOrganisation(
     data: {
       name: args.input.update.name || undefined,
       logo: args.input.update.logo || undefined,
-      last_modified_by: context.user.email,
+      last_modified_by: context.user?.email,
     },
   });
 

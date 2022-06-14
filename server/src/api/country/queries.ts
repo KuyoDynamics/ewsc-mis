@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   MutationCreateCountryArgs,
   MutationDeleteCountryArgs,
@@ -33,8 +33,8 @@ async function createCountry(
   const requiredInput = {
     code,
     name,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
 
   const country = await context.prisma.country.create({
@@ -69,7 +69,7 @@ async function updateCountry(
     data: {
       code: code || undefined,
       name: name || undefined,
-      last_modified_by: code || name ? context.user.email : undefined,
+      last_modified_by: code || name ? context.user?.email : undefined,
     },
   });
   return {

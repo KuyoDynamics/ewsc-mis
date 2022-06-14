@@ -8,6 +8,9 @@ import {
   getUser,
   getUserOrganisations,
   getUsers,
+  login,
+  requestPasswordReset,
+  resetPassword,
   updateUser,
 } from "./queries";
 
@@ -22,7 +25,7 @@ const typeDefs = gql`
     user_roles: [UserRoleType!]!
     # hashed_confirmation_token: String
     confirmed_at: DateTime
-    # hashed_password_reset_token: String
+    hashed_password_reset_token: String
     last_login: DateTime
     theme: UserTheme
     created_at: DateTime!
@@ -34,6 +37,7 @@ const typeDefs = gql`
   extend type Query {
     users: [User!]
     user(id: ID!): User
+    me: User!
   }
 
   extend type Mutation {
@@ -42,6 +46,41 @@ const typeDefs = gql`
     deleteUser(input: DeleteUserInput!): DeleteUserPayload
     disableUser(input: DisableUserInput!): DisableUserPayload
     updateUser(input: UpdateUserInput!): UpdateUserPayload
+    login(input: LoginInput!): LoginPayload
+    """
+      Create takes an object with an email and generates a hashed_password_reset_token
+    for the requesting user. It sends an email to the user with the reset token.
+    """
+    requestPasswordReset(
+      input: PasswordResetRequestInput!
+    ): PasswordResetRequestPayload
+    resetPassword(input: PasswordResetInput!): PasswordResetPayload
+  }
+
+  input PasswordResetInput {
+    hashed_password_reset_token: String!
+    password: String!
+  }
+
+  type PasswordResetPayload {
+    user: User!
+  }
+
+  input PasswordResetRequestInput {
+    email: EmailAddress!
+  }
+
+  type PasswordResetRequestPayload {
+    hashed_password_reset_token: String!
+  }
+
+  input LoginInput {
+    email: EmailAddress!
+    password: String!
+  }
+
+  type LoginPayload {
+    accessToken: JWT
   }
 
   input CreateInvitedUserInput {
@@ -117,6 +156,7 @@ const typeDefs = gql`
     LIGHT
   }
   scalar DateTime
+  scalar JWT
 `;
 
 const resolvers: Resolvers = {
@@ -127,15 +167,18 @@ const resolvers: Resolvers = {
   Query: {
     users: (_, _args, context) => getUsers(context),
     user: (_, args, context) => getUser(args, context),
+    me: (_, _args, context) => getUser({ id: context.user?.id }, context),
   },
   Mutation: {
     createUser: (_, args, context) => createUser(args, context),
-    createInvitedUser: (_, args, context) => {
-      return createInvitedUser(args, context);
-    },
+    createInvitedUser: (_, args, context) => createInvitedUser(args, context),
     deleteUser: (_, args, context) => deleteUser(args, context),
     disableUser: (_, args, context) => disableUser(args, context),
     updateUser: (_, args, context) => updateUser(args, context),
+    login: (_, args, context) => login(args, context),
+    requestPasswordReset: (_, args, context) =>
+      requestPasswordReset(args, context),
+    resetPassword: (_, args, context) => resetPassword(args, context),
   },
 };
 

@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   CreateDistrictUserPayload,
   DeleteDistrictUserPayload,
@@ -40,8 +40,8 @@ async function createDistrictUser(
   const requiredInput = {
     organisation_user_id: args.input.organisation_user_id,
     catchment_district_id: args.input.catchment_district_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
 
   const district_user = await context.prisma.districtUser.create({

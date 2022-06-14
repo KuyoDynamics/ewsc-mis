@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   CatchmentDistrict,
   CreateCatchmentDistrictPayload,
@@ -76,8 +76,8 @@ async function createCatchmentDistrict(
   const requiredInput = {
     district_id: args.input.district_id,
     catchment_province_id: args.input.catchment_province_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
   const result = await context.prisma.catchmentDistrict.create({
     data: requiredInput,
@@ -115,7 +115,7 @@ async function updateCatchmentDistrict(
     },
     data: {
       disabled: args.input.update.disabled,
-      last_modified_by: context.user.email,
+      last_modified_by: context.user?.email,
     },
     include: {
       district: {

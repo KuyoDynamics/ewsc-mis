@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   MutationCreateProvinceArgs,
   MutationUpdateProvinceArgs,
@@ -25,8 +25,8 @@ async function createProvince(
     code: args.input.code,
     name: args.input.name,
     country_id: args.input.country_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
   const province = await context.prisma.province.create({
     data: requiredInput,
@@ -56,7 +56,7 @@ async function updateProvince(
     data: {
       name: args.input.update.name || undefined,
       code: args.input.update.code || undefined,
-      last_modified_by: context.user.email,
+      last_modified_by: context.user?.email,
     },
   });
 

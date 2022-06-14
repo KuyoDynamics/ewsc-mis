@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   CreateOrganisationUserPayload,
   DeleteOrganisationUserPayload,
@@ -43,8 +43,8 @@ async function createOrganisationUser(
   const requiredInput = {
     user_id: args.input.user_id,
     organisation_id: args.input.organisation_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
   const organisation_user = await context.prisma.organisationUser.create({
     data: requiredInput,

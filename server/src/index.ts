@@ -2,18 +2,20 @@ import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
-import { PrismaClient, User } from "@prisma/client";
-import express, { Request } from "express";
+import { PrismaClient } from "@prisma/client";
+import express from "express";
 import http from "http";
 import { GraphQLSchema } from "graphql";
 import dotenv from "dotenv";
+import { expressjwt } from "express-jwt";
 import { schema } from "./api/schema";
+import { createContext } from "./utils";
 
 const prisma = new PrismaClient({
-  rejectOnNotFound: {
-    findUnique: true,
-    findFirst: true,
-  },
+  // rejectOnNotFound: {
+  //   findUnique: true,
+  //   findFirst: true,
+  // },
   log: [
     {
       emit: "event",
@@ -34,47 +36,12 @@ const prisma = new PrismaClient({
   ],
 });
 
-prisma.$on("query", (e) => {
-  console.log("Query: " + e.query);
-  console.log("Params: " + e.params);
-  console.log("Duration: " + e.duration + "ms");
-  console.log("\n===================================");
-});
-
-export type GraphQLContext = {
-  req: Request;
-  prisma: PrismaClient;
-  user: User;
-};
-
-export function createContext(
-  req: Request,
-  prismaClient: PrismaClient
-): GraphQLContext {
-  return {
-    req,
-    prisma: prismaClient,
-    // Replace this currently logged-in user
-    user: {
-      id: "f37beb05-fd36-4046-81a2-33b7051d1ff6",
-      first_name: "Berian",
-      last_name: "Chaiwa",
-      last_login: new Date(),
-      last_modified_at: new Date(),
-      created_at: new Date(),
-      created_by: "chaiwa@kuyodynamics.com",
-      email: "chaiwa@kuyodynamics.com",
-      last_modified_by: "chaiwa@kuyodynamics.com",
-      password: "password",
-      theme: null,
-      confirmed_at: null,
-      user_roles: ["USER"],
-      hashed_confirmation_token: null,
-      hashed_password_reset_token: null,
-      disabled: false,
-    },
-  };
-}
+// prisma.$on("query", (e) => {
+//   console.log("Query: " + e.query);
+//   console.log("Params: " + e.params);
+//   console.log("Duration: " + e.duration + "ms");
+//   console.log("\n===================================");
+// });
 
 async function startApolloServer(
   gqlSchema: GraphQLSchema,
@@ -83,6 +50,19 @@ async function startApolloServer(
   dotenv.config();
 
   const app = express();
+
+  app.use(
+    expressjwt({
+      secret: process.env.JWT_SECRET!,
+      algorithms: ["HS256"],
+      credentialsRequired: false,
+    })
+  );
+
+  // Express global error handler
+  app.use(function (_err: any, _req: any, _res: any, next: any) {
+    next();
+  });
 
   // 1. Http Server
   const httpServer = http.createServer(app);

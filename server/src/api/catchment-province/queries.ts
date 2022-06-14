@@ -1,4 +1,4 @@
-import { GraphQLContext } from "../..";
+import { GraphQLContext } from "../../utils";
 import {
   CatchmentProvince,
   CreateCatchmentProvincePayload,
@@ -45,8 +45,8 @@ async function createCatchmentProvince(
   const requiredInput = {
     province_id: args.input.province_id,
     organisation_id: args.input.organisation_id,
-    created_by: context.user.email,
-    last_modified_by: context.user.email,
+    created_by: context.user?.email,
+    last_modified_by: context.user?.email,
   };
   const result = await context.prisma.catchmentProvince.create({
     data: requiredInput,
@@ -84,7 +84,7 @@ async function updateCatchmentProvince(
     },
     data: {
       disabled: args.input.update.disabled,
-      last_modified_by: context.user.email,
+      last_modified_by: context.user?.email,
     },
     include: {
       province: {
