@@ -11,6 +11,7 @@ import { DistrictUserTypeDefs } from "../district-user";
 import { UserInvitationTypeDefs } from "../user-invitation";
 import { ResidenceTypeDefs } from "../residence";
 import { ServiceAreaTypeDefs } from "../service-area";
+import { WaterTreatmentPlantTypeDefs } from "../water-treatment-plant";
 
 export default [
   CountryTypeDefs,
@@ -25,5 +26,6 @@ export default [
   UserInvitationTypeDefs,
   ResidenceTypeDefs,
   ServiceAreaTypeDefs,
+  WaterTreatmentPlantTypeDefs,
   scalarTypeDefs,
 ];
