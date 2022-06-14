@@ -9,6 +9,8 @@ import { UserTypeDefs } from "../user";
 import { OrganisationUserTypeDefs } from "../organisation-user";
 import { DistrictUserTypeDefs } from "../district-user";
 import { UserInvitationTypeDefs } from "../user-invitation";
+import { ResidenceTypeDefs } from "../residence";
+import { ServiceAreaTypeDefs } from "../service-area";
 
 export default [
   CountryTypeDefs,
@@ -21,5 +23,7 @@ export default [
   OrganisationUserTypeDefs,
   DistrictUserTypeDefs,
   UserInvitationTypeDefs,
+  ResidenceTypeDefs,
+  ServiceAreaTypeDefs,
   scalarTypeDefs,
 ];

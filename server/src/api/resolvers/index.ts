@@ -9,6 +9,8 @@ import { UserResolvers } from "../user";
 import { OrganisationUserResolvers } from "../organisation-user";
 import { DistrictUserResolvers } from "../district-user";
 import { UserInvitationResolvers } from "../user-invitation";
+import { ResidenceResolvers } from "../residence";
+import { ServiceAreaResolvers } from "../service-area";
 
 export default [
   CountryResolvers,
@@ -21,5 +23,7 @@ export default [
   OrganisationUserResolvers,
   DistrictUserResolvers,
   UserInvitationResolvers,
+  ResidenceResolvers,
+  ServiceAreaResolvers,
   scalarResolvers,
 ];
