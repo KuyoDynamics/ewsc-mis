@@ -9,6 +9,7 @@ import {
   updateWaterTreatmentPlant,
   getWaterProductionSites,
   getWaterStorageTanks,
+  getWaterNetwork,
 } from "../queries";
 
 const typeDefs = gql`
@@ -24,7 +25,7 @@ const typeDefs = gql`
 
     water_production_sites: [WaterProductionSite!]
     water_storage_tanks: [WaterStorageTank!]
-    #   water_network: WaterNetwork
+    water_network: WaterNetworkResult!
 
     created_at: DateTime!
     created_by: String!
@@ -34,28 +35,64 @@ const typeDefs = gql`
 
   extend type Query {
     water_treatment_plants(catchment_district_id: ID!): [WaterTreatmentPlant!]
-    water_treatment_plant(id: ID!): WaterTreatmentPlant
+    water_treatment_plant(id: ID!): WaterTreatmentPlantResult!
   }
 
   extend type Mutation {
     createWaterTreatmentPlant(
       input: CreateWaterTreatmentPlantInput!
-    ): CreateWaterTreatmentPlantPayload
+    ): WaterTreatmentPlantResult!
     updateWaterTreatmentPlant(
       input: UpdateWaterTreatmentPlantInput!
-    ): UpdateWaterTreatmentPlantPayload
+    ): WaterTreatmentPlantResult!
     deleteWaterTreatmentPlants(
       filter: DeleteWaterTreatmentPlantsInput!
-    ): DeleteWaterTreatmentPlantsPayload
+    ): DeleteWaterTreatmentPlantsResult!
   }
+  # Error handling
+  type WaterTreatmentPlantNotFoundError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type ErrorField {
+    field: String!
+    message: String!
+  }
+
+  type WaterTreatmentPlantCreateError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type WaterTreatmentPlantUpdateError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type WaterTreatmentPlantDeleteError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  union DeleteWaterTreatmentPlantsResult =
+      DeleteBatchPayload
+    | WaterTreatmentPlantDeleteError
+
+  union WaterTreatmentPlantResult =
+      WaterTreatmentPlant
+    | WaterTreatmentPlantNotFoundError
+    | WaterTreatmentPlantCreateError
+    | WaterTreatmentPlantUpdateError
+    | WaterTreatmentPlantDeleteError
 
   input DeleteWaterTreatmentPlantsInput {
     id: ID
     catchment_district_id: String
   }
 
-  type DeleteWaterTreatmentPlantsPayload {
-    water_treatment_plants: [WaterTreatmentPlant!]
+  type DeleteBatchPayload {
+    count: Int!
   }
 
   input UpdateWaterTreatmentPlantInput {
@@ -118,6 +155,8 @@ const resolves: Resolvers = {
       getWaterProductionSites({ plant_id: parent.id }, context),
     water_storage_tanks: (parent, _args, context) =>
       getWaterStorageTanks({ plant_id: parent.id }, context),
+    water_network: (parent, _args, context) =>
+      getWaterNetwork({ id: parent.id }, context),
   },
 };
 
