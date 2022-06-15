@@ -60,7 +60,7 @@ const PRISMA_ERROR_CODES: Record<string, string> = {
 
   P1008: "Operations timed out.",
 
-  P1009: "Databasealready exists on the database server.",
+  P1009: "Database already exists on the database server.",
 
   P1010: "User was denied access on the database.",
   P1011: "Error opening a TLS connection.",
