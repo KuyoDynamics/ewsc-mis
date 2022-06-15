@@ -3,6 +3,7 @@ import {
   canSeeUserSensitiveData,
   isAdmin,
   isAuthenticated,
+  isEditor,
   isValidUserInvitation,
 } from "./rules";
 
@@ -37,6 +38,12 @@ const permissions = shield(
       // Catchment District
       catchment_district: isAuthenticated,
       catchment_districts: isAuthenticated,
+      // WaterNetwork
+      water_network: isAuthenticated,
+      water_networks: isAuthenticated,
+      // WaterTreatmentPlant
+      water_treatment_plants: isAuthenticated,
+      water_treatment_plant: isAuthenticated,
     },
     Mutation: {
       // Country
@@ -79,6 +86,14 @@ const permissions = shield(
       updateCatchmentDistrict: isAuthenticated,
       createDistrictUser: isAuthenticated,
       deleteDistrictUser: isAuthenticated,
+      // WaterNetwork
+      createWaterNetwork: and(isAuthenticated, isEditor),
+      updateWaterNetwork: and(isAuthenticated, isEditor),
+      deleteWaterNetwork: and(isAuthenticated, isAdmin),
+      // WaterTreatmentPlant
+      createWaterTreatmentPlant: and(isAuthenticated, isEditor),
+      updateWaterTreatmentPlant: and(isAuthenticated, isEditor),
+      deleteWaterTreatmentPlants: and(isAuthenticated, isAdmin),
     },
     // Types
     CatchmentDistrict: isAuthenticated,
@@ -130,6 +145,8 @@ const permissions = shield(
       ),
     },
     UserInvitation: isAuthenticated,
+    WaterTreatmentPlant: isAuthenticated,
+    WaterNetwork: isAuthenticated,
   },
   { allowExternalErrors: true }
 );

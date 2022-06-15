@@ -8,6 +8,10 @@ import {
   UserRoleType,
 } from "../../libs/resolvers-types";
 
+function hasRole(ctx: GraphQLContext, user_role: UserRoleType): boolean {
+  return ctx.user.user_roles.some((role) => role === user_role);
+}
+
 const isValidUserInvitation = rule()(
   async (_, args: MutationCreateInvitedUserArgs, ctx: GraphQLContext) => {
     const { catchment_district_ids, organisation_id, user_invitation_id } =
@@ -71,7 +75,7 @@ const isAuthenticated = and(authenticated, not(isUserDisabled));
 
 const isAdmin = rule({ cache: "contextual" })(
   (_parent, _args, ctx: GraphQLContext, _info) => {
-    return ctx.user.user_roles.some((role) => role === UserRoleType.Admin);
+    return hasRole(ctx, UserRoleType.Admin);
   }
 );
 
@@ -81,6 +85,10 @@ const canSeeUserSensitiveData = rule({ cache: "strict" })(
     return ctx.user.id === parent.id;
   }
 );
+
+const isEditor = rule()(async (parent, args, ctx, info) => {
+  return hasRole(ctx, UserRoleType.DataEntry);
+});
 
 // const isUserSensitiveData = rule()(
 //   async (parent,args,ctx,info)=>{
@@ -95,10 +103,6 @@ const canSeeUserSensitiveData = rule({ cache: "strict" })(
 //   }
 // );
 
-// const isEditor = rule()(async (parent, args, ctx, info) => {
-//   return ctx.user.role === UserRoleType.Data_Entry
-// })
-
 // const isOwner = rule()(async (parent, args, ctx, info) => {
 //   return ctx.user.items.some((id) => id === parent.id)
 // })
@@ -108,5 +112,6 @@ export {
   isAuthenticated,
   isUserDisabled,
   isAdmin,
+  isEditor,
   canSeeUserSensitiveData,
 };

@@ -16,3 +16,4 @@ export * from "../water-production-site/queries";
 export * from "../water-storage-tank/queries";
 export * from "../water-treatment-plant/queries";
 export * from "../residence/queries";
+export * from "../water-network/queries";
