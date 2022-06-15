@@ -3,7 +3,7 @@ import { mergeResolvers } from "@graphql-tools/merge";
 import typeDefs from "../typedefs";
 import resolvers from "../resolvers";
 import { applyMiddleware } from "graphql-middleware";
-import { permissions as permissionsMiddleware } from "../../permisions";
+import { permissions as permissionsMiddleware } from "../../permissions";
 import { deleteUserInvitationMiddleware } from "../../middleware";
 
 const schema = applyMiddleware(

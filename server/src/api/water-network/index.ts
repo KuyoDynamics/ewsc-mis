@@ -1,9 +1,12 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
+import { getWaterTreatmentPlant } from "../queries";
 import {
   createWaterNetwork,
+  deleteWaterNetwork,
   getWaterNetwork,
   getWaterNetworks,
+  updateWaterNetwork,
 } from "./queries";
 
 const typeDefs = gql`
@@ -41,10 +44,12 @@ const typeDefs = gql`
 
   type WaterNetworkCreateError implements ApiError {
     message: String!
+    errors: [ErrorField!]
   }
 
   type WaterNetworkUpdateError implements ApiError {
     message: String!
+    errors: [ErrorField!]
   }
 
   type WaterNetworkDeleteError implements ApiError {
@@ -88,6 +93,12 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     createWaterNetwork: (_, args, context) => createWaterNetwork(args, context),
+    updateWaterNetwork: (_, args, context) => updateWaterNetwork(args, context),
+    deleteWaterNetwork: (_, args, context) => deleteWaterNetwork(args, context),
+  },
+  WaterNetwork: {
+    water_treatment_plant: (parent, _args, context) =>
+      getWaterTreatmentPlant({ id: parent.plant_id }, context),
   },
 };
 

@@ -1436,6 +1436,7 @@ export type WaterNetwork = {
 
 export type WaterNetworkCreateError = ApiError & {
   __typename?: 'WaterNetworkCreateError';
+  errors?: Maybe<Array<ErrorField>>;
   message: Scalars['String'];
 };
 
@@ -1453,6 +1454,7 @@ export type WaterNetworkResult = WaterNetwork | WaterNetworkCreateError | WaterN
 
 export type WaterNetworkUpdateError = ApiError & {
   __typename?: 'WaterNetworkUpdateError';
+  errors?: Maybe<Array<ErrorField>>;
   message: Scalars['String'];
 };
 
@@ -2826,6 +2828,7 @@ export type WaterNetworkResolvers<ContextType = GraphQLContext, ParentType exten
 }>;
 
 export type WaterNetworkCreateErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['WaterNetworkCreateError'] = ResolversParentTypes['WaterNetworkCreateError']> = ResolversObject<{
+  errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -2845,6 +2848,7 @@ export type WaterNetworkResultResolvers<ContextType = GraphQLContext, ParentType
 }>;
 
 export type WaterNetworkUpdateErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['WaterNetworkUpdateError'] = ResolversParentTypes['WaterNetworkUpdateError']> = ResolversObject<{
+  errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

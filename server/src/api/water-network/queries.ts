@@ -1,11 +1,13 @@
 import {
   MutationCreateWaterNetworkArgs,
+  MutationDeleteWaterNetworkArgs,
+  MutationUpdateWaterNetworkArgs,
   QueryWater_NetworkArgs,
   QueryWater_NetworksArgs,
   WaterNetwork,
   WaterNetworkResult,
 } from "../../libs/resolvers-types";
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 
 async function getWaterNetworks(
   args: QueryWater_NetworksArgs,
@@ -46,7 +48,10 @@ async function getWaterNetwork(
       message: `The WaterNetwork with the id ${args.id} does not exist.`,
     };
 
-  return water_network as WaterNetworkResult;
+  return {
+    __typename: "WaterNetwork",
+    ...water_network,
+  } as WaterNetworkResult;
 }
 async function createWaterNetwork(
   args: MutationCreateWaterNetworkArgs,
@@ -62,16 +67,75 @@ async function createWaterNetwork(
         last_modified_by: context.user.email,
       },
     });
-    return water_network as WaterNetworkResult;
+    return {
+      __typename: "WaterNetwork",
+      ...water_network,
+    } as WaterNetworkResult;
   } catch (error) {
-    //   TODO: See if you can understand how to send back all other errors
-    // so that we can nicely bind them in the UI!
-    console.log("error", error);
     return {
       __typename: "WaterNetworkCreateError",
       message: `Failed to create WaterNewtork.`,
+      errors: generateClientErrors(error),
     };
   }
 }
 
-export { getWaterNetwork, getWaterNetworks, createWaterNetwork };
+async function updateWaterNetwork(
+  args: MutationUpdateWaterNetworkArgs,
+  context: GraphQLContext
+): Promise<WaterNetworkResult> {
+  try {
+    const water_network = await context.prisma.waterNetwork.update({
+      where: {
+        id: args.input.id,
+      },
+      data: {
+        name: args.input.update.name || undefined,
+        type: args.input.update.type || undefined,
+        last_modified_by: args.input.update ? context.user.email : undefined,
+      },
+    });
+
+    return {
+      __typename: "WaterNetwork",
+      ...water_network,
+    } as WaterNetworkResult;
+  } catch (error) {
+    return {
+      __typename: "WaterNetworkUpdateError",
+      message: `Failed to update WaterNewtork.`,
+      errors: generateClientErrors(error),
+    };
+  }
+}
+
+async function deleteWaterNetwork(
+  args: MutationDeleteWaterNetworkArgs,
+  context: GraphQLContext
+): Promise<WaterNetworkResult> {
+  try {
+    const water_network = await context.prisma.waterNetwork.delete({
+      where: {
+        id: args.id,
+      },
+    });
+
+    return {
+      __typename: "WaterNetwork",
+      ...water_network,
+    } as WaterNetworkResult;
+  } catch (error) {
+    return {
+      __typename: "WaterNetworkDeleteError",
+      message: `Failed to delete WaterNewtork with id ${args.id}.`,
+    };
+  }
+}
+
+export {
+  getWaterNetwork,
+  getWaterNetworks,
+  createWaterNetwork,
+  updateWaterNetwork,
+  deleteWaterNetwork,
+};
