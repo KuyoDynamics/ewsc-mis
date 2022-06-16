@@ -447,7 +447,7 @@ model SewerNetwork {
 }
 
 model ServiceAreaSewerConnection {
-  connections Int
+  connections BigInt
 
   // Relation Fields
   sewer_netowrk_id String       @db.Uuid

@@ -1,13 +1,13 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getSewerTreatmentPlant } from "../queries";
 import {
   createSewerNetwork,
   deleteSewerNetwork,
   getSewerNetwork,
   getSewerNetworks,
   updateSewerNetwork,
-} from "./queries";
+  getSewerTreatmentPlant,
+} from "../queries";
 
 const typeDefs = gql`
   type SewerNetwork {
