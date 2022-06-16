@@ -4,9 +4,8 @@ import {
   createCountry,
   deleteCountry,
   getCountries,
-  getCountryById,
-  getOrganisationsByCountryId,
-  getProvincesByCountryId,
+  getCountry,
+  getProvinces,
   updateCountry,
 } from "../queries";
 
@@ -26,13 +25,13 @@ const typeDefs = gql`
 
   type Query {
     countries: [Country!]
-    country(id: ID!): Country
+    country(id: ID!): CountryResult!
   }
 
   type Mutation {
-    createCountry(input: CreateCountryInput!): CreateCountryPayload
-    deleteCountry(input: DeleteCountryInput!): DeleteCountryPayload
-    updateCountry(input: UpdateCountryInput!): UpdateCountryPayload
+    createCountry(input: CreateCountryInput!): CountryResult!
+    deleteCountry(input: DeleteCountryInput!): CountryResult!
+    updateCountry(input: UpdateCountryInput!): CountryResult!
   }
 
   interface ApiError {
@@ -70,20 +69,19 @@ const typeDefs = gql`
     errors: [ErrorField!]
   }
 
+  union CountryResult =
+      Country
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
+
   input CreateCountryInput {
     code: String!
     name: String!
     flag: Byte
     provinces: [CreateProvinceInput!]
     organisations: [CreateOrganisationInput!]
-  }
-
-  type CreateCountryPayload {
-    country: Country!
-  }
-
-  type DeleteCountryPayload {
-    country: Country!
   }
 
   input DeleteCountryInput {
@@ -100,18 +98,17 @@ const typeDefs = gql`
     code: String
   }
 
-  type UpdateCountryPayload {
-    country: Country!
-  }
-
   scalar DateTime
+  scalar Byte
+  scalar JWT
+  scalar Float
   scalar Byte
 `;
 
 const resolvers: Resolvers = {
   Query: {
     countries: (_, _args, context) => getCountries(context),
-    country: (_, args, context) => getCountryById(args.id, context),
+    country: (_, args, context) => getCountry(args.id, context),
   },
   Mutation: {
     createCountry: (_, args, context) => createCountry(args, context),
@@ -119,10 +116,9 @@ const resolvers: Resolvers = {
     updateCountry: (_, args, context) => updateCountry(args, context),
   },
   Country: {
-    provinces: async ({ id }, _args, context) =>
-      getProvincesByCountryId(id, context),
-    organisations: ({ id }, _args, context) =>
-      getOrganisationsByCountryId(id, context),
+    provinces: async ({ id }, _args, context) => getProvinces(id, context),
+    // organisations: ({ id }, _args, context) =>
+    //   getOrganisationsByCountryId(id, context),
   },
 };
 

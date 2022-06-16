@@ -1,17 +1,17 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
-  getOrganisationUser,
+  // getOrganisationUser,
   getOrganisationUsers,
 } from "../organisation-user/queries";
 import {
   createOrganisation,
   deleteOrganisation,
-  getAllOrganisations,
+  // getAllOrganisations,
   getCatchmentProvinces,
   getCountryByOrganisationId,
   getOrganisationById,
-  getOrganisationsByCountryId,
+  // getOrganisationsByCountryId,
   updateOrganisation,
 } from "../queries";
 
@@ -21,7 +21,7 @@ const typeDefs = gql`
     name: String!
     logo: Byte
     country_id: String!
-    country: Country
+    country: CountryResult
     catchment_provinces: [CatchmentProvince!]
     users: [OrganisationUser!]
     created_at: DateTime!
@@ -31,33 +31,20 @@ const typeDefs = gql`
   }
 
   type Query {
-    allOrganisations: [Organisation!]
     organisations(country_id: ID!): [Organisation!]
-    organisation(id: ID!): Organisation
+    organisation(id: ID!): OrganisationResult
   }
 
   type Mutation {
-    createOrganisation(
-      input: CreateOrganisationInput!
-    ): CreateOrganisationPayload
-    updateOrganisation(
-      input: UpdateOrganisationInput!
-    ): UpdateOrganisationPayload
-    deleteOrganisation(
-      input: DeleteOrganisationInput!
-    ): DeleteOrganisationPayload
+    createOrganisation(input: CreateOrganisationInput!): OrganisationResult!
+    updateOrganisation(input: UpdateOrganisationInput!): OrganisationResult!
+    deleteOrganisation(input: DeleteOrganisationInput!): OrganisationResult!
   }
 
   input CreateOrganisationInput {
     name: String!
     logo: Byte
     country_id: String!
-    # catchment_provinces: [CreateCatchmentProvinceInput!]
-    # users: [User]
-  }
-
-  type CreateOrganisationPayload {
-    organisation: Organisation
   }
 
   input UpdateOrganisationInput {
@@ -70,39 +57,35 @@ const typeDefs = gql`
     logo: Byte
   }
 
-  type UpdateOrganisationPayload {
-    organisation: Organisation
-  }
-
   input DeleteOrganisationInput {
     id: ID!
   }
 
-  type DeleteOrganisationPayload {
-    organisation: Organisation
-  }
-
-  scalar DateTime
-  scalar Byte
+  union OrganisationResult =
+      Organisation
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {
   Query: {
-    allOrganisations: (_, _args, context) => getAllOrganisations(context),
-    organisations: (_, args, context) =>
-      getOrganisationsByCountryId(args.country_id, context),
-    organisation: (_, args, context) => getOrganisationById(args.id, context),
+    // allOrganisations: (_, _args, context) => getAllOrganisations(context),
+    // organisations: (_, args, context) =>
+    //   getOrganisationsByCountryId(args.country_id, context),
+    // organisation: (_, args, context) => getOrganisation(args.id, context),
   },
 
   Mutation: {
-    createOrganisation: (_, args, context) => createOrganisation(args, context),
-    updateOrganisation: (_, args, context) => updateOrganisation(args, context),
-    deleteOrganisation: (_, args, context) =>
-      deleteOrganisation(args.input.id, context),
+    // createOrganisation: (_, args, context) => createOrganisation(args, context),
+    // updateOrganisation: (_, args, context) => updateOrganisation(args, context),
+    // deleteOrganisation: (_, args, context) =>
+    //   deleteOrganisation(args.input.id, context),
   },
   Organisation: {
-    country: (parent, _args, context) =>
-      getCountryByOrganisationId(parent.id, context),
+    // country: (parent, _args, context) =>
+    //   getCountry(parent.country_id, context),
     catchment_provinces: (parent, _args, context) =>
       getCatchmentProvinces(parent.id, context),
     users: (parent, _args, context) =>

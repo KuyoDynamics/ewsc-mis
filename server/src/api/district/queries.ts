@@ -1,99 +1,155 @@
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 import {
+  CatchmentDistrict,
+  District,
+  DistrictResult,
   MutationCreateDistrictArgs,
   MutationUpdateDistrictArgs,
 } from "../../libs/resolvers-types";
 
-function getDistrictById(id: string, context: GraphQLContext) {
-  return context.prisma.district.findUnique({
-    where: {
-      id,
-    },
-  });
-}
-
-function getProvinceDistricts(id: string, context: GraphQLContext) {
-  return context.prisma.province
-    .findUnique({
+async function getDistrict(
+  id: string,
+  context: GraphQLContext
+): Promise<DistrictResult> {
+  try {
+    const district = await context.prisma.district.findUnique({
       where: {
         id,
       },
-    })
-    .districts();
+    });
+
+    if (!district) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The District with the id ${id} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "District",
+      ...district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find District with the id ${id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
-function getOrganisationsInDistrict(id: string, context: GraphQLContext) {
-  return context.prisma.district
+async function getDistricts(
+  province_id: string,
+  context: GraphQLContext
+): Promise<District[]> {
+  const districts = await context.prisma.province
+    .findUnique({
+      where: {
+        id: province_id,
+      },
+    })
+    .districts();
+  return districts;
+}
+
+async function getOrganisationsInDistrict(
+  id: string,
+  context: GraphQLContext
+): Promise<CatchmentDistrict[]> {
+  const organisations_in_district = await context.prisma.district
     .findUnique({
       where: {
         id,
       },
     })
     .organisations_in_district();
+  return organisations_in_district as CatchmentDistrict[];
 }
-
-function getDistrictsByProvinceId(id: string, context: GraphQLContext) {
-  return getProvinceDistricts(id, context);
-}
-
-function getDistrictProvince(id: string, context: GraphQLContext) {
-  return getDistrictById(id, context).province();
-}
-
-// Mutations
 
 async function createDistrict(
   args: MutationCreateDistrictArgs,
   context: GraphQLContext
-) {
-  const requiredInput = {
-    code: args.input.code,
-    name: args.input.name,
-    province_id: args.input.province_id,
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  };
-  const district = await context.prisma.district.create({
-    data: requiredInput,
-  });
+): Promise<DistrictResult> {
+  try {
+    const district = await context.prisma.district.create({
+      data: {
+        code: args.input.code,
+        name: args.input.name,
+        province_id: args.input.province_id,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      },
+    });
 
-  return {
-    district,
-  };
+    return {
+      __typename: "District",
+      ...district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create District.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function updateDistrict(
   args: MutationUpdateDistrictArgs,
   context: GraphQLContext
-) {
-  const district = await context.prisma.district.update({
-    where: {
-      id: args.input.id,
-    },
-    data: {
-      name: args.input.update.name || undefined,
-      code: args.input.update.code || undefined,
-      last_modified_by: context.user?.email,
-    },
-  });
+): Promise<DistrictResult> {
+  try {
+    const district = await context.prisma.district.update({
+      where: {
+        id: args.input.id,
+      },
+      data: {
+        name: args.input.update.name || undefined,
+        code: args.input.update.code || undefined,
+        last_modified_by: args.input.update ? context.user.email : undefined,
+      },
+    });
 
-  return { district };
+    return {
+      __typename: "District",
+      ...district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update District with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
-async function deleteDistrict(id: string, context: GraphQLContext) {
-  const district = await context.prisma.district.delete({
-    where: {
-      id,
-    },
-  });
+async function deleteDistrict(
+  id: string,
+  context: GraphQLContext
+): Promise<DistrictResult> {
+  try {
+    const district = await context.prisma.district.delete({
+      where: {
+        id,
+      },
+    });
 
-  return { district };
+    return {
+      __typename: "District",
+      ...district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete District with id ${id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {
-  getDistrictProvince,
-  getDistrictById,
-  getDistrictsByProvinceId,
+  getDistrict,
+  getDistricts,
   getOrganisationsInDistrict,
   createDistrict,
   updateDistrict,

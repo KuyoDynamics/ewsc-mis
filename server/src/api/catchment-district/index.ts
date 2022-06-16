@@ -7,7 +7,7 @@ import {
   getCatchmentDistrictById,
   getCatchmentDistricts,
   getCatchmentProvinceById,
-  getDistrictById,
+  getDistrict,
   updateCatchmentDistrict,
 } from "../queries";
 
@@ -99,8 +99,8 @@ const resolvers: Resolvers = {
       deleteCatchmentDistrict(args, context),
   },
   CatchmentDistrict: {
-    district: ({ district_id }, _args, context) =>
-      getDistrictById(district_id, context),
+    // district: ({ district_id }, _args, context) =>
+    //   getDistrict(district_id, context),
     catchment_province: ({ catchment_province_id }, _args, context) =>
       getCatchmentProvinceById(catchment_province_id, context),
     district_users: (parent, _args, context) =>

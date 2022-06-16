@@ -13,7 +13,7 @@ const typeDefs = gql`
   type ServiceArea {
     id: ID!
     residence_id: String!
-    residence: Residence
+    residence: ResidenceResult
     catchment_district_id: String!
     catchment_district: CatchmentDistrict
     # service_area_water_connections: [ServiceAreaWaterConnection!]

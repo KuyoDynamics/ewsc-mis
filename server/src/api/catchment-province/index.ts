@@ -7,7 +7,7 @@ import {
   getCatchmentProvinceById,
   getCatchmentProvinces,
   getOrganisationById,
-  getProvinceById,
+  // getProvinceById,
   updateCatchmentProvince,
 } from "../queries";
 
@@ -95,8 +95,8 @@ const resolvers: Resolvers = {
       deleteCatchmentProvince(args, context),
   },
   CatchmentProvince: {
-    province: ({ province_id }, _args, context) =>
-      getProvinceById(province_id, context),
+    // province: ({ province_id }, _args, context) =>
+    //   getProvinceById(province_id, context),
     organisation: ({ organisation_id }, _args, context) =>
       getOrganisationById(organisation_id, context),
     catchment_districts: ({ id }, _args, context) =>

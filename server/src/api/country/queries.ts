@@ -1,87 +1,128 @@
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 import {
+  Country,
+  CountryResult,
   MutationCreateCountryArgs,
   MutationDeleteCountryArgs,
   MutationUpdateCountryArgs,
 } from "../../libs/resolvers-types";
 
-function getCountries(context: GraphQLContext) {
+async function getCountries(context: GraphQLContext): Promise<Country[]> {
   return context.prisma.country.findMany({});
 }
-function getCountryById(id: string, context: GraphQLContext) {
-  return context.prisma.country.findUnique({
-    where: {
-      id,
-    },
-  });
-}
+async function getCountry(
+  id: string,
+  context: GraphQLContext
+): Promise<CountryResult> {
+  try {
+    const country = await context.prisma.country.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!country) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The Country with the id ${id} does not exist.`,
+      };
+    }
 
-function getProvincesByCountryId(id: string, context: GraphQLContext) {
-  return getCountryById(id, context).provinces();
-}
-
-function getOrganisationsByCountryId(id: string, context: GraphQLContext) {
-  return getCountryById(id, context).organisations();
+    return {
+      __typename: "Country",
+      ...country,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find Country with the id ${id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function createCountry(
   args: MutationCreateCountryArgs,
   context: GraphQLContext
-) {
-  const { name, code } = args.input;
+): Promise<CountryResult> {
+  try {
+    const country = await context.prisma.country.create({
+      data: {
+        code: args.input.code,
+        name: args.input.name,
+        flag: args.input.flag,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      },
+    });
 
-  const requiredInput = {
-    code,
-    name,
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  };
-
-  const country = await context.prisma.country.create({
-    data: requiredInput,
-  });
-
-  return { country };
+    return {
+      __typename: "Country",
+      ...country,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create ServiceArea.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function deleteCountry(
   args: MutationDeleteCountryArgs,
   context: GraphQLContext
-) {
-  const country = await context.prisma.country.delete({
-    where: {
-      id: args.input.id,
-    },
-  });
+): Promise<CountryResult> {
+  try {
+    const country = await context.prisma.country.delete({
+      where: {
+        id: args.input.id,
+      },
+    });
 
-  return { country };
+    return {
+      __typename: "Country",
+      ...country,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete Country with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function updateCountry(
   args: MutationUpdateCountryArgs,
   context: GraphQLContext
-) {
-  const { code, name } = args.input.update;
-  const country = await context.prisma.country.update({
-    where: {
-      id: args.input.id,
-    },
-    data: {
-      code: code || undefined,
-      name: name || undefined,
-      last_modified_by: code || name ? context.user?.email : undefined,
-    },
-  });
-  return {
-    country,
-  };
+): Promise<CountryResult> {
+  try {
+    const country = await context.prisma.country.update({
+      where: {
+        id: args.input.id,
+      },
+      data: {
+        code: args.input.update.code || undefined,
+        name: args.input.update.name || undefined,
+        last_modified_by: args.input.update ? context.user.email : undefined,
+      },
+    });
+    return {
+      __typename: "Country",
+      ...country,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update Country with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {
   getCountries,
-  getProvincesByCountryId,
-  getOrganisationsByCountryId,
-  getCountryById,
+  getCountry,
   createCountry,
   deleteCountry,
   updateCountry,
