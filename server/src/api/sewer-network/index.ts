@@ -7,6 +7,7 @@ import {
   getSewerNetworks,
   updateSewerNetwork,
   getSewerTreatmentPlant,
+  getSewerNetworkSewerConnections,
 } from "../queries";
 
 const typeDefs = gql`
@@ -16,7 +17,7 @@ const typeDefs = gql`
     plant_id: String!
     sewer_treatment_plant: SewerTreatmentPlantResult
     type: NetworkOwnershipType!
-    # service_area_Sewer_connections: [ServiceAreaSewerConnection!]
+    sewer_network_sewer_connections: [ServiceAreaSewerConnection!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -71,6 +72,8 @@ const resolvers: Resolvers = {
   SewerNetwork: {
     sewer_treatment_plant: (parent, _args, context) =>
       getSewerTreatmentPlant({ id: parent.plant_id }, context),
+    sewer_network_sewer_connections: (parent, _args, context) =>
+      getSewerNetworkSewerConnections(parent.id, context),
   },
 };
 

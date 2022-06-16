@@ -1,7 +1,6 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
-  getCatchmentDistrictById,
   createWaterTreatmentPlant,
   deleteWaterTreatmentPlants,
   getWaterTreatmentPlant,
@@ -10,6 +9,7 @@ import {
   getWaterProductionSites,
   getWaterStorageTanks,
   getWaterNetwork,
+  getCatchmentDistrict,
 } from "../queries";
 
 const typeDefs = gql`
@@ -21,7 +21,7 @@ const typeDefs = gql`
     gps: String
 
     catchment_district_id: String!
-    catchment_district: CatchmentDistrict
+    catchment_district: CatchmentDistrictResult
 
     water_production_sites: [WaterProductionSite!]
     water_storage_tanks: [WaterStorageTank!]
@@ -94,9 +94,6 @@ const typeDefs = gql`
     SURFACE
     GROUND
   }
-
-  scalar DateTime
-  scalar Float
 `;
 
 const resolves: Resolvers = {
@@ -117,7 +114,7 @@ const resolves: Resolvers = {
   },
   WaterTreatmentPlant: {
     catchment_district: (parent, _args, context) =>
-      getCatchmentDistrictById(parent.catchment_district_id, context),
+      getCatchmentDistrict(parent.catchment_district_id, context),
     water_production_sites: (parent, _args, context) =>
       getWaterProductionSites({ plant_id: parent.id }, context),
     water_storage_tanks: (parent, _args, context) =>

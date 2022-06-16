@@ -1,153 +1,136 @@
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 import {
   CatchmentProvince,
-  CreateCatchmentProvincePayload,
-  DeleteCatchmentProvincePayload,
+  CatchmentProvinceResult,
   MutationCreateCatchmentProvinceArgs,
   MutationDeleteCatchmentProvinceArgs,
   MutationUpdateCatchmentProvinceArgs,
-  UpdateCatchmentProvincePayload,
 } from "../../libs/resolvers-types";
 
-async function getCatchmentProvinceById(
+async function getCatchmentProvinces(
+  organisation_id: string,
+  context: GraphQLContext
+): Promise<CatchmentProvince[]> {
+  return context.prisma.organisation
+    .findUnique({
+      where: {
+        id: organisation_id,
+      },
+    })
+    .catchment_provinces();
+}
+
+async function getCatchmentProvince(
   id: string,
   context: GraphQLContext
-): Promise<CatchmentProvince> {
-  const result = await context.prisma.catchmentProvince.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      province: {
-        select: {
-          name: true,
+): Promise<CatchmentProvinceResult> {
+  try {
+    const catchment_province =
+      await context.prisma.catchmentProvince.findUnique({
+        where: {
+          id,
         },
-      },
-      organisation: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
+      });
 
-  return {
-    ...result,
-    province_name: result?.province.name,
-    organisation_name: result?.organisation.name,
-  } as CatchmentProvince;
+    if (!catchment_province) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The CatchmentProvince with the id ${id}} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "CatchmentProvince",
+      ...catchment_province,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find CatchmentProvince with the id ${id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function createCatchmentProvince(
   args: MutationCreateCatchmentProvinceArgs,
   context: GraphQLContext
-) {
-  const requiredInput = {
-    province_id: args.input.province_id,
-    organisation_id: args.input.organisation_id,
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  };
-  const result = await context.prisma.catchmentProvince.create({
-    data: requiredInput,
-    include: {
-      province: {
-        select: {
-          name: true,
-        },
+): Promise<CatchmentProvinceResult> {
+  try {
+    const catchment_province = await context.prisma.catchmentProvince.create({
+      data: {
+        province_id: args.input.province_id,
+        organisation_id: args.input.organisation_id,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
       },
-      organisation: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-  const { province, organisation, ...rest } = result;
-  const payload: CreateCatchmentProvincePayload = {
-    catchment_province: {
-      ...rest,
-      province_name: province.name,
-      organisation_name: organisation.name,
-    },
-  };
-  return payload;
+    });
+    return {
+      __typename: "CatchmentProvince",
+      ...catchment_province,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create CatchmentProvince.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function updateCatchmentProvince(
   args: MutationUpdateCatchmentProvinceArgs,
   context: GraphQLContext
-) {
-  const result = await context.prisma.catchmentProvince.update({
-    where: {
-      id: args.input.id,
-    },
-    data: {
-      disabled: args.input.update.disabled,
-      last_modified_by: context.user?.email,
-    },
-    include: {
-      province: {
-        select: {
-          name: true,
-        },
+): Promise<CatchmentProvinceResult> {
+  try {
+    const catchment_province = await context.prisma.catchmentProvince.update({
+      where: {
+        id: args.input.id,
       },
-      organisation: {
-        select: {
-          name: true,
-        },
+      data: {
+        disabled: args.input.update.disabled || undefined,
+        last_modified_by: args.input.update ? context.user.email : undefined,
       },
-    },
-  });
-
-  const { province, organisation, ...rest } = result;
-  const payload: UpdateCatchmentProvincePayload = {
-    catchment_province: {
-      ...rest,
-      province_name: province.name,
-      organisation_name: organisation.name,
-    },
-  };
-
-  return payload;
+    });
+    return {
+      __typename: "CatchmentProvince",
+      ...catchment_province,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update CatchmentProvince with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function deleteCatchmentProvince(
   args: MutationDeleteCatchmentProvinceArgs,
   context: GraphQLContext
-) {
-  const result = await context.prisma.catchmentProvince.delete({
-    where: {
-      id: args.input.id,
-    },
-    include: {
-      province: {
-        select: {
-          name: true,
-        },
+): Promise<CatchmentProvinceResult> {
+  try {
+    const catchment_province = await context.prisma.catchmentProvince.delete({
+      where: {
+        id: args.input.id,
       },
-      organisation: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-
-  const { province, organisation, ...rest } = result;
-  const payload: DeleteCatchmentProvincePayload = {
-    catchment_province: {
-      ...rest,
-      province_name: province.name,
-      organisation_name: organisation.name,
-    },
-  };
-
-  return payload;
+    });
+    return {
+      __typename: "CatchmentProvince",
+      ...catchment_province,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete CatchmentProvince with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {
-  getCatchmentProvinceById,
+  getCatchmentProvince,
+  getCatchmentProvinces,
   createCatchmentProvince,
   updateCatchmentProvince,
   deleteCatchmentProvince,

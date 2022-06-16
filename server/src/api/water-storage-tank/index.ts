@@ -82,9 +82,6 @@ const typeDefs = gql`
     PRODUCTION
     DISTRIBUTION
   }
-
-  scalar DateTime
-  scalar Float
 `;
 
 const resolvers: Resolvers = {

@@ -5,6 +5,7 @@ import {
   deleteCountry,
   getCountries,
   getCountry,
+  getOrganisations,
   getProvinces,
   updateCountry,
 } from "../queries";
@@ -69,6 +70,16 @@ const typeDefs = gql`
     errors: [ErrorField!]
   }
 
+  type ApiLoginError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type ApiPasswordResetError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
   union CountryResult =
       Country
     | ApiNotFoundError
@@ -117,8 +128,7 @@ const resolvers: Resolvers = {
   },
   Country: {
     provinces: async ({ id }, _args, context) => getProvinces(id, context),
-    // organisations: ({ id }, _args, context) =>
-    //   getOrganisationsByCountryId(id, context),
+    organisations: ({ id }, _args, context) => getOrganisations(id, context),
   },
 };
 

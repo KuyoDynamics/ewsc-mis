@@ -2,6 +2,10 @@ import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import { getWaterTreatmentPlant } from "../queries";
 import {
+  getServiceAreaWaterConnections,
+  getWaterNetworkWaterConnections,
+} from "../service-area-water-connection/queries";
+import {
   createWaterNetwork,
   deleteWaterNetwork,
   getWaterNetwork,
@@ -16,7 +20,7 @@ const typeDefs = gql`
     plant_id: String!
     water_treatment_plant: WaterTreatmentPlantResult
     type: NetworkOwnershipType!
-    # service_area_water_connections: [ServiceAreaWaterConnection!]
+    water_network_water_connections: [ServiceAreaWaterConnection!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -61,7 +65,6 @@ const typeDefs = gql`
     INDEPENDENT
     INTERNAL
   }
-  scalar DateTime
 `;
 
 const resolvers: Resolvers = {
@@ -77,6 +80,8 @@ const resolvers: Resolvers = {
   WaterNetwork: {
     water_treatment_plant: (parent, _args, context) =>
       getWaterTreatmentPlant({ id: parent.plant_id }, context),
+    water_network_water_connections: (parent, _args, context) =>
+      getWaterNetworkWaterConnections(parent.id, context),
   },
 };
 

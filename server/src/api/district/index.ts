@@ -16,7 +16,6 @@ const typeDefs = gql`
     code: String!
     province_id: String!
     province: ProvinceResult
-    # organisations_in_district: [Organisation!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!

@@ -23,6 +23,21 @@ async function getServiceAreaWaterConnections(
   return service_area_water_connections;
 }
 
+async function getWaterNetworkWaterConnections(
+  water_network_id: string,
+  context: GraphQLContext
+): Promise<ServiceAreaWaterConnection[]> {
+  const water_network_water_connections = await context.prisma.waterNetwork
+    .findUnique({
+      where: {
+        id: water_network_id,
+      },
+    })
+    .service_area_water_connections();
+
+  return water_network_water_connections;
+}
+
 async function getServiceAreaWaterConnection(
   args: QueryService_Area_Water_ConnectionArgs,
   context: GraphQLContext
@@ -177,4 +192,5 @@ export {
   createServiceAreaWaterConnection,
   updateServiceAreaWaterConnection,
   deleteServiceAreaWaterConnection,
+  getWaterNetworkWaterConnections,
 };

@@ -1,9 +1,10 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
-  getCatchmentDistrictById,
   createSewerTreatmentPlant,
   deleteSewerTreatmentPlants,
+  getCatchmentDistrict,
+  getSewerNetwork,
   getSewerTreatmentPlant,
   getSewerTreatmentPlants,
   updateSewerTreatmentPlant,
@@ -17,8 +18,8 @@ const typeDefs = gql`
     capacity: Float!
     gps: String
     catchment_district_id: String!
-    catchment_district: CatchmentDistrict
-    # sewer_network: SewerNetworkResult!
+    catchment_district: CatchmentDistrictResult
+    sewer_network: SewerNetworkResult
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -101,9 +102,9 @@ const resolves: Resolvers = {
   },
   SewerTreatmentPlant: {
     catchment_district: (parent, _args, context) =>
-      getCatchmentDistrictById(parent.catchment_district_id, context),
-    // sewer_network: (parent, _args, context) =>
-    //   getSewerNetwork({ id: parent.id }, context),
+      getCatchmentDistrict(parent.catchment_district_id, context),
+    sewer_network: (parent, _args, context) =>
+      getSewerNetwork({ id: parent.id }, context),
   },
 };
 

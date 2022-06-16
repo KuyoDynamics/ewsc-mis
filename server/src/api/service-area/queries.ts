@@ -59,7 +59,7 @@ async function getServiceArea(
     return {
       __typename: "ServiceArea",
       ...service_area,
-    };
+    } as ServiceAreaResult;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
@@ -86,7 +86,7 @@ async function createServiceArea(
     return {
       __typename: "ServiceArea",
       ...service_area,
-    };
+    } as ServiceAreaResult;
   } catch (error) {
     return {
       __typename: "ApiCreateError",
@@ -110,7 +110,7 @@ async function deleteServiceArea(
     return {
       __typename: "ServiceArea",
       ...service_area,
-    };
+    } as ServiceAreaResult;
   } catch (error) {
     return {
       __typename: "ApiDeleteError",

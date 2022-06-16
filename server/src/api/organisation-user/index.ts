@@ -1,23 +1,22 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getOrganisationById } from "../queries";
-import { getUser } from "../user/queries";
 import {
   createOrganisationUser,
   deleteOrganisationUser,
   getOrganisationUser,
   getOrganisationUsers,
   updateOrganisationUser,
-} from "./queries";
+  getOrganisation,
+  getUser,
+} from "../queries";
 const typeDefs = gql`
   type OrganisationUser {
     id: ID!
     is_owner: Boolean!
     user_id: String!
-    user: User
+    user: UserResult
     organisation_id: String!
-    organisation: Organisation
-    # district_users: [DistrictUser!]
+    organisation: OrganisationResult
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -26,28 +25,24 @@ const typeDefs = gql`
 
   extend type Query {
     organisation_users(organisation_id: ID!): [OrganisationUser!]
-    organisation_user(organisation_user_id: ID!): OrganisationUser
+    organisation_user(organisation_user_id: ID!): OrganisationUserResult!
   }
 
   extend type Mutation {
     createOrganisationUser(
       input: CreateOrganisationUserInput!
-    ): CreateOrganisationUserPayload
+    ): OrganisationUserResult!
     updateOrganisationUser(
       input: UpdateOrganisationUserInput!
-    ): UpdateOrganisationUserPayload
+    ): OrganisationUserResult!
     deleteOrganisationUser(
       input: DeleteOrganisationUserInput!
-    ): DeleteOrganisationUserPayload
+    ): OrganisationUserResult!
   }
 
   input CreateOrganisationUserInput {
     user_id: ID!
     organisation_id: ID!
-  }
-
-  type CreateOrganisationUserPayload {
-    organisation_user: OrganisationUser
   }
 
   input UpdateOrganisationUserInput {
@@ -59,26 +54,23 @@ const typeDefs = gql`
     is_owner: Boolean!
   }
 
-  type UpdateOrganisationUserPayload {
-    organisation_user: OrganisationUser
-  }
-
   input DeleteOrganisationUserInput {
     id: ID!
   }
 
-  type DeleteOrganisationUserPayload {
-    organisation_user: OrganisationUser
-  }
-
-  scalar DateTime
+  union OrganisationUserResult =
+      OrganisationUser
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {
   OrganisationUser: {
     user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
     organisation: (parent, _args, context) =>
-      getOrganisationById(parent.organisation_id, context),
+      getOrganisation(parent.organisation_id, context),
   },
   Query: {
     organisation_users: (_, args, context) =>

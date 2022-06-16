@@ -23,6 +23,21 @@ async function getServiceAreaSewerConnections(
   return service_area_sewer_connections;
 }
 
+async function getSewerNetworkSewerConnections(
+  sewer_network_id: string,
+  context: GraphQLContext
+): Promise<ServiceAreaSewerConnection[]> {
+  const sewer_network_sewer_connections = await context.prisma.sewerNetwork
+    .findUnique({
+      where: {
+        id: sewer_network_id,
+      },
+    })
+    .service_area_sewer_connections();
+
+  return sewer_network_sewer_connections;
+}
+
 async function getServiceAreaSewerConnection(
   args: QueryService_Area_Sewer_ConnectionArgs,
   context: GraphQLContext
@@ -177,4 +192,5 @@ export {
   createServiceAreaSewerConnection,
   updateServiceAreaSewerConnection,
   deleteServiceAreaSewerConnection,
+  getSewerNetworkSewerConnections,
 };

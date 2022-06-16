@@ -1,20 +1,20 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import { getOrganisationUser } from "../organisation-user/queries";
-import { getCatchmentDistrictById } from "../queries";
 import {
   createDistrictUser,
   deleteDistrictUser,
   getDistrictUser,
   getDistrictUsers,
-} from "./queries";
+  getCatchmentDistrict,
+} from "../queries";
 const typeDefs = gql`
   type DistrictUser {
     id: ID!
     organisation_user_id: ID!
-    organisation_user: OrganisationUser
+    organisation_user: OrganisationUserResult
     catchment_district_id: ID!
-    catchment_district: CatchmentDistrict
+    catchment_district: CatchmentDistrictResult
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -23,16 +23,12 @@ const typeDefs = gql`
 
   extend type Query {
     district_users(catchment_district_id: ID!): [DistrictUser!]
-    district_user(district_user_id: ID!): DistrictUser
+    district_user(district_user_id: ID!): DistrictUserResult!
   }
 
   extend type Mutation {
-    createDistrictUser(
-      input: CreateDistrictUserInput!
-    ): CreateDistrictUserPayload
-    deleteDistrictUser(
-      input: DeleteDistrictUserInput!
-    ): DeleteDistrictUserPayload
+    createDistrictUser(input: CreateDistrictUserInput!): DistrictUserResult!
+    deleteDistrictUser(input: DeleteDistrictUserInput!): DistrictUserResult!
   }
 
   input CreateDistrictUserInput {
@@ -40,19 +36,16 @@ const typeDefs = gql`
     catchment_district_id: ID!
   }
 
-  type CreateDistrictUserPayload {
-    district_user: DistrictUser
-  }
-
   input DeleteDistrictUserInput {
     id: ID!
   }
 
-  type DeleteDistrictUserPayload {
-    district_user: DistrictUser
-  }
-
-  scalar DateTime
+  union DistrictUserResult =
+      DistrictUser
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {
@@ -67,7 +60,7 @@ const resolvers: Resolvers = {
         context
       ),
     catchment_district: (parent, _args, context) =>
-      getCatchmentDistrictById(parent.catchment_district_id, context),
+      getCatchmentDistrict(parent.catchment_district_id, context),
   },
   Mutation: {
     createDistrictUser: (_, args, context) => createDistrictUser(args, context),

@@ -1,13 +1,15 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
-  getCatchmentDistrictById,
   createServiceArea,
   deleteServiceArea,
   getCatchmentDistrictServiceAreas,
   getServiceArea,
   getResidence,
+  getCatchmentDistrict,
+  getServiceAreaSewerConnections,
 } from "../queries";
+import { getServiceAreaWaterConnections } from "../service-area-water-connection/queries";
 
 const typeDefs = gql`
   type ServiceArea {
@@ -15,9 +17,9 @@ const typeDefs = gql`
     residence_id: String!
     residence: ResidenceResult
     catchment_district_id: String!
-    catchment_district: CatchmentDistrict
-    # service_area_water_connections: [ServiceAreaWaterConnection!]
-    # service_area_sewer_connections: [ServiceAreaSewerConnection!]
+    catchment_district: CatchmentDistrictResult!
+    service_area_water_connections: [ServiceAreaWaterConnection!]
+    service_area_sewer_connections: [ServiceAreaSewerConnection!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -49,8 +51,6 @@ const typeDefs = gql`
     residence_id: String!
     catchment_district_id: String!
   }
-
-  scalar DateTime
 `;
 
 const resolvers: Resolvers = {
@@ -67,7 +67,11 @@ const resolvers: Resolvers = {
     residence: (parent, _args, context) =>
       getResidence({ id: parent.residence_id }, context),
     catchment_district: (parent, _args, context) =>
-      getCatchmentDistrictById(parent.catchment_district_id, context),
+      getCatchmentDistrict(parent.catchment_district_id, context),
+    service_area_water_connections: (parent, _args, context) =>
+      getServiceAreaWaterConnections(parent.id, context),
+    service_area_sewer_connections: (parent, _args, context) =>
+      getServiceAreaSewerConnections(parent.id, context),
   },
 };
 

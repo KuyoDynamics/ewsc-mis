@@ -1,17 +1,13 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import {
-  // getOrganisationUser,
-  getOrganisationUsers,
-} from "../organisation-user/queries";
+import { getOrganisationUsers } from "../organisation-user/queries";
 import {
   createOrganisation,
   deleteOrganisation,
-  // getAllOrganisations,
   getCatchmentProvinces,
-  getCountryByOrganisationId,
-  getOrganisationById,
-  // getOrganisationsByCountryId,
+  getCountry,
+  getOrganisation,
+  getOrganisations,
   updateOrganisation,
 } from "../queries";
 
@@ -71,21 +67,19 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    // allOrganisations: (_, _args, context) => getAllOrganisations(context),
-    // organisations: (_, args, context) =>
-    //   getOrganisationsByCountryId(args.country_id, context),
-    // organisation: (_, args, context) => getOrganisation(args.id, context),
+    organisations: (_, args, context) =>
+      getOrganisations(args.country_id, context),
+    organisation: (_, args, context) => getOrganisation(args.id, context),
   },
 
   Mutation: {
-    // createOrganisation: (_, args, context) => createOrganisation(args, context),
-    // updateOrganisation: (_, args, context) => updateOrganisation(args, context),
-    // deleteOrganisation: (_, args, context) =>
-    //   deleteOrganisation(args.input.id, context),
+    createOrganisation: (_, args, context) => createOrganisation(args, context),
+    updateOrganisation: (_, args, context) => updateOrganisation(args, context),
+    deleteOrganisation: (_, args, context) =>
+      deleteOrganisation(args.input.id, context),
   },
   Organisation: {
-    // country: (parent, _args, context) =>
-    //   getCountry(parent.country_id, context),
+    country: (parent, _args, context) => getCountry(parent.country_id, context),
     catchment_provinces: (parent, _args, context) =>
       getCatchmentProvinces(parent.id, context),
     users: (parent, _args, context) =>

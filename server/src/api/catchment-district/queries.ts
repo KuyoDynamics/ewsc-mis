@@ -1,193 +1,135 @@
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 import {
   CatchmentDistrict,
-  CreateCatchmentDistrictPayload,
-  DeleteCatchmentDistrictPayload,
+  CatchmentDistrictResult,
   MutationCreateCatchmentDistrictArgs,
   MutationDeleteCatchmentDistrictArgs,
   MutationUpdateCatchmentDistrictArgs,
-  UpdateCatchmentDistrictPayload,
 } from "../../libs/resolvers-types";
 
 async function getCatchmentDistricts(
   id: string,
   context: GraphQLContext
 ): Promise<CatchmentDistrict[]> {
-  const result = await context.prisma.catchmentProvince
+  return context.prisma.catchmentProvince
     .findUnique({
       where: {
         id,
       },
     })
-    .catchment_districts({
-      include: {
-        district: {
-          select: {
-            name: true,
-            province: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    });
-  return result.map((value) => ({
-    ...value,
-    district_name: value.district.name,
-    catchment_province_name: value.district.province.name,
-  })) as CatchmentDistrict[];
+    .catchment_districts();
 }
 
-async function getCatchmentDistrictById(
+async function getCatchmentDistrict(
   id: string,
   context: GraphQLContext
-): Promise<CatchmentDistrict> {
-  const result = await context.prisma.catchmentDistrict.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      district: {
-        select: {
-          name: true,
-          province: {
-            select: {
-              name: true,
-            },
-          },
+): Promise<CatchmentDistrictResult> {
+  try {
+    const catchment_district =
+      await context.prisma.catchmentDistrict.findUnique({
+        where: {
+          id,
         },
-      },
-    },
-  });
-
-  return {
-    ...result,
-    district_name: result?.district.name,
-    catchment_province_name: result?.district.province.name,
-  } as CatchmentDistrict;
+      });
+    if (!catchment_district) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The CatchmentDistrict with the id ${id}} does not exist.`,
+      };
+    }
+    return {
+      __typename: "CatchmentDistrict",
+      ...catchment_district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find CatchmentDistrict with the id ${id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function createCatchmentDistrict(
   args: MutationCreateCatchmentDistrictArgs,
   context: GraphQLContext
-) {
-  const requiredInput = {
-    district_id: args.input.district_id,
-    catchment_province_id: args.input.catchment_province_id,
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  };
-  const result = await context.prisma.catchmentDistrict.create({
-    data: requiredInput,
-    include: {
-      district: {
-        select: {
-          name: true,
-        },
+): Promise<CatchmentDistrictResult> {
+  try {
+    const catchment_district = await context.prisma.catchmentDistrict.create({
+      data: {
+        district_id: args.input.district_id,
+        catchment_province_id: args.input.catchment_province_id,
+        created_by: context.user?.email,
+        last_modified_by: context.user?.email,
       },
-      catchment_province: {
-        include: {
-          province: true,
-        },
-      },
-    },
-  });
-  const { district, catchment_province, ...rest } = result;
-  const payload: CreateCatchmentDistrictPayload = {
-    catchment_district: {
-      ...rest,
-      catchment_province_name: catchment_province.province.name,
-      district_name: district.name,
-    },
-  };
-  return payload;
+    });
+
+    return {
+      __typename: "CatchmentDistrict",
+      ...catchment_district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create CatchmentDistrict.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function updateCatchmentDistrict(
   args: MutationUpdateCatchmentDistrictArgs,
   context: GraphQLContext
-) {
-  const result = await context.prisma.catchmentDistrict.update({
-    where: {
-      id: args.input.id,
-    },
-    data: {
-      disabled: args.input.update.disabled,
-      last_modified_by: context.user?.email,
-    },
-    include: {
-      district: {
-        select: {
-          name: true,
-        },
+): Promise<CatchmentDistrictResult> {
+  try {
+    const catchment_district = await context.prisma.catchmentDistrict.update({
+      where: {
+        id: args.input.id,
       },
-      catchment_province: {
-        include: {
-          province: {
-            select: {
-              name: true,
-            },
-          },
-        },
+      data: {
+        disabled: args.input.update.disabled,
+        last_modified_by: args.input.update ? context.user.email : undefined,
       },
-    },
-  });
-
-  const { district, catchment_province, ...rest } = result;
-  const payload: UpdateCatchmentDistrictPayload = {
-    catchment_district: {
-      ...rest,
-      catchment_province_name: catchment_province.province.name,
-      district_name: district.name,
-    },
-  };
-
-  return payload;
+    });
+    return {
+      __typename: "CatchmentDistrict",
+      ...catchment_district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update CatchmentDistrict with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function deleteCatchmentDistrict(
   args: MutationDeleteCatchmentDistrictArgs,
   context: GraphQLContext
-) {
-  const result = await context.prisma.catchmentDistrict.delete({
-    where: {
-      id: args.input.id,
-    },
-    include: {
-      district: {
-        select: {
-          name: true,
-        },
+): Promise<CatchmentDistrictResult> {
+  try {
+    const catchment_district = await context.prisma.catchmentDistrict.delete({
+      where: {
+        id: args.input.id,
       },
-      catchment_province: {
-        include: {
-          province: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const { district, catchment_province, ...rest } = result;
-  const payload: DeleteCatchmentDistrictPayload = {
-    catchment_district: {
-      ...rest,
-      district_name: district.name,
-      catchment_province_name: catchment_province.province.name,
-    },
-  };
-
-  return payload;
+    });
+    return {
+      __typename: "CatchmentDistrict",
+      ...catchment_district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete CatchmentDistrict with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {
   getCatchmentDistricts,
-  getCatchmentDistrictById,
+  getCatchmentDistrict,
   createCatchmentDistrict,
   updateCatchmentDistrict,
   deleteCatchmentDistrict,
