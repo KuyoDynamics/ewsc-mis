@@ -5,6 +5,7 @@ import { ErrorField } from "./libs/resolvers-types";
 import {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
+  PrismaClientValidationError,
 } from "@prisma/client/runtime";
 async function encryptPassword(password: string) {
   return hash(password, 10);
@@ -185,7 +186,10 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
         },
       ];
     }
-  } else if (error instanceof PrismaClientUnknownRequestError) {
+  } else if (
+    error instanceof PrismaClientUnknownRequestError ||
+    error instanceof PrismaClientValidationError
+  ) {
     errorFields = [
       {
         field: "unknown",

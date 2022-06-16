@@ -375,6 +375,12 @@ export type CreateServiceAreaInput = {
   residence_id: Scalars['String'];
 };
 
+export type CreateServiceAreaSewerConnectionInput = {
+  connections: Scalars['BigInt'];
+  service_area_id: Scalars['ID'];
+  sewer_netowrk_id: Scalars['ID'];
+};
+
 export type CreateServiceAreaWaterConnectionInput = {
   connections: Scalars['BigInt'];
   service_area_id: Scalars['ID'];
@@ -560,6 +566,11 @@ export type DeleteServiceAreaInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteServiceAreaSewerConnectionInput = {
+  service_area_id: Scalars['ID'];
+  sewer_netowrk_id: Scalars['ID'];
+};
+
 export type DeleteServiceAreaWaterConnectionInput = {
   service_area_id: Scalars['ID'];
   water_netowrk_id: Scalars['ID'];
@@ -681,6 +692,7 @@ export type Mutation = {
   createProvince?: Maybe<CreateProvincePayload>;
   createResidence?: Maybe<CreateResidencePayload>;
   createServiceArea: ServiceAreaResult;
+  createServiceAreaSewerConnection: ServiceAreaSewerConnectionResult;
   createServiceAreaWaterConnection: ServiceAreaWaterConnectionResult;
   createSewerNetwork: SewerNetworkResult;
   createSewerTreatmentPlant: SewerTreatmentPlantResult;
@@ -700,6 +712,7 @@ export type Mutation = {
   deleteProvince?: Maybe<DeleteProvincePayload>;
   deleteResidence?: Maybe<DeleteResidencePayload>;
   deleteServiceArea: ServiceAreaResult;
+  deleteServiceAreaSewerConnection: ServiceAreaSewerConnectionResult;
   deleteServiceAreaWaterConnection: ServiceAreaWaterConnectionResult;
   deleteSewerNetwork: SewerNetworkResult;
   deleteSewerTreatmentPlants: ApiBatchPayloadResult;
@@ -725,6 +738,7 @@ export type Mutation = {
   updateOrganisationUser?: Maybe<UpdateOrganisationUserPayload>;
   updateProvince?: Maybe<UpdateProvicePayload>;
   updateResidence?: Maybe<UpdateResidencePayload>;
+  updateServiceAreaSewerConnection: ServiceAreaSewerConnectionResult;
   updateServiceAreaWaterConnection: ServiceAreaWaterConnectionResult;
   updateSewerNetwork: SewerNetworkResult;
   updateSewerTreatmentPlant: SewerTreatmentPlantResult;
@@ -788,6 +802,11 @@ export type MutationCreateResidenceArgs = {
 
 export type MutationCreateServiceAreaArgs = {
   input: CreateServiceAreaInput;
+};
+
+
+export type MutationCreateServiceAreaSewerConnectionArgs = {
+  input: CreateServiceAreaSewerConnectionInput;
 };
 
 
@@ -883,6 +902,11 @@ export type MutationDeleteResidenceArgs = {
 
 export type MutationDeleteServiceAreaArgs = {
   input: DeleteServiceAreaInput;
+};
+
+
+export type MutationDeleteServiceAreaSewerConnectionArgs = {
+  input: DeleteServiceAreaSewerConnectionInput;
 };
 
 
@@ -988,6 +1012,11 @@ export type MutationUpdateProvinceArgs = {
 
 export type MutationUpdateResidenceArgs = {
   input: UpdateResidenceInput;
+};
+
+
+export type MutationUpdateServiceAreaSewerConnectionArgs = {
+  input: UpdateServiceAreaSewerConnectionInput;
 };
 
 
@@ -1134,6 +1163,8 @@ export type Query = {
   residence?: Maybe<Residence>;
   residences?: Maybe<Array<Residence>>;
   service_area: ServiceAreaResult;
+  service_area_sewer_connection: ServiceAreaSewerConnectionResult;
+  service_area_sewer_connections?: Maybe<Array<ServiceAreaSewerConnection>>;
   service_area_water_connection: ServiceAreaWaterConnectionResult;
   service_area_water_connections?: Maybe<Array<ServiceAreaWaterConnection>>;
   service_areas?: Maybe<Array<ServiceArea>>;
@@ -1243,6 +1274,17 @@ export type QueryResidencesArgs = {
 
 export type QueryService_AreaArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryService_Area_Sewer_ConnectionArgs = {
+  service_area_id: Scalars['ID'];
+  sewer_netowrk_id: Scalars['ID'];
+};
+
+
+export type QueryService_Area_Sewer_ConnectionsArgs = {
+  service_area_id: Scalars['ID'];
 };
 
 
@@ -1378,6 +1420,25 @@ export type ServiceArea = {
 };
 
 export type ServiceAreaResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | ServiceArea;
+
+export type ServiceAreaSewerConnection = {
+  __typename?: 'ServiceAreaSewerConnection';
+  connections: Scalars['BigInt'];
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  service_area?: Maybe<ServiceAreaResult>;
+  service_area_id: Scalars['ID'];
+  sewer_netowrk_id: Scalars['ID'];
+  sewer_network?: Maybe<SewerNetworkResult>;
+};
+
+export type ServiceAreaSewerConnectionResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | ServiceAreaSewerConnection;
+
+export type ServiceAreaSewerConnectionUpdateInput = {
+  connections: Scalars['BigInt'];
+};
 
 export type ServiceAreaWaterConnection = {
   __typename?: 'ServiceAreaWaterConnection';
@@ -1520,6 +1581,12 @@ export type UpdateResidenceInput = {
 export type UpdateResidencePayload = {
   __typename?: 'UpdateResidencePayload';
   residence: Residence;
+};
+
+export type UpdateServiceAreaSewerConnectionInput = {
+  service_area_id: Scalars['ID'];
+  sewer_netowrk_id: Scalars['ID'];
+  update: ServiceAreaSewerConnectionUpdateInput;
 };
 
 export type UpdateServiceAreaWaterConnectionInput = {
@@ -1864,6 +1931,7 @@ export type ResolversTypes = ResolversObject<{
   CreateResidenceInput: CreateResidenceInput;
   CreateResidencePayload: ResolverTypeWrapper<CreateResidencePayload>;
   CreateServiceAreaInput: CreateServiceAreaInput;
+  CreateServiceAreaSewerConnectionInput: CreateServiceAreaSewerConnectionInput;
   CreateServiceAreaWaterConnectionInput: CreateServiceAreaWaterConnectionInput;
   CreateSewerNetworkInput: CreateSewerNetworkInput;
   CreateSewerTreatmentPlantInput: CreateSewerTreatmentPlantInput;
@@ -1903,6 +1971,7 @@ export type ResolversTypes = ResolversObject<{
   DeleteResidenceInput: DeleteResidenceInput;
   DeleteResidencePayload: ResolverTypeWrapper<DeleteResidencePayload>;
   DeleteServiceAreaInput: DeleteServiceAreaInput;
+  DeleteServiceAreaSewerConnectionInput: DeleteServiceAreaSewerConnectionInput;
   DeleteServiceAreaWaterConnectionInput: DeleteServiceAreaWaterConnectionInput;
   DeleteSewerTreatmentPlantsInput: DeleteSewerTreatmentPlantsInput;
   DeleteUserInput: DeleteUserInput;
@@ -1983,6 +2052,9 @@ export type ResolversTypes = ResolversObject<{
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']>;
   ServiceArea: ResolverTypeWrapper<ServiceArea>;
   ServiceAreaResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceArea'];
+  ServiceAreaSewerConnection: ResolverTypeWrapper<Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversTypes['SewerNetworkResult']> }>;
+  ServiceAreaSewerConnectionResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceAreaSewerConnection'];
+  ServiceAreaSewerConnectionUpdateInput: ServiceAreaSewerConnectionUpdateInput;
   ServiceAreaWaterConnection: ResolverTypeWrapper<Omit<ServiceAreaWaterConnection, 'service_area' | 'water_network'> & { service_area?: Maybe<ResolversTypes['ServiceAreaResult']>, water_network?: Maybe<ResolversTypes['WaterNetworkResult']> }>;
   ServiceAreaWaterConnectionResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceAreaWaterConnection'];
   ServiceAreaWaterConnectionUpdateInput: ServiceAreaWaterConnectionUpdateInput;
@@ -2017,6 +2089,7 @@ export type ResolversTypes = ResolversObject<{
   UpdateProvinceInput: UpdateProvinceInput;
   UpdateResidenceInput: UpdateResidenceInput;
   UpdateResidencePayload: ResolverTypeWrapper<UpdateResidencePayload>;
+  UpdateServiceAreaSewerConnectionInput: UpdateServiceAreaSewerConnectionInput;
   UpdateServiceAreaWaterConnectionInput: UpdateServiceAreaWaterConnectionInput;
   UpdateSewerNetworkInput: UpdateSewerNetworkInput;
   UpdateSewerTreatmentPlantInput: UpdateSewerTreatmentPlantInput;
@@ -2094,6 +2167,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateResidenceInput: CreateResidenceInput;
   CreateResidencePayload: CreateResidencePayload;
   CreateServiceAreaInput: CreateServiceAreaInput;
+  CreateServiceAreaSewerConnectionInput: CreateServiceAreaSewerConnectionInput;
   CreateServiceAreaWaterConnectionInput: CreateServiceAreaWaterConnectionInput;
   CreateSewerNetworkInput: CreateSewerNetworkInput;
   CreateSewerTreatmentPlantInput: CreateSewerTreatmentPlantInput;
@@ -2133,6 +2207,7 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteResidenceInput: DeleteResidenceInput;
   DeleteResidencePayload: DeleteResidencePayload;
   DeleteServiceAreaInput: DeleteServiceAreaInput;
+  DeleteServiceAreaSewerConnectionInput: DeleteServiceAreaSewerConnectionInput;
   DeleteServiceAreaWaterConnectionInput: DeleteServiceAreaWaterConnectionInput;
   DeleteSewerTreatmentPlantsInput: DeleteSewerTreatmentPlantsInput;
   DeleteUserInput: DeleteUserInput;
@@ -2211,6 +2286,9 @@ export type ResolversParentTypes = ResolversObject<{
   SafeInt: Scalars['SafeInt'];
   ServiceArea: ServiceArea;
   ServiceAreaResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceArea'];
+  ServiceAreaSewerConnection: Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversParentTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversParentTypes['SewerNetworkResult']> };
+  ServiceAreaSewerConnectionResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceAreaSewerConnection'];
+  ServiceAreaSewerConnectionUpdateInput: ServiceAreaSewerConnectionUpdateInput;
   ServiceAreaWaterConnection: Omit<ServiceAreaWaterConnection, 'service_area' | 'water_network'> & { service_area?: Maybe<ResolversParentTypes['ServiceAreaResult']>, water_network?: Maybe<ResolversParentTypes['WaterNetworkResult']> };
   ServiceAreaWaterConnectionResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceAreaWaterConnection'];
   ServiceAreaWaterConnectionUpdateInput: ServiceAreaWaterConnectionUpdateInput;
@@ -2245,6 +2323,7 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateProvinceInput: UpdateProvinceInput;
   UpdateResidenceInput: UpdateResidenceInput;
   UpdateResidencePayload: UpdateResidencePayload;
+  UpdateServiceAreaSewerConnectionInput: UpdateServiceAreaSewerConnectionInput;
   UpdateServiceAreaWaterConnectionInput: UpdateServiceAreaWaterConnectionInput;
   UpdateSewerNetworkInput: UpdateSewerNetworkInput;
   UpdateSewerTreatmentPlantInput: UpdateSewerTreatmentPlantInput;
@@ -2686,6 +2765,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createProvince?: Resolver<Maybe<ResolversTypes['CreateProvincePayload']>, ParentType, ContextType, RequireFields<MutationCreateProvinceArgs, 'input'>>;
   createResidence?: Resolver<Maybe<ResolversTypes['CreateResidencePayload']>, ParentType, ContextType, RequireFields<MutationCreateResidenceArgs, 'input'>>;
   createServiceArea?: Resolver<ResolversTypes['ServiceAreaResult'], ParentType, ContextType, RequireFields<MutationCreateServiceAreaArgs, 'input'>>;
+  createServiceAreaSewerConnection?: Resolver<ResolversTypes['ServiceAreaSewerConnectionResult'], ParentType, ContextType, RequireFields<MutationCreateServiceAreaSewerConnectionArgs, 'input'>>;
   createServiceAreaWaterConnection?: Resolver<ResolversTypes['ServiceAreaWaterConnectionResult'], ParentType, ContextType, RequireFields<MutationCreateServiceAreaWaterConnectionArgs, 'input'>>;
   createSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateSewerNetworkArgs, 'input'>>;
   createSewerTreatmentPlant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<MutationCreateSewerTreatmentPlantArgs, 'input'>>;
@@ -2705,6 +2785,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteProvince?: Resolver<Maybe<ResolversTypes['DeleteProvincePayload']>, ParentType, ContextType, RequireFields<MutationDeleteProvinceArgs, 'input'>>;
   deleteResidence?: Resolver<Maybe<ResolversTypes['DeleteResidencePayload']>, ParentType, ContextType, RequireFields<MutationDeleteResidenceArgs, 'input'>>;
   deleteServiceArea?: Resolver<ResolversTypes['ServiceAreaResult'], ParentType, ContextType, RequireFields<MutationDeleteServiceAreaArgs, 'input'>>;
+  deleteServiceAreaSewerConnection?: Resolver<ResolversTypes['ServiceAreaSewerConnectionResult'], ParentType, ContextType, RequireFields<MutationDeleteServiceAreaSewerConnectionArgs, 'input'>>;
   deleteServiceAreaWaterConnection?: Resolver<ResolversTypes['ServiceAreaWaterConnectionResult'], ParentType, ContextType, RequireFields<MutationDeleteServiceAreaWaterConnectionArgs, 'input'>>;
   deleteSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationDeleteSewerNetworkArgs, 'id'>>;
   deleteSewerTreatmentPlants?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationDeleteSewerTreatmentPlantsArgs, 'filter'>>;
@@ -2726,6 +2807,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateOrganisationUser?: Resolver<Maybe<ResolversTypes['UpdateOrganisationUserPayload']>, ParentType, ContextType, RequireFields<MutationUpdateOrganisationUserArgs, 'input'>>;
   updateProvince?: Resolver<Maybe<ResolversTypes['UpdateProvicePayload']>, ParentType, ContextType, RequireFields<MutationUpdateProvinceArgs, 'input'>>;
   updateResidence?: Resolver<Maybe<ResolversTypes['UpdateResidencePayload']>, ParentType, ContextType, RequireFields<MutationUpdateResidenceArgs, 'input'>>;
+  updateServiceAreaSewerConnection?: Resolver<ResolversTypes['ServiceAreaSewerConnectionResult'], ParentType, ContextType, RequireFields<MutationUpdateServiceAreaSewerConnectionArgs, 'input'>>;
   updateServiceAreaWaterConnection?: Resolver<ResolversTypes['ServiceAreaWaterConnectionResult'], ParentType, ContextType, RequireFields<MutationUpdateServiceAreaWaterConnectionArgs, 'input'>>;
   updateSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationUpdateSewerNetworkArgs, 'input'>>;
   updateSewerTreatmentPlant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<MutationUpdateSewerTreatmentPlantArgs, 'input'>>;
@@ -2863,6 +2945,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   residence?: Resolver<Maybe<ResolversTypes['Residence']>, ParentType, ContextType, RequireFields<QueryResidenceArgs, 'id'>>;
   residences?: Resolver<Maybe<Array<ResolversTypes['Residence']>>, ParentType, ContextType, RequireFields<QueryResidencesArgs, 'district_id'>>;
   service_area?: Resolver<ResolversTypes['ServiceAreaResult'], ParentType, ContextType, RequireFields<QueryService_AreaArgs, 'id'>>;
+  service_area_sewer_connection?: Resolver<ResolversTypes['ServiceAreaSewerConnectionResult'], ParentType, ContextType, RequireFields<QueryService_Area_Sewer_ConnectionArgs, 'service_area_id' | 'sewer_netowrk_id'>>;
+  service_area_sewer_connections?: Resolver<Maybe<Array<ResolversTypes['ServiceAreaSewerConnection']>>, ParentType, ContextType, RequireFields<QueryService_Area_Sewer_ConnectionsArgs, 'service_area_id'>>;
   service_area_water_connection?: Resolver<ResolversTypes['ServiceAreaWaterConnectionResult'], ParentType, ContextType, RequireFields<QueryService_Area_Water_ConnectionArgs, 'service_area_id' | 'water_netowrk_id'>>;
   service_area_water_connections?: Resolver<Maybe<Array<ResolversTypes['ServiceAreaWaterConnection']>>, ParentType, ContextType, RequireFields<QueryService_Area_Water_ConnectionsArgs, 'service_area_id'>>;
   service_areas?: Resolver<Maybe<Array<ResolversTypes['ServiceArea']>>, ParentType, ContextType, RequireFields<QueryService_AreasArgs, 'catchment_district_id'>>;
@@ -2929,6 +3013,23 @@ export type ServiceAreaResolvers<ContextType = GraphQLContext, ParentType extend
 
 export type ServiceAreaResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ServiceAreaResult'] = ResolversParentTypes['ServiceAreaResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'ServiceArea', ParentType, ContextType>;
+}>;
+
+export type ServiceAreaSewerConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ServiceAreaSewerConnection'] = ResolversParentTypes['ServiceAreaSewerConnection']> = ResolversObject<{
+  connections?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  service_area?: Resolver<Maybe<ResolversTypes['ServiceAreaResult']>, ParentType, ContextType>;
+  service_area_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  sewer_netowrk_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  sewer_network?: Resolver<Maybe<ResolversTypes['SewerNetworkResult']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ServiceAreaSewerConnectionResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ServiceAreaSewerConnectionResult'] = ResolversParentTypes['ServiceAreaSewerConnectionResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'ServiceAreaSewerConnection', ParentType, ContextType>;
 }>;
 
 export type ServiceAreaWaterConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ServiceAreaWaterConnection'] = ResolversParentTypes['ServiceAreaWaterConnection']> = ResolversObject<{
@@ -3291,6 +3392,8 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   SafeInt?: GraphQLScalarType;
   ServiceArea?: ServiceAreaResolvers<ContextType>;
   ServiceAreaResult?: ServiceAreaResultResolvers<ContextType>;
+  ServiceAreaSewerConnection?: ServiceAreaSewerConnectionResolvers<ContextType>;
+  ServiceAreaSewerConnectionResult?: ServiceAreaSewerConnectionResultResolvers<ContextType>;
   ServiceAreaWaterConnection?: ServiceAreaWaterConnectionResolvers<ContextType>;
   ServiceAreaWaterConnectionResult?: ServiceAreaWaterConnectionResultResolvers<ContextType>;
   SewerNetwork?: SewerNetworkResolvers<ContextType>;
