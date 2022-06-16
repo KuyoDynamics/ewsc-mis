@@ -14,7 +14,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     plant_id: String!
-    water_treatment_plant: WaterTreatmentPlant
+    water_treatment_plant: WaterTreatmentPlantResult
     type: NetworkOwnershipType!
     # service_area_water_connections: [ServiceAreaWaterConnection!]
     created_at: DateTime!
@@ -34,34 +34,12 @@ const typeDefs = gql`
     deleteWaterNetwork(id: ID!): WaterNetworkResult!
   }
 
-  interface ApiError {
-    message: String!
-  }
-
-  type WaterNetworkNotFoundError implements ApiError {
-    message: String!
-  }
-
-  type WaterNetworkCreateError implements ApiError {
-    message: String!
-    errors: [ErrorField!]
-  }
-
-  type WaterNetworkUpdateError implements ApiError {
-    message: String!
-    errors: [ErrorField!]
-  }
-
-  type WaterNetworkDeleteError implements ApiError {
-    message: String!
-  }
-
   union WaterNetworkResult =
       WaterNetwork
-    | WaterNetworkNotFoundError
-    | WaterNetworkCreateError
-    | WaterNetworkUpdateError
-    | WaterNetworkDeleteError
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 
   input CreateWaterNetworkInput {
     name: String!

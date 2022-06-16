@@ -35,6 +35,41 @@ const typeDefs = gql`
     updateCountry(input: UpdateCountryInput!): UpdateCountryPayload
   }
 
+  interface ApiError {
+    message: String!
+  }
+
+  type ErrorField {
+    field: String!
+    message: String!
+  }
+
+  type DeleteBatchPayload {
+    count: Int!
+  }
+
+  union ApiBatchPayloadResult = DeleteBatchPayload | ApiDeleteError
+
+  type ApiNotFoundError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type ApiCreateError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type ApiUpdateError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type ApiDeleteError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
   input CreateCountryInput {
     code: String!
     name: String!

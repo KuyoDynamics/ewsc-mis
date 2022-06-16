@@ -165,7 +165,7 @@ const PRISMA_ERROR_CODES: Record<string, string> = {
   P4002: "The schema of the introspected database was inconsistent.",
 };
 
-function generateClientErrors(error: any): ErrorField[] {
+function generateClientErrors(error: any, field_name?: string): ErrorField[] {
   let errorFields: ErrorField[] = [];
 
   if (error instanceof PrismaClientKnownRequestError) {
@@ -179,8 +179,9 @@ function generateClientErrors(error: any): ErrorField[] {
     } else {
       errorFields = [
         {
-          field: "unknown",
-          message: error.message,
+          field: `${field_name}` || "unknown",
+          message:
+            (error.meta?.cause as string) || PRISMA_ERROR_CODES[err.code],
         },
       ];
     }
@@ -192,11 +193,14 @@ function generateClientErrors(error: any): ErrorField[] {
       },
     ];
   } else {
+    errorFields = [
+      {
+        field: "unknown",
+        message: "Internal Server Error.",
+      },
+    ];
     // Send to Sentry,do not show the client the error
-    console.log(
-      "Something wrong happended during WaterTreatmentPlantCreate: ",
-      error
-    );
+    console.log("Something wrong happened: ", error);
   }
 
   return errorFields;

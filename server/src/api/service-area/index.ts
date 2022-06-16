@@ -26,29 +26,28 @@ const typeDefs = gql`
 
   extend type Query {
     service_areas(catchment_district_id: ID!): [ServiceArea!]
-    service_area(id: ID!): ServiceArea!
+    service_area(id: ID!): ServiceAreaResult!
   }
 
   extend type Mutation {
-    createServiceArea(input: CreateServiceAreaInput!): CreateServiceAreaPayload
-    deleteServiceArea(input: DeleteServiceAreaInput!): DeleteServiceAreaPayload
+    createServiceArea(input: CreateServiceAreaInput!): ServiceAreaResult!
+    deleteServiceArea(input: DeleteServiceAreaInput!): ServiceAreaResult!
   }
+
+  union ServiceAreaResult =
+      ServiceArea
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 
   input DeleteServiceAreaInput {
     id: ID!
   }
 
-  type DeleteServiceAreaPayload {
-    service_area: ServiceArea!
-  }
-
   input CreateServiceAreaInput {
     residence_id: String!
     catchment_district_id: String!
-  }
-
-  type CreateServiceAreaPayload {
-    service_area: ServiceArea!
   }
 
   scalar DateTime

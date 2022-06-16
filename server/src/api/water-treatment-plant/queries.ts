@@ -1,5 +1,5 @@
 import {
-  DeleteWaterTreatmentPlantsResult,
+  ApiBatchPayloadResult,
   MutationCreateWaterTreatmentPlantArgs,
   MutationDeleteWaterTreatmentPlantsArgs,
   MutationUpdateWaterTreatmentPlantArgs,
@@ -28,15 +28,32 @@ async function getWaterTreatmentPlants(
 async function getWaterTreatmentPlant(
   args: QueryWater_Treatment_PlantArgs,
   context: GraphQLContext
-): Promise<WaterTreatmentPlant> {
-  const water_treatment_plant =
-    await context.prisma.waterTreatmentPlant.findUnique({
-      where: {
-        id: args.id,
-      },
-    });
+): Promise<WaterTreatmentPlantResult> {
+  try {
+    const water_treatment_plant =
+      await context.prisma.waterTreatmentPlant.findUnique({
+        where: {
+          id: args.id,
+        },
+      });
+    if (!water_treatment_plant) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `Failed to find WaterTreatmentPlant with id ${args.id}.`,
+      };
+    }
 
-  return water_treatment_plant as WaterTreatmentPlant;
+    return {
+      __typename: "WaterTreatmentPlant",
+      ...water_treatment_plant,
+    } as WaterTreatmentPlant;
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find WaterTreatmentPlant with id ${args.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function createWaterTreatmentPlant(
@@ -63,7 +80,7 @@ async function createWaterTreatmentPlant(
     } as WaterTreatmentPlantResult;
   } catch (error) {
     return {
-      __typename: "WaterTreatmentPlantCreateError",
+      __typename: "ApiCreateError",
       message: `Failed to create WaterTreatmentPlant.`,
       errors: generateClientErrors(error),
     };
@@ -95,7 +112,7 @@ async function updateWaterTreatmentPlant(
     } as WaterTreatmentPlantResult;
   } catch (error) {
     return {
-      __typename: "WaterTreatmentPlantUpdateError",
+      __typename: "ApiUpdateError",
       message: `Failed to update WaterTreatmentPlant.`,
       errors: generateClientErrors(error),
     };
@@ -105,7 +122,7 @@ async function updateWaterTreatmentPlant(
 async function deleteWaterTreatmentPlants(
   args: MutationDeleteWaterTreatmentPlantsArgs,
   context: GraphQLContext
-): Promise<DeleteWaterTreatmentPlantsResult> {
+): Promise<ApiBatchPayloadResult> {
   try {
     const water_treatment_plants =
       await context.prisma.waterTreatmentPlant.deleteMany({
@@ -122,17 +139,17 @@ async function deleteWaterTreatmentPlants(
 
     if (water_treatment_plants.count === 0) {
       return {
-        __typename: "WaterTreatmentPlantDeleteError",
+        __typename: "ApiDeleteError",
         message: `Failed to delete WaterTreatmentPlant(s) with filter ${args.filter} or do not exist.`,
       };
     }
     return {
       __typename: "DeleteBatchPayload",
       ...water_treatment_plants,
-    } as DeleteWaterTreatmentPlantsResult;
+    } as ApiBatchPayloadResult;
   } catch (error) {
     return {
-      __typename: "WaterTreatmentPlantDeleteError",
+      __typename: "ApiDeleteError",
       message: `Failed to delete WaterTreatmentPlant(s) with filter ${args.filter} or do not exist.`,
       errors: generateClientErrors(error),
     };

@@ -44,7 +44,7 @@ async function getWaterNetwork(
 
   if (!water_network)
     return {
-      __typename: "WaterNetworkNotFoundError",
+      __typename: "ApiNotFoundError",
       message: `The WaterNetwork with the id ${args.id} does not exist.`,
     };
 
@@ -73,7 +73,7 @@ async function createWaterNetwork(
     } as WaterNetworkResult;
   } catch (error) {
     return {
-      __typename: "WaterNetworkCreateError",
+      __typename: "ApiCreateError",
       message: `Failed to create WaterNewtork.`,
       errors: generateClientErrors(error),
     };
@@ -102,7 +102,7 @@ async function updateWaterNetwork(
     } as WaterNetworkResult;
   } catch (error) {
     return {
-      __typename: "WaterNetworkUpdateError",
+      __typename: "ApiUpdateError",
       message: `Failed to update WaterNewtork.`,
       errors: generateClientErrors(error),
     };
@@ -125,9 +125,11 @@ async function deleteWaterNetwork(
       ...water_network,
     } as WaterNetworkResult;
   } catch (error) {
+    console.log("error", error);
     return {
-      __typename: "WaterNetworkDeleteError",
+      __typename: "ApiDeleteError",
       message: `Failed to delete WaterNewtork with id ${args.id}.`,
+      errors: generateClientErrors(error, "id"),
     };
   }
 }
