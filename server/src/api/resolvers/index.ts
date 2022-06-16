@@ -16,6 +16,7 @@ import { WaterStorageTankResolvers } from "../water-storage-tank";
 import { WaterProductionSiteResolvers } from "../water-production-site";
 import { WaterNetworkResolvers } from "../water-network";
 import { ServiceAreaWaterConnectionResolvers } from "../service-area-water-connection";
+import { SewerTreatmentPlantResolvers } from "../sewer-treatment-plant";
 
 export default [
   CountryResolvers,
@@ -35,5 +36,6 @@ export default [
   WaterProductionSiteResolvers,
   WaterNetworkResolvers,
   ServiceAreaWaterConnectionResolvers,
+  SewerTreatmentPlantResolvers,
   scalarResolvers,
 ];
