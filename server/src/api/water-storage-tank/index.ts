@@ -17,7 +17,7 @@ const typeDefs = gql`
     storage_capacity: Float!
     gps: String
     plant_id: String!
-    water_treatment_plant: WaterTreatmentPlant
+    water_treatment_plant: WaterTreatmentPlantResult
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!

@@ -18,7 +18,7 @@ const typeDefs = gql`
     gps: String
     type: WaterProductionSiteType!
     plant_id: String!
-    water_treatment_plant: WaterTreatmentPlant
+    water_treatment_plant: WaterTreatmentPlantResult
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!

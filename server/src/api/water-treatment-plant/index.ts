@@ -47,52 +47,19 @@ const typeDefs = gql`
     ): WaterTreatmentPlantResult!
     deleteWaterTreatmentPlants(
       filter: DeleteWaterTreatmentPlantsInput!
-    ): DeleteWaterTreatmentPlantsResult!
+    ): ApiBatchPayloadResult!
   }
-  # Error handling
-  type WaterTreatmentPlantNotFoundError implements ApiError {
-    message: String!
-    errors: [ErrorField!]
-  }
-
-  type ErrorField {
-    field: String!
-    message: String!
-  }
-
-  type WaterTreatmentPlantCreateError implements ApiError {
-    message: String!
-    errors: [ErrorField!]
-  }
-
-  type WaterTreatmentPlantUpdateError implements ApiError {
-    message: String!
-    errors: [ErrorField!]
-  }
-
-  type WaterTreatmentPlantDeleteError implements ApiError {
-    message: String!
-    errors: [ErrorField!]
-  }
-
-  union DeleteWaterTreatmentPlantsResult =
-      DeleteBatchPayload
-    | WaterTreatmentPlantDeleteError
 
   union WaterTreatmentPlantResult =
       WaterTreatmentPlant
-    | WaterTreatmentPlantNotFoundError
-    | WaterTreatmentPlantCreateError
-    | WaterTreatmentPlantUpdateError
-    | WaterTreatmentPlantDeleteError
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 
   input DeleteWaterTreatmentPlantsInput {
     id: ID
     catchment_district_id: String
-  }
-
-  type DeleteBatchPayload {
-    count: Int!
   }
 
   input UpdateWaterTreatmentPlantInput {

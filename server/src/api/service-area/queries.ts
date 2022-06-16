@@ -1,13 +1,12 @@
 import {
-  CreateServiceAreaPayload,
-  DeleteServiceAreaPayload,
   MutationCreateServiceAreaArgs,
   MutationDeleteServiceAreaArgs,
   QueryService_AreaArgs,
   QueryService_AreasArgs,
   ServiceArea,
+  ServiceAreaResult,
 } from "../../libs/resolvers-types";
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 
 async function getCatchmentDistrictServiceAreas(
   args: QueryService_AreasArgs,
@@ -42,43 +41,83 @@ async function getResidenceServiceAreas(
 async function getServiceArea(
   args: QueryService_AreaArgs,
   context: GraphQLContext
-): Promise<ServiceArea> {
-  const service_area = await context.prisma.serviceArea.findUnique({
-    where: {
-      id: args.id,
-    },
-  });
+): Promise<ServiceAreaResult> {
+  try {
+    const service_area = await context.prisma.serviceArea.findUnique({
+      where: {
+        id: args.id,
+      },
+    });
 
-  return service_area!;
+    if (!service_area) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The ServiceArea with the id ${args.id} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "ServiceArea",
+      ...service_area,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find ServiceArea with the id ${args.id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function createServiceArea(
   args: MutationCreateServiceAreaArgs,
   context: GraphQLContext
-): Promise<CreateServiceAreaPayload> {
-  const service_area = await context.prisma.serviceArea.create({
-    data: {
-      catchment_district_id: args.input.catchment_district_id,
-      residence_id: args.input.residence_id,
-      created_by: context.user.email,
-      last_modified_by: context.user.email,
-    },
-  });
+): Promise<ServiceAreaResult> {
+  try {
+    const service_area = await context.prisma.serviceArea.create({
+      data: {
+        catchment_district_id: args.input.catchment_district_id,
+        residence_id: args.input.residence_id,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      },
+    });
 
-  return { service_area };
+    return {
+      __typename: "ServiceArea",
+      ...service_area,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create ServiceArea.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function deleteServiceArea(
   args: MutationDeleteServiceAreaArgs,
   context: GraphQLContext
-): Promise<DeleteServiceAreaPayload> {
-  const service_area = await context.prisma.serviceArea.delete({
-    where: {
-      id: args.input.id,
-    },
-  });
+): Promise<ServiceAreaResult> {
+  try {
+    const service_area = await context.prisma.serviceArea.delete({
+      where: {
+        id: args.input.id,
+      },
+    });
 
-  return { service_area };
+    return {
+      __typename: "ServiceArea",
+      ...service_area,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete ServiceArea with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {
