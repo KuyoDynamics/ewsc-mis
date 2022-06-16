@@ -84,9 +84,6 @@ const typeDefs = gql`
     BOREHOLE
     DAM
   }
-
-  scalar DateTime
-  scalar Float
 `;
 
 const resolvers: Resolvers = {

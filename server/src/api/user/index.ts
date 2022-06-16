@@ -21,9 +21,9 @@ const typeDefs = gql`
     last_name: String!
     email: String!
     disabled: Boolean
-    user_organisations: [Organisation!]
+    user_organisations: [OrganisationUser!]
     user_roles: [UserRoleType!]!
-    # hashed_confirmation_token: String
+    hashed_confirmation_token: String
     confirmed_at: DateTime
     hashed_password_reset_token: String
     last_login: DateTime
@@ -36,34 +36,26 @@ const typeDefs = gql`
 
   extend type Query {
     users: [User!]
-    user(id: ID!): User
-    me: User!
+    user(id: ID!): UserResult!
+    me: UserResult!
   }
 
   extend type Mutation {
-    createUser(input: CreateUserInput!): CreateUserPayoad
-    createInvitedUser(input: CreateInvitedUserInput!): CreateInvitedUserPayload
-    deleteUser(input: DeleteUserInput!): DeleteUserPayload
-    disableUser(input: DisableUserInput!): DisableUserPayload
-    updateUser(input: UpdateUserInput!): UpdateUserPayload
-    login(input: LoginInput!): LoginPayload
-    """
-      Create takes an object with an email and generates a hashed_password_reset_token
-    for the requesting user. It sends an email to the user with the reset token.
-    """
+    createUser(input: CreateUserInput!): UserResult!
+    createInvitedUser(input: CreateInvitedUserInput!): UserResult!
+    deleteUser(input: DeleteUserInput!): UserResult!
+    disableUser(input: DisableUserInput!): UserResult!
+    updateUser(input: UpdateUserInput!): UserResult!
+    login(input: LoginInput!): LoginResult!
     requestPasswordReset(
       input: PasswordResetRequestInput!
-    ): PasswordResetRequestPayload
-    resetPassword(input: PasswordResetInput!): PasswordResetPayload
+    ): PasswordResetRequestResult!
+    resetPassword(input: PasswordResetInput!): PasswordResetResult!
   }
 
   input PasswordResetInput {
     hashed_password_reset_token: String!
     password: String!
-  }
-
-  type PasswordResetPayload {
-    user: User!
   }
 
   input PasswordResetRequestInput {
@@ -90,10 +82,6 @@ const typeDefs = gql`
     user_details: CreateUserInput!
   }
 
-  type CreateInvitedUserPayload {
-    user: User
-  }
-
   input CreateUserInput {
     first_name: String!
     last_name: String!
@@ -102,16 +90,8 @@ const typeDefs = gql`
     user_roles: [UserRoleType!]!
   }
 
-  type CreateUserPayoad {
-    user: User
-  }
-
   input DeleteUserInput {
     id: ID!
-  }
-
-  type DeleteUserPayload {
-    user: User
   }
 
   input DisableUserInput {
@@ -121,10 +101,6 @@ const typeDefs = gql`
 
   input UserDisableInput {
     disabled: Boolean!
-  }
-
-  type DisableUserPayload {
-    user: User
   }
 
   input UpdateUserInput {
@@ -139,10 +115,6 @@ const typeDefs = gql`
     user_roles: [UserRoleType!]
   }
 
-  type UpdateUserPayload {
-    user: User
-  }
-
   enum UserRoleType {
     SUPPORT
     ADMIN
@@ -155,8 +127,21 @@ const typeDefs = gql`
     DARK
     LIGHT
   }
-  scalar DateTime
-  scalar JWT
+
+  union UserResult =
+      User
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
+
+  union LoginResult = LoginPayload | ApiLoginError
+
+  union PasswordResetRequestResult =
+      PasswordResetRequestPayload
+    | ApiPasswordResetError
+
+  union PasswordResetResult = User | ApiPasswordResetError
 `;
 
 const resolvers: Resolvers = {

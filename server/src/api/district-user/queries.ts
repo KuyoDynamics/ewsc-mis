@@ -1,8 +1,7 @@
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 import {
-  CreateDistrictUserPayload,
-  DeleteDistrictUserPayload,
   DistrictUser,
+  DistrictUserResult,
   MutationCreateDistrictUserArgs,
   MutationDeleteDistrictUserArgs,
   QueryDistrict_UserArgs,
@@ -25,43 +24,82 @@ async function getDistrictUsers(
 async function getDistrictUser(
   args: QueryDistrict_UserArgs,
   context: GraphQLContext
-): Promise<DistrictUser | null> {
-  return context.prisma.districtUser.findUnique({
-    where: {
-      id: args.district_user_id,
-    },
-  });
+): Promise<DistrictUserResult> {
+  try {
+    const district_user = await context.prisma.districtUser.findUnique({
+      where: {
+        id: args.district_user_id,
+      },
+    });
+
+    if (!district_user) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The DistrictUser with the id ${args.district_user_id} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "DistrictUser",
+      ...district_user,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find DistrictUser with the id ${args.district_user_id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function createDistrictUser(
   args: MutationCreateDistrictUserArgs,
   context: GraphQLContext
-): Promise<CreateDistrictUserPayload> {
-  const requiredInput = {
-    organisation_user_id: args.input.organisation_user_id,
-    catchment_district_id: args.input.catchment_district_id,
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  };
-
-  const district_user = await context.prisma.districtUser.create({
-    data: requiredInput,
-  });
-
-  return { district_user };
+): Promise<DistrictUserResult> {
+  try {
+    const district_user = await context.prisma.districtUser.create({
+      data: {
+        organisation_user_id: args.input.organisation_user_id,
+        catchment_district_id: args.input.catchment_district_id,
+        created_by: context.user?.email,
+        last_modified_by: context.user?.email,
+      },
+    });
+    return {
+      __typename: "DistrictUser",
+      ...district_user,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create DistrictUser.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function deleteDistrictUser(
   args: MutationDeleteDistrictUserArgs,
   context: GraphQLContext
-): Promise<DeleteDistrictUserPayload> {
-  const district_user = await context.prisma.districtUser.delete({
-    where: {
-      id: args.input.id,
-    },
-  });
+): Promise<DistrictUserResult> {
+  try {
+    const district_user = await context.prisma.districtUser.delete({
+      where: {
+        id: args.input.id,
+      },
+    });
 
-  return { district_user };
+    return {
+      __typename: "DistrictUser",
+      ...district_user,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete DistrictUser with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {

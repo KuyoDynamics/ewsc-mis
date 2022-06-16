@@ -1,13 +1,13 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
-  getDistrictById,
   createResidence,
   deleteResidence,
   getResidence,
   getResidences,
   updateResidence,
   getResidenceServiceAreas,
+  getDistrict,
 } from "../queries";
 
 const typeDefs = gql`
@@ -16,7 +16,7 @@ const typeDefs = gql`
     name: String!
     cost_classification: ResidenceClassification!
     district_id: String!
-    district: District
+    district: DistrictResult
     service_areas: [ServiceArea!]
     created_at: DateTime!
     created_by: String!
@@ -25,22 +25,25 @@ const typeDefs = gql`
   }
 
   extend type Query {
-    residence(id: ID!): Residence
+    residence(id: ID!): ResidenceResult!
     residences(district_id: ID!): [Residence!]
   }
 
   extend type Mutation {
-    createResidence(input: CreateResidenceInput!): CreateResidencePayload
-    updateResidence(input: UpdateResidenceInput!): UpdateResidencePayload
-    deleteResidence(input: DeleteResidenceInput!): DeleteResidencePayload
+    createResidence(input: CreateResidenceInput!): ResidenceResult!
+    updateResidence(input: UpdateResidenceInput!): ResidenceResult!
+    deleteResidence(input: DeleteResidenceInput!): ResidenceResult!
   }
+
+  union ResidenceResult =
+      Residence
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 
   input DeleteResidenceInput {
     id: ID!
-  }
-
-  type DeleteResidencePayload {
-    residence: Residence!
   }
 
   input UpdateResidenceInput {
@@ -54,18 +57,10 @@ const typeDefs = gql`
     cost_classification: ResidenceClassification
   }
 
-  type UpdateResidencePayload {
-    residence: Residence!
-  }
-
   input CreateResidenceInput {
     name: String!
     cost_classification: ResidenceClassification!
     district_id: String!
-  }
-
-  type CreateResidencePayload {
-    residence: Residence!
   }
 
   enum ResidenceClassification {
@@ -75,8 +70,6 @@ const typeDefs = gql`
     PERI_URBAN
     RURAL
   }
-
-  scalar DateTime
 `;
 
 const resolvers: Resolvers = {
@@ -91,7 +84,7 @@ const resolvers: Resolvers = {
   },
   Residence: {
     district: (parent, _args, context) =>
-      getDistrictById(parent.district_id, context),
+      getDistrict(parent.district_id, context),
     service_areas: (parent, _args, context) =>
       getResidenceServiceAreas(parent.id, context),
   },

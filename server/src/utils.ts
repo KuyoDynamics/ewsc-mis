@@ -7,6 +7,7 @@ import {
   PrismaClientUnknownRequestError,
   PrismaClientValidationError,
 } from "@prisma/client/runtime";
+import { AuthenticationError } from "apollo-server-core";
 async function encryptPassword(password: string) {
   return hash(password, 10);
 }
@@ -193,6 +194,13 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
     errorFields = [
       {
         field: "unknown",
+        message: error.message,
+      },
+    ];
+  } else if (error instanceof AuthenticationError) {
+    errorFields = [
+      {
+        field: field_name || "unknown",
         message: error.message,
       },
     ];

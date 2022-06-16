@@ -3,9 +3,9 @@ import { Resolvers } from "../../libs/resolvers-types";
 import {
   createDistrict,
   deleteDistrict,
-  getDistrictById,
-  getDistrictsByProvinceId,
-  getProvinceById,
+  getDistrict,
+  getDistricts,
+  getProvince,
   updateDistrict,
 } from "../queries";
 
@@ -15,8 +15,7 @@ const typeDefs = gql`
     name: String!
     code: String!
     province_id: String!
-    province: Province
-    # organisations_in_district: [Organisation!]
+    province: ProvinceResult
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -25,24 +24,19 @@ const typeDefs = gql`
 
   extend type Query {
     districts(province_id: ID!): [District!]
-    district(id: ID!): District
+    district(id: ID!): DistrictResult!
   }
 
   extend type Mutation {
-    createDistrict(input: CreateDistrictInput!): CreateDistrictPayload
-    updateDistrict(input: UpdateDistrictInput!): UpdateDistrictPayload
-    deleteDistrict(input: DeleteDistrictInput!): DeleteDistrictPayload
+    createDistrict(input: CreateDistrictInput!): DistrictResult!
+    updateDistrict(input: UpdateDistrictInput!): DistrictResult!
+    deleteDistrict(input: DeleteDistrictInput!): DistrictResult!
   }
 
   input CreateDistrictInput {
     name: String!
     code: String!
     province_id: String!
-    # organisations_in_district: [Organisation!]
-  }
-
-  type CreateDistrictPayload {
-    district: District
   }
 
   input UpdateDistrictInput {
@@ -55,26 +49,22 @@ const typeDefs = gql`
     name: String
   }
 
-  type UpdateDistrictPayload {
-    district: District
-  }
-
   input DeleteDistrictInput {
     id: ID!
   }
 
-  type DeleteDistrictPayload {
-    district: District
-  }
-
-  scalar DateTime
+  union DistrictResult =
+      District
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {
   Query: {
-    districts: (_, args, context) =>
-      getDistrictsByProvinceId(args.province_id, context),
-    district: (_, args, context) => getDistrictById(args.id, context),
+    districts: (_, args, context) => getDistricts(args.province_id, context),
+    district: (_, args, context) => getDistrict(args.id, context),
   },
   Mutation: {
     createDistrict: (_, args, context) => createDistrict(args, context),
@@ -84,7 +74,7 @@ const resolvers: Resolvers = {
   },
   District: {
     province: (parent, _args, context) =>
-      getProvinceById(parent.province_id, context),
+      getProvince(parent.province_id, context),
   },
 };
 

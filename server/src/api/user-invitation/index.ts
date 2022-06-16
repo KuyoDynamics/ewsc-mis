@@ -54,8 +54,6 @@ const typeDefs = gql`
   type CreateUserInvitationPayload {
     user_invitation: UserInvitation
   }
-
-  scalar DateTime
 `;
 
 const resolvers: Resolvers = {

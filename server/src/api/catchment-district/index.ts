@@ -4,10 +4,13 @@ import { getDistrictUsers } from "../district-user/queries";
 import {
   createCatchmentDistrict,
   deleteCatchmentDistrict,
-  getCatchmentDistrictById,
+  getCatchmentDistrict,
   getCatchmentDistricts,
-  getCatchmentProvinceById,
-  getDistrictById,
+  getCatchmentDistrictServiceAreas,
+  getCatchmentProvince,
+  getDistrict,
+  getSewerTreatmentPlants,
+  getWaterTreatmentPlants,
   updateCatchmentDistrict,
 } from "../queries";
 
@@ -16,14 +19,12 @@ const typeDefs = gql`
     id: ID!
     disabled: Boolean!
     district_id: String!
-    district_name: String!
-    district: District
+    district: DistrictResult
     catchment_province_id: String!
-    catchment_province_name: String!
-    catchment_province: CatchmentProvince
-    # water_treatment_plants WaterTreatmentPlant[]
-    # service_areas          ServiceArea[]
-    # sewer_treatment_plants SewerTreatmentPlant[]
+    catchment_province: CatchmentProvinceResult
+    water_treatment_plants: [WaterTreatmentPlant!]
+    service_areas: [ServiceArea!]
+    sewer_treatment_plants: [SewerTreatmentPlant!]
     # reports                Report[]
     district_users: [DistrictUser!]
 
@@ -35,28 +36,24 @@ const typeDefs = gql`
 
   extend type Query {
     catchment_districts(catchment_province_id: ID!): [CatchmentDistrict!]
-    catchment_district(catchment_district_id: ID!): CatchmentDistrict
+    catchment_district(catchment_district_id: ID!): CatchmentDistrictResult!
   }
 
   extend type Mutation {
     createCatchmentDistrict(
       input: CreateCatchmentDistrictInput!
-    ): CreateCatchmentDistrictPayload
+    ): CatchmentDistrictResult!
     updateCatchmentDistrict(
       input: UpdateCatchmentDistrictInput!
-    ): UpdateCatchmentDistrictPayload
+    ): CatchmentDistrictResult!
     deleteCatchmentDistrict(
       input: DeleteCatchmentDistrictInput!
-    ): DeleteCatchmentDistrictPayload
+    ): CatchmentDistrictResult!
   }
 
   input CreateCatchmentDistrictInput {
     district_id: String!
     catchment_province_id: String!
-  }
-
-  type CreateCatchmentDistrictPayload {
-    catchment_district: CatchmentDistrict
   }
 
   input UpdateCatchmentDistrictInput {
@@ -68,19 +65,16 @@ const typeDefs = gql`
     disabled: Boolean!
   }
 
-  type UpdateCatchmentDistrictPayload {
-    catchment_district: CatchmentDistrict
-  }
-
   input DeleteCatchmentDistrictInput {
     id: ID!
   }
 
-  type DeleteCatchmentDistrictPayload {
-    catchment_district: CatchmentDistrict
-  }
-
-  scalar DateTime
+  union CatchmentDistrictResult =
+      CatchmentDistrict
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {
@@ -88,7 +82,7 @@ const resolvers: Resolvers = {
     catchment_districts: (_, args, context) =>
       getCatchmentDistricts(args.catchment_province_id, context),
     catchment_district: (_, args, context) =>
-      getCatchmentDistrictById(args.catchment_district_id, context),
+      getCatchmentDistrict(args.catchment_district_id, context),
   },
   Mutation: {
     createCatchmentDistrict: (_, args, context) =>
@@ -100,11 +94,20 @@ const resolvers: Resolvers = {
   },
   CatchmentDistrict: {
     district: ({ district_id }, _args, context) =>
-      getDistrictById(district_id, context),
+      getDistrict(district_id, context),
     catchment_province: ({ catchment_province_id }, _args, context) =>
-      getCatchmentProvinceById(catchment_province_id, context),
+      getCatchmentProvince(catchment_province_id, context),
     district_users: (parent, _args, context) =>
       getDistrictUsers({ catchment_district_id: parent.id }, context),
+    water_treatment_plants: (parent, _args, context) =>
+      getWaterTreatmentPlants({ catchment_district_id: parent.id }, context),
+    service_areas: (parent, _args, context) =>
+      getCatchmentDistrictServiceAreas(
+        { catchment_district_id: parent.id },
+        context
+      ),
+    sewer_treatment_plants: (parent, _args, context) =>
+      getSewerTreatmentPlants({ catchment_district_id: parent.id }, context),
   },
 };
 

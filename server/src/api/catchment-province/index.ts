@@ -4,10 +4,10 @@ import {
   createCatchmentProvince,
   deleteCatchmentProvince,
   getCatchmentDistricts,
-  getCatchmentProvinceById,
+  getCatchmentProvince,
   getCatchmentProvinces,
-  getOrganisationById,
-  getProvinceById,
+  getOrganisation,
+  getProvince,
   updateCatchmentProvince,
 } from "../queries";
 
@@ -16,13 +16,10 @@ const typeDefs = gql`
     id: ID!
     disabled: Boolean!
     province_id: String!
-    province_name: String!
-    province: Province
+    province: ProvinceResult
     organisation_id: String!
-    organisation_name: String!
-    organisation: Organisation
+    organisation: OrganisationResult
     catchment_districts: [CatchmentDistrict!]
-
     created_at: DateTime
     created_by: String
     last_modified_at: DateTime
@@ -31,28 +28,24 @@ const typeDefs = gql`
 
   type Query {
     catchment_provinces(organisation_id: ID!): [CatchmentProvince!]
-    catchment_province(catchment_province_id: ID!): CatchmentProvince
+    catchment_province(catchment_province_id: ID!): CatchmentProvinceResult!
   }
 
   type Mutation {
     createCatchmentProvince(
       input: CreateCatchmentProvinceInput!
-    ): CreateCatchmentProvincePayload
+    ): CatchmentProvinceResult!
     updateCatchmentProvince(
       input: UpdateCatchmentProvinceInput!
-    ): UpdateCatchmentProvincePayload
+    ): CatchmentProvinceResult!
     deleteCatchmentProvince(
       input: DeleteCatchmentProvinceInput!
-    ): DeleteCatchmentProvincePayload
+    ): CatchmentProvinceResult!
   }
 
   input CreateCatchmentProvinceInput {
     province_id: String!
     organisation_id: String!
-  }
-
-  type CreateCatchmentProvincePayload {
-    catchment_province: CatchmentProvince
   }
 
   input UpdateCatchmentProvinceInput {
@@ -64,19 +57,16 @@ const typeDefs = gql`
     disabled: Boolean!
   }
 
-  type UpdateCatchmentProvincePayload {
-    catchment_province: CatchmentProvince
-  }
-
   input DeleteCatchmentProvinceInput {
     id: ID!
   }
 
-  type DeleteCatchmentProvincePayload {
-    catchment_province: CatchmentProvince
-  }
-
-  scalar DateTime
+  union CatchmentProvinceResult =
+      CatchmentProvince
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {
@@ -84,7 +74,7 @@ const resolvers: Resolvers = {
     catchment_provinces: (_, args, context) =>
       getCatchmentProvinces(args.organisation_id, context),
     catchment_province: (_, args, context) =>
-      getCatchmentProvinceById(args.catchment_province_id, context),
+      getCatchmentProvince(args.catchment_province_id, context),
   },
   Mutation: {
     createCatchmentProvince: (_, args, context) =>
@@ -96,9 +86,9 @@ const resolvers: Resolvers = {
   },
   CatchmentProvince: {
     province: ({ province_id }, _args, context) =>
-      getProvinceById(province_id, context),
+      getProvince(province_id, context),
     organisation: ({ organisation_id }, _args, context) =>
-      getOrganisationById(organisation_id, context),
+      getOrganisation(organisation_id, context),
     catchment_districts: ({ id }, _args, context) =>
       getCatchmentDistricts(id, context),
   },

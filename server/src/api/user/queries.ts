@@ -1,13 +1,14 @@
 import { AuthenticationError } from "apollo-server-core";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import { encryptPassword, isValidPassword, GraphQLContext } from "../../utils";
 import {
-  CreateInvitedUserPayload,
-  CreateUserPayoad,
-  DeleteUserPayload,
-  DisableUserPayload,
-  LoginPayload,
+  encryptPassword,
+  isValidPassword,
+  GraphQLContext,
+  generateClientErrors,
+} from "../../utils";
+import {
+  LoginResult,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
   MutationDeleteUserArgs,
@@ -17,11 +18,12 @@ import {
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
   Organisation,
-  PasswordResetPayload,
-  PasswordResetRequestPayload,
+  OrganisationUser,
+  PasswordResetRequestResult,
+  PasswordResetResult,
   QueryUserArgs,
-  UpdateUserPayload,
   User,
+  UserResult,
   UserRoleType,
 } from "../../libs/resolvers-types";
 
@@ -30,36 +32,49 @@ async function getUsers(context: GraphQLContext): Promise<User[]> {
 
   return result as User[];
 }
+
 async function getUser(
   args: QueryUserArgs,
   context: GraphQLContext
-): Promise<User> {
-  const user = await context.prisma.user.findUnique({
-    where: {
-      id: args.id,
-    },
-  });
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.findUnique({
+      where: {
+        id: args.id,
+      },
+    });
 
-  return user as User;
+    if (!user) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The Country with the id ${args.id} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "User",
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find Country with the id ${args.id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function getUserOrganisations(
   user_id: string,
   context: GraphQLContext
-): Promise<Organisation[]> {
-  const user_organisations = await context.prisma.user
+): Promise<OrganisationUser[]> {
+  return context.prisma.user
     .findUnique({
       where: {
         id: user_id,
       },
     })
-    .user_organisations({
-      include: {
-        organisation: true,
-      },
-    });
-
-  return user_organisations.map((value) => value.organisation);
+    .user_organisations();
 }
 
 function prepareUserRolesForUpdate(new_user_roles: UserRoleType[] | undefined) {
@@ -77,127 +92,173 @@ function prepareUserRolesForCreate(user_roles: UserRoleType[]) {
 async function createUser(
   args: MutationCreateUserArgs,
   context: GraphQLContext
-): Promise<CreateUserPayoad> {
-  const { email, first_name, last_name, password, user_roles } = args.input;
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.create({
+      data: {
+        email: args.input.email,
+        first_name: args.input.first_name,
+        last_name: args.input.last_name,
+        password: await encryptPassword(args.input.password),
+        user_roles: prepareUserRolesForCreate(args.input.user_roles),
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      },
+    });
 
-  const requiredFields = {
-    email,
-    first_name,
-    last_name,
-    password: await encryptPassword(password),
-    user_roles: prepareUserRolesForCreate(user_roles),
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  };
-
-  const user = await context.prisma.user.create({
-    data: requiredFields,
-  });
-
-  return {
-    user,
-  } as CreateUserPayoad;
+    return {
+      __typename: "User",
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create User.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function createInvitedUser(
   args: MutationCreateInvitedUserArgs,
   context: GraphQLContext
-): Promise<CreateInvitedUserPayload> {
-  const { email, first_name, last_name, password, user_roles } =
-    args.input.user_details;
-  const { catchment_district_ids, organisation_id } = args.input;
+): Promise<UserResult> {
+  try {
+    const { email, first_name, last_name, password, user_roles } =
+      args.input.user_details;
+    const { catchment_district_ids, organisation_id } = args.input;
 
-  const user_districts = catchment_district_ids.map((id) => ({
-    catchment_district_id: id,
-    created_by: context.user?.email,
-    last_modified_by: context.user?.email,
-  }));
+    const user_districts = catchment_district_ids.map((id) => ({
+      catchment_district_id: id,
+      created_by: context.user.email,
+      last_modified_by: context.user.email,
+    }));
 
-  const user = await context.prisma.user.create({
-    data: {
-      first_name,
-      last_name,
-      email,
-      password: await encryptPassword(password),
-      user_roles: prepareUserRolesForCreate(user_roles),
-      created_by: context.user?.email,
-      last_modified_by: context.user?.email,
-      user_organisations: {
-        create: {
-          organisation_id,
-          created_by: context.user?.email,
-          last_modified_by: context.user?.email,
-          district_users: {
-            createMany: {
-              data: user_districts,
-              skipDuplicates: true,
+    const user = await context.prisma.user.create({
+      data: {
+        first_name,
+        last_name,
+        email,
+        password: await encryptPassword(password),
+        user_roles: prepareUserRolesForCreate(user_roles),
+        created_by: context.user?.email,
+        last_modified_by: context.user?.email,
+        user_organisations: {
+          create: {
+            organisation_id,
+            created_by: context.user?.email,
+            last_modified_by: context.user?.email,
+            district_users: {
+              createMany: {
+                data: user_districts,
+                skipDuplicates: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  return { user } as CreateInvitedUserPayload;
+    return {
+      __typename: "User",
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create User.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function updateUser(
   args: MutationUpdateUserArgs,
   context: GraphQLContext
-): Promise<UpdateUserPayload> {
-  const { user_roles } = args.input.update;
-  const user = await context.prisma.user.update({
-    where: {
-      id: args.input.id,
-    },
-    data: {
-      first_name: args.input.update.first_name || undefined,
-      last_name: args.input.update.last_name || undefined,
-      theme: args.input.update.theme || undefined,
-      user_roles: prepareUserRolesForUpdate(user_roles!),
-      last_modified_by: context.user?.email,
-    },
-  });
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.update({
+      where: {
+        id: args.input.id,
+      },
+      data: {
+        first_name: args.input.update.first_name || undefined,
+        last_name: args.input.update.last_name || undefined,
+        theme: args.input.update.theme || undefined,
+        user_roles: prepareUserRolesForUpdate(args.input.update.user_roles!),
+        last_modified_by: args.input.update ? context.user.email : undefined,
+      },
+    });
 
-  return { user } as UpdateUserPayload;
+    return {
+      __typename: "User",
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update User with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function deleteUser(
   args: MutationDeleteUserArgs,
   context: GraphQLContext
-): Promise<DeleteUserPayload> {
-  const user = await context.prisma.user.delete({
-    where: {
-      id: args.input.id,
-    },
-  });
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.delete({
+      where: {
+        id: args.input.id,
+      },
+    });
 
-  console.log("Deleted User", user);
-
-  return { user } as DeleteUserPayload;
+    return {
+      __typename: "User",
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete User with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function disableUser(
   args: MutationDisableUserArgs,
   context: GraphQLContext
-): Promise<DisableUserPayload> {
-  const user = await context.prisma.user.update({
-    where: {
-      id: args.input.id,
-    },
-    data: {
-      disabled: args.input.update.disabled,
-      last_modified_by: context.user?.email,
-    },
-  });
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.update({
+      where: {
+        id: args.input.id,
+      },
+      data: {
+        disabled: args.input.update.disabled,
+        last_modified_by: args.input.update ? context.user.email : undefined,
+      },
+    });
 
-  return { user } as DisableUserPayload;
+    return {
+      __typename: "User",
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to disable/enable User with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function login(
   args: MutationLoginArgs,
   context: GraphQLContext
-): Promise<LoginPayload> {
+): Promise<LoginResult> {
   let accessToken;
   try {
     const user = await context.prisma.user.findUnique({
@@ -238,19 +299,23 @@ async function login(
         last_login: new Date(),
       },
     });
+    return {
+      __typename: "LoginPayload",
+      accessToken,
+    };
   } catch (error) {
-    console.log("Something bad happened during Authentication: ", error);
-    // Also send to Sentry
-    throw error;
+    return {
+      __typename: "ApiLoginError",
+      message: "Login Failed.",
+      errors: generateClientErrors(error, "email,password"),
+    };
   }
-
-  return { accessToken };
 }
 
 async function requestPasswordReset(
   args: MutationRequestPasswordResetArgs,
   context: GraphQLContext
-): Promise<PasswordResetRequestPayload> {
+): Promise<PasswordResetRequestResult> {
   let hashed_password_reset_token;
   try {
     const user = await context.prisma.user.findUnique({
@@ -278,19 +343,23 @@ async function requestPasswordReset(
 
     // We can send email at this point like this, async. After we figure out sending emails, we will not return
     // Email.password_recovery_email(user, token) |> Mailer.deliver_later()
+    return {
+      __typename: "PasswordResetRequestPayload",
+      hashed_password_reset_token,
+    };
   } catch (error) {
-    // Send to Sentry for cryptic errors. TODO
-    console.log(error);
-    throw error;
+    return {
+      __typename: "ApiPasswordResetError",
+      message: "Password Reset Request Failed.",
+      errors: generateClientErrors(error, "email,password"),
+    };
   }
-  return { hashed_password_reset_token } as PasswordResetRequestPayload;
 }
 
 async function resetPassword(
   args: MutationResetPasswordArgs,
   context: GraphQLContext
-): Promise<PasswordResetPayload> {
-  let updatedUser;
+): Promise<PasswordResetResult> {
   try {
     const user = await context.prisma.user.findFirst({
       where: {
@@ -302,7 +371,7 @@ async function resetPassword(
 
     if (user.disabled) throw new AuthenticationError("Account is disabled.");
 
-    updatedUser = await context.prisma.user.update({
+    const updatedUser = await context.prisma.user.update({
       where: {
         id: user.id,
       },
@@ -312,14 +381,18 @@ async function resetPassword(
         last_modified_by: user.email,
       },
     });
+
+    return {
+      __typename: "User",
+      ...updatedUser,
+    } as PasswordResetResult;
   } catch (error) {
-    if (!(error instanceof AuthenticationError)) {
-      // Also send to sentry. TODO:
-      console.log("Error:", error);
-    }
-    throw error;
+    return {
+      __typename: "ApiPasswordResetError",
+      message: "Password Reset Failed.",
+      errors: generateClientErrors(error, "email"),
+    };
   }
-  return { user: updatedUser } as PasswordResetPayload;
 }
 
 export {

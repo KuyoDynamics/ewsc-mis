@@ -1,28 +1,43 @@
-import { ValidationError } from "apollo-server-core";
 import {
-  CreateResidencePayload,
   MutationCreateResidenceArgs,
   MutationUpdateResidenceArgs,
   QueryResidenceArgs,
   QueryResidencesArgs,
   Residence,
-  UpdateResidencePayload,
-  ResidenceUpdateInput,
   MutationDeleteResidenceArgs,
-  DeleteResidencePayload,
+  ResidenceResult,
 } from "../../libs/resolvers-types";
-import { GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from "../../utils";
 
 async function getResidence(
   args: QueryResidenceArgs,
   context: GraphQLContext
-): Promise<Residence> {
-  const result = await context.prisma.residence.findUnique({
-    where: {
-      id: args.id,
-    },
-  });
-  return result as Residence;
+): Promise<ResidenceResult> {
+  try {
+    const residence = await context.prisma.residence.findUnique({
+      where: {
+        id: args.id,
+      },
+    });
+
+    if (!residence) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The Residence with the id ${args.id}} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "Residence",
+      ...residence,
+    } as ResidenceResult;
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find Residence with the id ${args.id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function getResidences(
@@ -42,58 +57,82 @@ async function getResidences(
 async function createResidence(
   args: MutationCreateResidenceArgs,
   context: GraphQLContext
-): Promise<CreateResidencePayload> {
-  const residence = await context.prisma.residence.create({
-    data: {
-      name: args.input.name,
-      cost_classification: args.input.cost_classification,
-      district_id: args.input.district_id,
-      created_by: context.user.email,
-      last_modified_by: context.user.email,
-    },
-  });
-  return { residence } as CreateResidencePayload;
+): Promise<ResidenceResult> {
+  try {
+    const residence = await context.prisma.residence.create({
+      data: {
+        name: args.input.name,
+        cost_classification: args.input.cost_classification,
+        district_id: args.input.district_id,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      },
+    });
+    return {
+      __typename: "Residence",
+      ...residence,
+    } as ResidenceResult;
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create Residence.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function updateResidence(
   args: MutationUpdateResidenceArgs,
   context: GraphQLContext
-): Promise<UpdateResidencePayload> {
-  if (
-    !args.input.update.cost_classification &&
-    !args.input.update.name &&
-    !args.input.update.district_id
-  )
-    throw new ValidationError("Invalid input");
+): Promise<ResidenceResult> {
+  try {
+    const residence = await context.prisma.residence.update({
+      where: {
+        id: args.input.id,
+      },
+      data: {
+        name: args.input.update.name || undefined,
+        cost_classification: args.input.update.cost_classification || undefined,
+        district_id: args.input.update.district_id || undefined,
+        last_modified_by: context.user.email,
+      },
+    });
 
-  const requiredInput = {
-    name: args.input.update.name || undefined,
-    cost_classification: args.input.update.cost_classification || undefined,
-    district_id: args.input.update.district_id || undefined,
-    last_modified_by: context.user.email,
-  };
-
-  const residence = await context.prisma.residence.update({
-    where: {
-      id: args.input.id,
-    },
-    data: requiredInput,
-  });
-
-  return { residence } as UpdateResidencePayload;
+    return {
+      __typename: "Residence",
+      ...residence,
+    } as ResidenceResult;
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update Residence with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function deleteResidence(
   args: MutationDeleteResidenceArgs,
   context: GraphQLContext
-): Promise<DeleteResidencePayload> {
-  const residence = await context.prisma.residence.delete({
-    where: {
-      id: args.input.id,
-    },
-  });
+): Promise<ResidenceResult> {
+  try {
+    const residence = await context.prisma.residence.delete({
+      where: {
+        id: args.input.id,
+      },
+    });
 
-  return { residence } as DeleteResidencePayload;
+    return {
+      __typename: "Residence",
+      ...residence,
+    } as ResidenceResult;
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete Residence with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 export {
