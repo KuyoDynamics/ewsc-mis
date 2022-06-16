@@ -17,6 +17,7 @@ import { WaterProductionSiteTypeDefs } from "../water-production-site";
 import { WaterNetworkTypeDefs } from "../water-network";
 import { ServiceAreaWaterConnectionTypeDefs } from "../service-area-water-connection";
 import { SewerTreatmentPlantTypeDefs } from "../sewer-treatment-plant";
+import { SewerNetworkTypeDefs } from "../sewer-network";
 
 export default [
   CountryTypeDefs,
@@ -37,5 +38,6 @@ export default [
   WaterNetworkTypeDefs,
   ServiceAreaWaterConnectionTypeDefs,
   SewerTreatmentPlantTypeDefs,
+  SewerNetworkTypeDefs,
   scalarTypeDefs,
 ];
