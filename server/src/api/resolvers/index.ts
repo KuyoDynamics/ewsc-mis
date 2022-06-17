@@ -22,6 +22,7 @@ import { ServiceAreaSewerConnectionResolvers } from "../service-area-sewer-conne
 import { DisaggregateOptionResolvers } from "../disaggregate-option";
 import { DisaggregateOptionSetResolvers } from "../disaggregate-option-set";
 import { DisaggregateResolvers } from "../disaggregate";
+import { IndicatorUnitResolvers } from "../indicator-unit";
 
 export default [
   CountryResolvers,
@@ -47,5 +48,6 @@ export default [
   DisaggregateOptionResolvers,
   DisaggregateOptionSetResolvers,
   DisaggregateResolvers,
+  IndicatorUnitResolvers,
   scalarResolvers,
 ];

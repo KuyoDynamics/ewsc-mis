@@ -321,6 +321,11 @@ export type CreateDistrictUserInput = {
   organisation_user_id: Scalars['ID'];
 };
 
+export type CreateIndicatorUnitInput = {
+  display_name: Scalars['String'];
+  unit: Scalars['String'];
+};
+
 export type CreateInvitedUserInput = {
   catchment_district_ids: Array<Scalars['ID']>;
   organisation_id: Scalars['ID'];
@@ -486,6 +491,10 @@ export type DeleteDistrictInput = {
 };
 
 export type DeleteDistrictUserInput = {
+  id: Scalars['ID'];
+};
+
+export type DeleteIndicatorUnitInput = {
   id: Scalars['ID'];
 };
 
@@ -660,6 +669,24 @@ export type ErrorField = {
   message: Scalars['String'];
 };
 
+export type IndicatorUnit = {
+  __typename?: 'IndicatorUnit';
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  display_name: Scalars['String'];
+  id: Scalars['ID'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  unit: Scalars['String'];
+};
+
+export type IndicatorUnitResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | IndicatorUnit;
+
+export type IndicatorUnitUpdateInput = {
+  display_name?: InputMaybe<Scalars['String']>;
+  unit?: InputMaybe<Scalars['String']>;
+};
+
 export type LoginInput = {
   email: Scalars['EmailAddress'];
   password: Scalars['String'];
@@ -682,6 +709,7 @@ export type Mutation = {
   createDisaggregateOptionSet: DisaggregateOptionSetResult;
   createDistrict: DistrictResult;
   createDistrictUser: DistrictUserResult;
+  createIndicatorUnit: IndicatorUnitResult;
   createInvitedUser: UserResult;
   createOrganisation: OrganisationResult;
   createOrganisationUser: OrganisationUserResult;
@@ -706,6 +734,7 @@ export type Mutation = {
   deleteDisaggregateOptionSet: DisaggregateOptionSetResult;
   deleteDistrict: DistrictResult;
   deleteDistrictUser: DistrictUserResult;
+  deleteIndicatorUnit: IndicatorUnitResult;
   deleteOrganisation: OrganisationResult;
   deleteOrganisationUser: OrganisationUserResult;
   deleteProvince: ProvinceResult;
@@ -731,6 +760,7 @@ export type Mutation = {
   updateDisaggregate: DisaggregateResult;
   updateDisaggregateOption: DisaggregateOptionResult;
   updateDistrict: DistrictResult;
+  updateIndicatorUnit: IndicatorUnitResult;
   updateOrganisation: OrganisationResult;
   updateOrganisationUser: OrganisationUserResult;
   updateProvince: ProvinceResult;
@@ -784,6 +814,11 @@ export type MutationCreateDistrictArgs = {
 
 export type MutationCreateDistrictUserArgs = {
   input: CreateDistrictUserInput;
+};
+
+
+export type MutationCreateIndicatorUnitArgs = {
+  input: CreateIndicatorUnitInput;
 };
 
 
@@ -904,6 +939,11 @@ export type MutationDeleteDistrictArgs = {
 
 export type MutationDeleteDistrictUserArgs = {
   input: DeleteDistrictUserInput;
+};
+
+
+export type MutationDeleteIndicatorUnitArgs = {
+  input: DeleteIndicatorUnitInput;
 };
 
 
@@ -1029,6 +1069,11 @@ export type MutationUpdateDisaggregateOptionArgs = {
 
 export type MutationUpdateDistrictArgs = {
   input: UpdateDistrictInput;
+};
+
+
+export type MutationUpdateIndicatorUnitArgs = {
+  input: UpdateIndicatorUnitInput;
 };
 
 
@@ -1200,6 +1245,8 @@ export type Query = {
   district_user: DistrictUserResult;
   district_users?: Maybe<Array<DistrictUser>>;
   districts?: Maybe<Array<District>>;
+  indicator_unit: IndicatorUnitResult;
+  indicator_units?: Maybe<Array<IndicatorUnit>>;
   me: UserResult;
   organisation?: Maybe<OrganisationResult>;
   organisation_user: OrganisationUserResult;
@@ -1291,6 +1338,11 @@ export type QueryDistrict_UsersArgs = {
 
 export type QueryDistrictsArgs = {
   province_id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_UnitArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -1599,6 +1651,11 @@ export type UpdateDisaggregateOptionInput = {
 export type UpdateDistrictInput = {
   id: Scalars['ID'];
   update: DistrictUpdateInput;
+};
+
+export type UpdateIndicatorUnitInput = {
+  id: Scalars['ID'];
+  update: IndicatorUnitUpdateInput;
 };
 
 export type UpdateOrganisationInput = {
@@ -1960,6 +2017,7 @@ export type ResolversTypes = ResolversObject<{
   CreateDisaggregateOptionSetInput: CreateDisaggregateOptionSetInput;
   CreateDistrictInput: CreateDistrictInput;
   CreateDistrictUserInput: CreateDistrictUserInput;
+  CreateIndicatorUnitInput: CreateIndicatorUnitInput;
   CreateInvitedUserInput: CreateInvitedUserInput;
   CreateOrganisationInput: CreateOrganisationInput;
   CreateOrganisationUserInput: CreateOrganisationUserInput;
@@ -1994,6 +2052,7 @@ export type ResolversTypes = ResolversObject<{
   DeleteDisaggregateOptionSetInput: DeleteDisaggregateOptionSetInput;
   DeleteDistrictInput: DeleteDistrictInput;
   DeleteDistrictUserInput: DeleteDistrictUserInput;
+  DeleteIndicatorUnitInput: DeleteIndicatorUnitInput;
   DeleteOrganisationInput: DeleteOrganisationInput;
   DeleteOrganisationUserInput: DeleteOrganisationUserInput;
   DeleteProvinceInput: DeleteProvinceInput;
@@ -2040,6 +2099,9 @@ export type ResolversTypes = ResolversObject<{
   IPv6: ResolverTypeWrapper<Scalars['IPv6']>;
   ISBN: ResolverTypeWrapper<Scalars['ISBN']>;
   ISO8601Duration: ResolverTypeWrapper<Scalars['ISO8601Duration']>;
+  IndicatorUnit: ResolverTypeWrapper<IndicatorUnit>;
+  IndicatorUnitResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['IndicatorUnit'];
+  IndicatorUnitUpdateInput: IndicatorUnitUpdateInput;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']>;
   JSONObject: ResolverTypeWrapper<Scalars['JSONObject']>;
@@ -2122,6 +2184,7 @@ export type ResolversTypes = ResolversObject<{
   UpdateDisaggregateInput: UpdateDisaggregateInput;
   UpdateDisaggregateOptionInput: UpdateDisaggregateOptionInput;
   UpdateDistrictInput: UpdateDistrictInput;
+  UpdateIndicatorUnitInput: UpdateIndicatorUnitInput;
   UpdateOrganisationInput: UpdateOrganisationInput;
   UpdateOrganisationUserInput: UpdateOrganisationUserInput;
   UpdateProvinceInput: UpdateProvinceInput;
@@ -2196,6 +2259,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateDisaggregateOptionSetInput: CreateDisaggregateOptionSetInput;
   CreateDistrictInput: CreateDistrictInput;
   CreateDistrictUserInput: CreateDistrictUserInput;
+  CreateIndicatorUnitInput: CreateIndicatorUnitInput;
   CreateInvitedUserInput: CreateInvitedUserInput;
   CreateOrganisationInput: CreateOrganisationInput;
   CreateOrganisationUserInput: CreateOrganisationUserInput;
@@ -2230,6 +2294,7 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteDisaggregateOptionSetInput: DeleteDisaggregateOptionSetInput;
   DeleteDistrictInput: DeleteDistrictInput;
   DeleteDistrictUserInput: DeleteDistrictUserInput;
+  DeleteIndicatorUnitInput: DeleteIndicatorUnitInput;
   DeleteOrganisationInput: DeleteOrganisationInput;
   DeleteOrganisationUserInput: DeleteOrganisationUserInput;
   DeleteProvinceInput: DeleteProvinceInput;
@@ -2275,6 +2340,9 @@ export type ResolversParentTypes = ResolversObject<{
   IPv6: Scalars['IPv6'];
   ISBN: Scalars['ISBN'];
   ISO8601Duration: Scalars['ISO8601Duration'];
+  IndicatorUnit: IndicatorUnit;
+  IndicatorUnitResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['IndicatorUnit'];
+  IndicatorUnitUpdateInput: IndicatorUnitUpdateInput;
   Int: Scalars['Int'];
   JSON: Scalars['JSON'];
   JSONObject: Scalars['JSONObject'];
@@ -2355,6 +2423,7 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateDisaggregateInput: UpdateDisaggregateInput;
   UpdateDisaggregateOptionInput: UpdateDisaggregateOptionInput;
   UpdateDistrictInput: UpdateDistrictInput;
+  UpdateIndicatorUnitInput: UpdateIndicatorUnitInput;
   UpdateOrganisationInput: UpdateOrganisationInput;
   UpdateOrganisationUserInput: UpdateOrganisationUserInput;
   UpdateProvinceInput: UpdateProvinceInput;
@@ -2707,6 +2776,21 @@ export interface Iso8601DurationScalarConfig extends GraphQLScalarTypeConfig<Res
   name: 'ISO8601Duration';
 }
 
+export type IndicatorUnitResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['IndicatorUnit'] = ResolversParentTypes['IndicatorUnit']> = ResolversObject<{
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  display_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  unit?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type IndicatorUnitResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['IndicatorUnitResult'] = ResolversParentTypes['IndicatorUnitResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'IndicatorUnit', ParentType, ContextType>;
+}>;
+
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
   name: 'JSON';
 }
@@ -2769,6 +2853,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createDisaggregateOptionSet?: Resolver<ResolversTypes['DisaggregateOptionSetResult'], ParentType, ContextType, RequireFields<MutationCreateDisaggregateOptionSetArgs, 'input'>>;
   createDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictArgs, 'input'>>;
   createDistrictUser?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictUserArgs, 'input'>>;
+  createIndicatorUnit?: Resolver<ResolversTypes['IndicatorUnitResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorUnitArgs, 'input'>>;
   createInvitedUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCreateInvitedUserArgs, 'input'>>;
   createOrganisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationArgs, 'input'>>;
   createOrganisationUser?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationUserArgs, 'input'>>;
@@ -2793,6 +2878,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteDisaggregateOptionSet?: Resolver<ResolversTypes['DisaggregateOptionSetResult'], ParentType, ContextType, RequireFields<MutationDeleteDisaggregateOptionSetArgs, 'input'>>;
   deleteDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationDeleteDistrictArgs, 'input'>>;
   deleteDistrictUser?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationDeleteDistrictUserArgs, 'input'>>;
+  deleteIndicatorUnit?: Resolver<ResolversTypes['IndicatorUnitResult'], ParentType, ContextType, RequireFields<MutationDeleteIndicatorUnitArgs, 'input'>>;
   deleteOrganisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<MutationDeleteOrganisationArgs, 'input'>>;
   deleteOrganisationUser?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationDeleteOrganisationUserArgs, 'input'>>;
   deleteProvince?: Resolver<ResolversTypes['ProvinceResult'], ParentType, ContextType, RequireFields<MutationDeleteProvinceArgs, 'input'>>;
@@ -2818,6 +2904,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateDisaggregate?: Resolver<ResolversTypes['DisaggregateResult'], ParentType, ContextType, RequireFields<MutationUpdateDisaggregateArgs, 'input'>>;
   updateDisaggregateOption?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<MutationUpdateDisaggregateOptionArgs, 'input'>>;
   updateDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateDistrictArgs, 'input'>>;
+  updateIndicatorUnit?: Resolver<ResolversTypes['IndicatorUnitResult'], ParentType, ContextType, RequireFields<MutationUpdateIndicatorUnitArgs, 'input'>>;
   updateOrganisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<MutationUpdateOrganisationArgs, 'input'>>;
   updateOrganisationUser?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationUpdateOrganisationUserArgs, 'input'>>;
   updateProvince?: Resolver<ResolversTypes['ProvinceResult'], ParentType, ContextType, RequireFields<MutationUpdateProvinceArgs, 'input'>>;
@@ -2970,6 +3057,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   district_user?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<QueryDistrict_UserArgs, 'district_user_id'>>;
   district_users?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType, RequireFields<QueryDistrict_UsersArgs, 'catchment_district_id'>>;
   districts?: Resolver<Maybe<Array<ResolversTypes['District']>>, ParentType, ContextType, RequireFields<QueryDistrictsArgs, 'province_id'>>;
+  indicator_unit?: Resolver<ResolversTypes['IndicatorUnitResult'], ParentType, ContextType, RequireFields<QueryIndicator_UnitArgs, 'id'>>;
+  indicator_units?: Resolver<Maybe<Array<ResolversTypes['IndicatorUnit']>>, ParentType, ContextType>;
   me?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType>;
   organisation?: Resolver<Maybe<ResolversTypes['OrganisationResult']>, ParentType, ContextType, RequireFields<QueryOrganisationArgs, 'id'>>;
   organisation_user?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<QueryOrganisation_UserArgs, 'organisation_user_id'>>;
@@ -3348,6 +3437,8 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   IPv6?: GraphQLScalarType;
   ISBN?: GraphQLScalarType;
   ISO8601Duration?: GraphQLScalarType;
+  IndicatorUnit?: IndicatorUnitResolvers<ContextType>;
+  IndicatorUnitResult?: IndicatorUnitResultResolvers<ContextType>;
   JSON?: GraphQLScalarType;
   JSONObject?: GraphQLScalarType;
   JWT?: GraphQLScalarType;

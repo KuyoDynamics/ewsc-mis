@@ -23,3 +23,4 @@ export * from "../sewer-network/queries";
 export * from "../disaggregate-option/queries";
 export * from "../disaggregate-option-set/queries";
 export * from "../disaggregate/queries";
+export * from "../indicator-unit/queries";
