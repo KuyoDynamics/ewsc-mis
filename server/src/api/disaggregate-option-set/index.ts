@@ -5,7 +5,7 @@ import {
   deleteDisaggregateOptionSet,
   getDisaggregateOption,
   getDisaggregateOptionSet,
-  getDisaggregateOptionSets,
+  getAllDisaggregateOptionSets,
 } from "../queries";
 
 const typeDefs = gql`
@@ -58,7 +58,7 @@ const resolvers: Resolvers = {
     disaggregate_option_set: (_, args, context) =>
       getDisaggregateOptionSet(args, context),
     disaggregate_option_sets: (_, _args, context) =>
-      getDisaggregateOptionSets(context),
+      getAllDisaggregateOptionSets(context),
   },
   Mutation: {
     createDisaggregateOptionSet: (_, args, context) =>
@@ -68,7 +68,7 @@ const resolvers: Resolvers = {
   },
   DisaggregateOptionSet: {
     disaggregate_option: (parent, _args, context) =>
-      getDisaggregateOption({ id: parent.id }, context),
+      getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
   },
 };
 

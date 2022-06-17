@@ -74,7 +74,8 @@ async function updateDisaggregateOption(
         id: args.input.id,
       },
       data: {
-        option_name: args.input.update.option_name,
+        option_name: args.input.update.option_name || undefined,
+        last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
     return {

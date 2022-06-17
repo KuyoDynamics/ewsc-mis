@@ -12,10 +12,21 @@ import {
   GraphQLContext,
 } from "../../utils";
 
-async function getDisaggregateOptionSets(
+async function getAllDisaggregateOptionSets(
   context: GraphQLContext
 ): Promise<DisaggregateOptionSet[]> {
   return context.prisma.disaggregateOptionSet.findMany({});
+}
+
+async function getDisaggregateOptionSets(
+  disaggregate_id: string,
+  context: GraphQLContext
+): Promise<DisaggregateOptionSet[]> {
+  return context.prisma.disaggregateOptionSet.findMany({
+    where: {
+      disaggregate_id,
+    },
+  });
 }
 
 async function getDisaggregateOptionSet(
@@ -86,7 +97,8 @@ async function deleteDisaggregateOptionSet(
 
 export {
   getDisaggregateOptionSet,
-  getDisaggregateOptionSets,
+  getAllDisaggregateOptionSets,
   createDisaggregateOptionSet,
   deleteDisaggregateOptionSet,
+  getDisaggregateOptionSets,
 };

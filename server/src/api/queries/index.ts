@@ -22,3 +22,4 @@ export * from "../service-area-sewer-connection/queries";
 export * from "../sewer-network/queries";
 export * from "../disaggregate-option/queries";
 export * from "../disaggregate-option-set/queries";
+export * from "../disaggregate/queries";

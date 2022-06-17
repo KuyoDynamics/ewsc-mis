@@ -175,6 +175,7 @@ const PRISMA_ERROR_CODES: Record<string, string> = {
 
 function generateClientErrors(error: any, field_name?: string): ErrorField[] {
   let errorFields: ErrorField[] = [];
+  console.log("Chaiwa, see this error", error);
 
   if (error instanceof PrismaClientKnownRequestError) {
     const err = error;
@@ -189,7 +190,9 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
         {
           field: `${field_name}` || "unknown",
           message:
-            (error.meta?.cause as string) || PRISMA_ERROR_CODES[err.code],
+            (error.meta?.cause as string) ||
+            (error.meta?.message as string) ||
+            PRISMA_ERROR_CODES[err.code],
         },
       ];
     }
@@ -224,8 +227,10 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
   return errorFields;
 }
 
-function getApiErrors(error?: any) {
-  return { errors: error ? generateClientErrors(error) : undefined };
+function getApiErrors(error?: any, field_name?: string) {
+  return {
+    errors: error ? generateClientErrors(error, field_name) : undefined,
+  };
 }
 
 function getApiNotFoundError(
@@ -236,7 +241,7 @@ function getApiNotFoundError(
   return {
     __typename: "ApiNotFoundError",
     message: `The ${model_name} with the id ${id_value} does not exist.`,
-    ...getApiErrors(error),
+    ...getApiErrors(error, "id"),
   };
 }
 
@@ -256,7 +261,7 @@ function getApitUpdateError(
   return {
     __typename: "ApiUpdateError",
     message: `Failed to update ${model_name} with id ${id_value}.`,
-    errors: generateClientErrors(error, "id"),
+    ...getApiErrors(error, "id"),
   };
 }
 
@@ -268,7 +273,7 @@ function getApitDeleteError(
   return {
     __typename: "ApiDeleteError",
     message: `Failed to delete ${model_name} with id ${id_value}.`,
-    errors: generateClientErrors(error, "id"),
+    ...getApiErrors(error, "id"),
   };
 }
 

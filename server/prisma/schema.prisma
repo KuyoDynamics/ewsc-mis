@@ -651,7 +651,7 @@ model Disaggregate {
   type DisaggregateType //default the table with one row of number disaggregate and users should not be allowed to create a disaggregate of this type
 
   // Relation Fields
-  option_set DisaggregateOptionSet[]
+  disaggregate_option_set DisaggregateOptionSet[]
   indicators Indicator[]
 
   indicator_reports IndicatorReport[]

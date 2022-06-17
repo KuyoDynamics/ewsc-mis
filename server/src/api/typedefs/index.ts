@@ -21,6 +21,7 @@ import { SewerNetworkTypeDefs } from "../sewer-network";
 import { ServiceAreaSewerConnectionTypeDefs } from "../service-area-sewer-connection";
 import { DisaggregateOptionTypeDefs } from "../disaggregate-option";
 import { DisaggregateOptionSetTypeDefs } from "../disaggregate-option-set";
+import { DisaggregateTypeDefs } from "../disaggregate";
 
 export default [
   CountryTypeDefs,
@@ -45,5 +46,6 @@ export default [
   ServiceAreaSewerConnectionTypeDefs,
   DisaggregateOptionTypeDefs,
   DisaggregateOptionSetTypeDefs,
+  DisaggregateTypeDefs,
   scalarTypeDefs,
 ];
