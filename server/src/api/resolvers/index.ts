@@ -19,6 +19,7 @@ import { ServiceAreaWaterConnectionResolvers } from "../service-area-water-conne
 import { SewerTreatmentPlantResolvers } from "../sewer-treatment-plant";
 import { SewerNetworkResolvers } from "../sewer-network";
 import { ServiceAreaSewerConnectionResolvers } from "../service-area-sewer-connection";
+import { DisaggregateOptionResolvers } from "../disaggregate-option";
 
 export default [
   CountryResolvers,
@@ -41,5 +42,6 @@ export default [
   SewerTreatmentPlantResolvers,
   SewerNetworkResolvers,
   ServiceAreaSewerConnectionResolvers,
+  DisaggregateOptionResolvers,
   scalarResolvers,
 ];

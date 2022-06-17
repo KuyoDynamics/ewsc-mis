@@ -71,7 +71,7 @@ const typeDefs = gql`
     password: String!
   }
 
-  type LoginPayload {
+  type LoginSuccess {
     accessToken: JWT
   }
 
@@ -135,7 +135,7 @@ const typeDefs = gql`
     | ApiUpdateError
     | ApiDeleteError
 
-  union LoginResult = LoginPayload | ApiLoginError
+  union LoginResult = LoginSuccess | ApiLoginError
 
   union PasswordResetRequestResult =
       PasswordResetRequestPayload

@@ -296,6 +296,10 @@ export type CreateCountryInput = {
   provinces?: InputMaybe<Array<CreateProvinceInput>>;
 };
 
+export type CreateDisaggregateOptionInput = {
+  option_name: Scalars['String'];
+};
+
 export type CreateDistrictInput = {
   code: Scalars['String'];
   name: Scalars['String'];
@@ -455,6 +459,10 @@ export type DeleteCountryInput = {
   id: Scalars['ID'];
 };
 
+export type DeleteDisaggregateOptionInput = {
+  id: Scalars['ID'];
+};
+
 export type DeleteDistrictInput = {
   id: Scalars['ID'];
 };
@@ -539,6 +547,22 @@ export type DisableUserInput = {
   update: UserDisableInput;
 };
 
+export type DisaggregateOption = {
+  __typename?: 'DisaggregateOption';
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  id: Scalars['ID'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  option_name: Scalars['String'];
+};
+
+export type DisaggregateOptionResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | DisaggregateOption;
+
+export type DisaggregateOptionUpdateInput = {
+  option_name: Scalars['String'];
+};
+
 export type District = {
   __typename?: 'District';
   code: Scalars['String'];
@@ -585,18 +609,19 @@ export type LoginInput = {
   password: Scalars['String'];
 };
 
-export type LoginPayload = {
-  __typename?: 'LoginPayload';
+export type LoginResult = ApiLoginError | LoginSuccess;
+
+export type LoginSuccess = {
+  __typename?: 'LoginSuccess';
   accessToken?: Maybe<Scalars['JWT']>;
 };
-
-export type LoginResult = ApiLoginError | LoginPayload;
 
 export type Mutation = {
   __typename?: 'Mutation';
   createCatchmentDistrict: CatchmentDistrictResult;
   createCatchmentProvince: CatchmentProvinceResult;
   createCountry: CountryResult;
+  createDisaggregateOption: DisaggregateOptionResult;
   createDistrict: DistrictResult;
   createDistrictUser: DistrictUserResult;
   createInvitedUser: UserResult;
@@ -618,6 +643,7 @@ export type Mutation = {
   deleteCatchmentDistrict: CatchmentDistrictResult;
   deleteCatchmentProvince: CatchmentProvinceResult;
   deleteCountry: CountryResult;
+  deleteDisaggregateOption: DisaggregateOptionResult;
   deleteDistrict: DistrictResult;
   deleteDistrictUser: DistrictUserResult;
   deleteOrganisation: OrganisationResult;
@@ -642,6 +668,7 @@ export type Mutation = {
   updateCatchmentDistrict: CatchmentDistrictResult;
   updateCatchmentProvince: CatchmentProvinceResult;
   updateCountry: CountryResult;
+  updateDisaggregateOption: DisaggregateOptionResult;
   updateDistrict: DistrictResult;
   updateOrganisation: OrganisationResult;
   updateOrganisationUser: OrganisationUserResult;
@@ -671,6 +698,11 @@ export type MutationCreateCatchmentProvinceArgs = {
 
 export type MutationCreateCountryArgs = {
   input: CreateCountryInput;
+};
+
+
+export type MutationCreateDisaggregateOptionArgs = {
+  input: CreateDisaggregateOptionInput;
 };
 
 
@@ -776,6 +808,11 @@ export type MutationDeleteCatchmentProvinceArgs = {
 
 export type MutationDeleteCountryArgs = {
   input: DeleteCountryInput;
+};
+
+
+export type MutationDeleteDisaggregateOptionArgs = {
+  input: DeleteDisaggregateOptionInput;
 };
 
 
@@ -896,6 +933,11 @@ export type MutationUpdateCatchmentProvinceArgs = {
 
 export type MutationUpdateCountryArgs = {
   input: UpdateCountryInput;
+};
+
+
+export type MutationUpdateDisaggregateOptionArgs = {
+  input: UpdateDisaggregateOptionInput;
 };
 
 
@@ -1062,6 +1104,8 @@ export type Query = {
   catchment_provinces?: Maybe<Array<CatchmentProvince>>;
   countries?: Maybe<Array<Country>>;
   country: CountryResult;
+  disaggregate_option: DisaggregateOptionResult;
+  disaggregate_options?: Maybe<Array<DisaggregateOption>>;
   district: DistrictResult;
   district_user: DistrictUserResult;
   district_users?: Maybe<Array<DistrictUser>>;
@@ -1121,6 +1165,11 @@ export type QueryCatchment_ProvincesArgs = {
 
 
 export type QueryCountryArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryDisaggregate_OptionArgs = {
   id: Scalars['ID'];
 };
 
@@ -1435,6 +1484,11 @@ export type UpdateCatchmentProvinceInput = {
 export type UpdateCountryInput = {
   id: Scalars['ID'];
   update: CountryUpdateInput;
+};
+
+export type UpdateDisaggregateOptionInput = {
+  id: Scalars['ID'];
+  update: DisaggregateOptionUpdateInput;
 };
 
 export type UpdateDistrictInput = {
@@ -1796,6 +1850,7 @@ export type ResolversTypes = ResolversObject<{
   CreateCatchmentDistrictInput: CreateCatchmentDistrictInput;
   CreateCatchmentProvinceInput: CreateCatchmentProvinceInput;
   CreateCountryInput: CreateCountryInput;
+  CreateDisaggregateOptionInput: CreateDisaggregateOptionInput;
   CreateDistrictInput: CreateDistrictInput;
   CreateDistrictUserInput: CreateDistrictUserInput;
   CreateInvitedUserInput: CreateInvitedUserInput;
@@ -1827,6 +1882,7 @@ export type ResolversTypes = ResolversObject<{
   DeleteCatchmentDistrictInput: DeleteCatchmentDistrictInput;
   DeleteCatchmentProvinceInput: DeleteCatchmentProvinceInput;
   DeleteCountryInput: DeleteCountryInput;
+  DeleteDisaggregateOptionInput: DeleteDisaggregateOptionInput;
   DeleteDistrictInput: DeleteDistrictInput;
   DeleteDistrictUserInput: DeleteDistrictUserInput;
   DeleteOrganisationInput: DeleteOrganisationInput;
@@ -1846,6 +1902,9 @@ export type ResolversTypes = ResolversObject<{
   DeleteWaterStorageTankPayload: ResolverTypeWrapper<DeleteWaterStorageTankPayload>;
   DeleteWaterTreatmentPlantsInput: DeleteWaterTreatmentPlantsInput;
   DisableUserInput: DisableUserInput;
+  DisaggregateOption: ResolverTypeWrapper<DisaggregateOption>;
+  DisaggregateOptionResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['DisaggregateOption'];
+  DisaggregateOptionUpdateInput: DisaggregateOptionUpdateInput;
   District: ResolverTypeWrapper<Omit<District, 'province'> & { province?: Maybe<ResolversTypes['ProvinceResult']> }>;
   DistrictResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['District'];
   DistrictUpdateInput: DistrictUpdateInput;
@@ -1876,8 +1935,8 @@ export type ResolversTypes = ResolversObject<{
   LocalTime: ResolverTypeWrapper<Scalars['LocalTime']>;
   Locale: ResolverTypeWrapper<Scalars['Locale']>;
   LoginInput: LoginInput;
-  LoginPayload: ResolverTypeWrapper<LoginPayload>;
-  LoginResult: ResolversTypes['ApiLoginError'] | ResolversTypes['LoginPayload'];
+  LoginResult: ResolversTypes['ApiLoginError'] | ResolversTypes['LoginSuccess'];
+  LoginSuccess: ResolverTypeWrapper<LoginSuccess>;
   Long: ResolverTypeWrapper<Scalars['Long']>;
   Longitude: ResolverTypeWrapper<Scalars['Longitude']>;
   MAC: ResolverTypeWrapper<Scalars['MAC']>;
@@ -1945,6 +2004,7 @@ export type ResolversTypes = ResolversObject<{
   UpdateCatchmentDistrictInput: UpdateCatchmentDistrictInput;
   UpdateCatchmentProvinceInput: UpdateCatchmentProvinceInput;
   UpdateCountryInput: UpdateCountryInput;
+  UpdateDisaggregateOptionInput: UpdateDisaggregateOptionInput;
   UpdateDistrictInput: UpdateDistrictInput;
   UpdateOrganisationInput: UpdateOrganisationInput;
   UpdateOrganisationUserInput: UpdateOrganisationUserInput;
@@ -2015,6 +2075,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateCatchmentDistrictInput: CreateCatchmentDistrictInput;
   CreateCatchmentProvinceInput: CreateCatchmentProvinceInput;
   CreateCountryInput: CreateCountryInput;
+  CreateDisaggregateOptionInput: CreateDisaggregateOptionInput;
   CreateDistrictInput: CreateDistrictInput;
   CreateDistrictUserInput: CreateDistrictUserInput;
   CreateInvitedUserInput: CreateInvitedUserInput;
@@ -2046,6 +2107,7 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteCatchmentDistrictInput: DeleteCatchmentDistrictInput;
   DeleteCatchmentProvinceInput: DeleteCatchmentProvinceInput;
   DeleteCountryInput: DeleteCountryInput;
+  DeleteDisaggregateOptionInput: DeleteDisaggregateOptionInput;
   DeleteDistrictInput: DeleteDistrictInput;
   DeleteDistrictUserInput: DeleteDistrictUserInput;
   DeleteOrganisationInput: DeleteOrganisationInput;
@@ -2065,6 +2127,9 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteWaterStorageTankPayload: DeleteWaterStorageTankPayload;
   DeleteWaterTreatmentPlantsInput: DeleteWaterTreatmentPlantsInput;
   DisableUserInput: DisableUserInput;
+  DisaggregateOption: DisaggregateOption;
+  DisaggregateOptionResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['DisaggregateOption'];
+  DisaggregateOptionUpdateInput: DisaggregateOptionUpdateInput;
   District: Omit<District, 'province'> & { province?: Maybe<ResolversParentTypes['ProvinceResult']> };
   DistrictResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['District'];
   DistrictUpdateInput: DistrictUpdateInput;
@@ -2095,8 +2160,8 @@ export type ResolversParentTypes = ResolversObject<{
   LocalTime: Scalars['LocalTime'];
   Locale: Scalars['Locale'];
   LoginInput: LoginInput;
-  LoginPayload: LoginPayload;
-  LoginResult: ResolversParentTypes['ApiLoginError'] | ResolversParentTypes['LoginPayload'];
+  LoginResult: ResolversParentTypes['ApiLoginError'] | ResolversParentTypes['LoginSuccess'];
+  LoginSuccess: LoginSuccess;
   Long: Scalars['Long'];
   Longitude: Scalars['Longitude'];
   MAC: Scalars['MAC'];
@@ -2162,6 +2227,7 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateCatchmentDistrictInput: UpdateCatchmentDistrictInput;
   UpdateCatchmentProvinceInput: UpdateCatchmentProvinceInput;
   UpdateCountryInput: UpdateCountryInput;
+  UpdateDisaggregateOptionInput: UpdateDisaggregateOptionInput;
   UpdateDistrictInput: UpdateDistrictInput;
   UpdateOrganisationInput: UpdateOrganisationInput;
   UpdateOrganisationUserInput: UpdateOrganisationUserInput;
@@ -2381,6 +2447,20 @@ export type DeleteWaterStorageTankPayloadResolvers<ContextType = GraphQLContext,
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type DisaggregateOptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DisaggregateOption'] = ResolversParentTypes['DisaggregateOption']> = ResolversObject<{
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  option_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type DisaggregateOptionResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DisaggregateOptionResult'] = ResolversParentTypes['DisaggregateOptionResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'DisaggregateOption', ParentType, ContextType>;
+}>;
+
 export type DistrictResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['District'] = ResolversParentTypes['District']> = ResolversObject<{
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -2501,13 +2581,13 @@ export interface LocaleScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
   name: 'Locale';
 }
 
-export type LoginPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoginPayload'] = ResolversParentTypes['LoginPayload']> = ResolversObject<{
-  accessToken?: Resolver<Maybe<ResolversTypes['JWT']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+export type LoginResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoginResult'] = ResolversParentTypes['LoginResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiLoginError' | 'LoginSuccess', ParentType, ContextType>;
 }>;
 
-export type LoginResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoginResult'] = ResolversParentTypes['LoginResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'ApiLoginError' | 'LoginPayload', ParentType, ContextType>;
+export type LoginSuccessResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoginSuccess'] = ResolversParentTypes['LoginSuccess']> = ResolversObject<{
+  accessToken?: Resolver<Maybe<ResolversTypes['JWT']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export interface LongScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Long'], any> {
@@ -2526,6 +2606,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentDistrictArgs, 'input'>>;
   createCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentProvinceArgs, 'input'>>;
   createCountry?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<MutationCreateCountryArgs, 'input'>>;
+  createDisaggregateOption?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<MutationCreateDisaggregateOptionArgs, 'input'>>;
   createDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictArgs, 'input'>>;
   createDistrictUser?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictUserArgs, 'input'>>;
   createInvitedUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCreateInvitedUserArgs, 'input'>>;
@@ -2547,6 +2628,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationDeleteCatchmentDistrictArgs, 'input'>>;
   deleteCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationDeleteCatchmentProvinceArgs, 'input'>>;
   deleteCountry?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<MutationDeleteCountryArgs, 'input'>>;
+  deleteDisaggregateOption?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<MutationDeleteDisaggregateOptionArgs, 'input'>>;
   deleteDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationDeleteDistrictArgs, 'input'>>;
   deleteDistrictUser?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationDeleteDistrictUserArgs, 'input'>>;
   deleteOrganisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<MutationDeleteOrganisationArgs, 'input'>>;
@@ -2571,6 +2653,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;
   updateCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentProvinceArgs, 'input'>>;
   updateCountry?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<MutationUpdateCountryArgs, 'input'>>;
+  updateDisaggregateOption?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<MutationUpdateDisaggregateOptionArgs, 'input'>>;
   updateDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateDistrictArgs, 'input'>>;
   updateOrganisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<MutationUpdateOrganisationArgs, 'input'>>;
   updateOrganisationUser?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationUpdateOrganisationUserArgs, 'input'>>;
@@ -2714,6 +2797,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   catchment_provinces?: Resolver<Maybe<Array<ResolversTypes['CatchmentProvince']>>, ParentType, ContextType, RequireFields<QueryCatchment_ProvincesArgs, 'organisation_id'>>;
   countries?: Resolver<Maybe<Array<ResolversTypes['Country']>>, ParentType, ContextType>;
   country?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<QueryCountryArgs, 'id'>>;
+  disaggregate_option?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<QueryDisaggregate_OptionArgs, 'id'>>;
+  disaggregate_options?: Resolver<Maybe<Array<ResolversTypes['DisaggregateOption']>>, ParentType, ContextType>;
   district?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<QueryDistrictArgs, 'id'>>;
   district_user?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<QueryDistrict_UserArgs, 'district_user_id'>>;
   district_users?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType, RequireFields<QueryDistrict_UsersArgs, 'catchment_district_id'>>;
@@ -3073,6 +3158,8 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   DeleteUserInvitationPayload?: DeleteUserInvitationPayloadResolvers<ContextType>;
   DeleteWaterProductionSitePayload?: DeleteWaterProductionSitePayloadResolvers<ContextType>;
   DeleteWaterStorageTankPayload?: DeleteWaterStorageTankPayloadResolvers<ContextType>;
+  DisaggregateOption?: DisaggregateOptionResolvers<ContextType>;
+  DisaggregateOptionResult?: DisaggregateOptionResultResolvers<ContextType>;
   District?: DistrictResolvers<ContextType>;
   DistrictResult?: DistrictResultResolvers<ContextType>;
   DistrictUser?: DistrictUserResolvers<ContextType>;
@@ -3098,8 +3185,8 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   LocalEndTime?: GraphQLScalarType;
   LocalTime?: GraphQLScalarType;
   Locale?: GraphQLScalarType;
-  LoginPayload?: LoginPayloadResolvers<ContextType>;
   LoginResult?: LoginResultResolvers<ContextType>;
+  LoginSuccess?: LoginSuccessResolvers<ContextType>;
   Long?: GraphQLScalarType;
   Longitude?: GraphQLScalarType;
   MAC?: GraphQLScalarType;

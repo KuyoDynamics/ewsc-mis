@@ -300,7 +300,7 @@ async function login(
       },
     });
     return {
-      __typename: "LoginPayload",
+      __typename: "LoginSuccess",
       accessToken,
     };
   } catch (error) {
