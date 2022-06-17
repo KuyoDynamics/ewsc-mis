@@ -1,7 +1,13 @@
 import { hash, compare } from "bcrypt";
 import { Request as JWTRequest } from "express-jwt";
 import { PrismaClient, User } from "@prisma/client";
-import { ErrorField } from "./libs/resolvers-types";
+import {
+  ApiCreateError,
+  ApiDeleteError,
+  ApiNotFoundError,
+  ApiUpdateError,
+  ErrorField,
+} from "./libs/resolvers-types";
 import {
   PrismaClientKnownRequestError,
   PrismaClientUnknownRequestError,
@@ -169,6 +175,7 @@ const PRISMA_ERROR_CODES: Record<string, string> = {
 
 function generateClientErrors(error: any, field_name?: string): ErrorField[] {
   let errorFields: ErrorField[] = [];
+  console.log("Chaiwa, see this error", error);
 
   if (error instanceof PrismaClientKnownRequestError) {
     const err = error;
@@ -183,7 +190,9 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
         {
           field: `${field_name}` || "unknown",
           message:
-            (error.meta?.cause as string) || PRISMA_ERROR_CODES[err.code],
+            (error.meta?.cause as string) ||
+            (error.meta?.message as string) ||
+            PRISMA_ERROR_CODES[err.code],
         },
       ];
     }
@@ -218,6 +227,56 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
   return errorFields;
 }
 
+function getApiErrors(error?: any, field_name?: string) {
+  return {
+    errors: error ? generateClientErrors(error, field_name) : undefined,
+  };
+}
+
+function getApiNotFoundError(
+  model_name: string,
+  id_value: string,
+  error?: any
+): ApiNotFoundError {
+  return {
+    __typename: "ApiNotFoundError",
+    message: `The ${model_name} with the id ${id_value} does not exist.`,
+    ...getApiErrors(error, "id"),
+  };
+}
+
+function getApiCreateError(model_name: string, error: any): ApiCreateError {
+  return {
+    __typename: "ApiCreateError",
+    message: `Failed to create ${model_name}.`,
+    ...getApiErrors(error),
+  };
+}
+
+function getApitUpdateError(
+  model_name: string,
+  id_value: string,
+  error?: any
+): ApiUpdateError {
+  return {
+    __typename: "ApiUpdateError",
+    message: `Failed to update ${model_name} with id ${id_value}.`,
+    ...getApiErrors(error, "id"),
+  };
+}
+
+function getApitDeleteError(
+  model_name: string,
+  id_value: string,
+  error?: any
+): ApiDeleteError {
+  return {
+    __typename: "ApiDeleteError",
+    message: `Failed to delete ${model_name} with id ${id_value}.`,
+    ...getApiErrors(error, "id"),
+  };
+}
+
 export {
   encryptPassword,
   isValidPassword,
@@ -226,4 +285,8 @@ export {
   createContext,
   PRISMA_ERROR_CODES,
   generateClientErrors,
+  getApiCreateError,
+  getApiNotFoundError,
+  getApitUpdateError,
+  getApitDeleteError,
 };

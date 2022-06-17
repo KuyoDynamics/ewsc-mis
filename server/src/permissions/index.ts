@@ -94,6 +94,8 @@ const permissions = shield(
       createWaterTreatmentPlant: and(isAuthenticated, isEditor),
       updateWaterTreatmentPlant: and(isAuthenticated, isEditor),
       deleteWaterTreatmentPlants: and(isAuthenticated, isAdmin),
+      // DisaggregateOption
+      createDisaggregateOption: and(isAuthenticated, isAdmin),
     },
     // Types
     CatchmentDistrict: isAuthenticated,
@@ -103,7 +105,6 @@ const permissions = shield(
     DeleteUserInvitationPayload: allow,
     District: isAuthenticated,
     DistrictUser: isAuthenticated,
-    LoginPayload: allow,
     Organisation: isAuthenticated,
     OrganisationUser: isAuthenticated,
     PasswordResetRequestPayload: allow,
