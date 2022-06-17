@@ -478,11 +478,11 @@ model Report {
   reporting_date              DateTime @db.Timestamptz()
 
   // Relation Fields
-  report_type_id String?     @db.Uuid
-  report_type    ReportType? @relation(fields: [report_type_id], references: [id])
+  report_type_id String    @db.Uuid
+  report_type    ReportType @relation(fields: [report_type_id], references: [id])
 
-  catchment_district_id String?            @map("catchment_district_id") @db.Uuid
-  catchment_district    CatchmentDistrict? @relation(fields: [catchment_district_id], references: [id])
+  catchment_district_id String            @map("catchment_district_id") @db.Uuid
+  catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
 
   indicator_reports IndicatorReport[]
   report_approvals  ReportApproval[]
