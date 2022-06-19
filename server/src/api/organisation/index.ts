@@ -20,6 +20,8 @@ const typeDefs = gql`
     country: CountryResult
     catchment_provinces: [CatchmentProvince!]
     users: [OrganisationUser!]
+    organisation_report_templates: [OrganisationReportTemplate!]
+    organisation_indicators: [OrganisationIndicator!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!

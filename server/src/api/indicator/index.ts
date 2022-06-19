@@ -1,17 +1,17 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import {
-  createIndicator,
-  deleteIndicator,
-  getDisaggregate,
-  getIndicator,
-  // getDisaggregateOptionSetReports,
-  getIndicators,
-  getIndicatorUnit,
-  // getReportsForIndicator,
-  getReportType,
-  updateIndicator,
-} from "../queries";
+// import {
+//   createIndicator,
+//   deleteIndicator,
+//   getDisaggregate,
+//   getIndicator,
+//   // getDisaggregateOptionSetReports,
+//   getIndicators,
+//   getIndicatorUnit,
+//   // getReportsForIndicator,
+//   getReportType,
+//   updateIndicator,
+// } from "../queries";
 
 const typeDefs = gql`
   type Indicator {
@@ -19,13 +19,17 @@ const typeDefs = gql`
     indicator_number: String!
     description: String!
     category: String!
-    report_type_id: String!
-    report_type: ReportTypeResult
+    type: IndicatorType!
+    contributing_organisation: String!
+
+    report_template_id: String!
+    report_template: ReportTemplateResult
+
     indicator_unit_id: String!
     indicator_unit: IndicatorUnitResult
-    disaggregate_id: String!
-    disaggregate: DisaggregateResult
-    disaggregate_option_set_reports: [DisaggregateOptionSetReport!]
+
+    indicator_organisations: [OrganisationIndicator!]
+
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -47,9 +51,9 @@ const typeDefs = gql`
     indicator_number: String!
     description: String!
     category: String!
-    report_type_id: String!
+    type: IndicatorType!
     indicator_unit_id: String!
-    disaggregate_id: String!
+    report_template_id: String!
   }
 
   input UpdateIndicatorInput {
@@ -61,13 +65,18 @@ const typeDefs = gql`
     indicator_number: String
     description: String
     category: String
-    report_type_id: String
+    type: IndicatorType
     indicator_unit_id: String
-    disaggregate_id: String
+    report_template_id: String
   }
 
   input DeleteIndicatorInput {
     id: ID!
+  }
+
+  enum IndicatorType {
+    CUSTOM
+    NIS
   }
 
   union IndicatorResult =
@@ -80,21 +89,21 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    indicator: (_, args, context) => getIndicator(args, context),
-    indicators: (_, _args, context) => getIndicators(context),
+    // indicator: (_, args, context) => getIndicator(args, context),
+    // indicators: (_, _args, context) => getIndicators(context),
   },
   Mutation: {
-    createIndicator: (_, args, context) => createIndicator(args, context),
-    updateIndicator: (_, args, context) => updateIndicator(args, context),
-    deleteIndicator: (_, args, context) => deleteIndicator(args, context),
+    // createIndicator: (_, args, context) => createIndicator(args, context),
+    // updateIndicator: (_, args, context) => updateIndicator(args, context),
+    // deleteIndicator: (_, args, context) => deleteIndicator(args, context),
   },
   Indicator: {
-    report_type: (parent, _args, context) =>
-      getReportType({ id: parent.report_type_id }, context),
-    disaggregate: (parent, _args, context) =>
-      getDisaggregate({ id: parent.disaggregate_id }, context),
-    indicator_unit: (parent, _args, context) =>
-      getIndicatorUnit({ id: parent.indicator_unit_id }, context),
+    // report_type: (parent, _args, context) =>
+    //   getReportType({ id: parent.report_type_id }, context),
+    // disaggregate: (parent, _args, context) =>
+    //   getDisaggregate({ id: parent.disaggregate_id }, context),
+    // indicator_unit: (parent, _args, context) =>
+    //   getIndicatorUnit({ id: parent.indicator_unit_id }, context),
     // disaggregate_option_set_reports: (parent, _args, context) =>
     //   getReportsForIndicator(parent.id, context),
   },

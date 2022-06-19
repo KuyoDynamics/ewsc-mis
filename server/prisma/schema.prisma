@@ -139,6 +139,7 @@ model Organisation {
   users                         OrganisationUser[]
   organisation_report_templates OrganisationReportTemplate[]
 
+  organisation_indicators OrganisationIndicator[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -149,7 +150,6 @@ model Organisation {
   // Constraints
   @@unique([name, country_id])
   @@map("organisation")
-  OrganisationIndicator OrganisationIndicator[]
 }
 
 model User {
@@ -501,7 +501,7 @@ model Report {
 
 model ReportTemplate {
   id        String             @id @default(uuid()) @db.Uuid
-  name      String
+  name      String @unique
   type      IndicatorType
   frequency ReportingFrequency
   window    Int
@@ -538,7 +538,7 @@ model OrganisationReportTemplate {
   last_modified_by String
 
   // Constraints
-  @@map("report_type")
+  @@map("organisation_report_template")
 }
 
 model IndicatorDisaggregateReport {
@@ -622,8 +622,7 @@ model Indicator {
   description                  String        @unique
   category                     String
   type                         IndicatorType
-  contributing_organisation_id String?       @db.Uuid
-
+  contributing_organisation String     @default("nis")
 
   // Relation Fields
   report_template_id String         @db.Uuid
@@ -632,7 +631,7 @@ model Indicator {
   indicator_unit_id String        @db.Uuid
   indicator_unit    IndicatorUnit @relation(fields: [indicator_unit_id], references: [id])
 
-  // organisation_indicators OrganisationIndicator[]
+  indicator_organisations OrganisationIndicator[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -642,7 +641,6 @@ model Indicator {
 
   // Constraints
   @@map("indicator")
-  OrganisationIndicator OrganisationIndicator[]
 }
 
 model IndicatorUnit {
@@ -673,15 +671,15 @@ model OrganisationIndicator {
   indicator_id String    @db.Uuid
   indicator    Indicator @relation(fields: [indicator_id], references: [id])
 
+  indicator_disaggregate IndicatorDisaggregate[]
   // Timestamps
-  created_at       DateTime @default(now()) @db.Timestamptz()
-  created_by       String
-  last_modified_at DateTime @updatedAt @db.Timestamptz()
-  last_modified_by String
+  created_at             DateTime                @default(now()) @db.Timestamptz()
+  created_by             String
+  last_modified_at       DateTime                @updatedAt @db.Timestamptz()
+  last_modified_by       String
 
   // Constraints
   @@map("organisation_indicator")
-  IndicatorDisaggregate IndicatorDisaggregate[]
 }
 
 model IndicatorDisaggregate {
@@ -795,18 +793,18 @@ enum ApprovalStatus {
   @@map("approval_status")
 }
 
-enum ReportTypeOption {
-  PUBLIC_RELATIONS  @map("public_relations")
-  COMMERCIAL        @map("commercial")
-  TECHNICAL         @map("technical")
-  PURCHASE_SUPPLY   @map("purchase_supply")
-  PERSONNEL         @map("personnel")
-  FINANCE           @map("finance")
-  IT                @map("it")
-  INVENTORY         @map("inventory")
+// enum ReportTypeOption {
+//   PUBLIC_RELATIONS  @map("public_relations")
+//   COMMERCIAL        @map("commercial")
+//   TECHNICAL         @map("technical")
+//   PURCHASE_SUPPLY   @map("purchase_supply")
+//   PERSONNEL         @map("personnel")
+//   FINANCE           @map("finance")
+//   IT                @map("it")
+//   INVENTORY         @map("inventory")
 
-  @@map("report_type_option")
-}
+//   @@map("report_type_option")
+// }
 
 enum ReportingFrequency {
   WEEKLY      @map("weekly")

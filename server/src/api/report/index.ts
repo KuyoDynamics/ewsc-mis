@@ -1,15 +1,15 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import {
-  createReport,
-  deleteReport,
-  getReport,
-  getReports,
-  updateReport,
-  getCatchmentDistrict,
-  getDisaggregateOptionSetReports,
-  getReportType,
-} from "../queries";
+// import {
+//   createReport,
+//   deleteReport,
+//   getReport,
+//   getReports,
+//   updateReport,
+//   getCatchmentDistrict,
+//   getDisaggregateOptionSetReports,
+//   getReportType,
+// } from "../queries";
 
 const typeDefs = gql`
   type Report {
@@ -19,11 +19,14 @@ const typeDefs = gql`
     reporting_period_end_date: DateTime!
     report_due_date: DateTime!
     reporting_date: DateTime!
-    report_type_id: String!
-    report_type: ReportTypeResult
+
+    organisation_report_template_id: String!
+    organisation_report_template: OrganisationReportTemplateResult
+
     catchment_district_id: String!
     catchment_district: CatchmentDistrictResult
-    disaggregate_option_set_reports: [DisaggregateOptionSetReport!]
+
+    indicator_disaggregate_reports: [IndicatorDisaggregateReport!]
     # report_approvals: [ReportApproval!]
 
     created_at: DateTime!
@@ -49,7 +52,7 @@ const typeDefs = gql`
     reporting_period_end_date: DateTime!
     report_due_date: DateTime!
     reporting_date: DateTime!
-    report_type_id: String!
+    organisation_report_template_id: String!
     catchment_district_id: String!
   }
 
@@ -78,21 +81,21 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    report: (_, args, context) => getReport(args, context),
-    reports: (_, _args, context) => getReports(context),
+    // report: (_, args, context) => getReport(args, context),
+    // reports: (_, _args, context) => getReports(context),
   },
   Mutation: {
-    createReport: (_, args, context) => createReport(args, context),
-    updateReport: (_, args, context) => updateReport(args, context),
-    deleteReport: (_, args, context) => deleteReport(args, context),
+    // createReport: (_, args, context) => createReport(args, context),
+    // updateReport: (_, args, context) => updateReport(args, context),
+    // deleteReport: (_, args, context) => deleteReport(args, context),
   },
   Report: {
-    report_type: (parent, _args, context) =>
-      getReportType({ id: parent.report_type_id }, context),
-    catchment_district: (parent, _args, context) =>
-      getCatchmentDistrict(parent.catchment_district_id, context),
-    disaggregate_option_set_reports: (parent, _args, context) =>
-      getDisaggregateOptionSetReports({ report_id: parent.id }, context),
+    // report_type: (parent, _args, context) =>
+    //   getReportType({ id: parent.report_type_id }, context),
+    // catchment_district: (parent, _args, context) =>
+    //   getCatchmentDistrict(parent.catchment_district_id, context),
+    // disaggregate_option_set_reports: (parent, _args, context) =>
+    //   getDisaggregateOptionSetReports({ report_id: parent.id }, context),
   },
 };
 

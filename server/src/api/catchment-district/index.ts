@@ -25,7 +25,7 @@ const typeDefs = gql`
     water_treatment_plants: [WaterTreatmentPlant!]
     service_areas: [ServiceArea!]
     sewer_treatment_plants: [SewerTreatmentPlant!]
-    # reports                Report[]
+    # reports                ReportTemplate[]
     district_users: [DistrictUser!]
 
     created_at: DateTime!
