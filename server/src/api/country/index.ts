@@ -44,11 +44,16 @@ const typeDefs = gql`
     message: String!
   }
 
-  type DeleteBatchPayload {
+  type ApiOperationError implements ApiError {
+    message: String!
+    errors: [ErrorField!]
+  }
+
+  type ApiBatchPayload {
     count: Int!
   }
 
-  union ApiBatchPayloadResult = DeleteBatchPayload | ApiDeleteError
+  union ApiBatchPayloadResult = ApiBatchPayload | ApiOperationError
 
   type ApiNotFoundError implements ApiError {
     message: String!

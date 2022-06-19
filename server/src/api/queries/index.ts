@@ -24,3 +24,7 @@ export * from "../disaggregate-option/queries";
 export * from "../disaggregate-option-set/queries";
 export * from "../disaggregate/queries";
 export * from "../indicator-unit/queries";
+export * from "../indicator/queries";
+export * from "../report-type/queries";
+export * from "../disaggregate-option-set-report/queries";
+export * from "../report/queries";

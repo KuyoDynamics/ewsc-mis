@@ -9,8 +9,8 @@ import {
 import {
   getApiCreateError,
   getApiNotFoundError,
-  getApitDeleteError,
-  getApitUpdateError,
+  getApiDeleteError,
+  getApiUpdateError,
   GraphQLContext,
 } from "../../utils";
 
@@ -84,7 +84,7 @@ async function updateIndicatorUnit(
       ...indicator_unit,
     };
   } catch (error) {
-    return getApitUpdateError("IndicatorUnit", args.input.id);
+    return getApiUpdateError("IndicatorUnit", args.input.id);
   }
 }
 
@@ -103,7 +103,7 @@ async function deleteIndicatorUnit(
       ...indicator_unit,
     };
   } catch (error) {
-    return getApitDeleteError("IndicatorUnit", args.input.id);
+    return getApiDeleteError("IndicatorUnit", args.input.id);
   }
 }
 

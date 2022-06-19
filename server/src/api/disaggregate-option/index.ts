@@ -5,6 +5,7 @@ import {
   deleteDisaggregateOption,
   getDisaggregateOption,
   getDisaggregateOptions,
+  getDisaggregateOptionSetsByOption,
   updateDisaggregateOption,
 } from "../queries";
 
@@ -12,7 +13,7 @@ const typeDefs = gql`
   type DisaggregateOption {
     id: ID!
     option_name: String!
-    # disaggregate_option_sets: [DisaggregateOptionSet!]
+    disaggregate_option_sets: [DisaggregateOptionSet!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -75,6 +76,10 @@ const resolvers: Resolvers = {
       updateDisaggregateOption(args, context),
     deleteDisaggregateOption: (_, args, context) =>
       deleteDisaggregateOption(args, context),
+  },
+  DisaggregateOption: {
+    disaggregate_option_sets: (parent, _args, context) =>
+      getDisaggregateOptionSetsByOption(parent.id, context),
   },
 };
 

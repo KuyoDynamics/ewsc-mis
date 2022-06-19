@@ -67,7 +67,7 @@ model District {
   province_id               String              @db.Uuid
   province                  Province            @relation(fields: [province_id], references: [id])
   organisations_in_district CatchmentDistrict[]
-  residences Residence[]
+  residences                Residence[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -82,12 +82,12 @@ model District {
 
 //======================RESIDENCE AND SERVICE AREA====================================
 model Residence {
-  id                  String                    @id @default(uuid()) @db.Uuid
+  id                  String                  @id @default(uuid()) @db.Uuid
   name                String
   cost_classification ResidenceClassification
 
   // Relation Fields
-  district_id String            @map("district_id") @db.Uuid
+  district_id String   @map("district_id") @db.Uuid
   district    District @relation(fields: [district_id], references: [id])
 
   service_areas ServiceArea[]
@@ -104,11 +104,11 @@ model Residence {
 }
 
 model ServiceArea {
-  id                  String                    @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
   // Relation Fields
-  residence_id String @db.Uuid
-  residence Residence @relation(fields: [residence_id], references: [id])
+  residence_id String    @db.Uuid
+  residence    Residence @relation(fields: [residence_id], references: [id])
 
   catchment_district_id String            @map("catchment_district_id") @db.Uuid
   catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
@@ -127,17 +127,17 @@ model ServiceArea {
   @@map("service_area")
 }
 
-
 model Organisation {
   id   String @id @default(uuid()) @db.Uuid
   name String @unique
   logo Bytes? @db.ByteA
 
   // Relation Fields
-  country_id          String              @db.Uuid
-  country             Country             @relation(fields: [country_id], references: [id])
-  catchment_provinces CatchmentProvince[]
-  users               OrganisationUser[]
+  country_id                    String                       @db.Uuid
+  country                       Country                      @relation(fields: [country_id], references: [id])
+  catchment_provinces           CatchmentProvince[]
+  users                         OrganisationUser[]
+  organisation_report_templates OrganisationReportTemplate[]
 
 
   // Timestamps
@@ -149,6 +149,7 @@ model Organisation {
   // Constraints
   @@unique([name, country_id])
   @@map("organisation")
+  OrganisationIndicator OrganisationIndicator[]
 }
 
 model User {
@@ -478,14 +479,14 @@ model Report {
   reporting_date              DateTime @db.Timestamptz()
 
   // Relation Fields
-  report_type_id String    @db.Uuid
-  report_type    ReportType @relation(fields: [report_type_id], references: [id])
+  organisation_report_template_id String                     @db.Uuid
+  organisation_report_template    OrganisationReportTemplate @relation(fields: [organisation_report_template_id], references: [id])
 
   catchment_district_id String            @map("catchment_district_id") @db.Uuid
   catchment_district    CatchmentDistrict @relation(fields: [catchment_district_id], references: [id])
 
-  indicator_reports IndicatorReport[]
-  report_approvals  ReportApproval[]
+  indicator_disaggregate_reports IndicatorDisaggregateReport[]
+  report_approvals               ReportApproval[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -494,19 +495,41 @@ model Report {
   last_modified_by String
 
   // Constraints
-  @@unique([reporting_period, report_type_id, catchment_district_id])
+  @@unique([reporting_period, organisation_report_template_id, catchment_district_id])
   @@map("report")
 }
 
-model ReportType {
+model ReportTemplate {
   id        String             @id @default(uuid()) @db.Uuid
-  type      ReportTypeOption
+  name      String
+  type      IndicatorType
   frequency ReportingFrequency
   window    Int
 
   // Relation Fields
-  reports    Report[]
-  indicators Indicator[]
+  indicators                    Indicator[]
+  organisation_report_templates OrganisationReportTemplate[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("report_emplate")
+}
+
+model OrganisationReportTemplate {
+  id                 String         @id @default(uuid()) @db.Uuid
+  // Relation Fields
+  report_template_id String         @db.Uuid
+  report_template    ReportTemplate @relation(fields: [report_template_id], references: [id])
+
+  organisation_id String       @db.Uuid
+  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+
+  reports Report[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -518,7 +541,7 @@ model ReportType {
   @@map("report_type")
 }
 
-model IndicatorReport {
+model IndicatorDisaggregateReport {
   id String @id @default(uuid()) @db.Uuid
 
   target   Float?
@@ -529,14 +552,8 @@ model IndicatorReport {
   report_id String @db.Uuid
   report    Report @relation(fields: [report_id], references: [id])
 
-  indicator_id String    @db.Uuid
-  indicator    Indicator @relation(fields: [indicator_id], references: [id])
-
-  disaggregate_id String       @db.Uuid
-  disaggegate     Disaggregate @relation(fields: [disaggregate_id], references: [id])
-
-  disaggregate_option_set_id String                @db.Uuid
-  disaggregate_option_set    DisaggregateOptionSet @relation(fields: [disaggregate_option_set_id], references: [id])
+  indicator_disaggregate_id String                @db.Uuid
+  indicator_disaggregate    IndicatorDisaggregate @relation(fields: [indicator_disaggregate_id], references: [id])
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -545,8 +562,8 @@ model IndicatorReport {
   last_modified_by String
 
   // Constraints
-  @@unique([report_id, indicator_id])
-  @@map("indicator_report")
+  @@unique([report_id, indicator_disaggregate_id])
+  @@map("indicator_disaggregate_report")
 }
 
 model ReportApproval {
@@ -600,22 +617,22 @@ model ReportApprovalComment {
 //==============================INDICATORS================================
 
 model Indicator {
-  id               String @id @default(uuid()) @db.Uuid
-  indicator_number String @unique
-  description      String @unique
-  category         String
+  id                           String        @id @default(uuid()) @db.Uuid
+  indicator_number             String        @unique
+  description                  String        @unique
+  category                     String
+  type                         IndicatorType
+  contributing_organisation_id String?       @db.Uuid
+
 
   // Relation Fields
-  report_type_id String     @db.Uuid
-  report_type    ReportType @relation(fields: [report_type_id], references: [id])
+  report_template_id String         @db.Uuid
+  report_template    ReportTemplate @relation(fields: [report_template_id], references: [id])
 
   indicator_unit_id String        @db.Uuid
   indicator_unit    IndicatorUnit @relation(fields: [indicator_unit_id], references: [id])
 
-  disaggregate_id String       @db.Uuid
-  disaggregate    Disaggregate @relation(fields: [disaggregate_id], references: [id])
-
-  indicator_reports IndicatorReport[]
+  // organisation_indicators OrganisationIndicator[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -625,6 +642,7 @@ model Indicator {
 
   // Constraints
   @@map("indicator")
+  OrganisationIndicator OrganisationIndicator[]
 }
 
 model IndicatorUnit {
@@ -645,16 +663,55 @@ model IndicatorUnit {
   @@map("indicator_unit")
 }
 
+model OrganisationIndicator {
+  id String @id @default(uuid()) @db.Uuid
+
+  // Relation Fields
+  organisation_id String       @db.Uuid
+  organisation    Organisation @relation(fields: [organisation_id], references: [id])
+
+  indicator_id String    @db.Uuid
+  indicator    Indicator @relation(fields: [indicator_id], references: [id])
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("organisation_indicator")
+  IndicatorDisaggregate IndicatorDisaggregate[]
+}
+
+model IndicatorDisaggregate {
+  id                        String                @id @default(uuid()) @db.Uuid
+  organisation_indicator_id String                @db.Uuid
+  organisation_indicator    OrganisationIndicator @relation(fields: [organisation_indicator_id], references: [id])
+
+  // Relation Fields
+  disaggregate_option_id String             @db.Uuid
+  disaggregate_option    DisaggregateOption @relation(fields: [disaggregate_option_id], references: [id])
+
+  indicator_disaggregate_reports IndicatorDisaggregateReport[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("indicator_disaggregate")
+}
+
 model Disaggregate {
   id   String           @id @default(uuid()) @db.Uuid
   name String           @unique
-  type DisaggregateType //default the table with one row of number disaggregate and users should not be allowed to create a disaggregate of this type
+  type DisaggregateType
 
   // Relation Fields
-  disaggregate_option_set DisaggregateOptionSet[]
-  indicators Indicator[]
-
-  indicator_reports IndicatorReport[]
+  disaggregate_options DisaggregateOption[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -666,34 +723,17 @@ model Disaggregate {
   @@map("disaggregate")
 }
 
-model DisaggregateOptionSet {
+model DisaggregateOption {
   id String @id @default(uuid()) @db.Uuid
 
   // Relation Fields
   disaggregate_id String       @db.Uuid
   disaggregate    Disaggregate @relation(fields: [disaggregate_id], references: [id])
 
-  disaggregate_option_id String             @db.Uuid
-  disaggregate_option    DisaggregateOption @relation(fields: [disaggregate_option_id], references: [id])
+  option_id String @db.Uuid
+  option    Option @relation(fields: [option_id], references: [id])
 
-  indictor_reports IndicatorReport[]
-
-  // Timestamps
-  created_at       DateTime @default(now()) @db.Timestamptz()
-  created_by       String
-  last_modified_at DateTime @updatedAt @db.Timestamptz()
-  last_modified_by String
-
-  // Constraints
-  @@map("disaggregate_option_set")
-}
-
-model DisaggregateOption {
-  id          String @id @default(uuid()) @db.Uuid
-  option_name String @unique
-
-  // Relation Fields
-  disaggregate_option_sets DisaggregateOptionSet[]
+  indicator_disaggregates IndicatorDisaggregate[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -705,7 +745,29 @@ model DisaggregateOption {
   @@map("disaggregate_option")
 }
 
+model Option {
+  id          String @id @default(uuid()) @db.Uuid
+  option_name String @unique
+
+  // Relation Fields
+  disaggregate_options DisaggregateOption[]
+
+  // Timestamps
+  created_at       DateTime @default(now()) @db.Timestamptz()
+  created_by       String
+  last_modified_at DateTime @updatedAt @db.Timestamptz()
+  last_modified_by String
+
+  // Constraints
+  @@map("option")
+}
+
 //===============ENUMS=================================
+
+enum IndicatorType {
+  CUSTOM  @map("custom")
+  NIS     @map("nis")
+}
 
 enum DisaggregateType {
   NUMBER           @map("number")

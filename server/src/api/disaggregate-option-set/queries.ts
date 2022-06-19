@@ -1,4 +1,5 @@
 import {
+  ApiBatchPayloadResult,
   DisaggregateOptionSet,
   DisaggregateOptionSetResult,
   MutationCreateDisaggregateOptionSetArgs,
@@ -6,9 +7,10 @@ import {
   QueryDisaggregate_Option_SetArgs,
 } from "../../libs/resolvers-types";
 import {
+  getApiBatchPayloadCreateError,
   getApiCreateError,
   getApiNotFoundError,
-  getApitDeleteError,
+  getApiDeleteError,
   GraphQLContext,
 } from "../../utils";
 
@@ -25,6 +27,17 @@ async function getDisaggregateOptionSets(
   return context.prisma.disaggregateOptionSet.findMany({
     where: {
       disaggregate_id,
+    },
+  });
+}
+
+async function getDisaggregateOptionSetsByOption(
+  option_id: string,
+  context: GraphQLContext
+): Promise<DisaggregateOptionSet[]> {
+  return context.prisma.disaggregateOptionSet.findMany({
+    where: {
+      disaggregate_option_id: option_id,
     },
   });
 }
@@ -54,24 +67,28 @@ async function getDisaggregateOptionSet(
 async function createDisaggregateOptionSet(
   args: MutationCreateDisaggregateOptionSetArgs,
   context: GraphQLContext
-): Promise<DisaggregateOptionSetResult> {
+): Promise<ApiBatchPayloadResult> {
   try {
+    const disaggregate_options = args.input.disaggregate_options.map(
+      (option) => ({
+        disaggregate_id: args.input.disaggregate_id,
+        disaggregate_option_id: option,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      })
+    );
     const disaggregate_option_set =
-      await context.prisma.disaggregateOptionSet.create({
-        data: {
-          disaggregate_id: args.input.disaggregate_id,
-          disaggregate_option_id: args.input.disaggregate_option_id,
-          created_by: context.user.email,
-          last_modified_by: context.user.email,
-        },
+      await context.prisma.disaggregateOptionSet.createMany({
+        data: disaggregate_options,
+        skipDuplicates: true,
       });
 
     return {
-      __typename: "DisaggregateOptionSet",
+      __typename: "ApiBatchPayload",
       ...disaggregate_option_set,
     };
   } catch (error) {
-    return getApiCreateError("DisaggregateOptionSet", error);
+    return getApiBatchPayloadCreateError("DisaggregateOptionSet", error);
   }
 }
 
@@ -86,12 +103,16 @@ async function deleteDisaggregateOptionSet(
           id: args.input.id,
         },
       });
+    console.log(
+      "Chaiwa, what is in disaggregate_option_set?",
+      disaggregate_option_set
+    );
     return {
       __typename: "DisaggregateOptionSet",
       ...disaggregate_option_set,
     };
   } catch (error) {
-    return getApitDeleteError("DisaggregateOptionSet", args.input.id);
+    return getApiDeleteError("DisaggregateOptionSet", args.input.id);
   }
 }
 
@@ -101,4 +122,5 @@ export {
   createDisaggregateOptionSet,
   deleteDisaggregateOptionSet,
   getDisaggregateOptionSets,
+  getDisaggregateOptionSetsByOption,
 };

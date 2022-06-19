@@ -9,8 +9,8 @@ import {
 import {
   getApiCreateError,
   getApiNotFoundError,
-  getApitDeleteError,
-  getApitUpdateError,
+  getApiDeleteError,
+  getApiUpdateError,
   GraphQLContext,
 } from "../../utils";
 
@@ -83,7 +83,7 @@ async function updateDisaggregateOption(
       ...disaggregate_option,
     };
   } catch (error) {
-    return getApitUpdateError("DisaggregateOption", args.input.id);
+    return getApiUpdateError("DisaggregateOption", args.input.id);
   }
 }
 
@@ -102,7 +102,7 @@ async function deleteDisaggregateOption(
       ...disaggregate_option,
     };
   } catch (error) {
-    return getApitDeleteError("DisaggregateOption", args.input.id);
+    return getApiDeleteError("DisaggregateOption", args.input.id);
   }
 }
 

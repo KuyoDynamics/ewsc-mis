@@ -23,6 +23,10 @@ import { DisaggregateOptionResolvers } from "../disaggregate-option";
 import { DisaggregateOptionSetResolvers } from "../disaggregate-option-set";
 import { DisaggregateResolvers } from "../disaggregate";
 import { IndicatorUnitResolvers } from "../indicator-unit";
+import { IndicatorResolvers } from "../indicator";
+import { ReportTypeResolvers } from "../report-type";
+import { DisaggregateOptionSetReportResolvers } from "../disaggregate-option-set-report";
+import { ReportResolvers } from "../report";
 
 export default [
   CountryResolvers,
@@ -49,5 +53,9 @@ export default [
   DisaggregateOptionSetResolvers,
   DisaggregateResolvers,
   IndicatorUnitResolvers,
+  IndicatorResolvers,
+  ReportTypeResolvers,
+  DisaggregateOptionSetReportResolvers,
+  ReportResolvers,
   scalarResolvers,
 ];

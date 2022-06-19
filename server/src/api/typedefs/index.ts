@@ -23,6 +23,10 @@ import { DisaggregateOptionTypeDefs } from "../disaggregate-option";
 import { DisaggregateOptionSetTypeDefs } from "../disaggregate-option-set";
 import { DisaggregateTypeDefs } from "../disaggregate";
 import { IndicatorUnitTypeDefs } from "../indicator-unit";
+import { IndicatorTypeDefs } from "../indicator";
+import { ReportTypeTypeDefs } from "../report-type";
+import { DisaggregateOptionSetReportTypeDefs } from "../disaggregate-option-set-report";
+import { ReportTypeDefs } from "../report";
 
 export default [
   CountryTypeDefs,
@@ -49,5 +53,9 @@ export default [
   DisaggregateOptionSetTypeDefs,
   DisaggregateTypeDefs,
   IndicatorUnitTypeDefs,
+  IndicatorTypeDefs,
+  ReportTypeTypeDefs,
+  DisaggregateOptionSetReportTypeDefs,
+  ReportTypeDefs,
   scalarTypeDefs,
 ];

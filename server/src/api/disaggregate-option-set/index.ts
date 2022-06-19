@@ -1,21 +1,23 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
-  createDisaggregateOptionSet,
   deleteDisaggregateOptionSet,
   getDisaggregateOption,
   getDisaggregateOptionSet,
   getAllDisaggregateOptionSets,
+  createDisaggregateOptionSet,
+  getDisaggregate,
+  getReportsByDisaggregateOptionSet,
 } from "../queries";
 
 const typeDefs = gql`
   type DisaggregateOptionSet {
     id: ID!
     disaggregate_id: ID!
-    # disaggregate: DisaggregateResult
+    disaggregate: DisaggregateResult
     disaggregate_option_id: ID!
     disaggregate_option: DisaggregateOptionResult
-    # indictor_reports: [IndicatorReport!]
+    disaggregate_option_set_reports: [DisaggregateOptionSetReport!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -30,7 +32,7 @@ const typeDefs = gql`
   extend type Mutation {
     createDisaggregateOptionSet(
       input: CreateDisaggregateOptionSetInput!
-    ): DisaggregateOptionSetResult!
+    ): ApiBatchPayloadResult!
     deleteDisaggregateOptionSet(
       input: DeleteDisaggregateOptionSetInput!
     ): DisaggregateOptionSetResult!
@@ -38,7 +40,7 @@ const typeDefs = gql`
 
   input CreateDisaggregateOptionSetInput {
     disaggregate_id: ID!
-    disaggregate_option_id: ID!
+    disaggregate_options: [ID!]!
   }
 
   input DeleteDisaggregateOptionSetInput {
@@ -69,6 +71,10 @@ const resolvers: Resolvers = {
   DisaggregateOptionSet: {
     disaggregate_option: (parent, _args, context) =>
       getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
+    disaggregate: (parent, _args, context) =>
+      getDisaggregate({ id: parent.disaggregate_id }, context),
+    disaggregate_option_set_reports: (parent, _args, context) =>
+      getReportsByDisaggregateOptionSet(parent.id, context),
   },
 };
 
