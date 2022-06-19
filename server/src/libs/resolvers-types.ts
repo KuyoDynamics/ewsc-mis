@@ -314,7 +314,12 @@ export type CreateDisaggregateInput = {
 
 export type CreateDisaggregateOptionInput = {
   disaggregate_id: Scalars['ID'];
-  option_id: Scalars['String'];
+  option_id: Scalars['ID'];
+};
+
+export type CreateDisaggregateOptionsInput = {
+  disaggregate_id: Scalars['ID'];
+  option_ids: Array<Scalars['ID']>;
 };
 
 export type CreateDistrictInput = {
@@ -849,7 +854,8 @@ export type Mutation = {
   createCatchmentProvince: CatchmentProvinceResult;
   createCountry: CountryResult;
   createDisaggregate: DisaggregateResult;
-  createDisaggregateOption: ApiBatchPayloadResult;
+  createDisaggregateOption: DisaggregateOptionResult;
+  createDisaggregateOptions: ApiBatchPayloadResult;
   createDistrict: DistrictResult;
   createDistrictUser: DistrictUserResult;
   createIndicator: IndicatorResult;
@@ -961,6 +967,11 @@ export type MutationCreateDisaggregateArgs = {
 
 export type MutationCreateDisaggregateOptionArgs = {
   input: CreateDisaggregateOptionInput;
+};
+
+
+export type MutationCreateDisaggregateOptionsArgs = {
+  input: CreateDisaggregateOptionsInput;
 };
 
 
@@ -2452,6 +2463,7 @@ export type ResolversTypes = ResolversObject<{
   CreateCountryInput: CreateCountryInput;
   CreateDisaggregateInput: CreateDisaggregateInput;
   CreateDisaggregateOptionInput: CreateDisaggregateOptionInput;
+  CreateDisaggregateOptionsInput: CreateDisaggregateOptionsInput;
   CreateDistrictInput: CreateDistrictInput;
   CreateDistrictUserInput: CreateDistrictUserInput;
   CreateIndicatorDisaggregateInput: CreateIndicatorDisaggregateInput;
@@ -2733,6 +2745,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateCountryInput: CreateCountryInput;
   CreateDisaggregateInput: CreateDisaggregateInput;
   CreateDisaggregateOptionInput: CreateDisaggregateOptionInput;
+  CreateDisaggregateOptionsInput: CreateDisaggregateOptionsInput;
   CreateDistrictInput: CreateDistrictInput;
   CreateDistrictUserInput: CreateDistrictUserInput;
   CreateIndicatorDisaggregateInput: CreateIndicatorDisaggregateInput;
@@ -3416,7 +3429,8 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentProvinceArgs, 'input'>>;
   createCountry?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<MutationCreateCountryArgs, 'input'>>;
   createDisaggregate?: Resolver<ResolversTypes['DisaggregateResult'], ParentType, ContextType, RequireFields<MutationCreateDisaggregateArgs, 'input'>>;
-  createDisaggregateOption?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateDisaggregateOptionArgs, 'input'>>;
+  createDisaggregateOption?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<MutationCreateDisaggregateOptionArgs, 'input'>>;
+  createDisaggregateOptions?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateDisaggregateOptionsArgs, 'input'>>;
   createDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictArgs, 'input'>>;
   createDistrictUser?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictUserArgs, 'input'>>;
   createIndicator?: Resolver<ResolversTypes['IndicatorResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorArgs, 'input'>>;
