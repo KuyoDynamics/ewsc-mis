@@ -1,128 +1,130 @@
-// import {
-//   ApiBatchPayloadResult,
-//   DisaggregateOptionSet,
-//   DisaggregateOptionSetResult,
-//   MutationCreateDisaggregateOptionSetArgs,
-//   MutationDeleteDisaggregateOptionSetArgs,
-//   QueryDisaggregate_Option_SetArgs,
-// } from "../../libs/resolvers-types";
-// import {
-//   getApiBatchPayloadCreateError,
-//   getApiCreateError,
-//   getApiNotFoundError,
-//   getApiDeleteError,
-//   GraphQLContext,
-// } from "../../utils";
+import {
+  ApiBatchPayloadResult,
+  IndicatorDisaggregate,
+  IndicatorDisaggregateResult,
+  MutationCreateIndicatorDisaggregateArgs,
+  MutationCreateIndicatorDisaggregatesArgs,
+  MutationDeleteIndicatorDisaggregateArgs,
+  QueryIndicator_DisaggregateArgs,
+  QueryIndicator_DisaggregatesArgs,
+} from "../../libs/resolvers-types";
+import {
+  getApiCreateError,
+  getApiNotFoundError,
+  getApiDeleteError,
+  GraphQLContext,
+  getApiBatchPayloadCreateError,
+} from "../../utils";
 
-// async function getAllDisaggregateOptionSets(
-//   context: GraphQLContext
-// ): Promise<DisaggregateOptionSet[]> {
-//   return context.prisma.disaggregateOptionSet.findMany({});
-// }
+async function getIndicatorDisaggregates(
+  args: QueryIndicator_DisaggregatesArgs,
+  context: GraphQLContext
+): Promise<IndicatorDisaggregate[]> {
+  return context.prisma.indicatorDisaggregate.findMany({
+    where: {
+      organisation_indicator_id: args.organisation_indicator_id,
+    },
+  });
+}
 
-// async function getDisaggregateOptionSets(
-//   disaggregate_id: string,
-//   context: GraphQLContext
-// ): Promise<DisaggregateOptionSet[]> {
-//   return context.prisma.disaggregateOptionSet.findMany({
-//     where: {
-//       disaggregate_id,
-//     },
-//   });
-// }
+async function getIndicatorDisaggregate(
+  args: QueryIndicator_DisaggregateArgs,
+  context: GraphQLContext
+): Promise<IndicatorDisaggregateResult> {
+  try {
+    const indicator_disaggregate =
+      await context.prisma.indicatorDisaggregate.findUnique({
+        where: { id: args.id },
+      });
 
-// async function getDisaggregateOptionSetsByOption(
-//   option_id: string,
-//   context: GraphQLContext
-// ): Promise<DisaggregateOptionSet[]> {
-//   return context.prisma.disaggregateOptionSet.findMany({
-//     where: {
-//       disaggregate_option_id: option_id,
-//     },
-//   });
-// }
+    if (!indicator_disaggregate) {
+      return getApiNotFoundError("IndicatorDisaggregate", args.id);
+    }
+    return {
+      __typename: "IndicatorDisaggregate",
+      ...indicator_disaggregate,
+    };
+  } catch (error) {
+    return getApiNotFoundError("IndicatorDisaggregate", args.id, error);
+  }
+}
 
-// async function getDisaggregateOptionSet(
-//   args: QueryDisaggregate_Option_SetArgs,
-//   context: GraphQLContext
-// ): Promise<DisaggregateOptionSetResult> {
-//   try {
-//     const disaggregate_option_set =
-//       await context.prisma.disaggregateOptionSet.findUnique({
-//         where: { id: args.id },
-//       });
+async function createIndicatorDisaggregate(
+  args: MutationCreateIndicatorDisaggregateArgs,
+  context: GraphQLContext
+): Promise<IndicatorDisaggregateResult> {
+  try {
+    const indicator_disaggregate =
+      await context.prisma.indicatorDisaggregate.create({
+        data: {
+          organisation_indicator_id: args.input.organisation_indicator_id,
+          disaggregate_option_id: args.input.disaggregate_option_id,
+          created_by: context.user.email,
+          last_modified_by: context.user.email,
+        },
+      });
 
-//     if (!disaggregate_option_set) {
-//       return getApiNotFoundError("DisaggregateOptionSet", args.id);
-//     }
-//     return {
-//       __typename: "DisaggregateOptionSet",
-//       ...disaggregate_option_set,
-//     };
-//   } catch (error) {
-//     return getApiNotFoundError("DisaggregateOptionSet", args.id, error);
-//   }
-// }
+    return {
+      __typename: "IndicatorDisaggregate",
+      ...indicator_disaggregate,
+    };
+  } catch (error) {
+    return getApiCreateError("IndicatorDisaggregate", error);
+  }
+}
 
-// async function createDisaggregateOptionSet(
-//   args: MutationCreateDisaggregateOptionSetArgs,
-//   context: GraphQLContext
-// ): Promise<ApiBatchPayloadResult> {
-//   try {
-//     const disaggregate_options = args.input.disaggregate_options.map(
-//       (option) => ({
-//         disaggregate_id: args.input.disaggregate_id,
-//         disaggregate_option_id: option,
-//         created_by: context.user.email,
-//         last_modified_by: context.user.email,
-//       })
-//     );
-//     const disaggregate_option_set =
-//       await context.prisma.disaggregateOptionSet.createMany({
-//         data: disaggregate_options,
-//         skipDuplicates: true,
-//       });
+async function createIndicatorDisaggregates(
+  args: MutationCreateIndicatorDisaggregatesArgs,
+  context: GraphQLContext
+): Promise<ApiBatchPayloadResult> {
+  try {
+    const data = args.input.disaggregate_option_ids.map(
+      (disaggregate_option_id) => ({
+        disaggregate_option_id,
+        organisation_indicator_id: args.input.organisation_indicator_id,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      })
+    );
 
-//     return {
-//       __typename: "ApiBatchPayload",
-//       ...disaggregate_option_set,
-//     };
-//   } catch (error) {
-//     return getApiBatchPayloadCreateError("DisaggregateOptionSet", error);
-//   }
-// }
+    const result = await context.prisma.indicatorDisaggregate.createMany({
+      data,
+      skipDuplicates: true,
+    });
 
-// async function deleteDisaggregateOptionSet(
-//   args: MutationDeleteDisaggregateOptionSetArgs,
-//   context: GraphQLContext
-// ): Promise<DisaggregateOptionSetResult> {
-//   try {
-//     const disaggregate_option_set =
-//       await context.prisma.disaggregateOptionSet.delete({
-//         where: {
-//           id: args.input.id,
-//         },
-//       });
-//     console.log(
-//       "Chaiwa, what is in disaggregate_option_set?",
-//       disaggregate_option_set
-//     );
-//     return {
-//       __typename: "DisaggregateOptionSet",
-//       ...disaggregate_option_set,
-//     };
-//   } catch (error) {
-//     return getApiDeleteError("DisaggregateOptionSet", args.input.id);
-//   }
-// }
+    return {
+      __typename: "ApiBatchPayload",
+      ...result,
+    };
+  } catch (error) {
+    return getApiBatchPayloadCreateError("IndicatorDisaggregate", error);
+  }
+}
 
-// export {
-//   getDisaggregateOptionSet,
-//   getAllDisaggregateOptionSets,
-//   createDisaggregateOptionSet,
-//   deleteDisaggregateOptionSet,
-//   getDisaggregateOptionSets,
-//   getDisaggregateOptionSetsByOption,
-// };
+async function deleteIndicatorDisaggregate(
+  args: MutationDeleteIndicatorDisaggregateArgs,
+  context: GraphQLContext
+): Promise<IndicatorDisaggregateResult> {
+  try {
+    const indicator_disaggregate =
+      await context.prisma.indicatorDisaggregate.delete({
+        where: {
+          id: args.input.id,
+        },
+      });
+    return {
+      __typename: "IndicatorDisaggregate",
+      ...indicator_disaggregate,
+    };
+  } catch (error) {
+    return getApiDeleteError("IndicatorDisaggregate", args.input.id);
+  }
+}
 
-export {};
+export {
+  deleteIndicatorDisaggregate,
+  createIndicatorDisaggregate,
+  getIndicatorDisaggregate,
+  getIndicatorDisaggregates,
+  createIndicatorDisaggregates,
+};

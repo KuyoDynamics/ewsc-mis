@@ -335,7 +335,7 @@ export type CreateDistrictUserInput = {
 
 export type CreateIndicatorDisaggregateInput = {
   disaggregate_option_id: Scalars['ID'];
-  organisation_indicator_id: Scalars['String'];
+  organisation_indicator_id: Scalars['ID'];
 };
 
 export type CreateIndicatorDisaggregateReportInput = {
@@ -344,6 +344,11 @@ export type CreateIndicatorDisaggregateReportInput = {
   indicator_disaggregate_id: Scalars['String'];
   report_id: Scalars['String'];
   target?: InputMaybe<Scalars['Float']>;
+};
+
+export type CreateIndicatorDisaggregatesInput = {
+  disaggregate_option_ids: Array<Scalars['ID']>;
+  organisation_indicator_id: Scalars['ID'];
 };
 
 export type CreateIndicatorInput = {
@@ -859,8 +864,9 @@ export type Mutation = {
   createDistrict: DistrictResult;
   createDistrictUser: DistrictUserResult;
   createIndicator: IndicatorResult;
-  createIndicatorDisaggregate: ApiBatchPayloadResult;
+  createIndicatorDisaggregate: IndicatorDisaggregateResult;
   createIndicatorDisaggregateReport: IndicatorDisaggregateReportResult;
+  createIndicatorDisaggregates: ApiBatchPayloadResult;
   createIndicatorUnit: IndicatorUnitResult;
   createInvitedUser: UserResult;
   createOption: OptionResult;
@@ -997,6 +1003,11 @@ export type MutationCreateIndicatorDisaggregateArgs = {
 
 export type MutationCreateIndicatorDisaggregateReportArgs = {
   input: CreateIndicatorDisaggregateReportInput;
+};
+
+
+export type MutationCreateIndicatorDisaggregatesArgs = {
+  input: CreateIndicatorDisaggregatesInput;
 };
 
 
@@ -1551,8 +1562,6 @@ export type Query = {
   country: CountryResult;
   disaggregate: DisaggregateResult;
   disaggregate_option: DisaggregateOptionResult;
-  disaggregate_option_set: IndicatorDisaggregateResult;
-  disaggregate_option_sets?: Maybe<Array<IndicatorDisaggregate>>;
   disaggregate_options?: Maybe<Array<DisaggregateOption>>;
   disaggregates?: Maybe<Array<Disaggregate>>;
   district: DistrictResult;
@@ -1560,8 +1569,10 @@ export type Query = {
   district_users?: Maybe<Array<DistrictUser>>;
   districts?: Maybe<Array<District>>;
   indicator: IndicatorResult;
+  indicator_disaggregate: IndicatorDisaggregateResult;
   indicator_disaggregate_report: IndicatorDisaggregateReportResult;
   indicator_disaggregate_reports?: Maybe<Array<IndicatorDisaggregateReport>>;
+  indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
   indicator_unit: IndicatorUnitResult;
   indicator_units?: Maybe<Array<IndicatorUnit>>;
   indicators?: Maybe<Array<Indicator>>;
@@ -1644,11 +1655,6 @@ export type QueryDisaggregate_OptionArgs = {
 };
 
 
-export type QueryDisaggregate_Option_SetArgs = {
-  id: Scalars['ID'];
-};
-
-
 export type QueryDistrictArgs = {
   id: Scalars['ID'];
 };
@@ -1674,6 +1680,11 @@ export type QueryIndicatorArgs = {
 };
 
 
+export type QueryIndicator_DisaggregateArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryIndicator_Disaggregate_ReportArgs = {
   id: Scalars['ID'];
 };
@@ -1681,6 +1692,11 @@ export type QueryIndicator_Disaggregate_ReportArgs = {
 
 export type QueryIndicator_Disaggregate_ReportsArgs = {
   report_id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_DisaggregatesArgs = {
+  organisation_indicator_id: Scalars['ID'];
 };
 
 
@@ -2468,6 +2484,7 @@ export type ResolversTypes = ResolversObject<{
   CreateDistrictUserInput: CreateDistrictUserInput;
   CreateIndicatorDisaggregateInput: CreateIndicatorDisaggregateInput;
   CreateIndicatorDisaggregateReportInput: CreateIndicatorDisaggregateReportInput;
+  CreateIndicatorDisaggregatesInput: CreateIndicatorDisaggregatesInput;
   CreateIndicatorInput: CreateIndicatorInput;
   CreateIndicatorUnitInput: CreateIndicatorUnitInput;
   CreateInvitedUserInput: CreateInvitedUserInput;
@@ -2750,6 +2767,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateDistrictUserInput: CreateDistrictUserInput;
   CreateIndicatorDisaggregateInput: CreateIndicatorDisaggregateInput;
   CreateIndicatorDisaggregateReportInput: CreateIndicatorDisaggregateReportInput;
+  CreateIndicatorDisaggregatesInput: CreateIndicatorDisaggregatesInput;
   CreateIndicatorInput: CreateIndicatorInput;
   CreateIndicatorUnitInput: CreateIndicatorUnitInput;
   CreateInvitedUserInput: CreateInvitedUserInput;
@@ -3434,8 +3452,9 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createDistrict?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictArgs, 'input'>>;
   createDistrictUser?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationCreateDistrictUserArgs, 'input'>>;
   createIndicator?: Resolver<ResolversTypes['IndicatorResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorArgs, 'input'>>;
-  createIndicatorDisaggregate?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorDisaggregateArgs, 'input'>>;
+  createIndicatorDisaggregate?: Resolver<ResolversTypes['IndicatorDisaggregateResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorDisaggregateArgs, 'input'>>;
   createIndicatorDisaggregateReport?: Resolver<ResolversTypes['IndicatorDisaggregateReportResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorDisaggregateReportArgs, 'input'>>;
+  createIndicatorDisaggregates?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorDisaggregatesArgs, 'input'>>;
   createIndicatorUnit?: Resolver<ResolversTypes['IndicatorUnitResult'], ParentType, ContextType, RequireFields<MutationCreateIndicatorUnitArgs, 'input'>>;
   createInvitedUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCreateInvitedUserArgs, 'input'>>;
   createOption?: Resolver<ResolversTypes['OptionResult'], ParentType, ContextType, RequireFields<MutationCreateOptionArgs, 'input'>>;
@@ -3701,8 +3720,6 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   country?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<QueryCountryArgs, 'id'>>;
   disaggregate?: Resolver<ResolversTypes['DisaggregateResult'], ParentType, ContextType, RequireFields<QueryDisaggregateArgs, 'id'>>;
   disaggregate_option?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<QueryDisaggregate_OptionArgs, 'id'>>;
-  disaggregate_option_set?: Resolver<ResolversTypes['IndicatorDisaggregateResult'], ParentType, ContextType, RequireFields<QueryDisaggregate_Option_SetArgs, 'id'>>;
-  disaggregate_option_sets?: Resolver<Maybe<Array<ResolversTypes['IndicatorDisaggregate']>>, ParentType, ContextType>;
   disaggregate_options?: Resolver<Maybe<Array<ResolversTypes['DisaggregateOption']>>, ParentType, ContextType>;
   disaggregates?: Resolver<Maybe<Array<ResolversTypes['Disaggregate']>>, ParentType, ContextType>;
   district?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<QueryDistrictArgs, 'id'>>;
@@ -3710,8 +3727,10 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   district_users?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType, RequireFields<QueryDistrict_UsersArgs, 'catchment_district_id'>>;
   districts?: Resolver<Maybe<Array<ResolversTypes['District']>>, ParentType, ContextType, RequireFields<QueryDistrictsArgs, 'province_id'>>;
   indicator?: Resolver<ResolversTypes['IndicatorResult'], ParentType, ContextType, RequireFields<QueryIndicatorArgs, 'id'>>;
+  indicator_disaggregate?: Resolver<ResolversTypes['IndicatorDisaggregateResult'], ParentType, ContextType, RequireFields<QueryIndicator_DisaggregateArgs, 'id'>>;
   indicator_disaggregate_report?: Resolver<ResolversTypes['IndicatorDisaggregateReportResult'], ParentType, ContextType, RequireFields<QueryIndicator_Disaggregate_ReportArgs, 'id'>>;
   indicator_disaggregate_reports?: Resolver<Maybe<Array<ResolversTypes['IndicatorDisaggregateReport']>>, ParentType, ContextType, RequireFields<QueryIndicator_Disaggregate_ReportsArgs, 'report_id'>>;
+  indicator_disaggregates?: Resolver<Maybe<Array<ResolversTypes['IndicatorDisaggregate']>>, ParentType, ContextType, RequireFields<QueryIndicator_DisaggregatesArgs, 'organisation_indicator_id'>>;
   indicator_unit?: Resolver<ResolversTypes['IndicatorUnitResult'], ParentType, ContextType, RequireFields<QueryIndicator_UnitArgs, 'id'>>;
   indicator_units?: Resolver<Maybe<Array<ResolversTypes['IndicatorUnit']>>, ParentType, ContextType>;
   indicators?: Resolver<Maybe<Array<ResolversTypes['Indicator']>>, ParentType, ContextType>;

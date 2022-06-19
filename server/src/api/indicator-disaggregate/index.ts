@@ -8,6 +8,14 @@ import // deleteDisaggregateOptionSet,
 // getDisaggregate,
 // getReportsByDisaggregateOptionSet,
 "../queries";
+import {
+  createIndicatorDisaggregate,
+  createIndicatorDisaggregates,
+  deleteIndicatorDisaggregate,
+  getDisaggregateOption,
+  getIndicatorDisaggregate,
+  getIndicatorDisaggregates,
+} from "../queries";
 
 const typeDefs = gql`
   type IndicatorDisaggregate {
@@ -28,21 +36,31 @@ const typeDefs = gql`
   }
 
   extend type Query {
-    disaggregate_option_sets: [IndicatorDisaggregate!]
-    disaggregate_option_set(id: ID!): IndicatorDisaggregateResult!
+    indicator_disaggregates(
+      organisation_indicator_id: ID!
+    ): [IndicatorDisaggregate!]
+    indicator_disaggregate(id: ID!): IndicatorDisaggregateResult!
   }
 
   extend type Mutation {
     createIndicatorDisaggregate(
       input: CreateIndicatorDisaggregateInput!
+    ): IndicatorDisaggregateResult!
+    createIndicatorDisaggregates(
+      input: CreateIndicatorDisaggregatesInput!
     ): ApiBatchPayloadResult!
     deleteIndicatorDisaggregate(
       input: DeleteIndicatorDisaggregateInput!
     ): IndicatorDisaggregateResult!
   }
 
+  input CreateIndicatorDisaggregatesInput {
+    organisation_indicator_id: ID!
+    disaggregate_option_ids: [ID!]!
+  }
+
   input CreateIndicatorDisaggregateInput {
-    organisation_indicator_id: String!
+    organisation_indicator_id: ID!
     disaggregate_option_id: ID!
   }
 
@@ -60,24 +78,26 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    // disaggregate_option_set: (_, args, context) =>
-    //   getIndicatorDisaggregate(args, context),
-    // disaggregate_option_sets: (_, _args, context) =>
-    //   getAllIndicatorDisaggregates(context),
+    indicator_disaggregate: (_, args, context) =>
+      getIndicatorDisaggregate(args, context),
+    indicator_disaggregates: (_, args, context) =>
+      getIndicatorDisaggregates(args, context),
   },
   Mutation: {
-    // createIndicatorDisaggregate: (_, args, context) =>
-    //   createIndicatorDisaggregate(args, context),
-    // deleteIndicatorDisaggregate: (_, args, context) =>
-    //   deleteIndicatorDisaggregate(args, context),
+    createIndicatorDisaggregate: (_, args, context) =>
+      createIndicatorDisaggregate(args, context),
+    createIndicatorDisaggregates: (_, args, context) =>
+      createIndicatorDisaggregates(args, context),
+    deleteIndicatorDisaggregate: (_, args, context) =>
+      deleteIndicatorDisaggregate(args, context),
   },
   IndicatorDisaggregate: {
-    // disaggregate_option: (parent, _args, context) =>
-    //   getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
-    // disaggregate: (parent, _args, context) =>
-    //   getDisaggregate({ id: parent.disaggregate_id }, context),
-    // disaggregate_option_set_reports: (parent, _args, context) =>
-    //   getReportsByIndicatorDisaggregate(parent.id, context),
+    disaggregate_option: (parent, _args, context) =>
+      getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
+    // organisation_indicator: (parent, _args, context) =>
+    //   getOrganisationIndicator({ id: parent.organisation_indicator_id }, context),
+    // indicator_disaggregate_reports: (parent, _args, context) =>
+    //   getIndicatorDisaggregateReportsByIndicatorDisaggregateId(parent.id, context),
   },
 };
 
