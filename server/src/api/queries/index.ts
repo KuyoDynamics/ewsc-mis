@@ -31,3 +31,4 @@ export * from "../indicator-disaggregate/queries";
 export * from "../disaggregate-option/queries";
 export * from "../option/queries";
 export * from "../disaggregate/queries";
+export * from "../indicator-disaggregate-report/queries";

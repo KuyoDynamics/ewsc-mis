@@ -1,15 +1,14 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-// import {
-//   createReport,
-//   deleteReport,
-//   getReport,
-//   getReports,
-//   updateReport,
-//   getCatchmentDistrict,
-//   getDisaggregateOptionSetReports,
-//   getReportType,
-// } from "../queries";
+import {
+  createReport,
+  deleteReport,
+  getReport,
+  getReports,
+  updateReport,
+  getCatchmentDistrict,
+  getIndicatorDisaggregateReports,
+} from "../queries";
 
 const typeDefs = gql`
   type Report {
@@ -81,21 +80,21 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    // report: (_, args, context) => getReport(args, context),
-    // reports: (_, _args, context) => getReports(context),
+    report: (_, args, context) => getReport(args, context),
+    reports: (_, _args, context) => getReports(context),
   },
   Mutation: {
-    // createReport: (_, args, context) => createReport(args, context),
-    // updateReport: (_, args, context) => updateReport(args, context),
-    // deleteReport: (_, args, context) => deleteReport(args, context),
+    createReport: (_, args, context) => createReport(args, context),
+    updateReport: (_, args, context) => updateReport(args, context),
+    deleteReport: (_, args, context) => deleteReport(args, context),
   },
   Report: {
-    // report_type: (parent, _args, context) =>
-    //   getReportType({ id: parent.report_type_id }, context),
-    // catchment_district: (parent, _args, context) =>
-    //   getCatchmentDistrict(parent.catchment_district_id, context),
-    // disaggregate_option_set_reports: (parent, _args, context) =>
-    //   getDisaggregateOptionSetReports({ report_id: parent.id }, context),
+    // organisation_report_template: (parent, _args, context) =>
+    //   getOrganisationReportTemplate({ id: parent.organisation_report_template_id }, context),
+    catchment_district: (parent, _args, context) =>
+      getCatchmentDistrict(parent.catchment_district_id, context),
+    indicator_disaggregate_reports: (parent, _args, context) =>
+      getIndicatorDisaggregateReports({ report_id: parent.id }, context),
   },
 };
 

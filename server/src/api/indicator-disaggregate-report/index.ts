@@ -8,15 +8,6 @@ import {
   getIndicatorDisaggregateReports,
   updateIndicatorDisaggregateReport,
 } from "./queries";
-// import {
-//   createIndicatorDisaggregateReport,
-//   deleteIndicatorDisaggregateReport,
-//   getIndicatorDisaggregateReport,
-//   updateIndicatorDisaggregateReport,
-//   getIndicatorDisaggregate,
-//   getReport,
-// } from "../queries";
-// import { getIndicatorDisaggregateReports } from "./queries";
 
 const typeDefs = gql`
   type IndicatorDisaggregateReport {
