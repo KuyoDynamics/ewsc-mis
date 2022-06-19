@@ -392,6 +392,11 @@ export type CreateOrganisationReportTemplateInput = {
   report_template_id: Scalars['String'];
 };
 
+export type CreateOrganisationReportTemplatesInput = {
+  organisation_id: Scalars['ID'];
+  report_template_ids: Array<Scalars['ID']>;
+};
+
 export type CreateOrganisationUserInput = {
   organisation_id: Scalars['ID'];
   user_id: Scalars['ID'];
@@ -872,7 +877,8 @@ export type Mutation = {
   createOption: OptionResult;
   createOrganisation: OrganisationResult;
   createOrganisationIndicator: ApiBatchPayloadResult;
-  createOrganisationReportTemplate: ApiBatchPayloadResult;
+  createOrganisationReportTemplate: OrganisationReportTemplateResult;
+  createOrganisationReportTemplates: ApiBatchPayloadResult;
   createOrganisationUser: OrganisationUserResult;
   createProvince: ProvinceResult;
   createReport: ReportResult;
@@ -1038,6 +1044,11 @@ export type MutationCreateOrganisationIndicatorArgs = {
 
 export type MutationCreateOrganisationReportTemplateArgs = {
   input: CreateOrganisationReportTemplateInput;
+};
+
+
+export type MutationCreateOrganisationReportTemplatesArgs = {
+  input: CreateOrganisationReportTemplatesInput;
 };
 
 
@@ -1722,6 +1733,11 @@ export type QueryOrganisation_IndicatorArgs = {
 
 export type QueryOrganisation_Report_TemplateArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryOrganisation_Report_TemplatesArgs = {
+  organisation_id: Scalars['ID'];
 };
 
 
@@ -2492,6 +2508,7 @@ export type ResolversTypes = ResolversObject<{
   CreateOrganisationIndicatorInput: CreateOrganisationIndicatorInput;
   CreateOrganisationInput: CreateOrganisationInput;
   CreateOrganisationReportTemplateInput: CreateOrganisationReportTemplateInput;
+  CreateOrganisationReportTemplatesInput: CreateOrganisationReportTemplatesInput;
   CreateOrganisationUserInput: CreateOrganisationUserInput;
   CreateProvinceInput: CreateProvinceInput;
   CreateReportInput: CreateReportInput;
@@ -2775,6 +2792,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateOrganisationIndicatorInput: CreateOrganisationIndicatorInput;
   CreateOrganisationInput: CreateOrganisationInput;
   CreateOrganisationReportTemplateInput: CreateOrganisationReportTemplateInput;
+  CreateOrganisationReportTemplatesInput: CreateOrganisationReportTemplatesInput;
   CreateOrganisationUserInput: CreateOrganisationUserInput;
   CreateProvinceInput: CreateProvinceInput;
   CreateReportInput: CreateReportInput;
@@ -3460,7 +3478,8 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createOption?: Resolver<ResolversTypes['OptionResult'], ParentType, ContextType, RequireFields<MutationCreateOptionArgs, 'input'>>;
   createOrganisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationArgs, 'input'>>;
   createOrganisationIndicator?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationIndicatorArgs, 'input'>>;
-  createOrganisationReportTemplate?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationReportTemplateArgs, 'input'>>;
+  createOrganisationReportTemplate?: Resolver<ResolversTypes['OrganisationReportTemplateResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationReportTemplateArgs, 'input'>>;
+  createOrganisationReportTemplates?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationReportTemplatesArgs, 'input'>>;
   createOrganisationUser?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationCreateOrganisationUserArgs, 'input'>>;
   createProvince?: Resolver<ResolversTypes['ProvinceResult'], ParentType, ContextType, RequireFields<MutationCreateProvinceArgs, 'input'>>;
   createReport?: Resolver<ResolversTypes['ReportResult'], ParentType, ContextType, RequireFields<MutationCreateReportArgs, 'input'>>;
@@ -3741,7 +3760,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   organisation_indicator?: Resolver<ResolversTypes['OrganisationIndicatorResult'], ParentType, ContextType, RequireFields<QueryOrganisation_IndicatorArgs, 'id'>>;
   organisation_indicators?: Resolver<Maybe<Array<ResolversTypes['OrganisationIndicator']>>, ParentType, ContextType>;
   organisation_report_template?: Resolver<ResolversTypes['OrganisationReportTemplateResult'], ParentType, ContextType, RequireFields<QueryOrganisation_Report_TemplateArgs, 'id'>>;
-  organisation_report_templates?: Resolver<Maybe<Array<ResolversTypes['OrganisationReportTemplate']>>, ParentType, ContextType>;
+  organisation_report_templates?: Resolver<Maybe<Array<ResolversTypes['OrganisationReportTemplate']>>, ParentType, ContextType, RequireFields<QueryOrganisation_Report_TemplatesArgs, 'organisation_id'>>;
   organisation_user?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<QueryOrganisation_UserArgs, 'organisation_user_id'>>;
   organisation_users?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType, RequireFields<QueryOrganisation_UsersArgs, 'organisation_id'>>;
   organisations?: Resolver<Maybe<Array<ResolversTypes['Organisation']>>, ParentType, ContextType, RequireFields<QueryOrganisationsArgs, 'country_id'>>;

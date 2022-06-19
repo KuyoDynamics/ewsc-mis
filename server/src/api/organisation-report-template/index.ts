@@ -1,13 +1,15 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import // deleteDisaggregateOptionSet,
-// getDisaggregateOption,
-// getDisaggregateOptionSet,
-// getAllDisaggregateOptionSets,
-// createDisaggregateOptionSet,
-// getDisaggregate,
-// getReportsByDisaggregateOptionSet,
-"../queries";
+import {
+  createOrganisationReportTemplate,
+  createOrganisationReportTemplates,
+  deleteOrganisationReportTemplate,
+  getOrganisation,
+  getOrganisationReportTemplate,
+  getOrganisationReportTemplates,
+  getReportsByOrganisationReportTemplate,
+  getReportTemplate,
+} from "../queries";
 
 const typeDefs = gql`
   type OrganisationReportTemplate {
@@ -28,17 +30,27 @@ const typeDefs = gql`
   }
 
   extend type Query {
-    organisation_report_templates: [OrganisationReportTemplate!]
+    organisation_report_templates(
+      organisation_id: ID!
+    ): [OrganisationReportTemplate!]
     organisation_report_template(id: ID!): OrganisationReportTemplateResult!
   }
 
   extend type Mutation {
     createOrganisationReportTemplate(
       input: CreateOrganisationReportTemplateInput!
+    ): OrganisationReportTemplateResult!
+    createOrganisationReportTemplates(
+      input: CreateOrganisationReportTemplatesInput!
     ): ApiBatchPayloadResult!
     deleteOrganisationReportTemplate(
       input: DeleteOrganisationReportTemplateInput!
     ): OrganisationReportTemplateResult!
+  }
+
+  input CreateOrganisationReportTemplatesInput {
+    organisation_id: ID!
+    report_template_ids: [ID!]!
   }
 
   input CreateOrganisationReportTemplateInput {
@@ -60,24 +72,26 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    // disaggregate_option_set: (_, args, context) =>
-    //   getOrganisationReportTemplate(args, context),
-    // disaggregate_option_sets: (_, _args, context) =>
-    //   getAllOrganisationReportTemplates(context),
+    organisation_report_templates: (_, args, context) =>
+      getOrganisationReportTemplates(args, context),
+    organisation_report_template: (_, args, context) =>
+      getOrganisationReportTemplate(args, context),
   },
   Mutation: {
-    // createOrganisationReportTemplate: (_, args, context) =>
-    //   createOrganisationReportTemplate(args, context),
-    // deleteOrganisationReportTemplate: (_, args, context) =>
-    //   deleteOrganisationReportTemplate(args, context),
+    createOrganisationReportTemplate: (_, args, context) =>
+      createOrganisationReportTemplate(args, context),
+    createOrganisationReportTemplates: (_, args, context) =>
+      createOrganisationReportTemplates(args, context),
+    deleteOrganisationReportTemplate: (_, args, context) =>
+      deleteOrganisationReportTemplate(args, context),
   },
   OrganisationReportTemplate: {
-    // disaggregate_option: (parent, _args, context) =>
-    //   getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
-    // disaggregate: (parent, _args, context) =>
-    //   getDisaggregate({ id: parent.disaggregate_id }, context),
-    // disaggregate_option_set_reports: (parent, _args, context) =>
-    //   getReportsByOrganisationReportTemplate(parent.id, context),
+    report_template: (parent, _args, context) =>
+      getReportTemplate({ id: parent.report_template_id }, context),
+    organisation: (parent, _args, context) =>
+      getOrganisation(parent.organisation_id, context),
+    reports: (parent, _args, context) =>
+      getReportsByOrganisationReportTemplate(parent.id, context),
   },
 };
 

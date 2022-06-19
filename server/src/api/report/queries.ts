@@ -18,6 +18,17 @@ async function getReports(context: GraphQLContext): Promise<Report[]> {
   return context.prisma.report.findMany({});
 }
 
+async function getReportsByOrganisationReportTemplate(
+  organisation_report_template_id: string,
+  context: GraphQLContext
+): Promise<Report[]> {
+  return context.prisma.report.findMany({
+    where: {
+      organisation_report_template_id,
+    },
+  });
+}
+
 async function getReport(
   args: QueryReportArgs,
   context: GraphQLContext
@@ -114,4 +125,11 @@ async function deleteReport(
   }
 }
 
-export { getReport, getReports, createReport, updateReport, deleteReport };
+export {
+  getReport,
+  getReports,
+  createReport,
+  updateReport,
+  deleteReport,
+  getReportsByOrganisationReportTemplate,
+};
