@@ -3,6 +3,8 @@ import { Resolvers } from "../../libs/resolvers-types";
 import {
   createReportTemplate,
   deleteReportTemplate,
+  getIndicatorsByTemplateId,
+  getOrganisationReportTemplatesByTemplateId,
   getReportTemplate,
   getReportTemplates,
   updateReportTemplate,
@@ -95,8 +97,10 @@ const resolvers: Resolvers = {
       deleteReportTemplate(args, context),
   },
   ReportTemplate: {
-    // indicators: (parent,_args, context)=> getIndicators,
-    // organisation_report_templates: (parent, _args, context)=>getOrganisationReportTemplates()
+    indicators: (parent, _args, context) =>
+      getIndicatorsByTemplateId(parent.id, context),
+    organisation_report_templates: (parent, _args, context) =>
+      getOrganisationReportTemplatesByTemplateId(parent.id, context),
   },
 };
 

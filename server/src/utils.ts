@@ -186,6 +186,16 @@ function generateClientErrors<T>(error: T, field_name?: string): ErrorField[] {
         field: field,
         message: PRISMA_ERROR_CODES[err.code],
       }));
+    } else if (err.meta?.field_name) {
+      errorFields = [
+        {
+          field: err.meta.field_name as string,
+          message:
+            (error.meta?.cause as string) ||
+            (error.meta?.message as string) ||
+            PRISMA_ERROR_CODES[err.code],
+        },
+      ];
     } else {
       errorFields = [
         {

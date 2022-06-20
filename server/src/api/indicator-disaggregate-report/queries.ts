@@ -26,7 +26,7 @@ async function getIndicatorDisaggregateReports(
   });
 }
 
-async function getReportsByDisaggregateIndicatorDisaggregateId(
+async function getIndicatorDisaggregateReportsByIndicatorDisaggregateId(
   indicator_disaggregate_id: string,
   context: GraphQLContext
 ): Promise<IndicatorDisaggregateReport[]> {
@@ -135,7 +135,7 @@ async function deleteIndicatorDisaggregateReport(
 export {
   getIndicatorDisaggregateReport,
   getIndicatorDisaggregateReports,
-  getReportsByDisaggregateIndicatorDisaggregateId,
+  getIndicatorDisaggregateReportsByIndicatorDisaggregateId,
   createIndicatorDisaggregateReport,
   deleteIndicatorDisaggregateReport,
   updateIndicatorDisaggregateReport,

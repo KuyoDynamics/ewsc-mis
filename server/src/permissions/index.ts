@@ -59,8 +59,8 @@ const permissions = shield(
       updateDistrict: isAuthenticated,
       deleteDistrict: isAuthenticated,
       // User
-      createUserInvitation: isAuthenticated,
-      createInvitedUser: isValidUserInvitation,
+      createUserInvitation: allow,
+      createInvitedUser: allow,
       deleteUserInvitation: isAuthenticated,
       createUser: and(isAuthenticated, isAdmin),
       deleteUser: and(isAuthenticated, isAdmin),
@@ -96,6 +96,8 @@ const permissions = shield(
       deleteWaterTreatmentPlants: and(isAuthenticated, isAdmin),
       // DisaggregateOption
       createDisaggregateOption: and(isAuthenticated, isAdmin),
+      // Indicator
+      createIndicator: and(isAuthenticated, isAdmin),
     },
     // Types
     CatchmentDistrict: isAuthenticated,

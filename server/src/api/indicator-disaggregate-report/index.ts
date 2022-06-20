@@ -1,6 +1,6 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getIndicatorDisaggregate } from "../queries";
+import { getIndicatorDisaggregate, getReport } from "../queries";
 import {
   createIndicatorDisaggregateReport,
   deleteIndicatorDisaggregateReport,
@@ -99,7 +99,7 @@ const resolvers: Resolvers = {
         { id: parent.indicator_disaggregate_id },
         context
       ),
-    // report: (parent, _args, context) => getReport({ id: parent.id }, context),
+    report: (parent, _args, context) => getReport({ id: parent.id }, context),
   },
 };
 

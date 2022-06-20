@@ -8,6 +8,7 @@ import {
   updateReport,
   getCatchmentDistrict,
   getIndicatorDisaggregateReports,
+  getOrganisationReportTemplate,
 } from "../queries";
 
 const typeDefs = gql`
@@ -89,8 +90,11 @@ const resolvers: Resolvers = {
     deleteReport: (_, args, context) => deleteReport(args, context),
   },
   Report: {
-    // organisation_report_template: (parent, _args, context) =>
-    //   getOrganisationReportTemplate({ id: parent.organisation_report_template_id }, context),
+    organisation_report_template: (parent, _args, context) =>
+      getOrganisationReportTemplate(
+        { id: parent.organisation_report_template_id },
+        context
+      ),
     catchment_district: (parent, _args, context) =>
       getCatchmentDistrict(parent.catchment_district_id, context),
     indicator_disaggregate_reports: (parent, _args, context) =>

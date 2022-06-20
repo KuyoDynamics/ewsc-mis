@@ -1,13 +1,15 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import // deleteDisaggregateOptionSet,
-// getDisaggregateOption,
-// getDisaggregateOptionSet,
-// getAllDisaggregateOptionSets,
-// createDisaggregateOptionSet,
-// getDisaggregate,
-// getReportsByDisaggregateOptionSet,
-"../queries";
+import {
+  createOrganisationIndicator,
+  createOrganisationIndicators,
+  deleteOrganisationIndicator,
+  getOrganisationIndicator,
+  getOrganisationIndicators,
+  getIndicator,
+  getIndicatorDisaggregates,
+  getOrganisation,
+} from "../queries";
 
 const typeDefs = gql`
   type OrganisationIndicator {
@@ -19,7 +21,7 @@ const typeDefs = gql`
     organisation_id: ID!
     organisation: OrganisationResult
 
-    indicator_disaggregate: [IndicatorDisaggregate!]
+    indicator_disaggregates: [IndicatorDisaggregate!]
 
     created_at: DateTime!
     created_by: String!
@@ -28,17 +30,26 @@ const typeDefs = gql`
   }
 
   extend type Query {
-    organisation_indicators: [OrganisationIndicator!]
+    organisation_indicators(organisation_id: ID!): [OrganisationIndicator!]
     organisation_indicator(id: ID!): OrganisationIndicatorResult!
   }
 
   extend type Mutation {
     createOrganisationIndicator(
       input: CreateOrganisationIndicatorInput!
-    ): ApiBatchPayloadResult!
+    ): OrganisationIndicatorResult!
+    createOrganisationIndicators(
+      input: [CreateOrganisationIndicatorsInput!]!
+    ): CreateOrganisationIndicatorsResult!
     deleteOrganisationIndicator(
       input: DeleteOrganisationIndicatorInput!
     ): OrganisationIndicatorResult!
+  }
+
+  input CreateOrganisationIndicatorsInput {
+    indicator_id: String!
+    organisation_id: ID!
+    disaggregate_option_ids: [ID!]!
   }
 
   input CreateOrganisationIndicatorInput {
@@ -50,6 +61,14 @@ const typeDefs = gql`
     id: ID!
   }
 
+  type CreateOrganisationIndicatorsSuccess {
+    organisation_indicators: [OrganisationIndicator!]!
+  }
+
+  union CreateOrganisationIndicatorsResult =
+      CreateOrganisationIndicatorsSuccess
+    | ApiCreateError
+
   union OrganisationIndicatorResult =
       OrganisationIndicator
     | ApiNotFoundError
@@ -60,24 +79,29 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    // disaggregate_option_set: (_, args, context) =>
-    //   getOrganisationIndicator(args, context),
-    // disaggregate_option_sets: (_, _args, context) =>
-    //   getAllOrganisationIndicators(context),
+    organisation_indicators: (_, args, context) =>
+      getOrganisationIndicators(args, context),
+    organisation_indicator: (_, args, context) =>
+      getOrganisationIndicator(args, context),
   },
   Mutation: {
-    // createOrganisationIndicator: (_, args, context) =>
-    //   createOrganisationIndicator(args, context),
-    // deleteOrganisationIndicator: (_, args, context) =>
-    //   deleteOrganisationIndicator(args, context),
+    createOrganisationIndicator: (_, args, context) =>
+      createOrganisationIndicator(args, context),
+    createOrganisationIndicators: (_, args, context) =>
+      createOrganisationIndicators(args, context),
+    deleteOrganisationIndicator: (_, args, context) =>
+      deleteOrganisationIndicator(args, context),
   },
   OrganisationIndicator: {
-    // disaggregate_option: (parent, _args, context) =>
-    //   getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
-    // disaggregate: (parent, _args, context) =>
-    //   getDisaggregate({ id: parent.disaggregate_id }, context),
-    // disaggregate_option_set_reports: (parent, _args, context) =>
-    //   getReportsByOrganisationIndicator(parent.id, context),
+    indicator: (parent, _args, context) =>
+      getIndicator({ id: parent.indicator_id }, context),
+    organisation: (parent, _args, context) =>
+      getOrganisation(parent.organisation_id, context),
+    indicator_disaggregates: (parent, _args, context) =>
+      getIndicatorDisaggregates(
+        { organisation_indicator_id: parent.id },
+        context
+      ),
   },
 };
 

@@ -27,6 +27,17 @@ async function getIndicatorDisaggregates(
   });
 }
 
+async function getIndicatorDisaggregatesByDisaggregateOptionId(
+  disaggregate_option_id: string,
+  context: GraphQLContext
+): Promise<IndicatorDisaggregate[]> {
+  return context.prisma.indicatorDisaggregate.findMany({
+    where: {
+      disaggregate_option_id,
+    },
+  });
+}
+
 async function getIndicatorDisaggregate(
   args: QueryIndicator_DisaggregateArgs,
   context: GraphQLContext
@@ -127,4 +138,5 @@ export {
   getIndicatorDisaggregate,
   getIndicatorDisaggregates,
   createIndicatorDisaggregates,
+  getIndicatorDisaggregatesByDisaggregateOptionId,
 };

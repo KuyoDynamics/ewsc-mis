@@ -21,6 +21,17 @@ async function getDisaggregateOptions(
   return context.prisma.disaggregateOption.findMany({});
 }
 
+async function getDisaggregateOptionsByOptionId(
+  option_id: string,
+  context: GraphQLContext
+): Promise<DisaggregateOption[]> {
+  return context.prisma.disaggregateOption.findMany({
+    where: {
+      option_id,
+    },
+  });
+}
+
 async function getDisaggregateOption(
   args: QueryDisaggregate_OptionArgs,
   context: GraphQLContext
@@ -117,4 +128,5 @@ export {
   createDisaggregateOption,
   deleteDisaggregateOption,
   createDisaggregateOptions,
+  getDisaggregateOptionsByOptionId,
 };

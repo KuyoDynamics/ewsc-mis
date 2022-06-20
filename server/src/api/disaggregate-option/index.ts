@@ -7,6 +7,7 @@ import {
   getDisaggregate,
   getDisaggregateOption,
   getDisaggregateOptions,
+  getIndicatorDisaggregatesByDisaggregateOptionId,
   getOption,
 } from "../queries";
 
@@ -87,8 +88,8 @@ const resolvers: Resolvers = {
       getDisaggregate({ id: parent.disaggregate_id }, context),
     option: (parent, _args, context) =>
       getOption({ id: parent.option_id }, context),
-    // indicator_disaggregates: (parent, _args, context) =>
-    //   getReportsByDisaggregateOption(parent.id, context),
+    indicator_disaggregates: (parent, _args, context) =>
+      getIndicatorDisaggregatesByDisaggregateOptionId(parent.id, context),
   },
 };
 

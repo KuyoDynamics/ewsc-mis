@@ -8,6 +8,7 @@ import {
   updateIndicator,
   getIndicatorUnit,
   getReportTemplate,
+  getIndicatorOrganisations,
 } from "../queries";
 
 const typeDefs = gql`
@@ -101,7 +102,8 @@ const resolvers: Resolvers = {
     indicator_unit: (parent, _args, context) =>
       getIndicatorUnit({ id: parent.indicator_unit_id }, context),
 
-    // indicator_organisations: (parent, args,context)=> getOrganisationIndicator
+    indicator_organisations: (parent, _args, context) =>
+      getIndicatorOrganisations(parent.id, context),
   },
 };
 

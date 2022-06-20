@@ -3,6 +3,7 @@ import { Resolvers } from "../../libs/resolvers-types";
 import {
   createOption,
   deleteOption,
+  getDisaggregateOptionsByOptionId,
   getOption,
   getOptions,
   updateOption,
@@ -67,8 +68,8 @@ const resolvers: Resolvers = {
     deleteOption: (_, args, context) => deleteOption(args, context),
   },
   Option: {
-    // disaggregate_options: (parent, _args, context) =>
-    //   getDisaggregateOptionsByOptionId(parent.id, context),
+    disaggregate_options: (parent, _args, context) =>
+      getDisaggregateOptionsByOptionId(parent.id, context),
   },
 };
 

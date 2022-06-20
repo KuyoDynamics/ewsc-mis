@@ -18,6 +18,17 @@ async function getIndicators(context: GraphQLContext): Promise<Indicator[]> {
   return (await context.prisma.indicator.findMany({})) as Indicator[];
 }
 
+async function getIndicatorsByTemplateId(
+  report_template_id: string,
+  context: GraphQLContext
+): Promise<Indicator[]> {
+  return (await context.prisma.indicator.findMany({
+    where: {
+      report_template_id,
+    },
+  })) as Indicator[];
+}
+
 async function getIndicator(
   args: QueryIndicatorArgs,
   context: GraphQLContext
@@ -119,4 +130,5 @@ export {
   createIndicator,
   updateIndicator,
   deleteIndicator,
+  getIndicatorsByTemplateId,
 };

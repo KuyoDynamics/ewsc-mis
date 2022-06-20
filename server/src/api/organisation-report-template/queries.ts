@@ -37,6 +37,17 @@ async function getOrganisationReportTemplates(
   return organisation_report_templates;
 }
 
+async function getOrganisationReportTemplatesByTemplateId(
+  report_template_id: string,
+  context: GraphQLContext
+): Promise<OrganisationReportTemplate[]> {
+  const organisation_report_templates =
+    await context.prisma.organisationReportTemplate.findMany({
+      where: { report_template_id },
+    });
+  return organisation_report_templates;
+}
+
 async function createOrganisationReportTemplate(
   args: MutationCreateOrganisationReportTemplateArgs,
   context: GraphQLContext
@@ -113,4 +124,5 @@ export {
   getOrganisationReportTemplate,
   getOrganisationReportTemplates,
   createOrganisationReportTemplates,
+  getOrganisationReportTemplatesByTemplateId,
 };

@@ -1,20 +1,14 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import // deleteDisaggregateOptionSet,
-// getDisaggregateOption,
-// getDisaggregateOptionSet,
-// getAllDisaggregateOptionSets,
-// createDisaggregateOptionSet,
-// getDisaggregate,
-// getReportsByDisaggregateOptionSet,
-"../queries";
 import {
   createIndicatorDisaggregate,
   createIndicatorDisaggregates,
   deleteIndicatorDisaggregate,
   getDisaggregateOption,
   getIndicatorDisaggregate,
+  getIndicatorDisaggregateReportsByIndicatorDisaggregateId,
   getIndicatorDisaggregates,
+  getOrganisationIndicator,
 } from "../queries";
 
 const typeDefs = gql`
@@ -94,10 +88,16 @@ const resolvers: Resolvers = {
   IndicatorDisaggregate: {
     disaggregate_option: (parent, _args, context) =>
       getDisaggregateOption({ id: parent.disaggregate_option_id }, context),
-    // organisation_indicator: (parent, _args, context) =>
-    //   getOrganisationIndicator({ id: parent.organisation_indicator_id }, context),
-    // indicator_disaggregate_reports: (parent, _args, context) =>
-    //   getIndicatorDisaggregateReportsByIndicatorDisaggregateId(parent.id, context),
+    organisation_indicator: (parent, _args, context) =>
+      getOrganisationIndicator(
+        { id: parent.organisation_indicator_id },
+        context
+      ),
+    indicator_disaggregate_reports: (parent, _args, context) =>
+      getIndicatorDisaggregateReportsByIndicatorDisaggregateId(
+        parent.id,
+        context
+      ),
   },
 };
 

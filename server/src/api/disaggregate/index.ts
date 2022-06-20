@@ -2,9 +2,11 @@ import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
   createDisaggregate,
+  createDisaggregateWithOptions,
   deleteDisaggregate,
   getDisaggregate,
   getDisaggregates,
+  getOptionsForDisaggregate,
   updateDisaggregate,
 } from "../queries";
 
@@ -29,8 +31,17 @@ const typeDefs = gql`
 
   extend type Mutation {
     createDisaggregate(input: CreateDisaggregateInput!): DisaggregateResult!
+    createDisaggregateWithOptions(
+      input: CreateDisaggregateWithOptionsInput!
+    ): DisaggregateResult!
     updateDisaggregate(input: UpdateDisaggregateInput!): DisaggregateResult!
     deleteDisaggregate(input: DeleteDisaggregateInput!): DisaggregateResult!
+  }
+
+  input CreateDisaggregateWithOptionsInput {
+    name: String!
+    type: DisaggregateType!
+    option_ids: [ID!]!
   }
 
   input CreateDisaggregateInput {
@@ -72,12 +83,14 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     createDisaggregate: (_, args, context) => createDisaggregate(args, context),
+    createDisaggregateWithOptions: (_, args, context) =>
+      createDisaggregateWithOptions(args, context),
     updateDisaggregate: (_, args, context) => updateDisaggregate(args, context),
     deleteDisaggregate: (_, args, context) => deleteDisaggregate(args, context),
   },
   Disaggregate: {
-    // disaggregate_options: (parent, _args, context) =>
-    //   getDisaggregateOptionSets(parent.id, context),
+    disaggregate_options: (parent, _args, context) =>
+      getOptionsForDisaggregate(parent.id, context),
   },
 };
 

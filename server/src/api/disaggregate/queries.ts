@@ -1,7 +1,10 @@
+import { Prisma } from ".prisma/client";
 import {
   Disaggregate,
+  DisaggregateOption,
   DisaggregateResult,
   MutationCreateDisaggregateArgs,
+  MutationCreateDisaggregateWithOptionsArgs,
   MutationDeleteDisaggregateArgs,
   MutationUpdateDisaggregateArgs,
   QueryDisaggregateArgs,
@@ -19,6 +22,18 @@ async function getDisaggregates(
 ): Promise<Disaggregate[]> {
   const disaggregates = await context.prisma.disaggregate.findMany({});
   return disaggregates as Disaggregate[];
+}
+
+async function getOptionsForDisaggregate(
+  disaggregate_id: string,
+  context: GraphQLContext
+): Promise<DisaggregateOption[]> {
+  const options = await context.prisma.disaggregateOption.findMany({
+    where: {
+      disaggregate_id,
+    },
+  });
+  return options;
 }
 
 async function getDisaggregate(
@@ -53,6 +68,38 @@ async function createDisaggregate(
         type: args.input.type,
         created_by: context.user.email,
         last_modified_by: context.user.email,
+      },
+    });
+
+    return {
+      __typename: "Disaggregate",
+      ...disaggregate,
+    } as Disaggregate;
+  } catch (error) {
+    return getApiCreateError("Disaggregate", error);
+  }
+}
+
+async function createDisaggregateWithOptions(
+  args: MutationCreateDisaggregateWithOptionsArgs,
+  context: GraphQLContext
+): Promise<DisaggregateResult> {
+  try {
+    const disaggregate = await context.prisma.disaggregate.create({
+      data: {
+        name: args.input.name,
+        type: args.input.type,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+        disaggregate_options: {
+          createMany: {
+            data: args.input.option_ids.map((option_id) => ({
+              option_id,
+              created_by: context.user.email,
+              last_modified_by: context.user.email,
+            })),
+          },
+        },
       },
     });
 
@@ -114,4 +161,6 @@ export {
   createDisaggregate,
   deleteDisaggregate,
   updateDisaggregate,
+  getOptionsForDisaggregate,
+  createDisaggregateWithOptions,
 };
