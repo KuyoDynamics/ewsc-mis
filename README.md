@@ -22,9 +22,10 @@ A Management Information System for Water and Sewerage Utility Companies.
 ```env
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
-
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ewsc-mis?schema=public"
-Connecting to Postgres database in docker from host machine
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mis?schema=public"
+PASSWORD_SALT_ROUNDS=10
+PORT=4000
+JWT_SECRET="SOME_SECRET"
 ```
 
 1. `cd` into `/server` and run `npm install`
