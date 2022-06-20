@@ -2,17 +2,27 @@ import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
 import {
   createDisaggregateOption,
+  createDisaggregateOptions,
   deleteDisaggregateOption,
+  getDisaggregate,
   getDisaggregateOption,
   getDisaggregateOptions,
-  updateDisaggregateOption,
+  getIndicatorDisaggregatesByDisaggregateOptionId,
+  getOption,
 } from "../queries";
 
 const typeDefs = gql`
   type DisaggregateOption {
     id: ID!
-    option_name: String!
-    # disaggregate_option_sets: [DisaggregateOptionSet!]
+
+    option_id: String!
+    option: OptionResult
+
+    disaggregate_id: ID!
+    disaggregate: DisaggregateResult
+
+    indicator_disaggregates: [IndicatorDisaggregate!]
+
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -28,25 +38,22 @@ const typeDefs = gql`
     createDisaggregateOption(
       input: CreateDisaggregateOptionInput!
     ): DisaggregateOptionResult!
-    updateDisaggregateOption(
-      input: UpdateDisaggregateOptionInput!
-    ): DisaggregateOptionResult!
+    createDisaggregateOptions(
+      input: CreateDisaggregateOptionsInput!
+    ): ApiBatchPayloadResult!
     deleteDisaggregateOption(
       input: DeleteDisaggregateOptionInput!
     ): DisaggregateOptionResult!
   }
 
   input CreateDisaggregateOptionInput {
-    option_name: String!
+    disaggregate_id: ID!
+    option_id: ID!
   }
 
-  input UpdateDisaggregateOptionInput {
-    id: ID!
-    update: DisaggregateOptionUpdateInput!
-  }
-
-  input DisaggregateOptionUpdateInput {
-    option_name: String!
+  input CreateDisaggregateOptionsInput {
+    disaggregate_id: ID!
+    option_ids: [ID!]!
   }
 
   input DeleteDisaggregateOptionInput {
@@ -63,18 +70,26 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    disaggregate_option: (_, args, context) =>
-      getDisaggregateOption(args, context),
     disaggregate_options: (_, _args, context) =>
       getDisaggregateOptions(context),
+    disaggregate_option: (_, args, context) =>
+      getDisaggregateOption(args, context),
   },
   Mutation: {
     createDisaggregateOption: (_, args, context) =>
       createDisaggregateOption(args, context),
-    updateDisaggregateOption: (_, args, context) =>
-      updateDisaggregateOption(args, context),
+    createDisaggregateOptions: (_, args, context) =>
+      createDisaggregateOptions(args, context),
     deleteDisaggregateOption: (_, args, context) =>
       deleteDisaggregateOption(args, context),
+  },
+  DisaggregateOption: {
+    disaggregate: (parent, _args, context) =>
+      getDisaggregate({ id: parent.disaggregate_id }, context),
+    option: (parent, _args, context) =>
+      getOption({ id: parent.option_id }, context),
+    indicator_disaggregates: (parent, _args, context) =>
+      getIndicatorDisaggregatesByDisaggregateOptionId(parent.id, context),
   },
 };
 

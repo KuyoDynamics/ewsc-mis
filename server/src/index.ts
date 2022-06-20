@@ -36,12 +36,14 @@ const prisma = new PrismaClient({
   ],
 });
 
-// prisma.$on("query", (e) => {
-//   console.log("Query: " + e.query);
-//   console.log("Params: " + e.params);
-//   console.log("Duration: " + e.duration + "ms");
-//   console.log("\n===================================");
-// });
+prisma.$on("query", async (e) => {
+  // let metrics = await prisma.$metrics.json();
+  // console.log("metrics", metrics);
+  //   console.log("Query: " + e.query);
+  //   console.log("Params: " + e.params);
+  //   console.log("Duration: " + e.duration + "ms");
+  //   console.log("\n===================================");
+});
 
 async function startApolloServer(
   gqlSchema: GraphQLSchema,

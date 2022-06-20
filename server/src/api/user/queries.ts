@@ -130,8 +130,8 @@ async function createInvitedUser(
 
     const user_districts = catchment_district_ids.map((id) => ({
       catchment_district_id: id,
-      created_by: context.user.email,
-      last_modified_by: context.user.email,
+      created_by: "system_user@kuyodynamics.com",
+      last_modified_by: "system_user@kuyodynamics.com",
     }));
 
     const user = await context.prisma.user.create({
@@ -141,13 +141,13 @@ async function createInvitedUser(
         email,
         password: await encryptPassword(password),
         user_roles: prepareUserRolesForCreate(user_roles),
-        created_by: context.user?.email,
-        last_modified_by: context.user?.email,
+        created_by: "system_user@kuyodynamics.com",
+        last_modified_by: "system_user@kuyodynamics.com",
         user_organisations: {
           create: {
             organisation_id,
-            created_by: context.user?.email,
-            last_modified_by: context.user?.email,
+            created_by: "system_user@kuyodynamics.com",
+            last_modified_by: "system_user@kuyodynamics.com",
             district_users: {
               createMany: {
                 data: user_districts,

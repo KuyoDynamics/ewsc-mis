@@ -1,23 +1,35 @@
 import {
+  ApiBatchPayloadResult,
   DisaggregateOption,
   DisaggregateOptionResult,
   MutationCreateDisaggregateOptionArgs,
+  MutationCreateDisaggregateOptionsArgs,
   MutationDeleteDisaggregateOptionArgs,
-  MutationUpdateDisaggregateOptionArgs,
   QueryDisaggregate_OptionArgs,
 } from "../../libs/resolvers-types";
 import {
   getApiCreateError,
   getApiNotFoundError,
-  getApitDeleteError,
-  getApitUpdateError,
+  getApiDeleteError,
   GraphQLContext,
+  getApiBatchPayloadCreateError,
 } from "../../utils";
 
 async function getDisaggregateOptions(
   context: GraphQLContext
 ): Promise<DisaggregateOption[]> {
   return context.prisma.disaggregateOption.findMany({});
+}
+
+async function getDisaggregateOptionsByOptionId(
+  option_id: string,
+  context: GraphQLContext
+): Promise<DisaggregateOption[]> {
+  return context.prisma.disaggregateOption.findMany({
+    where: {
+      option_id,
+    },
+  });
 }
 
 async function getDisaggregateOption(
@@ -49,7 +61,8 @@ async function createDisaggregateOption(
   try {
     const disaggregate_option = await context.prisma.disaggregateOption.create({
       data: {
-        option_name: args.input.option_name,
+        option_id: args.input.option_id,
+        disaggregate_id: args.input.disaggregate_id,
         created_by: context.user.email,
         last_modified_by: context.user.email,
       },
@@ -64,26 +77,29 @@ async function createDisaggregateOption(
   }
 }
 
-async function updateDisaggregateOption(
-  args: MutationUpdateDisaggregateOptionArgs,
+async function createDisaggregateOptions(
+  args: MutationCreateDisaggregateOptionsArgs,
   context: GraphQLContext
-): Promise<DisaggregateOptionResult> {
+): Promise<ApiBatchPayloadResult> {
   try {
-    const disaggregate_option = await context.prisma.disaggregateOption.update({
-      where: {
-        id: args.input.id,
-      },
-      data: {
-        option_name: args.input.update.option_name || undefined,
-        last_modified_by: args.input.update ? context.user.email : undefined,
-      },
+    const data = args.input.option_ids.map((option_id) => ({
+      option_id,
+      disaggregate_id: args.input.disaggregate_id,
+      created_by: context.user.email,
+      last_modified_by: context.user.email,
+    }));
+
+    const result = await context.prisma.disaggregateOption.createMany({
+      data,
+      skipDuplicates: true,
     });
+
     return {
-      __typename: "DisaggregateOption",
-      ...disaggregate_option,
+      __typename: "ApiBatchPayload",
+      ...result,
     };
   } catch (error) {
-    return getApitUpdateError("DisaggregateOption", args.input.id);
+    return getApiBatchPayloadCreateError("DisaggregateOption", error);
   }
 }
 
@@ -102,7 +118,7 @@ async function deleteDisaggregateOption(
       ...disaggregate_option,
     };
   } catch (error) {
-    return getApitDeleteError("DisaggregateOption", args.input.id);
+    return getApiDeleteError("DisaggregateOption", args.input.id);
   }
 }
 
@@ -110,6 +126,7 @@ export {
   getDisaggregateOption,
   getDisaggregateOptions,
   createDisaggregateOption,
-  updateDisaggregateOption,
   deleteDisaggregateOption,
+  createDisaggregateOptions,
+  getDisaggregateOptionsByOptionId,
 };

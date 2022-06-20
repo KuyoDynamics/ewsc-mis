@@ -13,11 +13,13 @@ const deleteUserInvitationMiddleware = {
       try {
         const invitedUser = await resolve(parent, args, context, info);
         try {
-          await context.prisma.userInvitation.delete({
-            where: {
-              id: args.input.user_invitation_id,
-            },
-          });
+          if (invitedUser) {
+            await context.prisma.userInvitation.delete({
+              where: {
+                id: args.input.user_invitation_id,
+              },
+            });
+          }
         } catch (error) {
           console.log("Chaiwa, just keep quiet or send to Sentry!", error);
         }

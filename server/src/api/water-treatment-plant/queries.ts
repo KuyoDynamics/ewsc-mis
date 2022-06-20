@@ -139,17 +139,17 @@ async function deleteWaterTreatmentPlants(
 
     if (water_treatment_plants.count === 0) {
       return {
-        __typename: "ApiDeleteError",
+        __typename: "ApiOperationError",
         message: `Failed to delete WaterTreatmentPlant(s) with filter ${args.filter} or do not exist.`,
       };
     }
     return {
-      __typename: "DeleteBatchPayload",
+      __typename: "ApiBatchPayload",
       ...water_treatment_plants,
-    } as ApiBatchPayloadResult;
+    };
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: "ApiOperationError",
       message: `Failed to delete WaterTreatmentPlant(s) with filter ${args.filter} or do not exist.`,
       errors: generateClientErrors(error),
     };

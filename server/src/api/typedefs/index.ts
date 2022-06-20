@@ -20,9 +20,16 @@ import { SewerTreatmentPlantTypeDefs } from "../sewer-treatment-plant";
 import { SewerNetworkTypeDefs } from "../sewer-network";
 import { ServiceAreaSewerConnectionTypeDefs } from "../service-area-sewer-connection";
 import { DisaggregateOptionTypeDefs } from "../disaggregate-option";
-import { DisaggregateOptionSetTypeDefs } from "../disaggregate-option-set";
 import { DisaggregateTypeDefs } from "../disaggregate";
 import { IndicatorUnitTypeDefs } from "../indicator-unit";
+import { IndicatorTypeDefs } from "../indicator";
+import { ReportTypeDefs } from "../report";
+import { OrganisationReportTemplateTypeDefs } from "../organisation-report-template";
+import { ReportTemplateTypeDefs } from "../report-template";
+import { OrganisationIndicatorTypeDefs } from "../organisation-indicator";
+import { IndicatorDisaggregateTypeDefs } from "../indicator-disaggregate";
+import { OptionTypeDefs } from "../option";
+import { IndicatorDisaggregateReportTypeDefs } from "../indicator-disaggregate-report";
 
 export default [
   CountryTypeDefs,
@@ -46,8 +53,17 @@ export default [
   SewerNetworkTypeDefs,
   ServiceAreaSewerConnectionTypeDefs,
   DisaggregateOptionTypeDefs,
-  DisaggregateOptionSetTypeDefs,
   DisaggregateTypeDefs,
   IndicatorUnitTypeDefs,
+  IndicatorTypeDefs,
+  ReportTypeDefs,
+  OrganisationReportTemplateTypeDefs,
+  ReportTemplateTypeDefs,
+  OrganisationIndicatorTypeDefs,
+  IndicatorDisaggregateTypeDefs,
+  DisaggregateOptionTypeDefs,
+  OptionTypeDefs,
+  DisaggregateTypeDefs,
+  IndicatorDisaggregateReportTypeDefs,
   scalarTypeDefs,
 ];

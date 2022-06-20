@@ -5,6 +5,7 @@ import {
   ApiCreateError,
   ApiDeleteError,
   ApiNotFoundError,
+  ApiOperationError,
   ApiUpdateError,
   ErrorField,
 } from "./libs/resolvers-types";
@@ -173,7 +174,7 @@ const PRISMA_ERROR_CODES: Record<string, string> = {
   P4002: "The schema of the introspected database was inconsistent.",
 };
 
-function generateClientErrors(error: any, field_name?: string): ErrorField[] {
+function generateClientErrors<T>(error: T, field_name?: string): ErrorField[] {
   let errorFields: ErrorField[] = [];
   console.log("Chaiwa, see this error", error);
 
@@ -185,6 +186,16 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
         field: field,
         message: PRISMA_ERROR_CODES[err.code],
       }));
+    } else if (err.meta?.field_name) {
+      errorFields = [
+        {
+          field: err.meta.field_name as string,
+          message:
+            (error.meta?.cause as string) ||
+            (error.meta?.message as string) ||
+            PRISMA_ERROR_CODES[err.code],
+        },
+      ];
     } else {
       errorFields = [
         {
@@ -227,16 +238,16 @@ function generateClientErrors(error: any, field_name?: string): ErrorField[] {
   return errorFields;
 }
 
-function getApiErrors(error?: any, field_name?: string) {
+function getApiErrors<T>(error?: T, field_name?: string) {
   return {
     errors: error ? generateClientErrors(error, field_name) : undefined,
   };
 }
 
-function getApiNotFoundError(
+function getApiNotFoundError<T>(
   model_name: string,
   id_value: string,
-  error?: any
+  error?: T
 ): ApiNotFoundError {
   return {
     __typename: "ApiNotFoundError",
@@ -245,7 +256,7 @@ function getApiNotFoundError(
   };
 }
 
-function getApiCreateError(model_name: string, error: any): ApiCreateError {
+function getApiCreateError<T>(model_name: string, error: T): ApiCreateError {
   return {
     __typename: "ApiCreateError",
     message: `Failed to create ${model_name}.`,
@@ -253,10 +264,21 @@ function getApiCreateError(model_name: string, error: any): ApiCreateError {
   };
 }
 
-function getApitUpdateError(
+function getApiBatchPayloadCreateError<T>(
+  model_name: string,
+  error: T
+): ApiOperationError {
+  return {
+    __typename: "ApiOperationError",
+    message: `Failed to create ${model_name}.`,
+    ...getApiErrors(error),
+  };
+}
+
+function getApiUpdateError<T>(
   model_name: string,
   id_value: string,
-  error?: any
+  error?: T
 ): ApiUpdateError {
   return {
     __typename: "ApiUpdateError",
@@ -265,11 +287,12 @@ function getApitUpdateError(
   };
 }
 
-function getApitDeleteError(
+function getApiDeleteError<T>(
   model_name: string,
   id_value: string,
-  error?: any
+  error?: T
 ): ApiDeleteError {
+  console.log("Delete error", error);
   return {
     __typename: "ApiDeleteError",
     message: `Failed to delete ${model_name} with id ${id_value}.`,
@@ -287,6 +310,7 @@ export {
   generateClientErrors,
   getApiCreateError,
   getApiNotFoundError,
-  getApitUpdateError,
-  getApitDeleteError,
+  getApiUpdateError,
+  getApiDeleteError,
+  getApiBatchPayloadCreateError,
 };

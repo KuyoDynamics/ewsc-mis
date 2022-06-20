@@ -20,9 +20,16 @@ import { SewerTreatmentPlantResolvers } from "../sewer-treatment-plant";
 import { SewerNetworkResolvers } from "../sewer-network";
 import { ServiceAreaSewerConnectionResolvers } from "../service-area-sewer-connection";
 import { DisaggregateOptionResolvers } from "../disaggregate-option";
-import { DisaggregateOptionSetResolvers } from "../disaggregate-option-set";
 import { DisaggregateResolvers } from "../disaggregate";
 import { IndicatorUnitResolvers } from "../indicator-unit";
+import { IndicatorResolvers } from "../indicator";
+import { ReportResolvers } from "../report";
+import { OrganisationReportTemplateResolvers } from "../organisation-report-template";
+import { ReportTemplateResolvers } from "../report-template";
+import { OrganisationIndicatorResolvers } from "../organisation-indicator";
+import { IndicatorDisaggregateResolvers } from "../indicator-disaggregate";
+import { OptionResolvers } from "../option";
+import { IndicatorDisaggregateReportResolvers } from "../indicator-disaggregate-report";
 
 export default [
   CountryResolvers,
@@ -46,8 +53,17 @@ export default [
   SewerNetworkResolvers,
   ServiceAreaSewerConnectionResolvers,
   DisaggregateOptionResolvers,
-  DisaggregateOptionSetResolvers,
   DisaggregateResolvers,
   IndicatorUnitResolvers,
+  IndicatorResolvers,
+  ReportResolvers,
+  OrganisationReportTemplateResolvers,
+  ReportTemplateResolvers,
+  OrganisationIndicatorResolvers,
+  IndicatorDisaggregateResolvers,
+  DisaggregateOptionResolvers,
+  OptionResolvers,
+  DisaggregateResolvers,
+  IndicatorDisaggregateReportResolvers,
   scalarResolvers,
 ];
