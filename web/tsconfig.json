@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "sourceMap": true,
+    "target": "ES2018",
+    "module": "commonjs",
+    "sourceRoot": ".",
+    "outDir": "./dist/",
+    "strict": true,
+    "noImplicitAny": true,
+    "lib": ["ESNext", "DOM"],
+    "allowJs": false,
+    "esModuleInterop": true
+    // "moduleResolution": "",
+    // "types": ["node"]
+  },
+  "exclude": ["node_modules"]
+}

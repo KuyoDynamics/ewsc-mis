@@ -51,9 +51,12 @@ JWT_SECRET="SOME_SECRET"
 ### Frontend
 
 - Reactjs
+- Typescript
 - Apollo GraphQL Client
 - Material UI
 - Rechartjs
+- React Router v6
+- GraphQL Codegen
 
 ## Troubleshooting
 
