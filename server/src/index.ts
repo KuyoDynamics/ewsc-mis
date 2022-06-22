@@ -61,6 +61,8 @@ async function startApolloServer(
     })
   );
 
+  app.use(express.static("public"));
+
   // Express global error handler
   app.use(function (_err: any, _req: any, _res: any, next: any) {
     next();
