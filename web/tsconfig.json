@@ -11,8 +11,6 @@
     "lib": ["ESNext", "DOM"],
     "allowJs": false,
     "esModuleInterop": true
-    // "moduleResolution": "",
-    // "types": ["node"]
   },
   "exclude": ["node_modules"]
 }
