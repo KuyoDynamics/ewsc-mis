@@ -16,8 +16,10 @@ const config: webpack.Configuration = {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     filename: "[name].[contenthash].js",
+    assetModuleFilename: "[name][ext]",
     clean: true,
   },
+  devtool: "inline-source-map",
   optimization: {
     splitChunks: {
       chunks: "all",
@@ -34,6 +36,7 @@ const config: webpack.Configuration = {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
+      { test: /\.(svg|ico|png|webp|jpg|gif|jpeg)$/, type: "asset/resource" },
       {
         test: /\.html$/,
         use: ["html-loader"],
@@ -43,17 +46,14 @@ const config: webpack.Configuration = {
   devServer: {
     host: "localhost",
     hot: true,
+    open: true,
     liveReload: true,
-    watchFiles: [".ts", ".tsx", ".html"],
     compress: true,
     port: 9000,
     allowedHosts: "all",
     bonjour: true,
-    static: {
-      directory: path.join(__dirname, "/dist/"),
-      publicPath: "/",
-      serveIndex: true,
-    },
+    historyApiFallback: true,
+    static: "./dist",
     client: {
       overlay: true,
       progress: true,
@@ -61,7 +61,7 @@ const config: webpack.Configuration = {
     },
     proxy: {
       "/api": "http://localhost:4000/graphql",
-      secure: false, // can be changed later
+      secure: false,
     },
   },
   plugins: [
