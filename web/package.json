@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode development --config webpack.config.ts",
     "deploy": "webpack --mode production --config webpack.config.ts",
-    "dev": "webpack-dev-server --open",
+    "dev": "webpack serve --open",
     "gen": "graphql-codegen"
   },
   "author": "",
@@ -34,13 +34,23 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.8",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
     "@graphql-codegen/cli": "^1.17.8",
     "@graphql-codegen/typescript": "^2.5.1",
     "@graphql-codegen/typescript-operations": "^2.4.2",
     "@graphql-codegen/typescript-react-apollo": "^3.2.16",
+    "@hookform/resolvers": "^2.9.2",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/lab": "^5.0.0-alpha.87",
+    "@mui/material": "^5.8.5",
+    "file-loader": "^6.2.0",
     "graphql": "^16.5.0",
     "react": "^18.2.0",
+    "react-chartjs-2": "^4.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.3.0"
+    "react-hook-form": "^7.33.0",
+    "react-router-dom": "^6.3.0",
+    "yup": "^0.32.11"
   }
 }

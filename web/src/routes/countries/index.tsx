@@ -1,4 +1,5 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 import { useGetCountriesQuery } from "../../../graphql/generated";
 
 function Countries() {
@@ -16,6 +17,7 @@ function Countries() {
           <li>{country.name}</li>
         </ul>
       ))}
+      <Outlet />
     </main>
   );
 }
