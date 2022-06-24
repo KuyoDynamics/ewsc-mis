@@ -1,0 +1,14 @@
+mutation login($input: LoginInput!) {
+  login(input: $input) {
+    ... on ApiLoginError {
+      message
+      errors {
+        field
+        message
+      }
+    }
+    ... on LoginSuccess {
+      accessToken
+    }
+  }
+}

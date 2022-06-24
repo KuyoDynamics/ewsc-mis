@@ -10,10 +10,16 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import NotFound from "./components/404";
+import Login from "./routes/login";
+import { AuthProvider } from "./components/authentication/auth-provider";
+import { RequireAuth } from "./components/authentication/require-auth";
 
 const client = new ApolloClient({
   uri: "/api",
   cache: new InMemoryCache(),
+  headers: {
+    authorization: localStorage.getItem("token") || "",
+  },
 });
 
 const container = document.getElementById("root");
@@ -24,16 +30,25 @@ root.render(
   <ApolloProvider client={client}>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/">
-              <Route index element={<App />} />
-              <Route path="countries" element={<Countries />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        <AuthProvider>
+          <CssBaseline />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/">
+                <Route
+                  index
+                  element={
+                    <RequireAuth>
+                      <App />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="login" element={<Login />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </ThemeProvider>
     </LocalizationProvider>
   </ApolloProvider>

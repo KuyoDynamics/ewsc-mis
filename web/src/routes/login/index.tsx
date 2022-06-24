@@ -1,28 +1,68 @@
 import React from "react";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useLoginMutation } from "../../../graphql/generated";
 
 const Login = () => {
-  const onSubmit = (data: any) => console.log(data);
-
   const schema = Yup.object({
     email: Yup.string()
       .email("Must be a valid email")
       .max(255)
       .required("Email is required"),
-    password: Yup.string().max(255).required("Password is required"),
+    password: Yup.string()
+      .max(255)
+      .min(8, "Password must be a minimum of 8 characters")
+      .required("Password is required"),
   });
 
+  type FormInputs = {
+    email: string;
+    password: string;
+  };
   const {
-    register,
     handleSubmit,
-    getValues,
-    formState: { errors, touchedFields, isSubmitting },
-  } = useForm({ resolver: yupResolver(schema) });
+    control,
+    formState: { isSubmitting, isValid },
+    setError,
+  } = useForm<FormInputs>({
+    resolver: yupResolver(schema),
+    mode: "onChange",
+  });
+
+  const [login, { loading, data, error }] = useLoginMutation();
+  console.log("data", data);
+  console.log("loading", loading);
+  console.log("error", error);
+
+  const onSubmit = async (values: any) => {
+    await login({
+      variables: {
+        input: {
+          email: values.email,
+          password: values.password,
+        },
+      },
+      onCompleted: (result) => {
+        console.log("Chaiwa, data from server", result);
+        if (result.login.__typename === "LoginSuccess") {
+          localStorage.setItem("token", result.login.accessToken);
+        } else if (result.login.__typename === "ApiLoginError") {
+          console.log("Error", result);
+          result.login.errors?.forEach((err) =>
+            setError(err.field as "email" | "password", {
+              type: "server",
+              message: err.message,
+            })
+          );
+        }
+      },
+      onError: (error) => {
+        console.log("Chaiwa, something bad happened", error);
+      },
+    });
+  };
 
   return (
     <>
@@ -36,14 +76,6 @@ const Login = () => {
         }}
       >
         <Container maxWidth="sm">
-          <Link to="/">
-            <Button
-              component="a"
-              startIcon={<ArrowBackIcon fontSize="small" />}
-            >
-              Dashboard
-            </Button>
-          </Link>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Box sx={{ my: 3 }}>
               <Typography color="textPrimary" variant="h4">
@@ -53,61 +85,51 @@ const Login = () => {
                 Sign in on the internal platform
               </Typography>
             </Box>
-            <TextField
-              {...register("email")}
-              error={Boolean(touchedFields.email && errors.email)}
-              fullWidth
-              helperText={touchedFields.email && errors.email}
-              label="Email Address"
-              margin="normal"
+            <Controller
+              control={control}
               name="email"
-              //   onBlur={formik.handleBlur}
-              //   onChange={formik.handleChange}
-              type="email"
-              value={getValues().email}
-              variant="outlined"
+              render={({ field, fieldState: { isTouched, error } }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Email Address"
+                  type="email"
+                  margin="normal"
+                  variant="outlined"
+                  error={Boolean(isTouched && error)}
+                  helperText={isTouched && error?.message}
+                />
+              )}
             />
-            <TextField
-              {...register("password")}
-              error={Boolean(touchedFields.password && errors.password)}
-              fullWidth
-              helperText={touchedFields.password && errors.password}
-              label="Password"
-              margin="normal"
+            <Controller
+              control={control}
               name="password"
-              //   onBlur={formik.handleBlur}
-              //   onChange={formik.handleChange}
-              type="password"
-              value={getValues().password}
-              variant="outlined"
+              render={({ field, fieldState: { isTouched, error } }) => (
+                <TextField
+                  {...field}
+                  error={Boolean(isTouched && error)}
+                  fullWidth
+                  helperText={isTouched && error?.message}
+                  label="Password"
+                  margin="normal"
+                  type="password"
+                  variant="outlined"
+                />
+              )}
             />
+
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isValid || loading}
                 fullWidth
                 size="large"
                 type="submit"
                 variant="contained"
               >
-                Sign In Now
+                {loading ? "singing you in..." : "Sign In Now"}
               </Button>
             </Box>
-            <Typography color="textSecondary" variant="body2">
-              Don&apos;t have an account?{" "}
-              <Link to="/register">
-                <Link
-                  to="/register"
-                  //   variant="subtitle2"
-                  //   underline="hover"
-                  style={{
-                    cursor: "pointer",
-                  }}
-                >
-                  Sign Up
-                </Link>
-              </Link>
-            </Typography>
           </form>
         </Container>
       </Box>

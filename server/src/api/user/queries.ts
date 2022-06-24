@@ -268,12 +268,15 @@ async function login(
     });
 
     if (!user)
-      throw new AuthenticationError("No account found for this email.");
+      throw new AuthenticationError("No account found for this email.", {
+        field: "email",
+      });
 
-    if (user.disabled) throw new AuthenticationError("Account is disabled.");
+    if (user.disabled)
+      throw new AuthenticationError("Account is disabled.", { field: "email" });
 
     if (!(await isValidPassword(args.input.password, user.password)))
-      throw new AuthenticationError("Invalid password.");
+      throw new AuthenticationError("Invalid password.", { field: "password" });
 
     try {
       accessToken = jwt.sign(
@@ -288,7 +291,9 @@ async function login(
     } catch (error) {
       console.log("Failed to generate access token.", error);
       // Also send to Sentry
-      throw new AuthenticationError("Failed to generate access token.");
+      throw new AuthenticationError("Failed to generate access token.", {
+        field: "email",
+      });
     }
 
     await context.prisma.user.update({
@@ -307,7 +312,12 @@ async function login(
     return {
       __typename: "ApiLoginError",
       message: "Login Failed.",
-      errors: generateClientErrors(error, "email,password"),
+      errors: generateClientErrors(
+        error,
+        error instanceof AuthenticationError
+          ? error.extensions.field
+          : "email,password"
+      ),
     };
   }
 }
