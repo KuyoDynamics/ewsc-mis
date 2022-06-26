@@ -72,7 +72,8 @@ const typeDefs = gql`
   }
 
   type LoginSuccess {
-    accessToken: JWT
+    accessToken: JWT!
+    id: ID!
   }
 
   input CreateInvitedUserInput {

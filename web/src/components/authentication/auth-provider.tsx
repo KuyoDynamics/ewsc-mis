@@ -1,52 +1,23 @@
-import * as React from "react";
+// import * as React from "react";
+// import { User } from "../../../graphql/generated";
 
-/**
- * This represents some generic auth provider API, like Firebase.
- */
-const fakeAuthProvider = {
-  isAuthenticated: false,
-  signin(callback: VoidFunction) {
-    fakeAuthProvider.isAuthenticated = true;
-    setTimeout(callback, 100); // fake async
-  },
-  signout(callback: VoidFunction) {
-    fakeAuthProvider.isAuthenticated = false;
-    setTimeout(callback, 100);
-  },
-};
+// interface AuthContextType {
+//   user: User;
+//   isAuthenticated
+// }
 
-interface AuthContextType {
-  user: any;
-  signin: (user: string, callback: VoidFunction) => void;
-  signout: (callback: VoidFunction) => void;
-}
+// let AuthContext = React.createContext<AuthContextType>(null!);
 
-let AuthContext = React.createContext<AuthContextType>(null!);
+// function AuthProvider({ children }: { children: React.ReactNode }) {
+//   let [user, setUser] = React.useState<any>(null);
 
-function AuthProvider({ children }: { children: React.ReactNode }) {
-  let [user, setUser] = React.useState<any>(null);
+//   let value = { user };
 
-  let signin = (newUser: string, callback: VoidFunction) => {
-    return fakeAuthProvider.signin(() => {
-      setUser(newUser);
-      callback();
-    });
-  };
+//   return <AuthContext.Provider value={value}>{children} </AuthContext.Provider>;
+// }
 
-  let signout = (callback: VoidFunction) => {
-    return fakeAuthProvider.signout(() => {
-      setUser(null);
-      callback();
-    });
-  };
+// function useAuth() {
+//   return React.useContext(AuthContext);
+// }
 
-  let value = { user, signin, signout };
-
-  return <AuthContext.Provider value={value}>{children} </AuthContext.Provider>;
-}
-
-function useAuth() {
-  return React.useContext(AuthContext);
-}
-
-export { AuthProvider, useAuth };
+// export { AuthProvider, useAuth };

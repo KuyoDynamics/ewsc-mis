@@ -9,6 +9,7 @@ mutation login($input: LoginInput!) {
     }
     ... on LoginSuccess {
       accessToken
+      id
     }
   }
 }

@@ -1,0 +1,3 @@
+query IsUserLoggedIn($id: ID!) {
+  isLoggedIn(id: $id) @client
+}

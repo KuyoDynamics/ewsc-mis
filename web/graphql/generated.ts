@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
+import { FieldPolicy, FieldReadFunction, TypePolicies, TypePolicy } from '@apollo/client/cache';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -873,7 +874,8 @@ export type LoginResult = LoginSuccess | ApiLoginError;
 
 export type LoginSuccess = {
   __typename?: 'LoginSuccess';
-  accessToken?: Maybe<Scalars['JWT']>;
+  accessToken: Scalars['JWT'];
+  id: Scalars['ID'];
 };
 
 export type Mutation = {
@@ -1595,119 +1597,70 @@ export type ProvinceUpdateInput = {
 
 export type Query = {
   __typename?: 'Query';
+  catchment_district: CatchmentDistrictResult;
+  catchment_districts?: Maybe<Array<CatchmentDistrict>>;
+  catchment_province: CatchmentProvinceResult;
+  catchment_provinces?: Maybe<Array<CatchmentProvince>>;
   countries?: Maybe<Array<Country>>;
   country: CountryResult;
-  provinces?: Maybe<Array<Province>>;
-  province: ProvinceResult;
-  districts?: Maybe<Array<District>>;
+  disaggregate: DisaggregateResult;
+  disaggregate_option: DisaggregateOptionResult;
+  disaggregate_options?: Maybe<Array<DisaggregateOption>>;
+  disaggregates?: Maybe<Array<Disaggregate>>;
   district: DistrictResult;
-  organisations?: Maybe<Array<Organisation>>;
-  organisation?: Maybe<OrganisationResult>;
-  catchment_provinces?: Maybe<Array<CatchmentProvince>>;
-  catchment_province: CatchmentProvinceResult;
-  catchment_districts?: Maybe<Array<CatchmentDistrict>>;
-  catchment_district: CatchmentDistrictResult;
-  users?: Maybe<Array<User>>;
-  user: UserResult;
-  me: UserResult;
-  organisation_users?: Maybe<Array<OrganisationUser>>;
-  organisation_user: OrganisationUserResult;
-  district_users?: Maybe<Array<DistrictUser>>;
   district_user: DistrictUserResult;
-  user_invitations?: Maybe<Array<UserInvitation>>;
-  user_invitation?: Maybe<UserInvitation>;
+  district_users?: Maybe<Array<DistrictUser>>;
+  districts?: Maybe<Array<District>>;
+  indicator: IndicatorResult;
+  indicator_disaggregate: IndicatorDisaggregateResult;
+  indicator_disaggregate_report: IndicatorDisaggregateReportResult;
+  indicator_disaggregate_reports?: Maybe<Array<IndicatorDisaggregateReport>>;
+  indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
+  indicator_unit: IndicatorUnitResult;
+  indicator_units?: Maybe<Array<IndicatorUnit>>;
+  indicators?: Maybe<Array<Indicator>>;
+  isLoggedIn: Scalars['Boolean'];
+  me: UserResult;
+  option: OptionResult;
+  options?: Maybe<Array<Option>>;
+  organisation?: Maybe<OrganisationResult>;
+  organisation_indicator: OrganisationIndicatorResult;
+  organisation_indicators?: Maybe<Array<OrganisationIndicator>>;
+  organisation_report_template: OrganisationReportTemplateResult;
+  organisation_report_templates?: Maybe<Array<OrganisationReportTemplate>>;
+  organisation_user: OrganisationUserResult;
+  organisation_users?: Maybe<Array<OrganisationUser>>;
+  organisations?: Maybe<Array<Organisation>>;
+  province: ProvinceResult;
+  provinces?: Maybe<Array<Province>>;
+  report: ReportResult;
+  report_template: ReportTemplateResult;
+  report_templates?: Maybe<Array<ReportTemplate>>;
+  reports?: Maybe<Array<Report>>;
   residence: ResidenceResult;
   residences?: Maybe<Array<Residence>>;
-  service_areas?: Maybe<Array<ServiceArea>>;
   service_area: ServiceAreaResult;
-  water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
-  water_treatment_plant: WaterTreatmentPlantResult;
-  water_storage_tanks?: Maybe<Array<WaterStorageTank>>;
-  water_storage_tank: WaterStorageTank;
-  water_production_sites?: Maybe<Array<WaterProductionSite>>;
-  water_production_site?: Maybe<WaterProductionSite>;
-  water_networks?: Maybe<Array<WaterNetwork>>;
-  water_network: WaterNetworkResult;
-  service_area_water_connections?: Maybe<Array<ServiceAreaWaterConnection>>;
-  service_area_water_connection: ServiceAreaWaterConnectionResult;
-  sewer_treatment_plants?: Maybe<Array<SewerTreatmentPlant>>;
-  sewer_treatment_plant: SewerTreatmentPlantResult;
-  sewer_networks?: Maybe<Array<SewerNetwork>>;
-  sewer_network: SewerNetworkResult;
-  service_area_sewer_connections?: Maybe<Array<ServiceAreaSewerConnection>>;
   service_area_sewer_connection: ServiceAreaSewerConnectionResult;
-  disaggregate_options?: Maybe<Array<DisaggregateOption>>;
-  disaggregate_option: DisaggregateOptionResult;
-  disaggregates?: Maybe<Array<Disaggregate>>;
-  disaggregate: DisaggregateResult;
-  indicator_units?: Maybe<Array<IndicatorUnit>>;
-  indicator_unit: IndicatorUnitResult;
-  indicators?: Maybe<Array<Indicator>>;
-  indicator: IndicatorResult;
-  reports?: Maybe<Array<Report>>;
-  report: ReportResult;
-  organisation_report_templates?: Maybe<Array<OrganisationReportTemplate>>;
-  organisation_report_template: OrganisationReportTemplateResult;
-  report_templates?: Maybe<Array<ReportTemplate>>;
-  report_template: ReportTemplateResult;
-  organisation_indicators?: Maybe<Array<OrganisationIndicator>>;
-  organisation_indicator: OrganisationIndicatorResult;
-  indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
-  indicator_disaggregate: IndicatorDisaggregateResult;
-  options?: Maybe<Array<Option>>;
-  option: OptionResult;
-  indicator_disaggregate_reports?: Maybe<Array<IndicatorDisaggregateReport>>;
-  indicator_disaggregate_report: IndicatorDisaggregateReportResult;
-};
-
-
-export type QueryCountryArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryProvincesArgs = {
-  country_id: Scalars['ID'];
-};
-
-
-export type QueryProvinceArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryDistrictsArgs = {
-  province_id: Scalars['ID'];
-};
-
-
-export type QueryDistrictArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryOrganisationsArgs = {
-  country_id: Scalars['ID'];
-};
-
-
-export type QueryOrganisationArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryCatchment_ProvincesArgs = {
-  organisation_id: Scalars['ID'];
-};
-
-
-export type QueryCatchment_ProvinceArgs = {
-  catchment_province_id: Scalars['ID'];
-};
-
-
-export type QueryCatchment_DistrictsArgs = {
-  catchment_province_id: Scalars['ID'];
+  service_area_sewer_connections?: Maybe<Array<ServiceAreaSewerConnection>>;
+  service_area_water_connection: ServiceAreaWaterConnectionResult;
+  service_area_water_connections?: Maybe<Array<ServiceAreaWaterConnection>>;
+  service_areas?: Maybe<Array<ServiceArea>>;
+  sewer_network: SewerNetworkResult;
+  sewer_networks?: Maybe<Array<SewerNetwork>>;
+  sewer_treatment_plant: SewerTreatmentPlantResult;
+  sewer_treatment_plants?: Maybe<Array<SewerTreatmentPlant>>;
+  user: UserResult;
+  user_invitation?: Maybe<UserInvitation>;
+  user_invitations?: Maybe<Array<UserInvitation>>;
+  users?: Maybe<Array<User>>;
+  water_network: WaterNetworkResult;
+  water_networks?: Maybe<Array<WaterNetwork>>;
+  water_production_site?: Maybe<WaterProductionSite>;
+  water_production_sites?: Maybe<Array<WaterProductionSite>>;
+  water_storage_tank: WaterStorageTank;
+  water_storage_tanks?: Maybe<Array<WaterStorageTank>>;
+  water_treatment_plant: WaterTreatmentPlantResult;
+  water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
 };
 
 
@@ -1716,12 +1669,117 @@ export type QueryCatchment_DistrictArgs = {
 };
 
 
-export type QueryUserArgs = {
+export type QueryCatchment_DistrictsArgs = {
+  catchment_province_id: Scalars['ID'];
+};
+
+
+export type QueryCatchment_ProvinceArgs = {
+  catchment_province_id: Scalars['ID'];
+};
+
+
+export type QueryCatchment_ProvincesArgs = {
+  organisation_id: Scalars['ID'];
+};
+
+
+export type QueryCountryArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryOrganisation_UsersArgs = {
+export type QueryDisaggregateArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryDisaggregate_OptionArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryDistrictArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryDistrict_UserArgs = {
+  district_user_id: Scalars['ID'];
+};
+
+
+export type QueryDistrict_UsersArgs = {
+  catchment_district_id: Scalars['ID'];
+};
+
+
+export type QueryDistrictsArgs = {
+  province_id: Scalars['ID'];
+};
+
+
+export type QueryIndicatorArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_DisaggregateArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_Disaggregate_ReportArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_Disaggregate_ReportsArgs = {
+  report_id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_DisaggregatesArgs = {
+  organisation_indicator_id: Scalars['ID'];
+};
+
+
+export type QueryIndicator_UnitArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryIsLoggedInArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryOptionArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryOrganisationArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryOrganisation_IndicatorArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryOrganisation_IndicatorsArgs = {
+  organisation_id: Scalars['ID'];
+};
+
+
+export type QueryOrganisation_Report_TemplateArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryOrganisation_Report_TemplatesArgs = {
   organisation_id: Scalars['ID'];
 };
 
@@ -1731,22 +1789,32 @@ export type QueryOrganisation_UserArgs = {
 };
 
 
-export type QueryDistrict_UsersArgs = {
-  catchment_district_id: Scalars['ID'];
+export type QueryOrganisation_UsersArgs = {
+  organisation_id: Scalars['ID'];
 };
 
 
-export type QueryDistrict_UserArgs = {
-  district_user_id: Scalars['ID'];
+export type QueryOrganisationsArgs = {
+  country_id: Scalars['ID'];
 };
 
 
-export type QueryUser_InvitationsArgs = {
-  args: UserInvitationsArgsInput;
+export type QueryProvinceArgs = {
+  id: Scalars['ID'];
 };
 
 
-export type QueryUser_InvitationArgs = {
+export type QueryProvincesArgs = {
+  country_id: Scalars['ID'];
+};
+
+
+export type QueryReportArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryReport_TemplateArgs = {
   id: Scalars['ID'];
 };
 
@@ -1761,57 +1829,18 @@ export type QueryResidencesArgs = {
 };
 
 
-export type QueryService_AreasArgs = {
-  catchment_district_id: Scalars['ID'];
-};
-
-
 export type QueryService_AreaArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryWater_Treatment_PlantsArgs = {
-  catchment_district_id: Scalars['ID'];
+export type QueryService_Area_Sewer_ConnectionArgs = {
+  sewer_netowrk_id: Scalars['ID'];
+  service_area_id: Scalars['ID'];
 };
 
 
-export type QueryWater_Treatment_PlantArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryWater_Storage_TanksArgs = {
-  plant_id: Scalars['ID'];
-};
-
-
-export type QueryWater_Storage_TankArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryWater_Production_SitesArgs = {
-  plant_id: Scalars['ID'];
-};
-
-
-export type QueryWater_Production_SiteArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryWater_NetworksArgs = {
-  plant_id: Scalars['ID'];
-};
-
-
-export type QueryWater_NetworkArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryService_Area_Water_ConnectionsArgs = {
+export type QueryService_Area_Sewer_ConnectionsArgs = {
   service_area_id: Scalars['ID'];
 };
 
@@ -1822,12 +1851,17 @@ export type QueryService_Area_Water_ConnectionArgs = {
 };
 
 
-export type QuerySewer_Treatment_PlantsArgs = {
+export type QueryService_Area_Water_ConnectionsArgs = {
+  service_area_id: Scalars['ID'];
+};
+
+
+export type QueryService_AreasArgs = {
   catchment_district_id: Scalars['ID'];
 };
 
 
-export type QuerySewer_Treatment_PlantArgs = {
+export type QuerySewer_NetworkArgs = {
   id: Scalars['ID'];
 };
 
@@ -1837,94 +1871,68 @@ export type QuerySewer_NetworksArgs = {
 };
 
 
-export type QuerySewer_NetworkArgs = {
+export type QuerySewer_Treatment_PlantArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryService_Area_Sewer_ConnectionsArgs = {
-  service_area_id: Scalars['ID'];
+export type QuerySewer_Treatment_PlantsArgs = {
+  catchment_district_id: Scalars['ID'];
 };
 
 
-export type QueryService_Area_Sewer_ConnectionArgs = {
-  sewer_netowrk_id: Scalars['ID'];
-  service_area_id: Scalars['ID'];
-};
-
-
-export type QueryDisaggregate_OptionArgs = {
+export type QueryUserArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryDisaggregateArgs = {
+export type QueryUser_InvitationArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryIndicator_UnitArgs = {
+export type QueryUser_InvitationsArgs = {
+  args: UserInvitationsArgsInput;
+};
+
+
+export type QueryWater_NetworkArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryIndicatorArgs = {
+export type QueryWater_NetworksArgs = {
+  plant_id: Scalars['ID'];
+};
+
+
+export type QueryWater_Production_SiteArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryReportArgs = {
+export type QueryWater_Production_SitesArgs = {
+  plant_id: Scalars['ID'];
+};
+
+
+export type QueryWater_Storage_TankArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryOrganisation_Report_TemplatesArgs = {
-  organisation_id: Scalars['ID'];
+export type QueryWater_Storage_TanksArgs = {
+  plant_id: Scalars['ID'];
 };
 
 
-export type QueryOrganisation_Report_TemplateArgs = {
+export type QueryWater_Treatment_PlantArgs = {
   id: Scalars['ID'];
 };
 
 
-export type QueryReport_TemplateArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryOrganisation_IndicatorsArgs = {
-  organisation_id: Scalars['ID'];
-};
-
-
-export type QueryOrganisation_IndicatorArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryIndicator_DisaggregatesArgs = {
-  organisation_indicator_id: Scalars['ID'];
-};
-
-
-export type QueryIndicator_DisaggregateArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryOptionArgs = {
-  id: Scalars['ID'];
-};
-
-
-export type QueryIndicator_Disaggregate_ReportsArgs = {
-  report_id: Scalars['ID'];
-};
-
-
-export type QueryIndicator_Disaggregate_ReportArgs = {
-  id: Scalars['ID'];
+export type QueryWater_Treatment_PlantsArgs = {
+  catchment_district_id: Scalars['ID'];
 };
 
 export type Report = {
@@ -2431,54 +2439,54 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
-export type GetCountriesQueryVariables = Exact<{ [key: string]: never; }>;
+export type IsUserLoggedInQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
 
 
-export type GetCountriesQuery = { __typename?: 'Query', countries?: Array<{ __typename?: 'Country', id: string, name: string }> | null };
+export type IsUserLoggedInQuery = { __typename?: 'Query', isLoggedIn: boolean };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken?: any | null } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken: any, id: string } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
 
 
-export const GetCountriesDocument = gql`
-    query GetCountries {
-  countries {
-    id
-    name
-  }
+export const IsUserLoggedInDocument = gql`
+    query IsUserLoggedIn($id: ID!) {
+  isLoggedIn(id: $id) @client
 }
     `;
 
 /**
- * __useGetCountriesQuery__
+ * __useIsUserLoggedInQuery__
  *
- * To run a query within a React component, call `useGetCountriesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCountriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useIsUserLoggedInQuery` and pass it any options that fit your needs.
+ * When your component renders, `useIsUserLoggedInQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetCountriesQuery({
+ * const { data, loading, error } = useIsUserLoggedInQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function useGetCountriesQuery(baseOptions?: Apollo.QueryHookOptions<GetCountriesQuery, GetCountriesQueryVariables>) {
+export function useIsUserLoggedInQuery(baseOptions: Apollo.QueryHookOptions<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCountriesQuery, GetCountriesQueryVariables>(GetCountriesDocument, options);
+        return Apollo.useQuery<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>(IsUserLoggedInDocument, options);
       }
-export function useGetCountriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCountriesQuery, GetCountriesQueryVariables>) {
+export function useIsUserLoggedInLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCountriesQuery, GetCountriesQueryVariables>(GetCountriesDocument, options);
+          return Apollo.useLazyQuery<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>(IsUserLoggedInDocument, options);
         }
-export type GetCountriesQueryHookResult = ReturnType<typeof useGetCountriesQuery>;
-export type GetCountriesLazyQueryHookResult = ReturnType<typeof useGetCountriesLazyQuery>;
-export type GetCountriesQueryResult = Apollo.QueryResult<GetCountriesQuery, GetCountriesQueryVariables>;
+export type IsUserLoggedInQueryHookResult = ReturnType<typeof useIsUserLoggedInQuery>;
+export type IsUserLoggedInLazyQueryHookResult = ReturnType<typeof useIsUserLoggedInLazyQuery>;
+export type IsUserLoggedInQueryResult = Apollo.QueryResult<IsUserLoggedInQuery, IsUserLoggedInQueryVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -2491,6 +2499,7 @@ export const LoginDocument = gql`
     }
     ... on LoginSuccess {
       accessToken
+      id
     }
   }
 }
@@ -2521,3 +2530,937 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier)[];
+export type ApiBatchPayloadFieldPolicy = {
+	count?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiCreateErrorKeySpecifier = ('message' | 'errors' | ApiCreateErrorKeySpecifier)[];
+export type ApiCreateErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiDeleteErrorKeySpecifier = ('message' | 'errors' | ApiDeleteErrorKeySpecifier)[];
+export type ApiDeleteErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiErrorKeySpecifier = ('message' | ApiErrorKeySpecifier)[];
+export type ApiErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiLoginErrorKeySpecifier = ('message' | 'errors' | ApiLoginErrorKeySpecifier)[];
+export type ApiLoginErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiNotFoundErrorKeySpecifier = ('message' | 'errors' | ApiNotFoundErrorKeySpecifier)[];
+export type ApiNotFoundErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiOperationErrorKeySpecifier = ('message' | 'errors' | ApiOperationErrorKeySpecifier)[];
+export type ApiOperationErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiPasswordResetErrorKeySpecifier = ('message' | 'errors' | ApiPasswordResetErrorKeySpecifier)[];
+export type ApiPasswordResetErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ApiUpdateErrorKeySpecifier = ('message' | 'errors' | ApiUpdateErrorKeySpecifier)[];
+export type ApiUpdateErrorFieldPolicy = {
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	errors?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CatchmentDistrictKeySpecifier = ('id' | 'disabled' | 'district_id' | 'district' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictKeySpecifier)[];
+export type CatchmentDistrictFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	district?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_areas?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_users?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CatchmentProvinceKeySpecifier = ('id' | 'disabled' | 'province_id' | 'province' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceKeySpecifier)[];
+export type CatchmentProvinceFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	province_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	province?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CountryKeySpecifier = ('id' | 'code' | 'name' | 'flag' | 'provinces' | 'organisations' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CountryKeySpecifier)[];
+export type CountryFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	code?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	flag?: FieldPolicy<any> | FieldReadFunction<any>,
+	provinces?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisations?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateOrganisationIndicatorsSuccessKeySpecifier = ('organisation_indicators' | CreateOrganisationIndicatorsSuccessKeySpecifier)[];
+export type CreateOrganisationIndicatorsSuccessFieldPolicy = {
+	organisation_indicators?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateSewerTreatmentPlantPayloadKeySpecifier = ('sewer_treatment_plant' | CreateSewerTreatmentPlantPayloadKeySpecifier)[];
+export type CreateSewerTreatmentPlantPayloadFieldPolicy = {
+	sewer_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateUserInvitationPayloadKeySpecifier = ('user_invitation' | CreateUserInvitationPayloadKeySpecifier)[];
+export type CreateUserInvitationPayloadFieldPolicy = {
+	user_invitation?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateWaterProductionSitePayloadKeySpecifier = ('water_production_site' | CreateWaterProductionSitePayloadKeySpecifier)[];
+export type CreateWaterProductionSitePayloadFieldPolicy = {
+	water_production_site?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateWaterStorageTankPayloadKeySpecifier = ('water_storage_tank' | CreateWaterStorageTankPayloadKeySpecifier)[];
+export type CreateWaterStorageTankPayloadFieldPolicy = {
+	water_storage_tank?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CreateWaterTreatmentPlantPayloadKeySpecifier = ('water_treatment_plant' | CreateWaterTreatmentPlantPayloadKeySpecifier)[];
+export type CreateWaterTreatmentPlantPayloadFieldPolicy = {
+	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DeleteUserInvitationPayloadKeySpecifier = ('user_invitation' | DeleteUserInvitationPayloadKeySpecifier)[];
+export type DeleteUserInvitationPayloadFieldPolicy = {
+	user_invitation?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DeleteWaterProductionSitePayloadKeySpecifier = ('water_production_site' | DeleteWaterProductionSitePayloadKeySpecifier)[];
+export type DeleteWaterProductionSitePayloadFieldPolicy = {
+	water_production_site?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DeleteWaterStorageTankPayloadKeySpecifier = ('water_storage_tank' | DeleteWaterStorageTankPayloadKeySpecifier)[];
+export type DeleteWaterStorageTankPayloadFieldPolicy = {
+	water_storage_tank?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DisaggregateKeySpecifier = ('id' | 'name' | 'type' | 'disaggregate_options' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | DisaggregateKeySpecifier)[];
+export type DisaggregateFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_options?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DisaggregateOptionKeySpecifier = ('id' | 'option_id' | 'option' | 'disaggregate_id' | 'disaggregate' | 'indicator_disaggregates' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | DisaggregateOptionKeySpecifier)[];
+export type DisaggregateOptionFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	option_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	option?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregates?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DistrictKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | DistrictKeySpecifier)[];
+export type DistrictFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	code?: FieldPolicy<any> | FieldReadFunction<any>,
+	province_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	province?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type DistrictUserKeySpecifier = ('id' | 'organisation_user_id' | 'organisation_user' | 'catchment_district_id' | 'catchment_district' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | DistrictUserKeySpecifier)[];
+export type DistrictUserFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_user_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_user?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ErrorFieldKeySpecifier = ('field' | 'message' | ErrorFieldKeySpecifier)[];
+export type ErrorFieldFieldPolicy = {
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	message?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type IndicatorKeySpecifier = ('id' | 'indicator_number' | 'description' | 'category' | 'type' | 'contributing_organisation' | 'report_template_id' | 'report_template' | 'indicator_unit_id' | 'indicator_unit' | 'indicator_organisations' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | IndicatorKeySpecifier)[];
+export type IndicatorFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_number?: FieldPolicy<any> | FieldReadFunction<any>,
+	description?: FieldPolicy<any> | FieldReadFunction<any>,
+	category?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	contributing_organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_unit_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_unit?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type IndicatorDisaggregateKeySpecifier = ('id' | 'organisation_indicator_id' | 'organisation_indicator' | 'disaggregate_option_id' | 'disaggregate_option' | 'indicator_disaggregate_reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | IndicatorDisaggregateKeySpecifier)[];
+export type IndicatorDisaggregateFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_indicator_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_indicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_option_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_option?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate_reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type IndicatorDisaggregateReportKeySpecifier = ('id' | 'target' | 'achieved' | 'comment' | 'report_id' | 'report' | 'indicator_disaggregate_id' | 'indicator_disaggregate' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | IndicatorDisaggregateReportKeySpecifier)[];
+export type IndicatorDisaggregateReportFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	target?: FieldPolicy<any> | FieldReadFunction<any>,
+	achieved?: FieldPolicy<any> | FieldReadFunction<any>,
+	comment?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	report?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type IndicatorUnitKeySpecifier = ('id' | 'unit' | 'display_name' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | IndicatorUnitKeySpecifier)[];
+export type IndicatorUnitFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	unit?: FieldPolicy<any> | FieldReadFunction<any>,
+	display_name?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type LoginSuccessKeySpecifier = ('accessToken' | 'id' | LoginSuccessKeySpecifier)[];
+export type LoginSuccessFieldPolicy = {
+	accessToken?: FieldPolicy<any> | FieldReadFunction<any>,
+	id?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'resetPassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'deleteOrganisationUser' | 'createDistrictUser' | 'deleteDistrictUser' | 'createUserInvitation' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
+export type MutationFieldPolicy = {
+	createCountry?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteCountry?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateCountry?: FieldPolicy<any> | FieldReadFunction<any>,
+	createProvince?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteProvince?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateProvince?: FieldPolicy<any> | FieldReadFunction<any>,
+	createDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOrganisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateOrganisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteOrganisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	createCatchmentProvince?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateCatchmentProvince?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteCatchmentProvince?: FieldPolicy<any> | FieldReadFunction<any>,
+	createCatchmentDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateCatchmentDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteCatchmentDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
+	createUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	createInvitedUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	disableUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	login?: FieldPolicy<any> | FieldReadFunction<any>,
+	requestPasswordReset?: FieldPolicy<any> | FieldReadFunction<any>,
+	resetPassword?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOrganisationUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateOrganisationUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteOrganisationUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	createDistrictUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteDistrictUser?: FieldPolicy<any> | FieldReadFunction<any>,
+	createUserInvitation?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteUserInvitation?: FieldPolicy<any> | FieldReadFunction<any>,
+	createResidence?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateResidence?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteResidence?: FieldPolicy<any> | FieldReadFunction<any>,
+	createServiceArea?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteServiceArea?: FieldPolicy<any> | FieldReadFunction<any>,
+	createWaterTreatmentPlant?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateWaterTreatmentPlant?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteWaterTreatmentPlants?: FieldPolicy<any> | FieldReadFunction<any>,
+	createWaterStorageTank?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateWaterStorageTank?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteWaterStorageTank?: FieldPolicy<any> | FieldReadFunction<any>,
+	createWaterProductionSite?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateWaterProductionSite?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteWaterProductionSite?: FieldPolicy<any> | FieldReadFunction<any>,
+	createWaterNetwork?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateWaterNetwork?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteWaterNetwork?: FieldPolicy<any> | FieldReadFunction<any>,
+	createServiceAreaWaterConnection?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateServiceAreaWaterConnection?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteServiceAreaWaterConnection?: FieldPolicy<any> | FieldReadFunction<any>,
+	createSewerTreatmentPlant?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateSewerTreatmentPlant?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteSewerTreatmentPlants?: FieldPolicy<any> | FieldReadFunction<any>,
+	createSewerNetwork?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateSewerNetwork?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteSewerNetwork?: FieldPolicy<any> | FieldReadFunction<any>,
+	createServiceAreaSewerConnection?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateServiceAreaSewerConnection?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteServiceAreaSewerConnection?: FieldPolicy<any> | FieldReadFunction<any>,
+	createDisaggregateOption?: FieldPolicy<any> | FieldReadFunction<any>,
+	createDisaggregateOptions?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteDisaggregateOption?: FieldPolicy<any> | FieldReadFunction<any>,
+	createDisaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createDisaggregateWithOptions?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateDisaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteDisaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createIndicatorUnit?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateIndicatorUnit?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteIndicatorUnit?: FieldPolicy<any> | FieldReadFunction<any>,
+	createIndicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateIndicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteIndicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	createReport?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateReport?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteReport?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOrganisationReportTemplate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOrganisationReportTemplates?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteOrganisationReportTemplate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createReportTemplate?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateReportTemplate?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteReportTemplate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOrganisationIndicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOrganisationIndicators?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteOrganisationIndicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	createIndicatorDisaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createIndicatorDisaggregates?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteIndicatorDisaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	createOption?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateOption?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteOption?: FieldPolicy<any> | FieldReadFunction<any>,
+	createIndicatorDisaggregateReport?: FieldPolicy<any> | FieldReadFunction<any>,
+	updateIndicatorDisaggregateReport?: FieldPolicy<any> | FieldReadFunction<any>,
+	deleteIndicatorDisaggregateReport?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OptionKeySpecifier = ('id' | 'option_name' | 'disaggregate_options' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OptionKeySpecifier)[];
+export type OptionFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	option_name?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_options?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OrganisationKeySpecifier = ('id' | 'name' | 'logo' | 'country_id' | 'country' | 'catchment_provinces' | 'users' | 'organisation_report_templates' | 'organisation_indicators' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationKeySpecifier)[];
+export type OrganisationFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	logo?: FieldPolicy<any> | FieldReadFunction<any>,
+	country_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	country?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_provinces?: FieldPolicy<any> | FieldReadFunction<any>,
+	users?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_templates?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_indicators?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OrganisationIndicatorKeySpecifier = ('id' | 'indicator_id' | 'indicator' | 'organisation_id' | 'organisation' | 'indicator_disaggregates' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationIndicatorKeySpecifier)[];
+export type OrganisationIndicatorFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregates?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OrganisationReportTemplateKeySpecifier = ('id' | 'report_template_id' | 'report_template' | 'organisation_id' | 'organisation' | 'reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationReportTemplateKeySpecifier)[];
+export type OrganisationReportTemplateFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OrganisationUserKeySpecifier = ('id' | 'is_owner' | 'user_id' | 'user' | 'organisation_id' | 'organisation' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationUserKeySpecifier)[];
+export type OrganisationUserFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	is_owner?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	user?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type PasswordResetRequestPayloadKeySpecifier = ('hashed_password_reset_token' | PasswordResetRequestPayloadKeySpecifier)[];
+export type PasswordResetRequestPayloadFieldPolicy = {
+	hashed_password_reset_token?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ProvinceKeySpecifier = ('id' | 'code' | 'name' | 'country_id' | 'country' | 'districts' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ProvinceKeySpecifier)[];
+export type ProvinceFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	code?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	country_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	country?: FieldPolicy<any> | FieldReadFunction<any>,
+	districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type QueryKeySpecifier = ('catchment_district' | 'catchment_districts' | 'catchment_province' | 'catchment_provinces' | 'countries' | 'country' | 'disaggregate' | 'disaggregate_option' | 'disaggregate_options' | 'disaggregates' | 'district' | 'district_user' | 'district_users' | 'districts' | 'indicator' | 'indicator_disaggregate' | 'indicator_disaggregate_report' | 'indicator_disaggregate_reports' | 'indicator_disaggregates' | 'indicator_unit' | 'indicator_units' | 'indicators' | 'isLoggedIn' | 'me' | 'option' | 'options' | 'organisation' | 'organisation_indicator' | 'organisation_indicators' | 'organisation_report_template' | 'organisation_report_templates' | 'organisation_user' | 'organisation_users' | 'organisations' | 'province' | 'provinces' | 'report' | 'report_template' | 'report_templates' | 'reports' | 'residence' | 'residences' | 'service_area' | 'service_area_sewer_connection' | 'service_area_sewer_connections' | 'service_area_water_connection' | 'service_area_water_connections' | 'service_areas' | 'sewer_network' | 'sewer_networks' | 'sewer_treatment_plant' | 'sewer_treatment_plants' | 'user' | 'user_invitation' | 'user_invitations' | 'users' | 'water_network' | 'water_networks' | 'water_production_site' | 'water_production_sites' | 'water_storage_tank' | 'water_storage_tanks' | 'water_treatment_plant' | 'water_treatment_plants' | QueryKeySpecifier)[];
+export type QueryFieldPolicy = {
+	catchment_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_provinces?: FieldPolicy<any> | FieldReadFunction<any>,
+	countries?: FieldPolicy<any> | FieldReadFunction<any>,
+	country?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_option?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregate_options?: FieldPolicy<any> | FieldReadFunction<any>,
+	disaggregates?: FieldPolicy<any> | FieldReadFunction<any>,
+	district?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_user?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_users?: FieldPolicy<any> | FieldReadFunction<any>,
+	districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate_report?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate_reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregates?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_unit?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_units?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicators?: FieldPolicy<any> | FieldReadFunction<any>,
+	isLoggedIn?: FieldPolicy<any> | FieldReadFunction<any>,
+	me?: FieldPolicy<any> | FieldReadFunction<any>,
+	option?: FieldPolicy<any> | FieldReadFunction<any>,
+	options?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_indicator?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_indicators?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_templates?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_user?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_users?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisations?: FieldPolicy<any> | FieldReadFunction<any>,
+	province?: FieldPolicy<any> | FieldReadFunction<any>,
+	provinces?: FieldPolicy<any> | FieldReadFunction<any>,
+	report?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_templates?: FieldPolicy<any> | FieldReadFunction<any>,
+	reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	residence?: FieldPolicy<any> | FieldReadFunction<any>,
+	residences?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_sewer_connection?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_sewer_connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_water_connection?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_water_connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_areas?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_network?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_networks?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
+	user?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_invitation?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_invitations?: FieldPolicy<any> | FieldReadFunction<any>,
+	users?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_network?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_networks?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_production_site?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_production_sites?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_storage_tank?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_storage_tanks?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ReportKeySpecifier = ('id' | 'reporting_period' | 'reporting_period_start_date' | 'reporting_period_end_date' | 'report_due_date' | 'reporting_date' | 'organisation_report_template_id' | 'organisation_report_template' | 'catchment_district_id' | 'catchment_district' | 'indicator_disaggregate_reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ReportKeySpecifier)[];
+export type ReportFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	reporting_period?: FieldPolicy<any> | FieldReadFunction<any>,
+	reporting_period_start_date?: FieldPolicy<any> | FieldReadFunction<any>,
+	reporting_period_end_date?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_due_date?: FieldPolicy<any> | FieldReadFunction<any>,
+	reporting_date?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_template_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregate_reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ReportTemplateKeySpecifier = ('id' | 'name' | 'type' | 'frequency' | 'window' | 'indicators' | 'organisation_report_templates' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ReportTemplateKeySpecifier)[];
+export type ReportTemplateFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	frequency?: FieldPolicy<any> | FieldReadFunction<any>,
+	window?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicators?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_templates?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ResidenceKeySpecifier = ('id' | 'name' | 'cost_classification' | 'district_id' | 'district' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ResidenceKeySpecifier)[];
+export type ResidenceFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	cost_classification?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	district?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_areas?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ServiceAreaKeySpecifier = ('id' | 'residence_id' | 'residence' | 'catchment_district_id' | 'catchment_district' | 'service_area_water_connections' | 'service_area_sewer_connections' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ServiceAreaKeySpecifier)[];
+export type ServiceAreaFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	residence_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	residence?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_water_connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_sewer_connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ServiceAreaSewerConnectionKeySpecifier = ('connections' | 'sewer_netowrk_id' | 'sewer_network' | 'service_area_id' | 'service_area' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ServiceAreaSewerConnectionKeySpecifier)[];
+export type ServiceAreaSewerConnectionFieldPolicy = {
+	connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_netowrk_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_network?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type ServiceAreaWaterConnectionKeySpecifier = ('connections' | 'water_netowrk_id' | 'water_network' | 'service_area_id' | 'service_area' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ServiceAreaWaterConnectionKeySpecifier)[];
+export type ServiceAreaWaterConnectionFieldPolicy = {
+	connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_netowrk_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_network?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_area?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type SewerNetworkKeySpecifier = ('id' | 'name' | 'plant_id' | 'sewer_treatment_plant' | 'type' | 'sewer_network_sewer_connections' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | SewerNetworkKeySpecifier)[];
+export type SewerNetworkFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	plant_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_network_sewer_connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type SewerTreatmentPlantKeySpecifier = ('id' | 'name' | 'ponds' | 'capacity' | 'gps' | 'catchment_district_id' | 'catchment_district' | 'sewer_network' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | SewerTreatmentPlantKeySpecifier)[];
+export type SewerTreatmentPlantFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	ponds?: FieldPolicy<any> | FieldReadFunction<any>,
+	capacity?: FieldPolicy<any> | FieldReadFunction<any>,
+	gps?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_network?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UpdateSewerTreatmentPlantPayloadKeySpecifier = ('sewer_treatment_plant' | UpdateSewerTreatmentPlantPayloadKeySpecifier)[];
+export type UpdateSewerTreatmentPlantPayloadFieldPolicy = {
+	sewer_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UpdateWaterProductionSitePayloadKeySpecifier = ('water_production_site' | UpdateWaterProductionSitePayloadKeySpecifier)[];
+export type UpdateWaterProductionSitePayloadFieldPolicy = {
+	water_production_site?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UpdateWaterStorageTankPayloadKeySpecifier = ('water_storage_tank' | UpdateWaterStorageTankPayloadKeySpecifier)[];
+export type UpdateWaterStorageTankPayloadFieldPolicy = {
+	water_storage_tank?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UpdateWaterTreatmentPlantPayloadKeySpecifier = ('water_treatment_plant' | UpdateWaterTreatmentPlantPayloadKeySpecifier)[];
+export type UpdateWaterTreatmentPlantPayloadFieldPolicy = {
+	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UserKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'user_organisations' | 'user_roles' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserKeySpecifier)[];
+export type UserFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	first_name?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_name?: FieldPolicy<any> | FieldReadFunction<any>,
+	email?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_roles?: FieldPolicy<any> | FieldReadFunction<any>,
+	hashed_confirmation_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	confirmed_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	hashed_password_reset_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_login?: FieldPolicy<any> | FieldReadFunction<any>,
+	theme?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
+export type UserInvitationFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	ttl?: FieldPolicy<any> | FieldReadFunction<any>,
+	email?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_ids?: FieldPolicy<any> | FieldReadFunction<any>,
+	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type WaterNetworkKeySpecifier = ('id' | 'name' | 'plant_id' | 'water_treatment_plant' | 'type' | 'water_network_water_connections' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | WaterNetworkKeySpecifier)[];
+export type WaterNetworkFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	plant_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_network_water_connections?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type WaterProductionSiteKeySpecifier = ('id' | 'name' | 'static_suction_head' | 'static_discharge_head' | 'gps' | 'type' | 'plant_id' | 'water_treatment_plant' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | WaterProductionSiteKeySpecifier)[];
+export type WaterProductionSiteFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	static_suction_head?: FieldPolicy<any> | FieldReadFunction<any>,
+	static_discharge_head?: FieldPolicy<any> | FieldReadFunction<any>,
+	gps?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	plant_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type WaterStorageTankKeySpecifier = ('id' | 'name' | 'type' | 'storage_capacity' | 'gps' | 'plant_id' | 'water_treatment_plant' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | WaterStorageTankKeySpecifier)[];
+export type WaterStorageTankFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	storage_capacity?: FieldPolicy<any> | FieldReadFunction<any>,
+	gps?: FieldPolicy<any> | FieldReadFunction<any>,
+	plant_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type WaterTreatmentPlantKeySpecifier = ('id' | 'name' | 'water_source' | 'production_capacity' | 'gps' | 'catchment_district_id' | 'catchment_district' | 'water_production_sites' | 'water_storage_tanks' | 'water_network' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | WaterTreatmentPlantKeySpecifier)[];
+export type WaterTreatmentPlantFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_source?: FieldPolicy<any> | FieldReadFunction<any>,
+	production_capacity?: FieldPolicy<any> | FieldReadFunction<any>,
+	gps?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_production_sites?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_storage_tanks?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_network?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type StrictTypedTypePolicies = {
+	ApiBatchPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiBatchPayloadKeySpecifier | (() => undefined | ApiBatchPayloadKeySpecifier),
+		fields?: ApiBatchPayloadFieldPolicy,
+	},
+	ApiCreateError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiCreateErrorKeySpecifier | (() => undefined | ApiCreateErrorKeySpecifier),
+		fields?: ApiCreateErrorFieldPolicy,
+	},
+	ApiDeleteError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiDeleteErrorKeySpecifier | (() => undefined | ApiDeleteErrorKeySpecifier),
+		fields?: ApiDeleteErrorFieldPolicy,
+	},
+	ApiError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiErrorKeySpecifier | (() => undefined | ApiErrorKeySpecifier),
+		fields?: ApiErrorFieldPolicy,
+	},
+	ApiLoginError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiLoginErrorKeySpecifier | (() => undefined | ApiLoginErrorKeySpecifier),
+		fields?: ApiLoginErrorFieldPolicy,
+	},
+	ApiNotFoundError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiNotFoundErrorKeySpecifier | (() => undefined | ApiNotFoundErrorKeySpecifier),
+		fields?: ApiNotFoundErrorFieldPolicy,
+	},
+	ApiOperationError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiOperationErrorKeySpecifier | (() => undefined | ApiOperationErrorKeySpecifier),
+		fields?: ApiOperationErrorFieldPolicy,
+	},
+	ApiPasswordResetError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiPasswordResetErrorKeySpecifier | (() => undefined | ApiPasswordResetErrorKeySpecifier),
+		fields?: ApiPasswordResetErrorFieldPolicy,
+	},
+	ApiUpdateError?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ApiUpdateErrorKeySpecifier | (() => undefined | ApiUpdateErrorKeySpecifier),
+		fields?: ApiUpdateErrorFieldPolicy,
+	},
+	CatchmentDistrict?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CatchmentDistrictKeySpecifier | (() => undefined | CatchmentDistrictKeySpecifier),
+		fields?: CatchmentDistrictFieldPolicy,
+	},
+	CatchmentProvince?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CatchmentProvinceKeySpecifier | (() => undefined | CatchmentProvinceKeySpecifier),
+		fields?: CatchmentProvinceFieldPolicy,
+	},
+	Country?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CountryKeySpecifier | (() => undefined | CountryKeySpecifier),
+		fields?: CountryFieldPolicy,
+	},
+	CreateOrganisationIndicatorsSuccess?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateOrganisationIndicatorsSuccessKeySpecifier | (() => undefined | CreateOrganisationIndicatorsSuccessKeySpecifier),
+		fields?: CreateOrganisationIndicatorsSuccessFieldPolicy,
+	},
+	CreateSewerTreatmentPlantPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateSewerTreatmentPlantPayloadKeySpecifier | (() => undefined | CreateSewerTreatmentPlantPayloadKeySpecifier),
+		fields?: CreateSewerTreatmentPlantPayloadFieldPolicy,
+	},
+	CreateUserInvitationPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateUserInvitationPayloadKeySpecifier | (() => undefined | CreateUserInvitationPayloadKeySpecifier),
+		fields?: CreateUserInvitationPayloadFieldPolicy,
+	},
+	CreateWaterProductionSitePayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateWaterProductionSitePayloadKeySpecifier | (() => undefined | CreateWaterProductionSitePayloadKeySpecifier),
+		fields?: CreateWaterProductionSitePayloadFieldPolicy,
+	},
+	CreateWaterStorageTankPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateWaterStorageTankPayloadKeySpecifier | (() => undefined | CreateWaterStorageTankPayloadKeySpecifier),
+		fields?: CreateWaterStorageTankPayloadFieldPolicy,
+	},
+	CreateWaterTreatmentPlantPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CreateWaterTreatmentPlantPayloadKeySpecifier | (() => undefined | CreateWaterTreatmentPlantPayloadKeySpecifier),
+		fields?: CreateWaterTreatmentPlantPayloadFieldPolicy,
+	},
+	DeleteUserInvitationPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DeleteUserInvitationPayloadKeySpecifier | (() => undefined | DeleteUserInvitationPayloadKeySpecifier),
+		fields?: DeleteUserInvitationPayloadFieldPolicy,
+	},
+	DeleteWaterProductionSitePayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DeleteWaterProductionSitePayloadKeySpecifier | (() => undefined | DeleteWaterProductionSitePayloadKeySpecifier),
+		fields?: DeleteWaterProductionSitePayloadFieldPolicy,
+	},
+	DeleteWaterStorageTankPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DeleteWaterStorageTankPayloadKeySpecifier | (() => undefined | DeleteWaterStorageTankPayloadKeySpecifier),
+		fields?: DeleteWaterStorageTankPayloadFieldPolicy,
+	},
+	Disaggregate?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DisaggregateKeySpecifier | (() => undefined | DisaggregateKeySpecifier),
+		fields?: DisaggregateFieldPolicy,
+	},
+	DisaggregateOption?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DisaggregateOptionKeySpecifier | (() => undefined | DisaggregateOptionKeySpecifier),
+		fields?: DisaggregateOptionFieldPolicy,
+	},
+	District?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DistrictKeySpecifier | (() => undefined | DistrictKeySpecifier),
+		fields?: DistrictFieldPolicy,
+	},
+	DistrictUser?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | DistrictUserKeySpecifier | (() => undefined | DistrictUserKeySpecifier),
+		fields?: DistrictUserFieldPolicy,
+	},
+	ErrorField?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ErrorFieldKeySpecifier | (() => undefined | ErrorFieldKeySpecifier),
+		fields?: ErrorFieldFieldPolicy,
+	},
+	Indicator?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | IndicatorKeySpecifier | (() => undefined | IndicatorKeySpecifier),
+		fields?: IndicatorFieldPolicy,
+	},
+	IndicatorDisaggregate?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | IndicatorDisaggregateKeySpecifier | (() => undefined | IndicatorDisaggregateKeySpecifier),
+		fields?: IndicatorDisaggregateFieldPolicy,
+	},
+	IndicatorDisaggregateReport?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | IndicatorDisaggregateReportKeySpecifier | (() => undefined | IndicatorDisaggregateReportKeySpecifier),
+		fields?: IndicatorDisaggregateReportFieldPolicy,
+	},
+	IndicatorUnit?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | IndicatorUnitKeySpecifier | (() => undefined | IndicatorUnitKeySpecifier),
+		fields?: IndicatorUnitFieldPolicy,
+	},
+	LoginSuccess?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | LoginSuccessKeySpecifier | (() => undefined | LoginSuccessKeySpecifier),
+		fields?: LoginSuccessFieldPolicy,
+	},
+	Mutation?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | MutationKeySpecifier | (() => undefined | MutationKeySpecifier),
+		fields?: MutationFieldPolicy,
+	},
+	Option?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OptionKeySpecifier | (() => undefined | OptionKeySpecifier),
+		fields?: OptionFieldPolicy,
+	},
+	Organisation?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationKeySpecifier | (() => undefined | OrganisationKeySpecifier),
+		fields?: OrganisationFieldPolicy,
+	},
+	OrganisationIndicator?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationIndicatorKeySpecifier | (() => undefined | OrganisationIndicatorKeySpecifier),
+		fields?: OrganisationIndicatorFieldPolicy,
+	},
+	OrganisationReportTemplate?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationReportTemplateKeySpecifier | (() => undefined | OrganisationReportTemplateKeySpecifier),
+		fields?: OrganisationReportTemplateFieldPolicy,
+	},
+	OrganisationUser?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationUserKeySpecifier | (() => undefined | OrganisationUserKeySpecifier),
+		fields?: OrganisationUserFieldPolicy,
+	},
+	PasswordResetRequestPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | PasswordResetRequestPayloadKeySpecifier | (() => undefined | PasswordResetRequestPayloadKeySpecifier),
+		fields?: PasswordResetRequestPayloadFieldPolicy,
+	},
+	Province?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ProvinceKeySpecifier | (() => undefined | ProvinceKeySpecifier),
+		fields?: ProvinceFieldPolicy,
+	},
+	Query?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier),
+		fields?: QueryFieldPolicy,
+	},
+	Report?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ReportKeySpecifier | (() => undefined | ReportKeySpecifier),
+		fields?: ReportFieldPolicy,
+	},
+	ReportTemplate?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ReportTemplateKeySpecifier | (() => undefined | ReportTemplateKeySpecifier),
+		fields?: ReportTemplateFieldPolicy,
+	},
+	Residence?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ResidenceKeySpecifier | (() => undefined | ResidenceKeySpecifier),
+		fields?: ResidenceFieldPolicy,
+	},
+	ServiceArea?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ServiceAreaKeySpecifier | (() => undefined | ServiceAreaKeySpecifier),
+		fields?: ServiceAreaFieldPolicy,
+	},
+	ServiceAreaSewerConnection?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ServiceAreaSewerConnectionKeySpecifier | (() => undefined | ServiceAreaSewerConnectionKeySpecifier),
+		fields?: ServiceAreaSewerConnectionFieldPolicy,
+	},
+	ServiceAreaWaterConnection?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | ServiceAreaWaterConnectionKeySpecifier | (() => undefined | ServiceAreaWaterConnectionKeySpecifier),
+		fields?: ServiceAreaWaterConnectionFieldPolicy,
+	},
+	SewerNetwork?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | SewerNetworkKeySpecifier | (() => undefined | SewerNetworkKeySpecifier),
+		fields?: SewerNetworkFieldPolicy,
+	},
+	SewerTreatmentPlant?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | SewerTreatmentPlantKeySpecifier | (() => undefined | SewerTreatmentPlantKeySpecifier),
+		fields?: SewerTreatmentPlantFieldPolicy,
+	},
+	UpdateSewerTreatmentPlantPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UpdateSewerTreatmentPlantPayloadKeySpecifier | (() => undefined | UpdateSewerTreatmentPlantPayloadKeySpecifier),
+		fields?: UpdateSewerTreatmentPlantPayloadFieldPolicy,
+	},
+	UpdateWaterProductionSitePayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UpdateWaterProductionSitePayloadKeySpecifier | (() => undefined | UpdateWaterProductionSitePayloadKeySpecifier),
+		fields?: UpdateWaterProductionSitePayloadFieldPolicy,
+	},
+	UpdateWaterStorageTankPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UpdateWaterStorageTankPayloadKeySpecifier | (() => undefined | UpdateWaterStorageTankPayloadKeySpecifier),
+		fields?: UpdateWaterStorageTankPayloadFieldPolicy,
+	},
+	UpdateWaterTreatmentPlantPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UpdateWaterTreatmentPlantPayloadKeySpecifier | (() => undefined | UpdateWaterTreatmentPlantPayloadKeySpecifier),
+		fields?: UpdateWaterTreatmentPlantPayloadFieldPolicy,
+	},
+	User?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UserKeySpecifier | (() => undefined | UserKeySpecifier),
+		fields?: UserFieldPolicy,
+	},
+	UserInvitation?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UserInvitationKeySpecifier | (() => undefined | UserInvitationKeySpecifier),
+		fields?: UserInvitationFieldPolicy,
+	},
+	WaterNetwork?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | WaterNetworkKeySpecifier | (() => undefined | WaterNetworkKeySpecifier),
+		fields?: WaterNetworkFieldPolicy,
+	},
+	WaterProductionSite?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | WaterProductionSiteKeySpecifier | (() => undefined | WaterProductionSiteKeySpecifier),
+		fields?: WaterProductionSiteFieldPolicy,
+	},
+	WaterStorageTank?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | WaterStorageTankKeySpecifier | (() => undefined | WaterStorageTankKeySpecifier),
+		fields?: WaterStorageTankFieldPolicy,
+	},
+	WaterTreatmentPlant?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | WaterTreatmentPlantKeySpecifier | (() => undefined | WaterTreatmentPlantKeySpecifier),
+		fields?: WaterTreatmentPlantFieldPolicy,
+	}
+};
+export type TypedTypePolicies = StrictTypedTypePolicies & TypePolicies;

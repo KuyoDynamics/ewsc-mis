@@ -1,26 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller } from "react-hook-form";
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { Box, Button, Container, Typography } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useReactiveVar } from "@apollo/client";
 import { useLoginMutation } from "../../../graphql/generated";
+import { setToken } from "../../utils/session";
+import { isLoggedInVar } from "../../cache";
+import FormInput from "../../components/form-input/input";
+
+const schema = Yup.object({
+  email: Yup.string()
+    .email("Must be a valid email")
+    .max(255)
+    .required("Email is required"),
+  password: Yup.string()
+    .max(255)
+    .min(8, "Password must be a minimum of 8 characters")
+    .required("Password is required"),
+});
+
+type FormInputs = {
+  email: string;
+  password: string;
+};
 
 const Login = () => {
-  const schema = Yup.object({
-    email: Yup.string()
-      .email("Must be a valid email")
-      .max(255)
-      .required("Email is required"),
-    password: Yup.string()
-      .max(255)
-      .min(8, "Password must be a minimum of 8 characters")
-      .required("Password is required"),
-  });
+  const location: any = useLocation();
 
-  type FormInputs = {
-    email: string;
-    password: string;
-  };
+  const navigate = useNavigate();
+
   const {
     handleSubmit,
     control,
@@ -31,13 +41,21 @@ const Login = () => {
     mode: "onChange",
   });
 
-  const [login, { loading, data, error }] = useLoginMutation();
-  console.log("data", data);
-  console.log("loading", loading);
-  console.log("error", error);
+  const [login, { loading }] = useLoginMutation();
+
+  const isLoggedIn = useReactiveVar(isLoggedInVar);
+
+  let from = location.state?.from?.pathname || "/";
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate(from, { replace: true });
+    }
+  }, [isLoggedIn]);
 
   const onSubmit = async (values: any) => {
-    await login({
+    login({
+      fetchPolicy: "network-only",
       variables: {
         input: {
           email: values.email,
@@ -45,11 +63,9 @@ const Login = () => {
         },
       },
       onCompleted: (result) => {
-        console.log("Chaiwa, data from server", result);
         if (result.login.__typename === "LoginSuccess") {
-          localStorage.setItem("token", result.login.accessToken);
+          setToken(result.login.accessToken);
         } else if (result.login.__typename === "ApiLoginError") {
-          console.log("Error", result);
           result.login.errors?.forEach((err) =>
             setError(err.field as "email" | "password", {
               type: "server",
@@ -58,8 +74,9 @@ const Login = () => {
           );
         }
       },
-      onError: (error) => {
-        console.log("Chaiwa, something bad happened", error);
+      onError: (err) => {
+        // throw it and let it be handled by the Error Boundary
+        console.log("Chaiwa, something bad happened", err);
       },
     });
   };
@@ -85,39 +102,24 @@ const Login = () => {
                 Sign in on the internal platform
               </Typography>
             </Box>
-            <Controller
+            <FormInput
               control={control}
               name="email"
-              render={({ field, fieldState: { isTouched, error } }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Email Address"
-                  type="email"
-                  margin="normal"
-                  variant="outlined"
-                  error={Boolean(isTouched && error)}
-                  helperText={isTouched && error?.message}
-                />
-              )}
+              fullWidth
+              label="Email Address"
+              type="email"
+              margin="normal"
+              variant="outlined"
             />
-            <Controller
+            <FormInput
               control={control}
               name="password"
-              render={({ field, fieldState: { isTouched, error } }) => (
-                <TextField
-                  {...field}
-                  error={Boolean(isTouched && error)}
-                  fullWidth
-                  helperText={isTouched && error?.message}
-                  label="Password"
-                  margin="normal"
-                  type="password"
-                  variant="outlined"
-                />
-              )}
+              fullWidth
+              label="Password"
+              margin="normal"
+              type="password"
+              variant="outlined"
             />
-
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"

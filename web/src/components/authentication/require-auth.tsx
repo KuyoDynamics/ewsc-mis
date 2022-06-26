@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useReactiveVar } from "@apollo/client";
 import { useLocation, Navigate } from "react-router-dom";
-import { useAuth } from "./auth-provider";
+import { isTokenExpired, isLoggedInVar } from "../../cache";
 
-function RequireAuth({ children }: { children: JSX.Element }) {
-  let auth = useAuth();
+function PrivateRoute({ children }: { children: JSX.Element }) {
+  const tokenExpired = isTokenExpired();
+
   let location = useLocation();
+  const isLoggedIn = useReactiveVar(isLoggedInVar);
 
-  if (!auth.user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  useEffect(() => {
+    isLoggedInVar(!tokenExpired);
+  }, [tokenExpired]);
 
-  return children;
+  return isLoggedIn && !tokenExpired ? (
+    children
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 }
 
-export { RequireAuth };
+export { PrivateRoute };

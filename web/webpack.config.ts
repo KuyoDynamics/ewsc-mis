@@ -19,7 +19,7 @@ const config: webpack.Configuration = {
     assetModuleFilename: "[name][ext]",
     clean: true,
   },
-  devtool: "inline-source-map",
+  devtool: "source-map",
   optimization: {
     splitChunks: {
       chunks: "all",

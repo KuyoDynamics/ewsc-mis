@@ -307,6 +307,7 @@ async function login(
     return {
       __typename: "LoginSuccess",
       accessToken,
+      id: user.id,
     };
   } catch (error) {
     return {

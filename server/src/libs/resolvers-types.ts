@@ -874,7 +874,8 @@ export type LoginResult = ApiLoginError | LoginSuccess;
 
 export type LoginSuccess = {
   __typename?: 'LoginSuccess';
-  accessToken?: Maybe<Scalars['JWT']>;
+  accessToken: Scalars['JWT'];
+  id: Scalars['ID'];
 };
 
 export type Mutation = {
@@ -3497,7 +3498,8 @@ export type LoginResultResolvers<ContextType = GraphQLContext, ParentType extend
 }>;
 
 export type LoginSuccessResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoginSuccess'] = ResolversParentTypes['LoginSuccess']> = ResolversObject<{
-  accessToken?: Resolver<Maybe<ResolversTypes['JWT']>, ParentType, ContextType>;
+  accessToken?: Resolver<ResolversTypes['JWT'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
