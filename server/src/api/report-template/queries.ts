@@ -52,6 +52,7 @@ async function createReportTemplate(
         name: args.input.name,
         frequency: args.input.frequency,
         window: args.input.window,
+        icon: args.input.icon,
         created_by: context.user.email,
         last_modified_by: context.user.email,
       },
@@ -76,9 +77,11 @@ async function updateReportTemplate(
         id: args.input.id,
       },
       data: {
+        name: args.input.update.name || undefined,
         type: args.input.update.type || undefined,
         frequency: args.input.update.frequency || undefined,
         window: args.input.update.window || undefined,
+        icon: args.input.update.icon || undefined,
         last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });

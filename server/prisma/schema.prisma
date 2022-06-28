@@ -179,8 +179,9 @@ model User {
 }
 
 model OrganisationUser {
-  id       String  @id @default(uuid()) @db.Uuid
-  is_owner Boolean @default(false)
+  id                      String  @id @default(uuid()) @db.Uuid
+  is_owner                Boolean @default(false)
+  is_default_organisation Boolean @default(false)
 
   // Relation Fields
   user_id String @db.Uuid
@@ -203,6 +204,8 @@ model OrganisationUser {
 
 model DistrictUser {
   id String @id @default(uuid()) @db.Uuid
+
+  is_default_user_district Boolean?
 
   // Relation Fields
   organisation_user_id String           @map("organisation_user_id") @db.Uuid
@@ -501,10 +504,11 @@ model Report {
 
 model ReportTemplate {
   id        String             @id @default(uuid()) @db.Uuid
-  name      String @unique
+  name      String             @unique
   type      IndicatorType
   frequency ReportingFrequency
   window    Int
+  icon      Bytes?
 
   // Relation Fields
   indicators                    Indicator[]
@@ -617,12 +621,12 @@ model ReportApprovalComment {
 //==============================INDICATORS================================
 
 model Indicator {
-  id                           String        @id @default(uuid()) @db.Uuid
-  indicator_number             String        @unique
-  description                  String        @unique
-  category                     String
-  type                         IndicatorType
-  contributing_organisation String     @default("nis")
+  id                        String        @id @default(uuid()) @db.Uuid
+  indicator_number          String        @unique
+  description               String        @unique
+  category                  String
+  type                      IndicatorType
+  contributing_organisation String        @default("nis")
 
   // Relation Fields
   report_template_id String         @db.Uuid
@@ -673,10 +677,10 @@ model OrganisationIndicator {
 
   indicator_disaggregates IndicatorDisaggregate[]
   // Timestamps
-  created_at             DateTime                @default(now()) @db.Timestamptz()
-  created_by             String
-  last_modified_at       DateTime                @updatedAt @db.Timestamptz()
-  last_modified_by       String
+  created_at              DateTime                @default(now()) @db.Timestamptz()
+  created_by              String
+  last_modified_at        DateTime                @updatedAt @db.Timestamptz()
+  last_modified_by        String
 
   // Constraints
   @@map("organisation_indicator")

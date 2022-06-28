@@ -4,6 +4,7 @@ import {
   DistrictUserResult,
   MutationCreateDistrictUserArgs,
   MutationDeleteDistrictUserArgs,
+  MutationSetUserDefaultDistrictArgs,
   QueryDistrict_UserArgs,
   QueryDistrict_UsersArgs,
 } from "../../libs/resolvers-types";
@@ -78,6 +79,46 @@ async function createDistrictUser(
   }
 }
 
+async function setUserDefaultDistrict(
+  args: MutationSetUserDefaultDistrictArgs,
+  context: GraphQLContext
+): Promise<DistrictUserResult> {
+  try {
+    const [_batchResult, updateResult] = await context.prisma.$transaction([
+      context.prisma.districtUser.updateMany({
+        where: {
+          organisation_user_id: args.input.organisation_user_id,
+        },
+        data: {
+          is_default_user_district: false,
+        },
+      }),
+
+      context.prisma.districtUser.update({
+        where: {
+          id: args.input.district_user_id,
+        },
+        data: {
+          is_default_user_district: true,
+        },
+      }),
+    ]);
+    return {
+      __typename: "DistrictUser",
+      ...updateResult,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update UserDistrict as Default with ${{
+        district_user_id: args.input.district_user_id,
+        organisation_user_id: args.input.organisation_user_id,
+      }}.`,
+      errors: generateClientErrors(error, "district_user_id"),
+    };
+  }
+}
+
 async function deleteDistrictUser(
   args: MutationDeleteDistrictUserArgs,
   context: GraphQLContext
@@ -107,4 +148,5 @@ export {
   deleteDistrictUser,
   getDistrictUsers,
   getDistrictUser,
+  setUserDefaultDistrict,
 };

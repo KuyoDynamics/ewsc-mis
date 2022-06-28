@@ -1,0 +1,45 @@
+query GetCurrentUser {
+  me {
+    ... on ApiNotFoundError {
+      message
+    }
+    ... on User {
+      id
+      first_name
+      last_name
+      email
+      user_roles
+      user_districts {
+        ... on District {
+          id
+          name
+          province {
+            ... on Province {
+              id
+              name
+            }
+          }
+        }
+      }
+      user_organisations {
+        id
+        is_owner
+        organisation {
+          ... on Organisation {
+            id
+            name
+            logo
+            country {
+              ... on Country {
+                id
+                code
+                name
+                flag
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

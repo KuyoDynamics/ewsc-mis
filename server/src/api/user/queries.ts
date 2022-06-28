@@ -8,6 +8,8 @@ import {
   generateClientErrors,
 } from "../../utils";
 import {
+  District,
+  DistrictResult,
   LoginResult,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
@@ -17,10 +19,10 @@ import {
   MutationRequestPasswordResetArgs,
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
-  Organisation,
   OrganisationUser,
   PasswordResetRequestResult,
   PasswordResetResult,
+  QueryDefault_User_DistrictArgs,
   QueryUserArgs,
   User,
   UserResult,
@@ -59,6 +61,102 @@ async function getUser(
     return {
       __typename: "ApiNotFoundError",
       message: `Failed to find Country with the id ${args.id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
+}
+
+async function getUserDistricts(
+  user_id: string,
+  context: GraphQLContext
+): Promise<District[]> {
+  const result = await context.prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+    select: {
+      user_organisations: {
+        select: {
+          district_users: {
+            select: {
+              catchment_district: {
+                select: {
+                  district: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  const districts = result?.user_organisations.flatMap((org_user) =>
+    org_user.district_users.flatMap(
+      (district_user) => district_user.catchment_district.district
+    )
+  );
+  return districts as District[];
+}
+
+async function getDefaultUserDistrict(
+  args: QueryDefault_User_DistrictArgs,
+  context: GraphQLContext
+): Promise<DistrictResult> {
+  try {
+    const result = await context.prisma.user.findUnique({
+      where: {
+        id: args.user_id,
+      },
+      select: {
+        user_organisations: {
+          where: {
+            id: args.organisation_user_id,
+          },
+          select: {
+            district_users: {
+              where: {
+                is_default_user_district: true,
+              },
+              select: {
+                catchment_district: {
+                  select: {
+                    district: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const district = { ...result?.user_organisations! }.flatMap((user_org) =>
+      user_org.district_users.flatMap(
+        (user_district) => user_district.catchment_district.district
+      )
+    )[0];
+
+    if (!district) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The Default District not found for organisation_user_id ${{
+          user_id: args.user_id,
+          user_organisation_id: args.organisation_user_id,
+        }}.`,
+      };
+    }
+
+    return {
+      __typename: "District",
+      ...district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find Default District for organisation_user_id ${{
+        user_id: args.user_id,
+        user_organisation_id: args.organisation_user_id,
+      }}.`,
       errors: generateClientErrors(error),
     };
   }
@@ -418,4 +516,6 @@ export {
   login,
   requestPasswordReset,
   resetPassword,
+  getUserDistricts,
+  getDefaultUserDistrict,
 };

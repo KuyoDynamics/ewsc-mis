@@ -442,6 +442,7 @@ export type CreateReportTemplateInput = {
   type: IndicatorType;
   frequency: ReportingFrequency;
   window: Scalars['Int'];
+  icon?: InputMaybe<Scalars['Byte']>;
 };
 
 export type CreateResidenceInput = {
@@ -738,6 +739,8 @@ export type District = {
   code: Scalars['String'];
   province_id: Scalars['String'];
   province?: Maybe<ProvinceResult>;
+  organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
+  residences?: Maybe<Array<Residence>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   last_modified_at: Scalars['DateTime'];
@@ -1963,6 +1966,7 @@ export type ReportTemplate = {
   type: IndicatorType;
   frequency: ReportingFrequency;
   window: Scalars['Int'];
+  icon?: Maybe<Scalars['Byte']>;
   indicators?: Maybe<Array<Indicator>>;
   organisation_report_templates?: Maybe<Array<OrganisationReportTemplate>>;
   created_at: Scalars['DateTime'];
@@ -1974,10 +1978,11 @@ export type ReportTemplate = {
 export type ReportTemplateResult = ReportTemplate | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
 
 export type ReportTemplateUpdateInput = {
-  name: Scalars['String'];
-  type: IndicatorType;
-  frequency: ReportingFrequency;
-  window: Scalars['Int'];
+  name?: InputMaybe<Scalars['String']>;
+  type?: InputMaybe<IndicatorType>;
+  frequency?: InputMaybe<ReportingFrequency>;
+  window?: InputMaybe<Scalars['Int']>;
+  icon?: InputMaybe<Scalars['Byte']>;
 };
 
 export type ReportUpdateInput = {
@@ -2439,6 +2444,16 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, user_roles: Array<UserRoleType>, user_organisations?: Array<{ __typename?: 'OrganisationUser', id: string, is_owner: boolean, organisation?: { __typename?: 'Organisation', id: string, name: string, logo?: any | null, country?: { __typename?: 'Country', id: string, code: string, name: string, flag?: any | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null }> | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetAppDataQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAppDataQuery = { __typename?: 'Query', countries?: Array<{ __typename?: 'Country', id: string, name: string, flag?: any | null, provinces?: Array<{ __typename?: 'Province', id: string, name: string, districts?: Array<{ __typename?: 'District', id: string, name: string, residences?: Array<{ __typename?: 'Residence', id: string, name: string, cost_classification: ResidenceClassification, service_areas?: Array<{ __typename?: 'ServiceArea', id: string, catchment_district_id: string }> | null }> | null }> | null }> | null, organisations?: Array<{ __typename?: 'Organisation', id: string, name: string, logo?: any | null, users?: Array<{ __typename?: 'OrganisationUser', id: string, user_id: string, is_owner: boolean }> | null, catchment_provinces?: Array<{ __typename?: 'CatchmentProvince', id: string, disabled: boolean, province_id: string, catchment_districts?: Array<{ __typename?: 'CatchmentDistrict', id: string, disabled: boolean, district_id: string }> | null }> | null, organisation_report_templates?: Array<{ __typename?: 'OrganisationReportTemplate', id: string, report_template?: { __typename?: 'ReportTemplate', id: string, indicators?: Array<{ __typename?: 'Indicator', id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null }> | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null }> | null, organisation_indicators?: Array<{ __typename?: 'OrganisationIndicator', id: string, indicator_id: string, indicator_disaggregates?: Array<{ __typename?: 'IndicatorDisaggregate', id: string, disaggregate_option?: { __typename?: 'DisaggregateOption', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null }> | null }> | null }> | null }> | null, report_templates?: Array<{ __typename?: 'ReportTemplate', id: string, name: string, type: IndicatorType, frequency: ReportingFrequency, window: number, icon?: any | null, indicators?: Array<{ __typename?: 'Indicator', id: string, indicator_number: string, description: string, category: string, type: IndicatorType, contributing_organisation: string }> | null }> | null };
+
 export type IsUserLoggedInQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -2454,6 +2469,185 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken: any, id: string } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
 
 
+export const GetCurrentUserDocument = gql`
+    query GetCurrentUser {
+  me {
+    ... on ApiNotFoundError {
+      message
+    }
+    ... on User {
+      id
+      first_name
+      last_name
+      email
+      user_roles
+      user_organisations {
+        id
+        is_owner
+        organisation {
+          ... on Organisation {
+            id
+            name
+            logo
+            country {
+              ... on Country {
+                id
+                code
+                name
+                flag
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useGetCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCurrentUserQuery(baseOptions?: Apollo.QueryHookOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, options);
+      }
+export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, options);
+        }
+export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
+export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
+export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const GetAppDataDocument = gql`
+    query GetAppData {
+  countries {
+    id
+    name
+    flag
+    provinces {
+      id
+      name
+      districts {
+        id
+        name
+        residences {
+          id
+          name
+          cost_classification
+          service_areas {
+            id
+            catchment_district_id
+          }
+        }
+      }
+    }
+    organisations {
+      id
+      name
+      logo
+      users {
+        id
+        user_id
+        is_owner
+      }
+      catchment_provinces {
+        id
+        disabled
+        province_id
+        catchment_districts {
+          id
+          disabled
+          district_id
+        }
+      }
+      organisation_report_templates {
+        id
+        report_template {
+          ... on ReportTemplate {
+            id
+            indicators {
+              id
+              indicator_unit {
+                ... on IndicatorUnit {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+      organisation_indicators {
+        id
+        indicator_id
+        indicator_disaggregates {
+          id
+          disaggregate_option {
+            ... on DisaggregateOption {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+  report_templates {
+    id
+    name
+    type
+    frequency
+    window
+    icon
+    indicators {
+      id
+      indicator_number
+      description
+      category
+      type
+      contributing_organisation
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAppDataQuery__
+ *
+ * To run a query within a React component, call `useGetAppDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAppDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAppDataQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAppDataQuery(baseOptions?: Apollo.QueryHookOptions<GetAppDataQuery, GetAppDataQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAppDataQuery, GetAppDataQueryVariables>(GetAppDataDocument, options);
+      }
+export function useGetAppDataLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAppDataQuery, GetAppDataQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAppDataQuery, GetAppDataQueryVariables>(GetAppDataDocument, options);
+        }
+export type GetAppDataQueryHookResult = ReturnType<typeof useGetAppDataQuery>;
+export type GetAppDataLazyQueryHookResult = ReturnType<typeof useGetAppDataLazyQuery>;
+export type GetAppDataQueryResult = Apollo.QueryResult<GetAppDataQuery, GetAppDataQueryVariables>;
 export const IsUserLoggedInDocument = gql`
     query IsUserLoggedIn($id: ID!) {
   isLoggedIn(id: $id) @client
@@ -2677,13 +2871,15 @@ export type DisaggregateOptionFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type DistrictKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | DistrictKeySpecifier)[];
+export type DistrictKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'organisations_in_district' | 'residences' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | DistrictKeySpecifier)[];
 export type DistrictFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	code?: FieldPolicy<any> | FieldReadFunction<any>,
 	province_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	province?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisations_in_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	residences?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3033,13 +3229,14 @@ export type ReportFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ReportTemplateKeySpecifier = ('id' | 'name' | 'type' | 'frequency' | 'window' | 'indicators' | 'organisation_report_templates' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ReportTemplateKeySpecifier)[];
+export type ReportTemplateKeySpecifier = ('id' | 'name' | 'type' | 'frequency' | 'window' | 'icon' | 'indicators' | 'organisation_report_templates' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | ReportTemplateKeySpecifier)[];
 export type ReportTemplateFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	type?: FieldPolicy<any> | FieldReadFunction<any>,
 	frequency?: FieldPolicy<any> | FieldReadFunction<any>,
 	window?: FieldPolicy<any> | FieldReadFunction<any>,
+	icon?: FieldPolicy<any> | FieldReadFunction<any>,
 	indicators?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_report_templates?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_at?: FieldPolicy<any> | FieldReadFunction<any>,

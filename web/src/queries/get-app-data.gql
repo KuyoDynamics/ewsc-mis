@@ -1,0 +1,88 @@
+query GetAppData {
+  countries {
+    id
+    name
+    flag
+    provinces {
+      id
+      name
+      districts {
+        id
+        name
+        residences {
+          id
+          name
+          cost_classification
+          service_areas {
+            id
+            catchment_district_id
+          }
+        }
+      }
+    }
+    organisations {
+      id
+      name
+      logo
+      users {
+        id
+        user_id
+        is_owner
+      }
+      catchment_provinces {
+        id
+        disabled
+        province_id
+        catchment_districts {
+          id
+          disabled
+          district_id
+        }
+      }
+      organisation_report_templates {
+        id
+        report_template {
+          ... on ReportTemplate {
+            id
+            indicators {
+              id
+              indicator_unit {
+                ... on IndicatorUnit {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+      organisation_indicators {
+        id
+        indicator_id
+        indicator_disaggregates {
+          id
+          disaggregate_option {
+            ... on DisaggregateOption {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+  report_templates {
+    id
+    name
+    type
+    frequency
+    window
+    icon
+    indicators {
+      id
+      indicator_number
+      description
+      category
+      type
+      contributing_organisation
+    }
+  }
+}

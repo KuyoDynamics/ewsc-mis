@@ -20,9 +20,14 @@ function observeTokenForExternalChanges() {
   });
 }
 
+function logout() {
+  localStorage.removeItem("token");
+  isLoggedInVar(false);
+}
+
 function setToken(token: string) {
   localStorage.setItem("token", token);
   isLoggedInVar(true);
 }
 
-export { setToken, authLink, observeTokenForExternalChanges };
+export { logout, setToken, authLink, observeTokenForExternalChanges };

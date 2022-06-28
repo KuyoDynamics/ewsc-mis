@@ -417,6 +417,8 @@ export type CreateOrganisationReportTemplatesInput = {
 };
 
 export type CreateOrganisationUserInput = {
+  is_default_organisation: Scalars['Boolean'];
+  is_owner: Scalars['Boolean'];
   organisation_id: Scalars['ID'];
   user_id: Scalars['ID'];
 };
@@ -439,6 +441,7 @@ export type CreateReportInput = {
 
 export type CreateReportTemplateInput = {
   frequency: ReportingFrequency;
+  icon?: InputMaybe<Scalars['Byte']>;
   name: Scalars['String'];
   type: IndicatorType;
   window: Scalars['Int'];
@@ -740,8 +743,10 @@ export type District = {
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   name: Scalars['String'];
+  organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
   province?: Maybe<ProvinceResult>;
   province_id: Scalars['String'];
+  residences?: Maybe<Array<Residence>>;
 };
 
 export type DistrictResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | District;
@@ -758,6 +763,7 @@ export type DistrictUser = {
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   id: Scalars['ID'];
+  is_default_user_district?: Maybe<Scalars['Boolean']>;
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   organisation_user?: Maybe<OrganisationUserResult>;
@@ -952,6 +958,8 @@ export type Mutation = {
   login: LoginResult;
   requestPasswordReset: PasswordResetRequestResult;
   resetPassword: PasswordResetResult;
+  setUserDefaultDistrict: DistrictUserResult;
+  setUserDefaultProject: OrganisationUserResult;
   updateCatchmentDistrict: CatchmentDistrictResult;
   updateCatchmentProvince: CatchmentProvinceResult;
   updateCountry: CountryResult;
@@ -1339,6 +1347,16 @@ export type MutationResetPasswordArgs = {
 };
 
 
+export type MutationSetUserDefaultDistrictArgs = {
+  input: SetUserDefaultDistrictInput;
+};
+
+
+export type MutationSetUserDefaultProjectArgs = {
+  organisation_user_id: Scalars['ID'];
+};
+
+
 export type MutationUpdateCatchmentDistrictArgs = {
   input: UpdateCatchmentDistrictInput;
 };
@@ -1541,6 +1559,7 @@ export type OrganisationUser = {
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   id: Scalars['ID'];
+  is_default_organisation: Scalars['Boolean'];
   is_owner: Scalars['Boolean'];
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
@@ -1553,7 +1572,7 @@ export type OrganisationUser = {
 export type OrganisationUserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | OrganisationUser;
 
 export type OrganisationUserUpdateInput = {
-  is_owner: Scalars['Boolean'];
+  is_owner?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type PasswordResetInput = {
@@ -1603,6 +1622,8 @@ export type Query = {
   catchment_provinces?: Maybe<Array<CatchmentProvince>>;
   countries?: Maybe<Array<Country>>;
   country: CountryResult;
+  default_user_district: DistrictResult;
+  default_user_organisation: OrganisationResult;
   disaggregate: DisaggregateResult;
   disaggregate_option: DisaggregateOptionResult;
   disaggregate_options?: Maybe<Array<DisaggregateOption>>;
@@ -1685,6 +1706,17 @@ export type QueryCatchment_ProvincesArgs = {
 
 export type QueryCountryArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryDefault_User_DistrictArgs = {
+  organisation_user_id: Scalars['ID'];
+  user_id: Scalars['ID'];
+};
+
+
+export type QueryDefault_User_OrganisationArgs = {
+  user_id: Scalars['ID'];
 };
 
 
@@ -1955,6 +1987,7 @@ export type ReportTemplate = {
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   frequency: ReportingFrequency;
+  icon?: Maybe<Scalars['Byte']>;
   id: Scalars['ID'];
   indicators?: Maybe<Array<Indicator>>;
   last_modified_at: Scalars['DateTime'];
@@ -1968,10 +2001,11 @@ export type ReportTemplate = {
 export type ReportTemplateResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | ReportTemplate;
 
 export type ReportTemplateUpdateInput = {
-  frequency: ReportingFrequency;
-  name: Scalars['String'];
-  type: IndicatorType;
-  window: Scalars['Int'];
+  frequency?: InputMaybe<ReportingFrequency>;
+  icon?: InputMaybe<Scalars['Byte']>;
+  name?: InputMaybe<Scalars['String']>;
+  type?: InputMaybe<IndicatorType>;
+  window?: InputMaybe<Scalars['Int']>;
 };
 
 export type ReportUpdateInput = {
@@ -2071,6 +2105,11 @@ export type ServiceAreaWaterConnectionResult = ApiCreateError | ApiDeleteError |
 
 export type ServiceAreaWaterConnectionUpdateInput = {
   connections: Scalars['BigInt'];
+};
+
+export type SetUserDefaultDistrictInput = {
+  district_user_id: Scalars['ID'];
+  organisation_user_id: Scalars['ID'];
 };
 
 export type SewerNetwork = {
@@ -2277,6 +2316,7 @@ export type User = {
   last_modified_by: Scalars['String'];
   last_name: Scalars['String'];
   theme?: Maybe<UserTheme>;
+  user_districts?: Maybe<Array<District>>;
   user_organisations?: Maybe<Array<OrganisationUser>>;
   user_roles: Array<UserRoleType>;
 };
@@ -2721,6 +2761,7 @@ export type ResolversTypes = ResolversObject<{
   ServiceAreaWaterConnection: ResolverTypeWrapper<Omit<ServiceAreaWaterConnection, 'service_area' | 'water_network'> & { service_area?: Maybe<ResolversTypes['ServiceAreaResult']>, water_network?: Maybe<ResolversTypes['WaterNetworkResult']> }>;
   ServiceAreaWaterConnectionResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceAreaWaterConnection'];
   ServiceAreaWaterConnectionUpdateInput: ServiceAreaWaterConnectionUpdateInput;
+  SetUserDefaultDistrictInput: SetUserDefaultDistrictInput;
   SewerNetwork: ResolverTypeWrapper<Omit<SewerNetwork, 'sewer_treatment_plant'> & { sewer_treatment_plant?: Maybe<ResolversTypes['SewerTreatmentPlantResult']> }>;
   SewerNetworkResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['SewerNetwork'];
   SewerNetworkUpdateInput: SewerNetworkUpdateInput;
@@ -3004,6 +3045,7 @@ export type ResolversParentTypes = ResolversObject<{
   ServiceAreaWaterConnection: Omit<ServiceAreaWaterConnection, 'service_area' | 'water_network'> & { service_area?: Maybe<ResolversParentTypes['ServiceAreaResult']>, water_network?: Maybe<ResolversParentTypes['WaterNetworkResult']> };
   ServiceAreaWaterConnectionResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceAreaWaterConnection'];
   ServiceAreaWaterConnectionUpdateInput: ServiceAreaWaterConnectionUpdateInput;
+  SetUserDefaultDistrictInput: SetUserDefaultDistrictInput;
   SewerNetwork: Omit<SewerNetwork, 'sewer_treatment_plant'> & { sewer_treatment_plant?: Maybe<ResolversParentTypes['SewerTreatmentPlantResult']> };
   SewerNetworkResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['SewerNetwork'];
   SewerNetworkUpdateInput: SewerNetworkUpdateInput;
@@ -3305,8 +3347,10 @@ export type DistrictResolvers<ContextType = GraphQLContext, ParentType extends R
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisations_in_district?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrict']>>, ParentType, ContextType>;
   province?: Resolver<Maybe<ResolversTypes['ProvinceResult']>, ParentType, ContextType>;
   province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  residences?: Resolver<Maybe<Array<ResolversTypes['Residence']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3320,6 +3364,7 @@ export type DistrictUserResolvers<ContextType = GraphQLContext, ParentType exten
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  is_default_user_district?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_user?: Resolver<Maybe<ResolversTypes['OrganisationUserResult']>, ParentType, ContextType>;
@@ -3588,6 +3633,8 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   login?: Resolver<ResolversTypes['LoginResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   requestPasswordReset?: Resolver<ResolversTypes['PasswordResetRequestResult'], ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
   resetPassword?: Resolver<ResolversTypes['PasswordResetResult'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'input'>>;
+  setUserDefaultDistrict?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultDistrictArgs, 'input'>>;
+  setUserDefaultProject?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultProjectArgs, 'organisation_user_id'>>;
   updateCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;
   updateCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentProvinceArgs, 'input'>>;
   updateCountry?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<MutationUpdateCountryArgs, 'input'>>;
@@ -3722,6 +3769,7 @@ export type OrganisationUserResolvers<ContextType = GraphQLContext, ParentType e
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  is_default_organisation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   is_owner?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3794,6 +3842,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   catchment_provinces?: Resolver<Maybe<Array<ResolversTypes['CatchmentProvince']>>, ParentType, ContextType, RequireFields<QueryCatchment_ProvincesArgs, 'organisation_id'>>;
   countries?: Resolver<Maybe<Array<ResolversTypes['Country']>>, ParentType, ContextType>;
   country?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<QueryCountryArgs, 'id'>>;
+  default_user_district?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<QueryDefault_User_DistrictArgs, 'organisation_user_id' | 'user_id'>>;
+  default_user_organisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<QueryDefault_User_OrganisationArgs, 'user_id'>>;
   disaggregate?: Resolver<ResolversTypes['DisaggregateResult'], ParentType, ContextType, RequireFields<QueryDisaggregateArgs, 'id'>>;
   disaggregate_option?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<QueryDisaggregate_OptionArgs, 'id'>>;
   disaggregate_options?: Resolver<Maybe<Array<ResolversTypes['DisaggregateOption']>>, ParentType, ContextType>;
@@ -3888,6 +3938,7 @@ export type ReportTemplateResolvers<ContextType = GraphQLContext, ParentType ext
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   frequency?: Resolver<ResolversTypes['ReportingFrequency'], ParentType, ContextType>;
+  icon?: Resolver<Maybe<ResolversTypes['Byte']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   indicators?: Resolver<Maybe<Array<ResolversTypes['Indicator']>>, ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -4087,6 +4138,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   last_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
+  user_districts?: Resolver<Maybe<Array<ResolversTypes['District']>>, ParentType, ContextType>;
   user_organisations?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType>;
   user_roles?: Resolver<Array<ResolversTypes['UserRoleType']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

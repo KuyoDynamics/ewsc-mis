@@ -17,6 +17,7 @@ const typeDefs = gql`
     user: UserResult
     organisation_id: String!
     organisation: OrganisationResult
+    is_default_organisation: Boolean!
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -35,14 +36,17 @@ const typeDefs = gql`
     updateOrganisationUser(
       input: UpdateOrganisationUserInput!
     ): OrganisationUserResult!
+    setUserDefaultProject(organisation_user_id: ID!): OrganisationUserResult!
     deleteOrganisationUser(
       input: DeleteOrganisationUserInput!
     ): OrganisationUserResult!
   }
 
   input CreateOrganisationUserInput {
+    is_owner: Boolean!
     user_id: ID!
     organisation_id: ID!
+    is_default_organisation: Boolean!
   }
 
   input UpdateOrganisationUserInput {
@@ -51,7 +55,7 @@ const typeDefs = gql`
   }
 
   input OrganisationUserUpdateInput {
-    is_owner: Boolean!
+    is_owner: Boolean
   }
 
   input DeleteOrganisationUserInput {

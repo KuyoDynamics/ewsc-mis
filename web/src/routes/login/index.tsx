@@ -41,7 +41,7 @@ const Login = () => {
     mode: "onChange",
   });
 
-  const [login, { loading }] = useLoginMutation();
+  const [login, { loading: logginIn }] = useLoginMutation();
 
   const isLoggedIn = useReactiveVar(isLoggedInVar);
 
@@ -123,13 +123,13 @@ const Login = () => {
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={isSubmitting || !isValid || loading}
+                disabled={isSubmitting || !isValid || logginIn}
                 fullWidth
                 size="large"
                 type="submit"
                 variant="contained"
               >
-                {loading ? "singing you in..." : "Sign In Now"}
+                {logginIn ? "singing you in..." : "Sign In"}
               </Button>
             </Box>
           </form>

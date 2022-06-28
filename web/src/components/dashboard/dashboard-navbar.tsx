@@ -10,13 +10,10 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-import {
-  Bell as BellIcon,
-  UserCircle as UserCircleIcon,
-  Users as UsersIcon,
-} from "../../icons";
+import { Bell as BellIcon } from "../../icons";
 import { theme } from "../../theme";
 import React from "react";
+import UserMenu from "../account/user-menu";
 
 const DashboardNavbarRoot = styled(AppBar)({
   backgroundColor: theme.palette.background.paper,
@@ -68,11 +65,6 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
             </IconButton>
           </Tooltip>
           <Box sx={{ flexGrow: 1 }} />
-          <Tooltip title="Contacts">
-            <IconButton sx={{ ml: 1 }}>
-              <UsersIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Notifications">
             <IconButton sx={{ ml: 1 }}>
               <Badge badgeContent={4} color="primary" variant="dot">
@@ -80,16 +72,7 @@ export const DashboardNavbar = (props: DashboardNavbarProps) => {
               </Badge>
             </IconButton>
           </Tooltip>
-          <Avatar
-            sx={{
-              height: 40,
-              width: 40,
-              ml: 1,
-            }}
-            src="/static/images/avatars/avatar_1.png"
-          >
-            <UserCircleIcon fontSize="small" />
-          </Avatar>
+          <UserMenu />
         </Toolbar>
       </DashboardNavbarRoot>
     </>

@@ -17,6 +17,7 @@ const typeDefs = gql`
     type: IndicatorType!
     frequency: ReportingFrequency!
     window: Int!
+    icon: Byte
 
     indicators: [Indicator!]
     organisation_report_templates: [OrganisationReportTemplate!]
@@ -49,6 +50,7 @@ const typeDefs = gql`
     type: IndicatorType!
     frequency: ReportingFrequency!
     window: Int!
+    icon: Byte
   }
 
   input UpdateReportTemplateInput {
@@ -57,10 +59,11 @@ const typeDefs = gql`
   }
 
   input ReportTemplateUpdateInput {
-    name: String!
-    type: IndicatorType!
-    frequency: ReportingFrequency!
-    window: Int!
+    name: String
+    type: IndicatorType
+    frequency: ReportingFrequency
+    window: Int
+    icon: Byte
   }
 
   input DeleteReportTemplateInput {
