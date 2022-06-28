@@ -230,7 +230,7 @@ model UserInvitation {
   ttl              DateTime
   email            String
   organisation_id  String   @db.Uuid
-  district_ids     String[] @db.Uuid
+  catchment_district_ids     String[] @db.Uuid
   invitation_token String   @unique
 
   @@map("user_invitation")

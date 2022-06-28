@@ -49,7 +49,7 @@ async function getUser(
     if (!user) {
       return {
         __typename: "ApiNotFoundError",
-        message: `The Country with the id ${args.id} does not exist.`,
+        message: `The User with the id ${args.id} does not exist.`,
       };
     }
 
@@ -60,7 +60,7 @@ async function getUser(
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
-      message: `Failed to find Country with the id ${args.id}.`,
+      message: `Failed to find User with the id ${args.id}.`,
       errors: generateClientErrors(error),
     };
   }
@@ -225,6 +225,25 @@ async function createInvitedUser(
     const { email, first_name, last_name, password, user_roles } =
       args.input.user_details;
     const { catchment_district_ids, organisation_id } = args.input;
+
+    const disabled_catchment_districts =
+      await context.prisma.catchmentDistrict.findMany({
+        where: {
+          AND: {
+            id: {
+              in: catchment_district_ids,
+            },
+            disabled: true,
+          },
+        },
+      });
+
+    if (disabled_catchment_districts) {
+      return {
+        __typename: "ApiCreateError",
+        message: `Failed to create User because the following catchment districts are disabled.${catchment_district_ids}`,
+      };
+    }
 
     const user_districts = catchment_district_ids.map((id) => ({
       catchment_district_id: id,

@@ -498,14 +498,9 @@ export type CreateUserInput = {
 };
 
 export type CreateUserInvitationInput = {
-  district_ids: Array<Scalars['String']>;
+  catchment_district_ids: Array<Scalars['ID']>;
   email: Scalars['String'];
-  organisation_id: Scalars['String'];
-};
-
-export type CreateUserInvitationPayload = {
-  __typename?: 'CreateUserInvitationPayload';
-  user_invitation?: Maybe<UserInvitation>;
+  organisation_id: Scalars['ID'];
 };
 
 export type CreateWaterNetworkInput = {
@@ -659,11 +654,6 @@ export type DeleteUserInput = {
 
 export type DeleteUserInvitationInput = {
   id: Scalars['String'];
-};
-
-export type DeleteUserInvitationPayload = {
-  __typename?: 'DeleteUserInvitationPayload';
-  user_invitation?: Maybe<UserInvitation>;
 };
 
 export type DeleteWaterProductionSiteInput = {
@@ -918,7 +908,7 @@ export type Mutation = {
   createSewerNetwork: SewerNetworkResult;
   createSewerTreatmentPlant: SewerTreatmentPlantResult;
   createUser: UserResult;
-  createUserInvitation?: Maybe<CreateUserInvitationPayload>;
+  createUserInvitation: UserInvitationResult;
   createWaterNetwork: WaterNetworkResult;
   createWaterProductionSite?: Maybe<CreateWaterProductionSitePayload>;
   createWaterStorageTank?: Maybe<CreateWaterStorageTankPayload>;
@@ -949,7 +939,7 @@ export type Mutation = {
   deleteSewerNetwork: SewerNetworkResult;
   deleteSewerTreatmentPlants: ApiBatchPayloadResult;
   deleteUser: UserResult;
-  deleteUserInvitation?: Maybe<DeleteUserInvitationPayload>;
+  deleteUserInvitation: UserInvitationResult;
   deleteWaterNetwork: WaterNetworkResult;
   deleteWaterProductionSite?: Maybe<DeleteWaterProductionSitePayload>;
   deleteWaterStorageTank?: Maybe<DeleteWaterStorageTankPayload>;
@@ -1569,6 +1559,15 @@ export type OrganisationUser = {
   user_id: Scalars['String'];
 };
 
+export type OrganisationUserProfile = {
+  __typename?: 'OrganisationUserProfile';
+  default_district: DistrictResult;
+  is_owner: Scalars['Boolean'];
+  organisation: OrganisationResult;
+  organisation_user_id: Scalars['ID'];
+  user: UserResult;
+};
+
 export type OrganisationUserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | OrganisationUser;
 
 export type OrganisationUserUpdateInput = {
@@ -1670,7 +1669,7 @@ export type Query = {
   sewer_treatment_plant: SewerTreatmentPlantResult;
   sewer_treatment_plants?: Maybe<Array<SewerTreatmentPlant>>;
   user: UserResult;
-  user_invitation?: Maybe<UserInvitation>;
+  user_invitation: UserInvitationResult;
   user_invitations?: Maybe<Array<UserInvitation>>;
   users?: Maybe<Array<User>>;
   water_network: WaterNetworkResult;
@@ -2327,7 +2326,7 @@ export type UserDisableInput = {
 
 export type UserInvitation = {
   __typename?: 'UserInvitation';
-  district_ids?: Maybe<Array<Scalars['String']>>;
+  catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   email: Scalars['String'];
   id: Scalars['ID'];
   invitation_token: Scalars['String'];
@@ -2335,10 +2334,12 @@ export type UserInvitation = {
   ttl: Scalars['DateTime'];
 };
 
+export type UserInvitationResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | UserInvitation;
+
 export type UserInvitationsArgsInput = {
-  district_ids?: InputMaybe<Array<Scalars['String']>>;
+  catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
   email?: InputMaybe<Scalars['String']>;
-  organisation_id?: InputMaybe<Scalars['String']>;
+  organisation_id?: InputMaybe<Scalars['ID']>;
 };
 
 export type UserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | User;
@@ -2603,7 +2604,6 @@ export type ResolversTypes = ResolversObject<{
   CreateSewerTreatmentPlantPayload: ResolverTypeWrapper<CreateSewerTreatmentPlantPayload>;
   CreateUserInput: CreateUserInput;
   CreateUserInvitationInput: CreateUserInvitationInput;
-  CreateUserInvitationPayload: ResolverTypeWrapper<CreateUserInvitationPayload>;
   CreateWaterNetworkInput: CreateWaterNetworkInput;
   CreateWaterProductionSiteInput: CreateWaterProductionSiteInput;
   CreateWaterProductionSitePayload: ResolverTypeWrapper<CreateWaterProductionSitePayload>;
@@ -2641,7 +2641,6 @@ export type ResolversTypes = ResolversObject<{
   DeleteSewerTreatmentPlantsInput: DeleteSewerTreatmentPlantsInput;
   DeleteUserInput: DeleteUserInput;
   DeleteUserInvitationInput: DeleteUserInvitationInput;
-  DeleteUserInvitationPayload: ResolverTypeWrapper<DeleteUserInvitationPayload>;
   DeleteWaterProductionSiteInput: DeleteWaterProductionSiteInput;
   DeleteWaterProductionSitePayload: ResolverTypeWrapper<DeleteWaterProductionSitePayload>;
   DeleteWaterStorageTankInput: DeleteWaterStorageTankInput;
@@ -2722,6 +2721,7 @@ export type ResolversTypes = ResolversObject<{
   OrganisationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Organisation'];
   OrganisationUpdateInput: OrganisationUpdateInput;
   OrganisationUser: ResolverTypeWrapper<Omit<OrganisationUser, 'organisation' | 'user'> & { organisation?: Maybe<ResolversTypes['OrganisationResult']>, user?: Maybe<ResolversTypes['UserResult']> }>;
+  OrganisationUserProfile: ResolverTypeWrapper<Omit<OrganisationUserProfile, 'default_district' | 'organisation' | 'user'> & { default_district: ResolversTypes['DistrictResult'], organisation: ResolversTypes['OrganisationResult'], user: ResolversTypes['UserResult'] }>;
   OrganisationUserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['OrganisationUser'];
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
   PasswordResetInput: PasswordResetInput;
@@ -2808,6 +2808,7 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>;
   UserDisableInput: UserDisableInput;
   UserInvitation: ResolverTypeWrapper<UserInvitation>;
+  UserInvitationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['UserInvitation'];
   UserInvitationsArgsInput: UserInvitationsArgsInput;
   UserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['User'];
   UserRoleType: UserRoleType;
@@ -2892,7 +2893,6 @@ export type ResolversParentTypes = ResolversObject<{
   CreateSewerTreatmentPlantPayload: CreateSewerTreatmentPlantPayload;
   CreateUserInput: CreateUserInput;
   CreateUserInvitationInput: CreateUserInvitationInput;
-  CreateUserInvitationPayload: CreateUserInvitationPayload;
   CreateWaterNetworkInput: CreateWaterNetworkInput;
   CreateWaterProductionSiteInput: CreateWaterProductionSiteInput;
   CreateWaterProductionSitePayload: CreateWaterProductionSitePayload;
@@ -2930,7 +2930,6 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteSewerTreatmentPlantsInput: DeleteSewerTreatmentPlantsInput;
   DeleteUserInput: DeleteUserInput;
   DeleteUserInvitationInput: DeleteUserInvitationInput;
-  DeleteUserInvitationPayload: DeleteUserInvitationPayload;
   DeleteWaterProductionSiteInput: DeleteWaterProductionSiteInput;
   DeleteWaterProductionSitePayload: DeleteWaterProductionSitePayload;
   DeleteWaterStorageTankInput: DeleteWaterStorageTankInput;
@@ -3008,6 +3007,7 @@ export type ResolversParentTypes = ResolversObject<{
   OrganisationResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Organisation'];
   OrganisationUpdateInput: OrganisationUpdateInput;
   OrganisationUser: Omit<OrganisationUser, 'organisation' | 'user'> & { organisation?: Maybe<ResolversParentTypes['OrganisationResult']>, user?: Maybe<ResolversParentTypes['UserResult']> };
+  OrganisationUserProfile: Omit<OrganisationUserProfile, 'default_district' | 'organisation' | 'user'> & { default_district: ResolversParentTypes['DistrictResult'], organisation: ResolversParentTypes['OrganisationResult'], user: ResolversParentTypes['UserResult'] };
   OrganisationUserResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['OrganisationUser'];
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
   PasswordResetInput: PasswordResetInput;
@@ -3092,6 +3092,7 @@ export type ResolversParentTypes = ResolversObject<{
   User: User;
   UserDisableInput: UserDisableInput;
   UserInvitation: UserInvitation;
+  UserInvitationResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['UserInvitation'];
   UserInvitationsArgsInput: UserInvitationsArgsInput;
   UserResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['User'];
   UserUpdateInput: UserUpdateInput;
@@ -3254,11 +3255,6 @@ export type CreateSewerTreatmentPlantPayloadResolvers<ContextType = GraphQLConte
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type CreateUserInvitationPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateUserInvitationPayload'] = ResolversParentTypes['CreateUserInvitationPayload']> = ResolversObject<{
-  user_invitation?: Resolver<Maybe<ResolversTypes['UserInvitation']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type CreateWaterProductionSitePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CreateWaterProductionSitePayload'] = ResolversParentTypes['CreateWaterProductionSitePayload']> = ResolversObject<{
   water_production_site?: Resolver<ResolversTypes['WaterProductionSite'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -3289,11 +3285,6 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
-
-export type DeleteUserInvitationPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DeleteUserInvitationPayload'] = ResolversParentTypes['DeleteUserInvitationPayload']> = ResolversObject<{
-  user_invitation?: Resolver<Maybe<ResolversTypes['UserInvitation']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
 
 export type DeleteWaterProductionSitePayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DeleteWaterProductionSitePayload'] = ResolversParentTypes['DeleteWaterProductionSitePayload']> = ResolversObject<{
   water_production_site?: Resolver<ResolversTypes['WaterProductionSite'], ParentType, ContextType>;
@@ -3593,7 +3584,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateSewerNetworkArgs, 'input'>>;
   createSewerTreatmentPlant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<MutationCreateSewerTreatmentPlantArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
-  createUserInvitation?: Resolver<Maybe<ResolversTypes['CreateUserInvitationPayload']>, ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
+  createUserInvitation?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
   createWaterNetwork?: Resolver<ResolversTypes['WaterNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateWaterNetworkArgs, 'input'>>;
   createWaterProductionSite?: Resolver<Maybe<ResolversTypes['CreateWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterProductionSiteArgs, 'input'>>;
   createWaterStorageTank?: Resolver<Maybe<ResolversTypes['CreateWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterStorageTankArgs, 'input'>>;
@@ -3624,7 +3615,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationDeleteSewerNetworkArgs, 'id'>>;
   deleteSewerTreatmentPlants?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationDeleteSewerTreatmentPlantsArgs, 'filter'>>;
   deleteUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'input'>>;
-  deleteUserInvitation?: Resolver<Maybe<ResolversTypes['DeleteUserInvitationPayload']>, ParentType, ContextType, RequireFields<MutationDeleteUserInvitationArgs, 'input'>>;
+  deleteUserInvitation?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationDeleteUserInvitationArgs, 'input'>>;
   deleteWaterNetwork?: Resolver<ResolversTypes['WaterNetworkResult'], ParentType, ContextType, RequireFields<MutationDeleteWaterNetworkArgs, 'id'>>;
   deleteWaterProductionSite?: Resolver<Maybe<ResolversTypes['DeleteWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationDeleteWaterProductionSiteArgs, 'input'>>;
   deleteWaterStorageTank?: Resolver<Maybe<ResolversTypes['DeleteWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationDeleteWaterStorageTankArgs, 'input'>>;
@@ -3780,6 +3771,15 @@ export type OrganisationUserResolvers<ContextType = GraphQLContext, ParentType e
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type OrganisationUserProfileResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationUserProfile'] = ResolversParentTypes['OrganisationUserProfile']> = ResolversObject<{
+  default_district?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType>;
+  is_owner?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  organisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType>;
+  organisation_user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type OrganisationUserResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationUserResult'] = ResolversParentTypes['OrganisationUserResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'OrganisationUser', ParentType, ContextType>;
 }>;
@@ -3890,7 +3890,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   sewer_treatment_plant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<QuerySewer_Treatment_PlantArgs, 'id'>>;
   sewer_treatment_plants?: Resolver<Maybe<Array<ResolversTypes['SewerTreatmentPlant']>>, ParentType, ContextType, RequireFields<QuerySewer_Treatment_PlantsArgs, 'catchment_district_id'>>;
   user?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
-  user_invitation?: Resolver<Maybe<ResolversTypes['UserInvitation']>, ParentType, ContextType, RequireFields<QueryUser_InvitationArgs, 'id'>>;
+  user_invitation?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<QueryUser_InvitationArgs, 'id'>>;
   user_invitations?: Resolver<Maybe<Array<ResolversTypes['UserInvitation']>>, ParentType, ContextType, RequireFields<QueryUser_InvitationsArgs, 'args'>>;
   users?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
   water_network?: Resolver<ResolversTypes['WaterNetworkResult'], ParentType, ContextType, RequireFields<QueryWater_NetworkArgs, 'id'>>;
@@ -4145,13 +4145,17 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
 }>;
 
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
-  district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  catchment_district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invitation_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   ttl?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserInvitationResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitationResult'] = ResolversParentTypes['UserInvitationResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'UserInvitation', ParentType, ContextType>;
 }>;
 
 export type UserResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserResult'] = ResolversParentTypes['UserResult']> = ResolversObject<{
@@ -4261,7 +4265,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   CreateOrganisationIndicatorsResult?: CreateOrganisationIndicatorsResultResolvers<ContextType>;
   CreateOrganisationIndicatorsSuccess?: CreateOrganisationIndicatorsSuccessResolvers<ContextType>;
   CreateSewerTreatmentPlantPayload?: CreateSewerTreatmentPlantPayloadResolvers<ContextType>;
-  CreateUserInvitationPayload?: CreateUserInvitationPayloadResolvers<ContextType>;
   CreateWaterProductionSitePayload?: CreateWaterProductionSitePayloadResolvers<ContextType>;
   CreateWaterStorageTankPayload?: CreateWaterStorageTankPayloadResolvers<ContextType>;
   CreateWaterTreatmentPlantPayload?: CreateWaterTreatmentPlantPayloadResolvers<ContextType>;
@@ -4269,7 +4272,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   DID?: GraphQLScalarType;
   Date?: GraphQLScalarType;
   DateTime?: GraphQLScalarType;
-  DeleteUserInvitationPayload?: DeleteUserInvitationPayloadResolvers<ContextType>;
   DeleteWaterProductionSitePayload?: DeleteWaterProductionSitePayloadResolvers<ContextType>;
   DeleteWaterStorageTankPayload?: DeleteWaterStorageTankPayloadResolvers<ContextType>;
   Disaggregate?: DisaggregateResolvers<ContextType>;
@@ -4332,6 +4334,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   OrganisationReportTemplateResult?: OrganisationReportTemplateResultResolvers<ContextType>;
   OrganisationResult?: OrganisationResultResolvers<ContextType>;
   OrganisationUser?: OrganisationUserResolvers<ContextType>;
+  OrganisationUserProfile?: OrganisationUserProfileResolvers<ContextType>;
   OrganisationUserResult?: OrganisationUserResultResolvers<ContextType>;
   PasswordResetRequestPayload?: PasswordResetRequestPayloadResolvers<ContextType>;
   PasswordResetRequestResult?: PasswordResetRequestResultResolvers<ContextType>;
@@ -4378,6 +4381,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   UpdateWaterTreatmentPlantPayload?: UpdateWaterTreatmentPlantPayloadResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserInvitation?: UserInvitationResolvers<ContextType>;
+  UserInvitationResult?: UserInvitationResultResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
   UtcOffset?: GraphQLScalarType;
   Void?: GraphQLScalarType;

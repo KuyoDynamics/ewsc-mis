@@ -13,47 +13,46 @@ const typeDefs = gql`
     ttl: DateTime!
     email: String!
     organisation_id: String!
-    district_ids: [String!]
+    catchment_district_ids: [String!]
     invitation_token: String!
   }
 
   extend type Query {
     user_invitations(args: UserInvitationsArgsInput!): [UserInvitation!]
-    user_invitation(id: ID!): UserInvitation
+    user_invitation(id: ID!): UserInvitationResult!
   }
 
   extend type Mutation {
     createUserInvitation(
       input: CreateUserInvitationInput!
-    ): CreateUserInvitationPayload
+    ): UserInvitationResult!
     deleteUserInvitation(
       input: DeleteUserInvitationInput!
-    ): DeleteUserInvitationPayload
+    ): UserInvitationResult!
   }
 
   input DeleteUserInvitationInput {
     id: String!
   }
 
-  type DeleteUserInvitationPayload {
-    user_invitation: UserInvitation
-  }
-
   input UserInvitationsArgsInput {
     email: String
-    organisation_id: String
-    district_ids: [String!]
+    organisation_id: ID
+    catchment_district_ids: [ID!]
   }
 
   input CreateUserInvitationInput {
     email: String!
-    organisation_id: String!
-    district_ids: [String!]!
+    organisation_id: ID!
+    catchment_district_ids: [ID!]!
   }
 
-  type CreateUserInvitationPayload {
-    user_invitation: UserInvitation
-  }
+  union UserInvitationResult =
+      UserInvitation
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {

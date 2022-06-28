@@ -41,11 +41,15 @@ const typeDefs = gql`
   type OrganisationUserProfile {
     organisation_user_id: ID!
     is_owner: Boolean!
-    user_id: ID!
     user: UserResult!
     organisation: OrganisationResult!
     default_district: DistrictResult!
   }
+  # NOTES and TODO:
+  # 1. Should we be able to resolve profile given a user or given a selected organisation?
+  # 2. Should the UserProfile include roles per organisation?
+  # 3. Should the UserProfile include roles per district?
+  # 4.
 
   extend type Query {
     users: [User!]
