@@ -14,7 +14,6 @@ import {
   QueryDistrict_UserArgs,
   QueryDistrict_UsersArgs,
 } from "../../libs/resolvers-types";
-import { DistrictUserRoleType } from "@prisma/client";
 
 async function getDistrictUsers(
   args: QueryDistrict_UsersArgs,

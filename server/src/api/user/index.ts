@@ -1,6 +1,5 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getDefaultUserOrganisation } from "../queries";
 import {
   createInvitedUser,
   createUser,
@@ -15,17 +14,9 @@ import {
   requestPasswordReset,
   resetPassword,
   updateUser,
-} from "./queries";
-// User View
-// has_many(:project_users, OpenFn.ProjectUser)
-// has_many(:projects, through: [:project_users, :project])
-// field(:master_support, :boolean)
+  getDefaultUserOrganisation,
+} from "../queries";
 
-// ProjectUser View
-// id: project_user.id,
-// user: render_one(project_user.user, UserView, "collaborator.json"),
-// project_id: project_user.project_id,
-// role: project_user.role
 const typeDefs = gql`
   type User {
     id: String!

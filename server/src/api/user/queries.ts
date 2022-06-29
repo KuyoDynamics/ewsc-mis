@@ -27,7 +27,6 @@ import {
   QueryUserArgs,
   User,
   UserResult,
-  // UserRoleType,
 } from "../../libs/resolvers-types";
 
 async function getUsers(context: GraphQLContext): Promise<User[]> {
@@ -214,6 +213,23 @@ async function createInvitedUser(
     const { email, first_name, last_name, password } = args.input.user_details;
     const { catchment_districts, organisation_id } = args.input;
 
+    const user_invitation = await context.prisma.userInvitation.findUnique({
+      where: {
+        id: args.input.user_invitation_id,
+      },
+    });
+
+    if (!user_invitation) {
+      return {
+        __typename: "ApiCreateError",
+        message: `Failed to create User because we do not recognise the invitation or it expited.${catchment_districts.map(
+          (item) => item.catchment_district_id
+        )}`,
+      };
+    }
+
+    const invited_by = jwt.decode(user_invitation.invitation_token);
+
     const disabled_catchment_districts =
       await context.prisma.catchmentDistrict.findMany({
         where: {
@@ -238,8 +254,8 @@ async function createInvitedUser(
     const user_districts = catchment_districts.map((item) => ({
       roles: prepareDistrictUserRolesForCreate(item.roles),
       catchment_district_id: item.catchment_district_id,
-      created_by: "system_user@kuyodynamics.com",
-      last_modified_by: "system_user@kuyodynamics.com",
+      created_by: invited_by as string,
+      last_modified_by: invited_by as string,
     }));
 
     const user = await context.prisma.user.create({
@@ -249,13 +265,13 @@ async function createInvitedUser(
         email,
         password: await encryptPassword(password),
         // master_support: false,
-        created_by: "system_user@kuyodynamics.com",
-        last_modified_by: "system_user@kuyodynamics.com",
+        created_by: invited_by as string,
+        last_modified_by: invited_by as string,
         user_organisations: {
           create: {
             organisation_id,
-            created_by: "system_user@kuyodynamics.com",
-            last_modified_by: "system_user@kuyodynamics.com",
+            created_by: invited_by as string,
+            last_modified_by: invited_by as string,
             district_users: {
               createMany: {
                 data: user_districts,
