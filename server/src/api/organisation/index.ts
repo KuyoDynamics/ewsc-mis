@@ -8,6 +8,7 @@ import {
   getCountry,
   getOrganisation,
   getOrganisations,
+  getReportsByOrganisation,
   isMasterSupportAllowed,
   updateOrganisation,
 } from "../queries";
@@ -24,6 +25,7 @@ const typeDefs = gql`
     users: [OrganisationUser!]
     organisation_report_templates: [OrganisationReportTemplate!]
     organisation_indicators: [OrganisationIndicator!]
+    reports: [Report!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -90,6 +92,8 @@ const resolvers: Resolvers = {
       getOrganisationUsers({ organisation_id: parent.id }, context),
     allow_master_support: (parent, _args, context) =>
       isMasterSupportAllowed(parent.id, context),
+    reports: (parent, _args, context) =>
+      getReportsByOrganisation(parent.id, context),
   },
 };
 

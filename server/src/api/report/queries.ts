@@ -18,6 +18,17 @@ async function getReports(context: GraphQLContext): Promise<Report[]> {
   return context.prisma.report.findMany({});
 }
 
+async function getReportsByCatchmentDistrict(
+  catchment_district_id: string,
+  context: GraphQLContext
+): Promise<Report[]> {
+  return context.prisma.report.findMany({
+    where: {
+      catchment_district_id,
+    },
+  });
+}
+
 async function getReportsByOrganisationReportTemplate(
   organisation_report_template_id: string,
   context: GraphQLContext
@@ -25,6 +36,19 @@ async function getReportsByOrganisationReportTemplate(
   return context.prisma.report.findMany({
     where: {
       organisation_report_template_id,
+    },
+  });
+}
+
+async function getReportsByOrganisation(
+  organisation_id: string,
+  context: GraphQLContext
+): Promise<Report[]> {
+  return context.prisma.report.findMany({
+    where: {
+      organisation_report_template: {
+        organisation_id,
+      },
     },
   });
 }
@@ -132,4 +156,6 @@ export {
   updateReport,
   deleteReport,
   getReportsByOrganisationReportTemplate,
+  getReportsByCatchmentDistrict,
+  getReportsByOrganisation,
 };

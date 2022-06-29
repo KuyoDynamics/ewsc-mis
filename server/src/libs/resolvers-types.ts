@@ -236,6 +236,7 @@ export type CatchmentDistrict = {
   id: Scalars['ID'];
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
+  reports?: Maybe<Array<Report>>;
   service_areas?: Maybe<Array<ServiceArea>>;
   sewer_treatment_plants?: Maybe<Array<SewerTreatmentPlant>>;
   water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
@@ -1529,6 +1530,7 @@ export type Organisation = {
   name: Scalars['String'];
   organisation_indicators?: Maybe<Array<OrganisationIndicator>>;
   organisation_report_templates?: Maybe<Array<OrganisationReportTemplate>>;
+  reports?: Maybe<Array<Report>>;
   users?: Maybe<Array<OrganisationUser>>;
 };
 
@@ -1674,6 +1676,7 @@ export type Query = {
   organisation_indicators?: Maybe<Array<OrganisationIndicator>>;
   organisation_report_template: OrganisationReportTemplateResult;
   organisation_report_templates?: Maybe<Array<OrganisationReportTemplate>>;
+  organisation_reports?: Maybe<Array<Report>>;
   organisation_user: OrganisationUserResult;
   organisation_users?: Maybe<Array<OrganisationUser>>;
   organisations?: Maybe<Array<Organisation>>;
@@ -1832,6 +1835,11 @@ export type QueryOrganisation_Report_TemplateArgs = {
 
 
 export type QueryOrganisation_Report_TemplatesArgs = {
+  organisation_id: Scalars['ID'];
+};
+
+
+export type QueryOrganisation_ReportsArgs = {
   organisation_id: Scalars['ID'];
 };
 
@@ -3218,6 +3226,7 @@ export type CatchmentDistrictResolvers<ContextType = GraphQLContext, ParentType 
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  reports?: Resolver<Maybe<Array<ResolversTypes['Report']>>, ParentType, ContextType>;
   service_areas?: Resolver<Maybe<Array<ResolversTypes['ServiceArea']>>, ParentType, ContextType>;
   sewer_treatment_plants?: Resolver<Maybe<Array<ResolversTypes['SewerTreatmentPlant']>>, ParentType, ContextType>;
   water_treatment_plants?: Resolver<Maybe<Array<ResolversTypes['WaterTreatmentPlant']>>, ParentType, ContextType>;
@@ -3743,6 +3752,7 @@ export type OrganisationResolvers<ContextType = GraphQLContext, ParentType exten
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_indicators?: Resolver<Maybe<Array<ResolversTypes['OrganisationIndicator']>>, ParentType, ContextType>;
   organisation_report_templates?: Resolver<Maybe<Array<ResolversTypes['OrganisationReportTemplate']>>, ParentType, ContextType>;
+  reports?: Resolver<Maybe<Array<ResolversTypes['Report']>>, ParentType, ContextType>;
   users?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -3892,6 +3902,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   organisation_indicators?: Resolver<Maybe<Array<ResolversTypes['OrganisationIndicator']>>, ParentType, ContextType, RequireFields<QueryOrganisation_IndicatorsArgs, 'organisation_id'>>;
   organisation_report_template?: Resolver<ResolversTypes['OrganisationReportTemplateResult'], ParentType, ContextType, RequireFields<QueryOrganisation_Report_TemplateArgs, 'id'>>;
   organisation_report_templates?: Resolver<Maybe<Array<ResolversTypes['OrganisationReportTemplate']>>, ParentType, ContextType, RequireFields<QueryOrganisation_Report_TemplatesArgs, 'organisation_id'>>;
+  organisation_reports?: Resolver<Maybe<Array<ResolversTypes['Report']>>, ParentType, ContextType, RequireFields<QueryOrganisation_ReportsArgs, 'organisation_id'>>;
   organisation_user?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<QueryOrganisation_UserArgs, 'organisation_user_id'>>;
   organisation_users?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType, RequireFields<QueryOrganisation_UsersArgs, 'organisation_id'>>;
   organisations?: Resolver<Maybe<Array<ResolversTypes['Organisation']>>, ParentType, ContextType, RequireFields<QueryOrganisationsArgs, 'country_id'>>;
