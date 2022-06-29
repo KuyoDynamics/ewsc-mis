@@ -44,7 +44,13 @@ const typeDefs = gql`
   input CreateUserInvitationInput {
     email: String!
     organisation_id: ID!
-    catchment_district_ids: [ID!]!
+    organisation_role: UserRoleType!
+    catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]!
+  }
+
+  input CreateUserInvitationCatchmentDistrictInput {
+    catchment_district_id: ID!
+    role: UserRoleType!
   }
 
   union UserInvitationResult =

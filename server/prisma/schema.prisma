@@ -164,9 +164,9 @@ model User {
   last_login                  DateTime?          @db.Timestamptz()
   theme                       UserTheme?         @default(LIGHT)
   disabled                    Boolean?           @default(false)
+  master_support              Boolean?           @default(false)
   // Relation Fields
   user_organisations          OrganisationUser[]
-  user_roles                  UserRoleType[]
 
   // Timestamps
   created_at       DateTime @default(now()) @db.Timestamptz()
@@ -179,9 +179,9 @@ model User {
 }
 
 model OrganisationUser {
-  id                      String  @id @default(uuid()) @db.Uuid
-  is_owner                Boolean @default(false)
-  is_default_organisation Boolean @default(false)
+  id                      String       @id @default(uuid()) @db.Uuid
+  role                    UserRoleType @default(USER)
+  is_default_organisation Boolean      @default(false)
 
   // Relation Fields
   user_id String @db.Uuid
@@ -205,7 +205,9 @@ model OrganisationUser {
 model DistrictUser {
   id String @id @default(uuid()) @db.Uuid
 
-  is_default_user_district Boolean?
+  is_default_user_district Boolean @default(false)
+
+  role UserRoleType @default(USER)
 
   // Relation Fields
   organisation_user_id String           @map("organisation_user_id") @db.Uuid
@@ -226,12 +228,12 @@ model DistrictUser {
 }
 
 model UserInvitation {
-  id               String   @id @db.Uuid
-  ttl              DateTime
-  email            String
-  organisation_id  String   @db.Uuid
-  catchment_district_ids     String[] @db.Uuid
-  invitation_token String   @unique
+  id                     String   @id @db.Uuid
+  ttl                    DateTime
+  email                  String
+  organisation_id        String   @db.Uuid
+  catchment_district_ids String[] @db.Uuid
+  invitation_token       String   @unique
 
   @@map("user_invitation")
 }
@@ -784,6 +786,7 @@ enum UserRoleType {
   APPROVER    @map("approver")
   DATA_ENTRY  @map("data_entry")
   USER        @map("user")
+  OWNER       @map("owner")
 
   @@map("user_role_type")
 }

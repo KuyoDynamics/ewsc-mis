@@ -13,13 +13,14 @@ async function getDistrictUsers(
   args: QueryDistrict_UsersArgs,
   context: GraphQLContext
 ): Promise<DistrictUser[]> {
-  return context.prisma.catchmentDistrict
+  const res = await context.prisma.catchmentDistrict
     .findUnique({
       where: {
         id: args.catchment_district_id,
       },
     })
     .users();
+  return res as DistrictUser[];
 }
 
 async function getDistrictUser(
@@ -43,7 +44,7 @@ async function getDistrictUser(
     return {
       __typename: "DistrictUser",
       ...district_user,
-    };
+    } as DistrictUser;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
@@ -62,6 +63,7 @@ async function createDistrictUser(
       data: {
         organisation_user_id: args.input.organisation_user_id,
         catchment_district_id: args.input.catchment_district_id,
+        role: args.input.role,
         created_by: context.user?.email,
         last_modified_by: context.user?.email,
       },
@@ -69,7 +71,7 @@ async function createDistrictUser(
     return {
       __typename: "DistrictUser",
       ...district_user,
-    };
+    } as DistrictUser;
   } catch (error) {
     return {
       __typename: "ApiCreateError",
@@ -106,7 +108,7 @@ async function setUserDefaultDistrict(
     return {
       __typename: "DistrictUser",
       ...updateResult,
-    };
+    } as DistrictUser;
   } catch (error) {
     return {
       __typename: "ApiUpdateError",
@@ -133,7 +135,7 @@ async function deleteDistrictUser(
     return {
       __typename: "DistrictUser",
       ...district_user,
-    };
+    } as DistrictUser;
   } catch (error) {
     return {
       __typename: "ApiDeleteError",

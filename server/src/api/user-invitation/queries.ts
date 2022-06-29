@@ -21,7 +21,7 @@ async function createUserInvitation(
     const invitation_data = {
       email: args.input.email,
       organisation_id: args.input.organisation_id,
-      catchment_district_ids: args.input.catchment_district_ids,
+      catchment_districts: args.input.catchment_districts,
       id,
     };
 
@@ -30,7 +30,9 @@ async function createUserInvitation(
         where: {
           AND: {
             id: {
-              in: invitation_data.catchment_district_ids,
+              in: invitation_data.catchment_districts.map(
+                (item) => item.catchment_district_id
+              ),
             },
             disabled: true,
           },
@@ -40,7 +42,9 @@ async function createUserInvitation(
     if (disabled_catchment_districts) {
       return {
         __typename: "ApiCreateError",
-        message: `Failed to create UserInvitation because the following catchment districts are disabled.${invitation_data.catchment_district_ids}`,
+        message: `Failed to create UserInvitation because the following catchment districts are disabled.${invitation_data.catchment_districts.map(
+          (item) => item.catchment_district_id
+        )}`,
       };
     }
 
@@ -51,7 +55,9 @@ async function createUserInvitation(
       process.env.JWT_SECRET!,
       {
         issuer: invitation_data.organisation_id,
-        audience: invitation_data.catchment_district_ids,
+        audience: invitation_data.catchment_districts.map(
+          (item) => item.catchment_district_id
+        ),
         subject: invitation_data.email,
         jwtid: invitation_data.id,
         expiresIn: "5 days",

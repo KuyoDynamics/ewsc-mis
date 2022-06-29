@@ -56,7 +56,7 @@ async function getUser(
     return {
       __typename: "User",
       ...user,
-    } as UserResult;
+    } as User;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
@@ -166,13 +166,14 @@ async function getUserOrganisations(
   user_id: string,
   context: GraphQLContext
 ): Promise<OrganisationUser[]> {
-  return context.prisma.user
+  const user_orgs = await context.prisma.user
     .findUnique({
       where: {
         id: user_id,
       },
     })
     .user_organisations();
+  return user_orgs as OrganisationUser[];
 }
 
 function prepareUserRolesForUpdate(new_user_roles: UserRoleType[] | undefined) {
@@ -198,7 +199,7 @@ async function createUser(
         first_name: args.input.first_name,
         last_name: args.input.last_name,
         password: await encryptPassword(args.input.password),
-        user_roles: prepareUserRolesForCreate(args.input.user_roles),
+        // master_support: args.input.m,
         created_by: context.user.email,
         last_modified_by: context.user.email,
       },
@@ -222,16 +223,15 @@ async function createInvitedUser(
   context: GraphQLContext
 ): Promise<UserResult> {
   try {
-    const { email, first_name, last_name, password, user_roles } =
-      args.input.user_details;
-    const { catchment_district_ids, organisation_id } = args.input;
+    const { email, first_name, last_name, password } = args.input.user_details;
+    const { catchment_districts, organisation_id } = args.input;
 
     const disabled_catchment_districts =
       await context.prisma.catchmentDistrict.findMany({
         where: {
           AND: {
             id: {
-              in: catchment_district_ids,
+              in: catchment_districts.map((item) => item.catchment_district_id),
             },
             disabled: true,
           },
@@ -241,12 +241,15 @@ async function createInvitedUser(
     if (disabled_catchment_districts) {
       return {
         __typename: "ApiCreateError",
-        message: `Failed to create User because the following catchment districts are disabled.${catchment_district_ids}`,
+        message: `Failed to create User because the following catchment districts are disabled.${catchment_districts.map(
+          (item) => item.catchment_district_id
+        )}`,
       };
     }
 
-    const user_districts = catchment_district_ids.map((id) => ({
-      catchment_district_id: id,
+    const user_districts = catchment_districts.map((item) => ({
+      role: item.role,
+      catchment_district_id: item.catchment_district_id,
       created_by: "system_user@kuyodynamics.com",
       last_modified_by: "system_user@kuyodynamics.com",
     }));
@@ -257,7 +260,7 @@ async function createInvitedUser(
         last_name,
         email,
         password: await encryptPassword(password),
-        user_roles: prepareUserRolesForCreate(user_roles),
+        // master_support: false,
         created_by: "system_user@kuyodynamics.com",
         last_modified_by: "system_user@kuyodynamics.com",
         user_organisations: {
@@ -302,7 +305,6 @@ async function updateUser(
         first_name: args.input.update.first_name || undefined,
         last_name: args.input.update.last_name || undefined,
         theme: args.input.update.theme || undefined,
-        user_roles: prepareUserRolesForUpdate(args.input.update.user_roles!),
         last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
@@ -396,15 +398,11 @@ async function login(
       throw new AuthenticationError("Invalid password.", { field: "password" });
 
     try {
-      accessToken = jwt.sign(
-        { roles: user.user_roles },
-        process.env.JWT_SECRET!,
-        {
-          algorithm: "HS256",
-          subject: user.id,
-          expiresIn: "1d",
-        }
-      );
+      accessToken = jwt.sign({}, process.env.JWT_SECRET!, {
+        algorithm: "HS256",
+        subject: user.id,
+        expiresIn: "1d",
+      });
     } catch (error) {
       console.log("Failed to generate access token.", error);
       // Also send to Sentry

@@ -15,13 +15,14 @@ async function getOrganisationUsers(
   args: QueryOrganisation_UsersArgs,
   context: GraphQLContext
 ): Promise<OrganisationUser[]> {
-  return context.prisma.organisation
+  const org_users = await context.prisma.organisation
     .findUnique({
       where: {
         id: args.organisation_id,
       },
     })
     .users();
+  return org_users as OrganisationUser[];
 }
 
 async function getOrganisationUser(
@@ -45,7 +46,7 @@ async function getOrganisationUser(
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
@@ -90,7 +91,7 @@ async function getDefaultUserOrganisation(
     return {
       __typename: "Organisation",
       ...user_default_organisation,
-    };
+    } as OrganisationResult;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
@@ -109,7 +110,7 @@ async function createOrganisationUser(
       data: {
         user_id: args.input.user_id,
         organisation_id: args.input.organisation_id,
-        is_owner: args.input.is_owner,
+        role: args.input.role,
         is_default_organisation: args.input.is_default_organisation,
         created_by: context.user.email,
         last_modified_by: context.user.email,
@@ -119,7 +120,7 @@ async function createOrganisationUser(
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiCreateError",
@@ -139,14 +140,14 @@ async function updateOrganisationUser(
         id: args.input.id,
       },
       data: {
-        is_owner: args.input.update.is_owner || undefined,
+        role: args.input.update.role || undefined,
         last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiUpdateError",
@@ -183,7 +184,7 @@ async function setUserDefaultOrganisation(
     return {
       __typename: "OrganisationUser",
       ...updateResult,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiUpdateError",
@@ -209,7 +210,7 @@ async function deleteOrganisationUser(
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiDeleteError",

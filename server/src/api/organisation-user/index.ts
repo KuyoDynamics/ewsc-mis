@@ -7,17 +7,17 @@ import {
   getOrganisationUsers,
   updateOrganisationUser,
   getOrganisation,
-  getUser,
+  // getUser,
 } from "../queries";
 const typeDefs = gql`
   type OrganisationUser {
     id: ID!
-    is_owner: Boolean!
     user_id: String!
     user: UserResult
     organisation_id: String!
     organisation: OrganisationResult
     is_default_organisation: Boolean!
+    role: UserRoleType!
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -43,7 +43,7 @@ const typeDefs = gql`
   }
 
   input CreateOrganisationUserInput {
-    is_owner: Boolean!
+    role: UserRoleType!
     user_id: ID!
     organisation_id: ID!
     is_default_organisation: Boolean!
@@ -55,7 +55,7 @@ const typeDefs = gql`
   }
 
   input OrganisationUserUpdateInput {
-    is_owner: Boolean
+    role: UserRoleType!
   }
 
   input DeleteOrganisationUserInput {
@@ -72,7 +72,7 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   OrganisationUser: {
-    user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
+    // user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
     organisation: (parent, _args, context) =>
       getOrganisation(parent.organisation_id, context),
   },

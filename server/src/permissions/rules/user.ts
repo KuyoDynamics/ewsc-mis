@@ -9,12 +9,13 @@ import {
 } from "../../libs/resolvers-types";
 
 function hasRole(ctx: GraphQLContext, user_role: UserRoleType): boolean {
-  return ctx.user.user_roles.some((role) => role === user_role);
+  // ctx.user.user_roles.some((role) => role === user_role);
+  return false;
 }
 
 const isValidUserInvitation = rule()(
   async (_, args: MutationCreateInvitedUserArgs, ctx: GraphQLContext) => {
-    const { catchment_district_ids, organisation_id, user_invitation_id } =
+    const { catchment_districts, organisation_id, user_invitation_id } =
       args.input;
     const { email } = args.input.user_details;
 
@@ -30,7 +31,7 @@ const isValidUserInvitation = rule()(
       }
 
       verify(userInvitation.invitation_token, process.env.JWT_SECRET!, {
-        audience: catchment_district_ids,
+        audience: catchment_districts.map((item) => item.catchment_district_id),
         issuer: organisation_id,
         subject: email,
         jwtid: user_invitation_id,

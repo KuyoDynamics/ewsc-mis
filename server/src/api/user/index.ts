@@ -16,16 +16,25 @@ import {
   resetPassword,
   updateUser,
 } from "./queries";
+// User View
+// has_many(:project_users, OpenFn.ProjectUser)
+// has_many(:projects, through: [:project_users, :project])
+// field(:master_support, :boolean)
 
+// ProjectUser View
+// id: project_user.id,
+// user: render_one(project_user.user, UserView, "collaborator.json"),
+// project_id: project_user.project_id,
+// role: project_user.role
 const typeDefs = gql`
   type User {
     id: String!
     first_name: String!
     last_name: String!
     email: String!
-    disabled: Boolean
+    disabled: Boolean!
+    master_support: Boolean!
     user_organisations: [OrganisationUser!]
-    user_roles: [UserRoleType!]!
     user_districts: [District!]
     hashed_confirmation_token: String
     confirmed_at: DateTime
@@ -40,16 +49,19 @@ const typeDefs = gql`
 
   type OrganisationUserProfile {
     organisation_user_id: ID!
-    is_owner: Boolean!
     user: UserResult!
     organisation: OrganisationResult!
     default_district: DistrictResult!
+    organisation_roles: [String!]!
+    district_roles: [String!]!
   }
   # NOTES and TODO:
   # 1. Should we be able to resolve profile given a user or given a selected organisation?
+  # -
   # 2. Should the UserProfile include roles per organisation?
+  # - Yes, organisation roles and create a view for OrganisationUser
   # 3. Should the UserProfile include roles per district?
-  # 4.
+  # 4. Yes, please
 
   extend type Query {
     users: [User!]
@@ -101,16 +113,22 @@ const typeDefs = gql`
   input CreateInvitedUserInput {
     user_invitation_id: ID!
     organisation_id: ID!
-    catchment_district_ids: [ID!]!
+    catchment_districts: [CatchmentDistrictInput!]!
     user_details: CreateUserInput!
   }
 
+  input CatchmentDistrictInput {
+    catchment_district_id: ID!
+    role: UserRoleType!
+  }
+
+  # when creating a user, we do not give them any roles until they create an organisation in which case they
+  # are given a role of owner
   input CreateUserInput {
     first_name: String!
     last_name: String!
     email: String!
     password: String!
-    user_roles: [UserRoleType!]!
   }
 
   input DeleteUserInput {
@@ -135,7 +153,6 @@ const typeDefs = gql`
     first_name: String
     last_name: String
     theme: UserTheme
-    user_roles: [UserRoleType!]
   }
 
   enum UserRoleType {
@@ -144,6 +161,7 @@ const typeDefs = gql`
     APPROVER
     DATA_ENTRY
     USER
+    OWNER
   }
 
   enum UserTheme {

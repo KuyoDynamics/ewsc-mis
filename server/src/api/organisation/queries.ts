@@ -10,13 +10,14 @@ async function getOrganisations(
   country_id: string,
   context: GraphQLContext
 ): Promise<Organisation[]> {
-  return context.prisma.country
+  const orgs = await context.prisma.country
     .findUnique({
       where: {
         id: country_id,
       },
     })
     .organisations();
+  return orgs as Organisation[];
 }
 async function getOrganisation(
   id: string,
@@ -39,7 +40,7 @@ async function getOrganisation(
     return {
       __typename: "Organisation",
       ...organisation,
-    };
+    } as OrganisationResult;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
@@ -67,13 +68,40 @@ async function createOrganisation(
     return {
       __typename: "Organisation",
       ...organisation,
-    };
+    } as OrganisationResult;
   } catch (error) {
     return {
       __typename: "ApiCreateError",
       message: `Failed to create Organisation.`,
       errors: generateClientErrors(error),
     };
+  }
+}
+
+async function isMasterSupportAllowed(
+  organisation_id: string,
+  context: GraphQLContext
+): Promise<boolean> {
+  try {
+    const org_master_support_users = await context.prisma.organisation
+      .findUnique({
+        where: {
+          id: organisation_id,
+        },
+      })
+      .users({
+        where: {
+          role: "SUPPORT",
+        },
+      });
+    if (org_master_support_users?.length <= 0) {
+      return false;
+    }
+    return true;
+  } catch (error) {
+    // Also send to Sentry
+    console.log("Error running isMasterSupportAllowed", error);
+    return false;
   }
 }
 
@@ -96,7 +124,7 @@ async function updateOrganisation(
     return {
       __typename: "Organisation",
       ...organisation,
-    };
+    } as OrganisationResult;
   } catch (error) {
     return {
       __typename: "ApiUpdateError",
@@ -120,7 +148,7 @@ async function deleteOrganisation(
     return {
       __typename: "Organisation",
       ...organisation,
-    };
+    } as OrganisationResult;
   } catch (error) {
     return {
       __typename: "ApiDeleteError",
@@ -136,4 +164,5 @@ export {
   createOrganisation,
   updateOrganisation,
   deleteOrganisation,
+  isMasterSupportAllowed,
 };
