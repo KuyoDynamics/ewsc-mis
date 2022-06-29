@@ -1,6 +1,6 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-// import { getOrganisationUser } from "../organisation-user/queries";
+import { getOrganisationUser } from "../organisation-user/queries";
 import {
   createDistrictUser,
   deleteDistrictUser,
@@ -66,11 +66,11 @@ const resolvers: Resolvers = {
     district_user: (_, args, context) => getDistrictUser(args, context),
   },
   DistrictUser: {
-    // organisation_user: (parent, _args, context) =>
-    //   getOrganisationUser(
-    //     { organisation_user_id: parent.organisation_user_id },
-    //     context
-    //   ),
+    organisation_user: (parent, _args, context) =>
+      getOrganisationUser(
+        { organisation_user_id: parent.organisation_user_id },
+        context
+      ),
     catchment_district: (parent, _args, context) =>
       getCatchmentDistrict(parent.catchment_district_id, context),
   },

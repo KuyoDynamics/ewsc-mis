@@ -509,7 +509,8 @@ export type CreateUserInvitationCatchmentDistrictInput = {
 
 export type CreateUserInvitationInput = {
   catchment_districts: Array<CreateUserInvitationCatchmentDistrictInput>;
-  email: Scalars['String'];
+  email: Scalars['EmailAddress'];
+  invited_by: Scalars['EmailAddress'];
   organisation_id: Scalars['ID'];
   organisation_role: UserRoleType;
 };
@@ -1931,7 +1932,7 @@ export type QueryUser_InvitationArgs = {
 
 
 export type QueryUser_InvitationsArgs = {
-  args: UserInvitationsArgsInput;
+  args: SearchUserInvitationsInput;
 };
 
 
@@ -2063,6 +2064,12 @@ export type ResidenceUpdateInput = {
   cost_classification?: InputMaybe<ResidenceClassification>;
   district_id?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
+};
+
+export type SearchUserInvitationsInput = {
+  catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
+  email?: InputMaybe<Scalars['EmailAddress']>;
+  organisation_id?: InputMaybe<Scalars['ID']>;
 };
 
 export type ServiceArea = {
@@ -2341,7 +2348,7 @@ export type UserDisableInput = {
 export type UserInvitation = {
   __typename?: 'UserInvitation';
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
-  email: Scalars['String'];
+  email: Scalars['EmailAddress'];
   id: Scalars['ID'];
   invitation_token: Scalars['String'];
   organisation_id: Scalars['String'];
@@ -2349,12 +2356,6 @@ export type UserInvitation = {
 };
 
 export type UserInvitationResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | UserInvitation;
-
-export type UserInvitationsArgsInput = {
-  catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
-  email?: InputMaybe<Scalars['String']>;
-  organisation_id?: InputMaybe<Scalars['ID']>;
-};
 
 export type UserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | User;
 
@@ -2769,6 +2770,7 @@ export type ResolversTypes = ResolversObject<{
   ResidenceUpdateInput: ResidenceUpdateInput;
   RoutingNumber: ResolverTypeWrapper<Scalars['RoutingNumber']>;
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']>;
+  SearchUserInvitationsInput: SearchUserInvitationsInput;
   ServiceArea: ResolverTypeWrapper<Omit<ServiceArea, 'catchment_district' | 'residence'> & { catchment_district: ResolversTypes['CatchmentDistrictResult'], residence?: Maybe<ResolversTypes['ResidenceResult']> }>;
   ServiceAreaResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceArea'];
   ServiceAreaSewerConnection: ResolverTypeWrapper<Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversTypes['SewerNetworkResult']> }>;
@@ -2825,7 +2827,6 @@ export type ResolversTypes = ResolversObject<{
   UserDisableInput: UserDisableInput;
   UserInvitation: ResolverTypeWrapper<UserInvitation>;
   UserInvitationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['UserInvitation'];
-  UserInvitationsArgsInput: UserInvitationsArgsInput;
   UserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['User'];
   UserRoleType: UserRoleType;
   UserTheme: UserTheme;
@@ -3055,6 +3056,7 @@ export type ResolversParentTypes = ResolversObject<{
   ResidenceUpdateInput: ResidenceUpdateInput;
   RoutingNumber: Scalars['RoutingNumber'];
   SafeInt: Scalars['SafeInt'];
+  SearchUserInvitationsInput: SearchUserInvitationsInput;
   ServiceArea: Omit<ServiceArea, 'catchment_district' | 'residence'> & { catchment_district: ResolversParentTypes['CatchmentDistrictResult'], residence?: Maybe<ResolversParentTypes['ResidenceResult']> };
   ServiceAreaResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceArea'];
   ServiceAreaSewerConnection: Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversParentTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversParentTypes['SewerNetworkResult']> };
@@ -3111,7 +3113,6 @@ export type ResolversParentTypes = ResolversObject<{
   UserDisableInput: UserDisableInput;
   UserInvitation: UserInvitation;
   UserInvitationResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['UserInvitation'];
-  UserInvitationsArgsInput: UserInvitationsArgsInput;
   UserResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['User'];
   UserUpdateInput: UserUpdateInput;
   UtcOffset: Scalars['UtcOffset'];
@@ -4167,7 +4168,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
 
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
   catchment_district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['EmailAddress'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invitation_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

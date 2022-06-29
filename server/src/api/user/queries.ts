@@ -199,7 +199,6 @@ async function createUser(
         first_name: args.input.first_name,
         last_name: args.input.last_name,
         password: await encryptPassword(args.input.password),
-        // master_support: args.input.m,
         created_by: context.user.email,
         last_modified_by: context.user.email,
       },

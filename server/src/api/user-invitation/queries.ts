@@ -21,6 +21,7 @@ async function createUserInvitation(
     const invitation_data = {
       email: args.input.email,
       organisation_id: args.input.organisation_id,
+      invited_by: args.input.invited_by,
       catchment_districts: args.input.catchment_districts,
       id,
     };
@@ -50,7 +51,7 @@ async function createUserInvitation(
 
     const invitation_token = jwt.sign(
       {
-        data: "user_invitation",
+        invited_by: invitation_data.invited_by,
       },
       process.env.JWT_SECRET!,
       {

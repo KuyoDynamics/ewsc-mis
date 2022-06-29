@@ -11,14 +11,14 @@ const typeDefs = gql`
   type UserInvitation {
     id: ID!
     ttl: DateTime!
-    email: String!
+    email: EmailAddress!
     organisation_id: String!
     catchment_district_ids: [String!]
     invitation_token: String!
   }
 
   extend type Query {
-    user_invitations(args: UserInvitationsArgsInput!): [UserInvitation!]
+    user_invitations(args: SearchUserInvitationsInput!): [UserInvitation!]
     user_invitation(id: ID!): UserInvitationResult!
   }
 
@@ -35,17 +35,18 @@ const typeDefs = gql`
     id: String!
   }
 
-  input UserInvitationsArgsInput {
-    email: String
+  input SearchUserInvitationsInput {
+    email: EmailAddress
     organisation_id: ID
     catchment_district_ids: [ID!]
   }
 
   input CreateUserInvitationInput {
-    email: String!
+    email: EmailAddress!
     organisation_id: ID!
     organisation_role: UserRoleType!
     catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]!
+    invited_by: EmailAddress!
   }
 
   input CreateUserInvitationCatchmentDistrictInput {

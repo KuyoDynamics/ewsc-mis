@@ -7,7 +7,7 @@ import {
   getOrganisationUsers,
   updateOrganisationUser,
   getOrganisation,
-  // getUser,
+  getUser,
 } from "../queries";
 const typeDefs = gql`
   type OrganisationUser {
@@ -72,7 +72,7 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   OrganisationUser: {
-    // user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
+    user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
     organisation: (parent, _args, context) =>
       getOrganisation(parent.organisation_id, context),
   },
