@@ -1,6 +1,6 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getDistrictUsers } from "../district-user/queries";
+// import { getDistrictUsers } from "../district-user/queries";
 import {
   createCatchmentDistrict,
   deleteCatchmentDistrict,
@@ -97,8 +97,8 @@ const resolvers: Resolvers = {
       getDistrict(district_id, context),
     catchment_province: ({ catchment_province_id }, _args, context) =>
       getCatchmentProvince(catchment_province_id, context),
-    district_users: (parent, _args, context) =>
-      getDistrictUsers({ catchment_district_id: parent.id }, context),
+    // district_users: (parent, _args, context) =>
+    //   getDistrictUsers({ catchment_district_id: parent.id }, context),
     water_treatment_plants: (parent, _args, context) =>
       getWaterTreatmentPlants({ catchment_district_id: parent.id }, context),
     service_areas: (parent, _args, context) =>

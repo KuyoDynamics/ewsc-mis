@@ -47,22 +47,6 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
-  type OrganisationUserProfile {
-    organisation_user_id: ID!
-    user: UserResult!
-    organisation: OrganisationResult!
-    default_district: DistrictResult!
-    organisation_roles: [String!]!
-    district_roles: [String!]!
-  }
-  # NOTES and TODO:
-  # 1. Should we be able to resolve profile given a user or given a selected organisation?
-  # -
-  # 2. Should the UserProfile include roles per organisation?
-  # - Yes, organisation roles and create a view for OrganisationUser
-  # 3. Should the UserProfile include roles per district?
-  # 4. Yes, please
-
   extend type Query {
     users: [User!]
     user(id: ID!): UserResult!
@@ -119,7 +103,7 @@ const typeDefs = gql`
 
   input CatchmentDistrictInput {
     catchment_district_id: ID!
-    role: UserRoleType!
+    roles: [DistrictUserRoleType!]!
   }
 
   # when creating a user, we do not give them any roles until they create an organisation in which case they
@@ -155,13 +139,18 @@ const typeDefs = gql`
     theme: UserTheme
   }
 
-  enum UserRoleType {
+  enum OrganisationUserRoleType {
     SUPPORT
+    OWNER
     ADMIN
+    USER
+  }
+
+  enum DistrictUserRoleType {
+    DISTRICT_MANAGER
     APPROVER
     DATA_ENTRY
     USER
-    OWNER
   }
 
   enum UserTheme {

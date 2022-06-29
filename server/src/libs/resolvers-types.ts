@@ -243,7 +243,7 @@ export type CatchmentDistrict = {
 
 export type CatchmentDistrictInput = {
   catchment_district_id: Scalars['ID'];
-  role: UserRoleType;
+  roles: Array<DistrictUserRoleType>;
 };
 
 export type CatchmentDistrictResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | CatchmentDistrict;
@@ -342,7 +342,7 @@ export type CreateDistrictInput = {
 export type CreateDistrictUserInput = {
   catchment_district_id: Scalars['ID'];
   organisation_user_id: Scalars['ID'];
-  role: UserRoleType;
+  roles: Array<DistrictUserRoleType>;
 };
 
 export type CreateIndicatorDisaggregateInput = {
@@ -425,7 +425,7 @@ export type CreateOrganisationReportTemplatesInput = {
 export type CreateOrganisationUserInput = {
   is_default_organisation: Scalars['Boolean'];
   organisation_id: Scalars['ID'];
-  role: UserRoleType;
+  role: OrganisationUserRoleType;
   user_id: Scalars['ID'];
 };
 
@@ -504,7 +504,7 @@ export type CreateUserInput = {
 
 export type CreateUserInvitationCatchmentDistrictInput = {
   catchment_district_id: Scalars['ID'];
-  role: UserRoleType;
+  roles: Array<DistrictUserRoleType>;
 };
 
 export type CreateUserInvitationInput = {
@@ -512,7 +512,7 @@ export type CreateUserInvitationInput = {
   email: Scalars['EmailAddress'];
   invited_by: Scalars['EmailAddress'];
   organisation_id: Scalars['ID'];
-  organisation_role: UserRoleType;
+  organisation_role: OrganisationUserRoleType;
 };
 
 export type CreateWaterNetworkInput = {
@@ -770,10 +770,17 @@ export type DistrictUser = {
   last_modified_by: Scalars['String'];
   organisation_user?: Maybe<OrganisationUserResult>;
   organisation_user_id: Scalars['ID'];
-  role: UserRoleType;
+  roles: Array<DistrictUserRoleType>;
 };
 
 export type DistrictUserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | DistrictUser;
+
+export enum DistrictUserRoleType {
+  Approver = 'APPROVER',
+  DataEntry = 'DATA_ENTRY',
+  DistrictManager = 'DISTRICT_MANAGER',
+  User = 'USER'
+}
 
 export type ErrorField = {
   __typename?: 'ErrorField';
@@ -983,6 +990,7 @@ export type Mutation = {
   updateSewerNetwork: SewerNetworkResult;
   updateSewerTreatmentPlant: SewerTreatmentPlantResult;
   updateUser: UserResult;
+  updateUserRolesForDistrict: DistrictUserResult;
   updateWaterNetwork: WaterNetworkResult;
   updateWaterProductionSite?: Maybe<UpdateWaterProductionSitePayload>;
   updateWaterStorageTank?: Maybe<UpdateWaterStorageTankPayload>;
@@ -1460,6 +1468,11 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationUpdateUserRolesForDistrictArgs = {
+  input: UpdateUserRolesForDistrictInput;
+};
+
+
 export type MutationUpdateWaterNetworkArgs = {
   input: UpdateWaterNetworkInput;
 };
@@ -1562,31 +1575,30 @@ export type OrganisationUser = {
   __typename?: 'OrganisationUser';
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
+  default_district?: Maybe<DistrictResult>;
+  district_roles?: Maybe<Array<Scalars['String']>>;
   id: Scalars['ID'];
   is_default_organisation: Scalars['Boolean'];
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   organisation?: Maybe<OrganisationResult>;
   organisation_id: Scalars['String'];
-  role: UserRoleType;
+  role: OrganisationUserRoleType;
   user?: Maybe<UserResult>;
   user_id: Scalars['String'];
 };
 
-export type OrganisationUserProfile = {
-  __typename?: 'OrganisationUserProfile';
-  default_district: DistrictResult;
-  district_roles: Array<Scalars['String']>;
-  organisation: OrganisationResult;
-  organisation_roles: Array<Scalars['String']>;
-  organisation_user_id: Scalars['ID'];
-  user: UserResult;
-};
-
 export type OrganisationUserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | OrganisationUser;
 
+export enum OrganisationUserRoleType {
+  Admin = 'ADMIN',
+  Owner = 'OWNER',
+  Support = 'SUPPORT',
+  User = 'USER'
+}
+
 export type OrganisationUserUpdateInput = {
-  role: UserRoleType;
+  role: OrganisationUserRoleType;
 };
 
 export type PasswordResetInput = {
@@ -2285,6 +2297,11 @@ export type UpdateUserInput = {
   update: UserUpdateInput;
 };
 
+export type UpdateUserRolesForDistrictInput = {
+  district_user_id: Scalars['ID'];
+  new_roles: Array<DistrictUserRoleType>;
+};
+
 export type UpdateWaterNetworkInput = {
   id: Scalars['ID'];
   update: WaterNetworkUpdateInput;
@@ -2358,15 +2375,6 @@ export type UserInvitation = {
 export type UserInvitationResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | UserInvitation;
 
 export type UserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | User;
-
-export enum UserRoleType {
-  Admin = 'ADMIN',
-  Approver = 'APPROVER',
-  DataEntry = 'DATA_ENTRY',
-  Owner = 'OWNER',
-  Support = 'SUPPORT',
-  User = 'USER'
-}
 
 export enum UserTheme {
   Dark = 'DARK',
@@ -2675,6 +2683,7 @@ export type ResolversTypes = ResolversObject<{
   DistrictUpdateInput: DistrictUpdateInput;
   DistrictUser: ResolverTypeWrapper<Omit<DistrictUser, 'catchment_district' | 'organisation_user'> & { catchment_district?: Maybe<ResolversTypes['CatchmentDistrictResult']>, organisation_user?: Maybe<ResolversTypes['OrganisationUserResult']> }>;
   DistrictUserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['DistrictUser'];
+  DistrictUserRoleType: DistrictUserRoleType;
   Duration: ResolverTypeWrapper<Scalars['Duration']>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']>;
   ErrorField: ResolverTypeWrapper<ErrorField>;
@@ -2737,9 +2746,9 @@ export type ResolversTypes = ResolversObject<{
   OrganisationReportTemplateResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['OrganisationReportTemplate'];
   OrganisationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Organisation'];
   OrganisationUpdateInput: OrganisationUpdateInput;
-  OrganisationUser: ResolverTypeWrapper<Omit<OrganisationUser, 'organisation' | 'user'> & { organisation?: Maybe<ResolversTypes['OrganisationResult']>, user?: Maybe<ResolversTypes['UserResult']> }>;
-  OrganisationUserProfile: ResolverTypeWrapper<Omit<OrganisationUserProfile, 'default_district' | 'organisation' | 'user'> & { default_district: ResolversTypes['DistrictResult'], organisation: ResolversTypes['OrganisationResult'], user: ResolversTypes['UserResult'] }>;
+  OrganisationUser: ResolverTypeWrapper<Omit<OrganisationUser, 'default_district' | 'organisation' | 'user'> & { default_district?: Maybe<ResolversTypes['DistrictResult']>, organisation?: Maybe<ResolversTypes['OrganisationResult']>, user?: Maybe<ResolversTypes['UserResult']> }>;
   OrganisationUserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['OrganisationUser'];
+  OrganisationUserRoleType: OrganisationUserRoleType;
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
   PasswordResetInput: PasswordResetInput;
   PasswordResetRequestInput: PasswordResetRequestInput;
@@ -2816,6 +2825,7 @@ export type ResolversTypes = ResolversObject<{
   UpdateSewerTreatmentPlantInput: UpdateSewerTreatmentPlantInput;
   UpdateSewerTreatmentPlantPayload: ResolverTypeWrapper<UpdateSewerTreatmentPlantPayload>;
   UpdateUserInput: UpdateUserInput;
+  UpdateUserRolesForDistrictInput: UpdateUserRolesForDistrictInput;
   UpdateWaterNetworkInput: UpdateWaterNetworkInput;
   UpdateWaterProductionSiteInput: UpdateWaterProductionSiteInput;
   UpdateWaterProductionSitePayload: ResolverTypeWrapper<UpdateWaterProductionSitePayload>;
@@ -2828,7 +2838,6 @@ export type ResolversTypes = ResolversObject<{
   UserInvitation: ResolverTypeWrapper<UserInvitation>;
   UserInvitationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['UserInvitation'];
   UserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['User'];
-  UserRoleType: UserRoleType;
   UserTheme: UserTheme;
   UserUpdateInput: UserUpdateInput;
   UtcOffset: ResolverTypeWrapper<Scalars['UtcOffset']>;
@@ -3025,8 +3034,7 @@ export type ResolversParentTypes = ResolversObject<{
   OrganisationReportTemplateResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['OrganisationReportTemplate'];
   OrganisationResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Organisation'];
   OrganisationUpdateInput: OrganisationUpdateInput;
-  OrganisationUser: Omit<OrganisationUser, 'organisation' | 'user'> & { organisation?: Maybe<ResolversParentTypes['OrganisationResult']>, user?: Maybe<ResolversParentTypes['UserResult']> };
-  OrganisationUserProfile: Omit<OrganisationUserProfile, 'default_district' | 'organisation' | 'user'> & { default_district: ResolversParentTypes['DistrictResult'], organisation: ResolversParentTypes['OrganisationResult'], user: ResolversParentTypes['UserResult'] };
+  OrganisationUser: Omit<OrganisationUser, 'default_district' | 'organisation' | 'user'> & { default_district?: Maybe<ResolversParentTypes['DistrictResult']>, organisation?: Maybe<ResolversParentTypes['OrganisationResult']>, user?: Maybe<ResolversParentTypes['UserResult']> };
   OrganisationUserResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['OrganisationUser'];
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
   PasswordResetInput: PasswordResetInput;
@@ -3102,6 +3110,7 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateSewerTreatmentPlantInput: UpdateSewerTreatmentPlantInput;
   UpdateSewerTreatmentPlantPayload: UpdateSewerTreatmentPlantPayload;
   UpdateUserInput: UpdateUserInput;
+  UpdateUserRolesForDistrictInput: UpdateUserRolesForDistrictInput;
   UpdateWaterNetworkInput: UpdateWaterNetworkInput;
   UpdateWaterProductionSiteInput: UpdateWaterProductionSiteInput;
   UpdateWaterProductionSitePayload: UpdateWaterProductionSitePayload;
@@ -3379,7 +3388,7 @@ export type DistrictUserResolvers<ContextType = GraphQLContext, ParentType exten
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_user?: Resolver<Maybe<ResolversTypes['OrganisationUserResult']>, ParentType, ContextType>;
   organisation_user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  role?: Resolver<ResolversTypes['UserRoleType'], ParentType, ContextType>;
+  roles?: Resolver<Array<ResolversTypes['DistrictUserRoleType']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3666,6 +3675,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationUpdateSewerNetworkArgs, 'input'>>;
   updateSewerTreatmentPlant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<MutationUpdateSewerTreatmentPlantArgs, 'input'>>;
   updateUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationUpdateUserArgs, 'input'>>;
+  updateUserRolesForDistrict?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationUpdateUserRolesForDistrictArgs, 'input'>>;
   updateWaterNetwork?: Resolver<ResolversTypes['WaterNetworkResult'], ParentType, ContextType, RequireFields<MutationUpdateWaterNetworkArgs, 'input'>>;
   updateWaterProductionSite?: Resolver<Maybe<ResolversTypes['UpdateWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationUpdateWaterProductionSiteArgs, 'input'>>;
   updateWaterStorageTank?: Resolver<Maybe<ResolversTypes['UpdateWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationUpdateWaterStorageTankArgs, 'input'>>;
@@ -3780,25 +3790,17 @@ export type OrganisationResultResolvers<ContextType = GraphQLContext, ParentType
 export type OrganisationUserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationUser'] = ResolversParentTypes['OrganisationUser']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  default_district?: Resolver<Maybe<ResolversTypes['DistrictResult']>, ParentType, ContextType>;
+  district_roles?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   is_default_organisation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation?: Resolver<Maybe<ResolversTypes['OrganisationResult']>, ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  role?: Resolver<ResolversTypes['UserRoleType'], ParentType, ContextType>;
+  role?: Resolver<ResolversTypes['OrganisationUserRoleType'], ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['UserResult']>, ParentType, ContextType>;
   user_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type OrganisationUserProfileResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationUserProfile'] = ResolversParentTypes['OrganisationUserProfile']> = ResolversObject<{
-  default_district?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType>;
-  district_roles?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  organisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType>;
-  organisation_roles?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
-  organisation_user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  user?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -4356,7 +4358,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   OrganisationReportTemplateResult?: OrganisationReportTemplateResultResolvers<ContextType>;
   OrganisationResult?: OrganisationResultResolvers<ContextType>;
   OrganisationUser?: OrganisationUserResolvers<ContextType>;
-  OrganisationUserProfile?: OrganisationUserProfileResolvers<ContextType>;
   OrganisationUserResult?: OrganisationUserResultResolvers<ContextType>;
   PasswordResetRequestPayload?: PasswordResetRequestPayloadResolvers<ContextType>;
   PasswordResetRequestResult?: PasswordResetRequestResultResolvers<ContextType>;

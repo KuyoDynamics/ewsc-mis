@@ -1,13 +1,20 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import {
+  generateClientErrors,
+  GraphQLContext,
+  prepareDistrictUserRolesForCreate,
+  prepareDistrictUserRolesForUpdate,
+} from "../../utils";
 import {
   DistrictUser,
   DistrictUserResult,
   MutationCreateDistrictUserArgs,
   MutationDeleteDistrictUserArgs,
   MutationSetUserDefaultDistrictArgs,
+  MutationUpdateUserRolesForDistrictArgs,
   QueryDistrict_UserArgs,
   QueryDistrict_UsersArgs,
 } from "../../libs/resolvers-types";
+import { DistrictUserRoleType } from "@prisma/client";
 
 async function getDistrictUsers(
   args: QueryDistrict_UsersArgs,
@@ -63,7 +70,7 @@ async function createDistrictUser(
       data: {
         organisation_user_id: args.input.organisation_user_id,
         catchment_district_id: args.input.catchment_district_id,
-        role: args.input.role,
+        roles: prepareDistrictUserRolesForCreate(args.input.roles),
         created_by: context.user?.email,
         last_modified_by: context.user?.email,
       },
@@ -77,6 +84,36 @@ async function createDistrictUser(
       __typename: "ApiCreateError",
       message: `Failed to create DistrictUser.`,
       errors: generateClientErrors(error),
+    };
+  }
+}
+
+async function updateUserRolesForDistrict(
+  args: MutationUpdateUserRolesForDistrictArgs,
+  context: GraphQLContext
+): Promise<DistrictUserResult> {
+  try {
+    const district_user = await context.prisma.districtUser.update({
+      where: {
+        id: args.input.district_user_id,
+      },
+      data: {
+        roles: prepareDistrictUserRolesForUpdate(args.input.new_roles),
+        last_modified_by: context.user.email,
+      },
+    });
+    return {
+      __typename: "DistrictUser",
+      ...district_user,
+    } as DistrictUserResult;
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update new roles for User's District with ${{
+        district_user_id: args.input.district_user_id,
+        roles: args.input.new_roles,
+      }}.`,
+      errors: generateClientErrors(error, "district_user_id"),
     };
   }
 }
@@ -108,7 +145,7 @@ async function setUserDefaultDistrict(
     return {
       __typename: "DistrictUser",
       ...updateResult,
-    } as DistrictUser;
+    } as DistrictUserResult;
   } catch (error) {
     return {
       __typename: "ApiUpdateError",
@@ -151,4 +188,5 @@ export {
   getDistrictUsers,
   getDistrictUser,
   setUserDefaultDistrict,
+  updateUserRolesForDistrict,
 };

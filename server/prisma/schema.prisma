@@ -180,7 +180,7 @@ model User {
 
 model OrganisationUser {
   id                      String       @id @default(uuid()) @db.Uuid
-  role                    UserRoleType @default(USER)
+  role                    OrganisationUserRoleType @default(USER)
   is_default_organisation Boolean      @default(false)
 
   // Relation Fields
@@ -207,7 +207,7 @@ model DistrictUser {
 
   is_default_user_district Boolean @default(false)
 
-  role UserRoleType @default(USER)
+  roles DistrictUserRoleType[]
 
   // Relation Fields
   organisation_user_id String           @map("organisation_user_id") @db.Uuid
@@ -780,16 +780,24 @@ enum DisaggregateType {
   @@map("disaggregate_type")
 }
 
-enum UserRoleType {
+enum OrganisationUserRoleType {
   SUPPORT     @map("support")
+  OWNER       @map("owner")
   ADMIN       @map("admin")
+  USER        @map("user")
+
+  @@map("organisation_user_role_type")
+}
+
+enum DistrictUserRoleType {
+  DISTRICT_MANAGER     @map("district_manager")
   APPROVER    @map("approver")
   DATA_ENTRY  @map("data_entry")
   USER        @map("user")
-  OWNER       @map("owner")
 
-  @@map("user_role_type")
+  @@map("district_user_role_type")
 }
+
 
 enum ApprovalStatus {
   PENDING      @map("pending")

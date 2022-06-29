@@ -6,6 +6,7 @@ import {
   isValidPassword,
   GraphQLContext,
   generateClientErrors,
+  prepareDistrictUserRolesForCreate,
 } from "../../utils";
 import {
   District,
@@ -26,7 +27,7 @@ import {
   QueryUserArgs,
   User,
   UserResult,
-  UserRoleType,
+  // UserRoleType,
 } from "../../libs/resolvers-types";
 
 async function getUsers(context: GraphQLContext): Promise<User[]> {
@@ -176,18 +177,6 @@ async function getUserOrganisations(
   return user_orgs as OrganisationUser[];
 }
 
-function prepareUserRolesForUpdate(new_user_roles: UserRoleType[] | undefined) {
-  return !new_user_roles?.length
-    ? undefined
-    : [...new Set([...new_user_roles, UserRoleType.User])];
-}
-
-function prepareUserRolesForCreate(user_roles: UserRoleType[]) {
-  return !user_roles?.length
-    ? [UserRoleType.User]
-    : [...new Set([...user_roles, UserRoleType.User])];
-}
-
 async function createUser(
   args: MutationCreateUserArgs,
   context: GraphQLContext
@@ -247,7 +236,7 @@ async function createInvitedUser(
     }
 
     const user_districts = catchment_districts.map((item) => ({
-      role: item.role,
+      roles: prepareDistrictUserRolesForCreate(item.roles),
       catchment_district_id: item.catchment_district_id,
       created_by: "system_user@kuyodynamics.com",
       last_modified_by: "system_user@kuyodynamics.com",
