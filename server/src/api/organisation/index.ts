@@ -8,6 +8,8 @@ import {
   getCountry,
   getOrganisation,
   getOrganisations,
+  getReportsByOrganisation,
+  isMasterSupportAllowed,
   updateOrganisation,
 } from "../queries";
 
@@ -16,12 +18,14 @@ const typeDefs = gql`
     id: ID!
     name: String!
     logo: Byte
+    allow_master_support: Boolean!
     country_id: String!
     country: CountryResult
     catchment_provinces: [CatchmentProvince!]
     users: [OrganisationUser!]
     organisation_report_templates: [OrganisationReportTemplate!]
     organisation_indicators: [OrganisationIndicator!]
+    reports: [Report!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -86,6 +90,10 @@ const resolvers: Resolvers = {
       getCatchmentProvinces(parent.id, context),
     users: (parent, _args, context) =>
       getOrganisationUsers({ organisation_id: parent.id }, context),
+    allow_master_support: (parent, _args, context) =>
+      isMasterSupportAllowed(parent.id, context),
+    reports: (parent, _args, context) =>
+      getReportsByOrganisation(parent.id, context),
   },
 };
 

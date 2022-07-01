@@ -12,11 +12,14 @@ import {
 const typeDefs = gql`
   type OrganisationUser {
     id: ID!
-    is_owner: Boolean!
     user_id: String!
     user: UserResult
     organisation_id: String!
     organisation: OrganisationResult
+    is_default_organisation: Boolean!
+    default_district: DistrictResult
+    role: OrganisationUserRoleType!
+    district_roles: [String!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -35,14 +38,17 @@ const typeDefs = gql`
     updateOrganisationUser(
       input: UpdateOrganisationUserInput!
     ): OrganisationUserResult!
+    setUserDefaultProject(organisation_user_id: ID!): OrganisationUserResult!
     deleteOrganisationUser(
       input: DeleteOrganisationUserInput!
     ): OrganisationUserResult!
   }
 
   input CreateOrganisationUserInput {
+    role: OrganisationUserRoleType!
     user_id: ID!
     organisation_id: ID!
+    is_default_organisation: Boolean!
   }
 
   input UpdateOrganisationUserInput {
@@ -51,7 +57,7 @@ const typeDefs = gql`
   }
 
   input OrganisationUserUpdateInput {
-    is_owner: Boolean!
+    role: OrganisationUserRoleType!
   }
 
   input DeleteOrganisationUserInput {

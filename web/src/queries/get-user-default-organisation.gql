@@ -1,0 +1,12 @@
+query GetUserDefaultOrganisation($userId: ID!) {
+  userDefaultOrganisation(userId: $userId) {
+    ... on ApiNotFoundError {
+      message
+    }
+    ... on Organisation {
+      id
+      name
+      logo
+    }
+  }
+}

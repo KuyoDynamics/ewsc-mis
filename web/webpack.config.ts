@@ -19,7 +19,7 @@ const config: webpack.Configuration = {
     assetModuleFilename: "[name][ext]",
     clean: true,
   },
-  devtool: "inline-source-map",
+  devtool: "source-map",
   optimization: {
     splitChunks: {
       chunks: "all",
@@ -60,7 +60,7 @@ const config: webpack.Configuration = {
       reconnect: true,
     },
     proxy: {
-      "/api": "http://localhost:4000/graphql",
+      "/api": "http://localhost:4000/api",
       secure: false,
     },
   },

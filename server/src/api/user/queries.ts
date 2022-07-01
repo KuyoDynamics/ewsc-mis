@@ -6,8 +6,11 @@ import {
   isValidPassword,
   GraphQLContext,
   generateClientErrors,
+  prepareDistrictUserRolesForCreate,
 } from "../../utils";
 import {
+  District,
+  DistrictResult,
   LoginResult,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
@@ -17,14 +20,13 @@ import {
   MutationRequestPasswordResetArgs,
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
-  Organisation,
   OrganisationUser,
   PasswordResetRequestResult,
   PasswordResetResult,
+  QueryDefault_User_DistrictArgs,
   QueryUserArgs,
   User,
   UserResult,
-  UserRoleType,
 } from "../../libs/resolvers-types";
 
 async function getUsers(context: GraphQLContext): Promise<User[]> {
@@ -47,18 +49,114 @@ async function getUser(
     if (!user) {
       return {
         __typename: "ApiNotFoundError",
-        message: `The Country with the id ${args.id} does not exist.`,
+        message: `The User with the id ${args.id} does not exist.`,
       };
     }
 
     return {
       __typename: "User",
       ...user,
-    } as UserResult;
+    } as User;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
-      message: `Failed to find Country with the id ${args.id}.`,
+      message: `Failed to find User with the id ${args.id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
+}
+
+async function getUserDistricts(
+  user_id: string,
+  context: GraphQLContext
+): Promise<District[]> {
+  const result = await context.prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+    select: {
+      user_organisations: {
+        select: {
+          district_users: {
+            select: {
+              catchment_district: {
+                select: {
+                  district: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  const districts = result?.user_organisations.flatMap((org_user) =>
+    org_user.district_users.flatMap(
+      (district_user) => district_user.catchment_district.district
+    )
+  );
+  return districts as District[];
+}
+
+async function getDefaultUserDistrict(
+  args: QueryDefault_User_DistrictArgs,
+  context: GraphQLContext
+): Promise<DistrictResult> {
+  try {
+    const result = await context.prisma.user.findUnique({
+      where: {
+        id: args.user_id,
+      },
+      select: {
+        user_organisations: {
+          where: {
+            id: args.organisation_user_id,
+          },
+          select: {
+            district_users: {
+              where: {
+                is_default_user_district: true,
+              },
+              select: {
+                catchment_district: {
+                  select: {
+                    district: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const district = { ...result?.user_organisations! }.flatMap((user_org) =>
+      user_org.district_users.flatMap(
+        (user_district) => user_district.catchment_district.district
+      )
+    )[0];
+
+    if (!district) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The Default District not found for organisation_user_id ${{
+          user_id: args.user_id,
+          user_organisation_id: args.organisation_user_id,
+        }}.`,
+      };
+    }
+
+    return {
+      __typename: "District",
+      ...district,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find Default District for organisation_user_id ${{
+        user_id: args.user_id,
+        user_organisation_id: args.organisation_user_id,
+      }}.`,
       errors: generateClientErrors(error),
     };
   }
@@ -68,25 +166,14 @@ async function getUserOrganisations(
   user_id: string,
   context: GraphQLContext
 ): Promise<OrganisationUser[]> {
-  return context.prisma.user
+  const user_orgs = await context.prisma.user
     .findUnique({
       where: {
         id: user_id,
       },
     })
     .user_organisations();
-}
-
-function prepareUserRolesForUpdate(new_user_roles: UserRoleType[] | undefined) {
-  return !new_user_roles?.length
-    ? undefined
-    : [...new Set([...new_user_roles, UserRoleType.User])];
-}
-
-function prepareUserRolesForCreate(user_roles: UserRoleType[]) {
-  return !user_roles?.length
-    ? [UserRoleType.User]
-    : [...new Set([...user_roles, UserRoleType.User])];
+  return user_orgs as OrganisationUser[];
 }
 
 async function createUser(
@@ -100,7 +187,6 @@ async function createUser(
         first_name: args.input.first_name,
         last_name: args.input.last_name,
         password: await encryptPassword(args.input.password),
-        user_roles: prepareUserRolesForCreate(args.input.user_roles),
         created_by: context.user.email,
         last_modified_by: context.user.email,
       },
@@ -124,14 +210,52 @@ async function createInvitedUser(
   context: GraphQLContext
 ): Promise<UserResult> {
   try {
-    const { email, first_name, last_name, password, user_roles } =
-      args.input.user_details;
-    const { catchment_district_ids, organisation_id } = args.input;
+    const { email, first_name, last_name, password } = args.input.user_details;
+    const { catchment_districts, organisation_id } = args.input;
 
-    const user_districts = catchment_district_ids.map((id) => ({
-      catchment_district_id: id,
-      created_by: "system_user@kuyodynamics.com",
-      last_modified_by: "system_user@kuyodynamics.com",
+    const user_invitation = await context.prisma.userInvitation.findUnique({
+      where: {
+        id: args.input.user_invitation_id,
+      },
+    });
+
+    if (!user_invitation) {
+      return {
+        __typename: "ApiCreateError",
+        message: `Failed to create User because we do not recognise the invitation or it expited.${catchment_districts.map(
+          (item) => item.catchment_district_id
+        )}`,
+      };
+    }
+
+    const invited_by = jwt.decode(user_invitation.invitation_token);
+
+    const disabled_catchment_districts =
+      await context.prisma.catchmentDistrict.findMany({
+        where: {
+          AND: {
+            id: {
+              in: catchment_districts.map((item) => item.catchment_district_id),
+            },
+            disabled: true,
+          },
+        },
+      });
+
+    if (disabled_catchment_districts) {
+      return {
+        __typename: "ApiCreateError",
+        message: `Failed to create User because the following catchment districts are disabled.${catchment_districts.map(
+          (item) => item.catchment_district_id
+        )}`,
+      };
+    }
+
+    const user_districts = catchment_districts.map((item) => ({
+      roles: prepareDistrictUserRolesForCreate(item.roles),
+      catchment_district_id: item.catchment_district_id,
+      created_by: invited_by as string,
+      last_modified_by: invited_by as string,
     }));
 
     const user = await context.prisma.user.create({
@@ -140,14 +264,14 @@ async function createInvitedUser(
         last_name,
         email,
         password: await encryptPassword(password),
-        user_roles: prepareUserRolesForCreate(user_roles),
-        created_by: "system_user@kuyodynamics.com",
-        last_modified_by: "system_user@kuyodynamics.com",
+        // master_support: false,
+        created_by: invited_by as string,
+        last_modified_by: invited_by as string,
         user_organisations: {
           create: {
             organisation_id,
-            created_by: "system_user@kuyodynamics.com",
-            last_modified_by: "system_user@kuyodynamics.com",
+            created_by: invited_by as string,
+            last_modified_by: invited_by as string,
             district_users: {
               createMany: {
                 data: user_districts,
@@ -185,7 +309,6 @@ async function updateUser(
         first_name: args.input.update.first_name || undefined,
         last_name: args.input.update.last_name || undefined,
         theme: args.input.update.theme || undefined,
-        user_roles: prepareUserRolesForUpdate(args.input.update.user_roles!),
         last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
@@ -268,27 +391,28 @@ async function login(
     });
 
     if (!user)
-      throw new AuthenticationError("No account found for this email.");
+      throw new AuthenticationError("No account found for this email.", {
+        field: "email",
+      });
 
-    if (user.disabled) throw new AuthenticationError("Account is disabled.");
+    if (user.disabled)
+      throw new AuthenticationError("Account is disabled.", { field: "email" });
 
     if (!(await isValidPassword(args.input.password, user.password)))
-      throw new AuthenticationError("Invalid password.");
+      throw new AuthenticationError("Invalid password.", { field: "password" });
 
     try {
-      accessToken = jwt.sign(
-        { roles: user.user_roles },
-        process.env.JWT_SECRET!,
-        {
-          algorithm: "HS256",
-          subject: user.id,
-          expiresIn: "1d",
-        }
-      );
+      accessToken = jwt.sign({}, process.env.JWT_SECRET!, {
+        algorithm: "HS256",
+        subject: user.id,
+        expiresIn: "1d",
+      });
     } catch (error) {
       console.log("Failed to generate access token.", error);
       // Also send to Sentry
-      throw new AuthenticationError("Failed to generate access token.");
+      throw new AuthenticationError("Failed to generate access token.", {
+        field: "email",
+      });
     }
 
     await context.prisma.user.update({
@@ -302,12 +426,18 @@ async function login(
     return {
       __typename: "LoginSuccess",
       accessToken,
+      id: user.id,
     };
   } catch (error) {
     return {
       __typename: "ApiLoginError",
       message: "Login Failed.",
-      errors: generateClientErrors(error, "email,password"),
+      errors: generateClientErrors(
+        error,
+        error instanceof AuthenticationError
+          ? error.extensions.field
+          : "email,password"
+      ),
     };
   }
 }
@@ -407,4 +537,6 @@ export {
   login,
   requestPasswordReset,
   resetPassword,
+  getUserDistricts,
+  getDefaultUserDistrict,
 };

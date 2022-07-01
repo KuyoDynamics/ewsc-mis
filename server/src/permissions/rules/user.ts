@@ -3,18 +3,16 @@ import { rule, and, or, not } from "graphql-shield";
 import { JsonWebTokenError, TokenExpiredError, verify } from "jsonwebtoken";
 
 import { GraphQLContext } from "../../utils";
-import {
-  MutationCreateInvitedUserArgs,
-  UserRoleType,
-} from "../../libs/resolvers-types";
+import { MutationCreateInvitedUserArgs } from "../../libs/resolvers-types";
 
-function hasRole(ctx: GraphQLContext, user_role: UserRoleType): boolean {
-  return ctx.user.user_roles.some((role) => role === user_role);
+function hasRole(ctx: GraphQLContext, user_role: any): boolean {
+  // ctx.user.user_roles.some((role) => role === user_role);
+  return false;
 }
 
 const isValidUserInvitation = rule()(
   async (_, args: MutationCreateInvitedUserArgs, ctx: GraphQLContext) => {
-    const { catchment_district_ids, organisation_id, user_invitation_id } =
+    const { catchment_districts, organisation_id, user_invitation_id } =
       args.input;
     const { email } = args.input.user_details;
 
@@ -30,7 +28,7 @@ const isValidUserInvitation = rule()(
       }
 
       verify(userInvitation.invitation_token, process.env.JWT_SECRET!, {
-        audience: catchment_district_ids,
+        audience: catchment_districts.map((item) => item.catchment_district_id),
         issuer: organisation_id,
         subject: email,
         jwtid: user_invitation_id,
@@ -75,7 +73,7 @@ const isAuthenticated = and(authenticated, not(isUserDisabled));
 
 const isAdmin = rule({ cache: "contextual" })(
   (_parent, _args, ctx: GraphQLContext, _info) => {
-    return hasRole(ctx, UserRoleType.Admin);
+    return hasRole(ctx, "Admin");
   }
 );
 
@@ -87,7 +85,7 @@ const canSeeUserSensitiveData = rule({ cache: "strict" })(
 );
 
 const isEditor = rule()(async (parent, args, ctx, info) => {
-  return hasRole(ctx, UserRoleType.DataEntry);
+  return hasRole(ctx, "DataEntry");
 });
 
 // const isUserSensitiveData = rule()(

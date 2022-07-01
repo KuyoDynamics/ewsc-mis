@@ -11,39 +11,7 @@ import { expressjwt } from "express-jwt";
 import { schema } from "./api/schema";
 import { createContext } from "./utils";
 
-const prisma = new PrismaClient({
-  // rejectOnNotFound: {
-  //   findUnique: true,
-  //   findFirst: true,
-  // },
-  log: [
-    {
-      emit: "event",
-      level: "query",
-    },
-    {
-      emit: "stdout",
-      level: "error",
-    },
-    {
-      emit: "stdout",
-      level: "info",
-    },
-    {
-      emit: "stdout",
-      level: "warn",
-    },
-  ],
-});
-
-prisma.$on("query", async (e) => {
-  // let metrics = await prisma.$metrics.json();
-  // console.log("metrics", metrics);
-  //   console.log("Query: " + e.query);
-  //   console.log("Params: " + e.params);
-  //   console.log("Duration: " + e.duration + "ms");
-  //   console.log("\n===================================");
-});
+const prisma = new PrismaClient();
 
 async function startApolloServer(
   gqlSchema: GraphQLSchema,
@@ -85,6 +53,7 @@ async function startApolloServer(
     context: ({ req }) => {
       return createContext(req, prismaClient);
     },
+    introspection: true,
     csrfPrevention: true,
     plugins: [
       // Proper shutdown for the HTTP server.
@@ -105,6 +74,7 @@ async function startApolloServer(
 
   await server.start();
   server.applyMiddleware({
+    path: "/api",
     app,
   });
 

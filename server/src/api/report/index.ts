@@ -9,6 +9,7 @@ import {
   getCatchmentDistrict,
   getIndicatorDisaggregateReports,
   getOrganisationReportTemplate,
+  getReportsByOrganisation,
 } from "../queries";
 
 const typeDefs = gql`
@@ -38,6 +39,7 @@ const typeDefs = gql`
   extend type Query {
     reports: [Report!]
     report(id: ID!): ReportResult!
+    organisation_reports(organisation_id: ID!): [Report!]
   }
 
   extend type Mutation {
@@ -83,6 +85,8 @@ const resolvers: Resolvers = {
   Query: {
     report: (_, args, context) => getReport(args, context),
     reports: (_, _args, context) => getReports(context),
+    organisation_reports: (_, args, context) =>
+      getReportsByOrganisation(args.organisation_id, context),
   },
   Mutation: {
     createReport: (_, args, context) => createReport(args, context),

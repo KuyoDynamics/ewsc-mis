@@ -1,12 +1,14 @@
 import { gql } from "apollo-server-express";
 import { Resolvers } from "../../libs/resolvers-types";
-import { getOrganisationUser } from "../organisation-user/queries";
 import {
   createDistrictUser,
   deleteDistrictUser,
   getDistrictUser,
   getDistrictUsers,
   getCatchmentDistrict,
+  setUserDefaultDistrict,
+  getOrganisationUser,
+  updateUserRolesForDistrict,
 } from "../queries";
 const typeDefs = gql`
   type DistrictUser {
@@ -15,6 +17,8 @@ const typeDefs = gql`
     organisation_user: OrganisationUserResult
     catchment_district_id: ID!
     catchment_district: CatchmentDistrictResult
+    is_default_user_district: Boolean!
+    roles: [DistrictUserRoleType!]!
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -28,12 +32,29 @@ const typeDefs = gql`
 
   extend type Mutation {
     createDistrictUser(input: CreateDistrictUserInput!): DistrictUserResult!
+    setUserDefaultDistrict(
+      input: SetUserDefaultDistrictInput!
+    ): DistrictUserResult!
+    updateUserRolesForDistrict(
+      input: UpdateUserRolesForDistrictInput!
+    ): DistrictUserResult!
     deleteDistrictUser(input: DeleteDistrictUserInput!): DistrictUserResult!
+  }
+
+  input UpdateUserRolesForDistrictInput {
+    district_user_id: ID!
+    new_roles: [DistrictUserRoleType!]!
+  }
+
+  input SetUserDefaultDistrictInput {
+    district_user_id: ID!
+    organisation_user_id: ID!
   }
 
   input CreateDistrictUserInput {
     organisation_user_id: ID!
     catchment_district_id: ID!
+    roles: [DistrictUserRoleType!]!
   }
 
   input DeleteDistrictUserInput {
@@ -65,6 +86,10 @@ const resolvers: Resolvers = {
   Mutation: {
     createDistrictUser: (_, args, context) => createDistrictUser(args, context),
     deleteDistrictUser: (_, args, context) => deleteDistrictUser(args, context),
+    setUserDefaultDistrict: (_, args, context) =>
+      setUserDefaultDistrict(args, context),
+    updateUserRolesForDistrict: (_, args, context) =>
+      updateUserRolesForDistrict(args, context),
   },
 };
 

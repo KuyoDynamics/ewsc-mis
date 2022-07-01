@@ -1,83 +1,128 @@
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
-import { GraphQLContext } from "../../utils";
 import {
-  CreateUserInvitationPayload,
-  DeleteUserInvitationPayload,
   MutationCreateUserInvitationArgs,
   MutationDeleteUserInvitationArgs,
   QueryUser_InvitationArgs,
   QueryUser_InvitationsArgs,
   UserInvitation,
+  UserInvitationResult,
 } from "../../libs/resolvers-types";
-import { addDays } from "../../utils";
+import { GraphQLContext, addDays, generateClientErrors } from "../../utils";
 
 async function createUserInvitation(
   args: MutationCreateUserInvitationArgs,
   context: GraphQLContext
-): Promise<CreateUserInvitationPayload> {
-  const id = uuidv4();
-  const ttl = addDays(new Date(), 5);
+): Promise<UserInvitationResult> {
+  try {
+    const id = uuidv4();
+    const ttl = addDays(new Date(), 5);
 
-  const invitation_data = {
-    email: args.input.email,
-    organisation_id: args.input.organisation_id,
-    district_ids: args.input.district_ids,
-    id,
-  };
+    const invitation_data = {
+      email: args.input.email,
+      organisation_id: args.input.organisation_id,
+      invited_by: args.input.invited_by,
+      catchment_districts: args.input.catchment_districts,
+      id,
+    };
 
-  const invitation_token = jwt.sign(
-    {
-      data: "user_invitation",
-    },
-    process.env.JWT_SECRET!,
-    {
-      issuer: invitation_data.organisation_id,
-      audience: invitation_data.district_ids,
-      subject: invitation_data.email,
-      jwtid: invitation_data.id,
-      expiresIn: "5 days",
+    const disabled_catchment_districts =
+      await context.prisma.catchmentDistrict.findMany({
+        where: {
+          AND: {
+            id: {
+              in: invitation_data.catchment_districts.map(
+                (item) => item.catchment_district_id
+              ),
+            },
+            disabled: true,
+          },
+        },
+      });
+
+    if (disabled_catchment_districts) {
+      return {
+        __typename: "ApiCreateError",
+        message: `Failed to create UserInvitation because the following catchment districts are disabled.${invitation_data.catchment_districts.map(
+          (item) => item.catchment_district_id
+        )}`,
+      };
     }
-  );
 
-  const requiredInput = {
-    ...invitation_data,
-    ttl,
-    invitation_token,
-  };
+    const invitation_token = jwt.sign(
+      {
+        invited_by: invitation_data.invited_by,
+      },
+      process.env.JWT_SECRET!,
+      {
+        issuer: invitation_data.organisation_id,
+        audience: invitation_data.catchment_districts.map(
+          (item) => item.catchment_district_id
+        ),
+        subject: invitation_data.email,
+        jwtid: invitation_data.id,
+        expiresIn: "5 days",
+      }
+    );
 
-  const user_invitation = await context.prisma.userInvitation.create({
-    data: requiredInput,
-  });
+    const requiredInput = {
+      ...invitation_data,
+      ttl,
+      invitation_token,
+    };
 
-  return { user_invitation };
+    const user_invitation = await context.prisma.userInvitation.create({
+      data: requiredInput,
+    });
+
+    return {
+      __typename: "UserInvitation",
+      ...user_invitation,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiCreateError",
+      message: `Failed to create UserInvitation.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 async function deleteUserInvitation(
   args: MutationDeleteUserInvitationArgs,
   context: GraphQLContext
-): Promise<DeleteUserInvitationPayload> {
-  const user_invitation = await context.prisma.userInvitation.delete({
-    where: {
-      ...args.input,
-    },
-  });
-
-  return { user_invitation };
+): Promise<UserInvitationResult> {
+  try {
+    const user_invitation = await context.prisma.userInvitation.delete({
+      where: {
+        ...args.input,
+      },
+    });
+    return {
+      __typename: "UserInvitation",
+      ...user_invitation,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiDeleteError",
+      message: `Failed to delete User with id ${args.input.id}.`,
+      errors: generateClientErrors(error, "id"),
+    };
+  }
 }
 
 async function getUserInvitations(
   args: QueryUser_InvitationsArgs,
   context: GraphQLContext
 ): Promise<UserInvitation[]> {
-  const { district_ids, email, organisation_id } = args.args;
+  const { catchment_district_ids, email, organisation_id } = args.args;
 
   const user_invitations = await context.prisma.userInvitation.findMany({
     where: {
       AND: {
-        district_ids: district_ids
+        catchment_district_ids: catchment_district_ids
           ? {
-              hasEvery: district_ids,
+              hasEvery: catchment_district_ids,
             }
           : undefined,
         email: email || undefined,
@@ -91,14 +136,32 @@ async function getUserInvitations(
 async function getUserInvitation(
   args: QueryUser_InvitationArgs,
   context: GraphQLContext
-): Promise<UserInvitation | null> {
-  const user_invitation = await context.prisma.userInvitation.findUnique({
-    where: {
-      id: args.id,
-    },
-  });
+): Promise<UserInvitationResult> {
+  try {
+    const user_invitation = await context.prisma.userInvitation.findUnique({
+      where: {
+        id: args.id,
+      },
+    });
 
-  return user_invitation;
+    if (!user_invitation) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The UserInvitation with the id ${args.id} does not exist.`,
+      };
+    }
+
+    return {
+      __typename: "UserInvitation",
+      ...user_invitation,
+    };
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `Failed to find UserInvitation with the id ${args.id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
 }
 
 export {

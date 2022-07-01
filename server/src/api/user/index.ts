@@ -5,14 +5,17 @@ import {
   createUser,
   deleteUser,
   disableUser,
+  getDefaultUserDistrict,
   getUser,
+  getUserDistricts,
   getUserOrganisations,
   getUsers,
   login,
   requestPasswordReset,
   resetPassword,
   updateUser,
-} from "./queries";
+  getDefaultUserOrganisation,
+} from "../queries";
 
 const typeDefs = gql`
   type User {
@@ -20,9 +23,10 @@ const typeDefs = gql`
     first_name: String!
     last_name: String!
     email: String!
-    disabled: Boolean
+    disabled: Boolean!
+    master_support: Boolean!
     user_organisations: [OrganisationUser!]
-    user_roles: [UserRoleType!]!
+    user_districts: [District!]
     hashed_confirmation_token: String
     confirmed_at: DateTime
     hashed_password_reset_token: String
@@ -38,6 +42,11 @@ const typeDefs = gql`
     users: [User!]
     user(id: ID!): UserResult!
     me: UserResult!
+    default_user_district(
+      user_id: ID!
+      organisation_user_id: ID!
+    ): DistrictResult!
+    default_user_organisation(user_id: ID!): OrganisationResult!
   }
 
   extend type Mutation {
@@ -72,22 +81,29 @@ const typeDefs = gql`
   }
 
   type LoginSuccess {
-    accessToken: JWT
+    accessToken: JWT!
+    id: ID!
   }
 
   input CreateInvitedUserInput {
     user_invitation_id: ID!
     organisation_id: ID!
-    catchment_district_ids: [ID!]!
+    catchment_districts: [CatchmentDistrictInput!]!
     user_details: CreateUserInput!
   }
 
+  input CatchmentDistrictInput {
+    catchment_district_id: ID!
+    roles: [DistrictUserRoleType!]!
+  }
+
+  # when creating a user, we do not give them any roles until they create an organisation in which case they
+  # are given a role of owner
   input CreateUserInput {
     first_name: String!
     last_name: String!
     email: String!
     password: String!
-    user_roles: [UserRoleType!]!
   }
 
   input DeleteUserInput {
@@ -112,12 +128,17 @@ const typeDefs = gql`
     first_name: String
     last_name: String
     theme: UserTheme
-    user_roles: [UserRoleType!]
   }
 
-  enum UserRoleType {
+  enum OrganisationUserRoleType {
     SUPPORT
+    OWNER
     ADMIN
+    USER
+  }
+
+  enum DistrictUserRoleType {
+    DISTRICT_MANAGER
     APPROVER
     DATA_ENTRY
     USER
@@ -148,11 +169,17 @@ const resolvers: Resolvers = {
   User: {
     user_organisations: (parent, _args, context) =>
       getUserOrganisations(parent.id, context),
+    user_districts: (parent, _args, context) =>
+      getUserDistricts(parent.id, context),
   },
   Query: {
     users: (_, _args, context) => getUsers(context),
     user: (_, args, context) => getUser(args, context),
     me: (_, _args, context) => getUser({ id: context.user?.id }, context),
+    default_user_district: (_, args, context) =>
+      getDefaultUserDistrict(args, context),
+    default_user_organisation: (_, args, context) =>
+      getDefaultUserOrganisation(args.user_id, context),
   },
   Mutation: {
     createUser: (_, args, context) => createUser(args, context),

@@ -11,49 +11,55 @@ const typeDefs = gql`
   type UserInvitation {
     id: ID!
     ttl: DateTime!
-    email: String!
+    email: EmailAddress!
     organisation_id: String!
-    district_ids: [String!]
+    catchment_district_ids: [String!]
     invitation_token: String!
   }
 
   extend type Query {
-    user_invitations(args: UserInvitationsArgsInput!): [UserInvitation!]
-    user_invitation(id: ID!): UserInvitation
+    user_invitations(args: SearchUserInvitationsInput!): [UserInvitation!]
+    user_invitation(id: ID!): UserInvitationResult!
   }
 
   extend type Mutation {
     createUserInvitation(
       input: CreateUserInvitationInput!
-    ): CreateUserInvitationPayload
+    ): UserInvitationResult!
     deleteUserInvitation(
       input: DeleteUserInvitationInput!
-    ): DeleteUserInvitationPayload
+    ): UserInvitationResult!
   }
 
   input DeleteUserInvitationInput {
     id: String!
   }
 
-  type DeleteUserInvitationPayload {
-    user_invitation: UserInvitation
-  }
-
-  input UserInvitationsArgsInput {
-    email: String
-    organisation_id: String
-    district_ids: [String!]
+  input SearchUserInvitationsInput {
+    email: EmailAddress
+    organisation_id: ID
+    catchment_district_ids: [ID!]
   }
 
   input CreateUserInvitationInput {
-    email: String!
-    organisation_id: String!
-    district_ids: [String!]!
+    email: EmailAddress!
+    organisation_id: ID!
+    organisation_role: OrganisationUserRoleType!
+    catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]!
+    invited_by: EmailAddress!
   }
 
-  type CreateUserInvitationPayload {
-    user_invitation: UserInvitation
+  input CreateUserInvitationCatchmentDistrictInput {
+    catchment_district_id: ID!
+    roles: [DistrictUserRoleType!]!
   }
+
+  union UserInvitationResult =
+      UserInvitation
+    | ApiNotFoundError
+    | ApiCreateError
+    | ApiUpdateError
+    | ApiDeleteError
 `;
 
 const resolvers: Resolvers = {

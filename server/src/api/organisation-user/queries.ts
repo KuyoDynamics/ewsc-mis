@@ -2,7 +2,9 @@ import { generateClientErrors, GraphQLContext } from "../../utils";
 import {
   MutationCreateOrganisationUserArgs,
   MutationDeleteOrganisationUserArgs,
+  MutationSetUserDefaultProjectArgs,
   MutationUpdateOrganisationUserArgs,
+  OrganisationResult,
   OrganisationUser,
   OrganisationUserResult,
   QueryOrganisation_UserArgs,
@@ -13,13 +15,14 @@ async function getOrganisationUsers(
   args: QueryOrganisation_UsersArgs,
   context: GraphQLContext
 ): Promise<OrganisationUser[]> {
-  return context.prisma.organisation
+  const org_users = await context.prisma.organisation
     .findUnique({
       where: {
         id: args.organisation_id,
       },
     })
     .users();
+  return org_users as OrganisationUser[];
 }
 
 async function getOrganisationUser(
@@ -43,11 +46,56 @@ async function getOrganisationUser(
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiNotFoundError",
       message: `Failed to find OrganisationUser with the id ${args.organisation_user_id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
+}
+
+async function getDefaultUserOrganisation(
+  user_id: string,
+  context: GraphQLContext
+): Promise<OrganisationResult> {
+  try {
+    const result = await context.prisma.user.findUnique({
+      where: {
+        id: user_id,
+      },
+      include: {
+        user_organisations: {
+          where: {
+            is_default_organisation: true,
+          },
+          select: {
+            organisation: true,
+          },
+        },
+      },
+    });
+
+    const user_default_organisation = result?.user_organisations.flatMap(
+      (user_org) => user_org.organisation
+    )[0];
+
+    if (!user_default_organisation) {
+      return {
+        __typename: "ApiNotFoundError",
+        message: `The Default Organisation not found for organisation_user_id ${user_id}.`,
+      };
+    }
+
+    return {
+      __typename: "Organisation",
+      ...user_default_organisation,
+    } as OrganisationResult;
+  } catch (error) {
+    return {
+      __typename: "ApiNotFoundError",
+      message: `The Default Organisation not found for organisation_user_id ${user_id}.`,
       errors: generateClientErrors(error),
     };
   }
@@ -58,20 +106,21 @@ async function createOrganisationUser(
   context: GraphQLContext
 ): Promise<OrganisationUserResult> {
   try {
-    const requiredInput = {
-      user_id: args.input.user_id,
-      organisation_id: args.input.organisation_id,
-      created_by: context.user?.email,
-      last_modified_by: context.user?.email,
-    };
     const organisation_user = await context.prisma.organisationUser.create({
-      data: requiredInput,
+      data: {
+        user_id: args.input.user_id,
+        organisation_id: args.input.organisation_id,
+        role: args.input.role,
+        is_default_organisation: args.input.is_default_organisation,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
+      },
     });
 
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiCreateError",
@@ -91,18 +140,58 @@ async function updateOrganisationUser(
         id: args.input.id,
       },
       data: {
-        is_owner: args.input.update.is_owner,
+        role: args.input.update.role || undefined,
+        last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiUpdateError",
       message: `Failed to update OrganisationUser with id ${args.input.id}.`,
       errors: generateClientErrors(error, "id"),
+    };
+  }
+}
+
+async function setUserDefaultOrganisation(
+  args: MutationSetUserDefaultProjectArgs,
+  context: GraphQLContext
+): Promise<OrganisationUserResult> {
+  try {
+    const [_batchResult, updateResult] = await context.prisma.$transaction([
+      context.prisma.organisationUser.updateMany({
+        where: {
+          id: args.organisation_user_id,
+        },
+        data: {
+          is_default_organisation: false,
+        },
+      }),
+
+      context.prisma.organisationUser.update({
+        where: {
+          id: args.organisation_user_id,
+        },
+        data: {
+          is_default_organisation: true,
+        },
+      }),
+    ]);
+    return {
+      __typename: "OrganisationUser",
+      ...updateResult,
+    } as OrganisationUser;
+  } catch (error) {
+    return {
+      __typename: "ApiUpdateError",
+      message: `Failed to update UserOrganisation as Default with ${{
+        id: args.organisation_user_id,
+      }}.`,
+      errors: generateClientErrors(error, "district_user_id"),
     };
   }
 }
@@ -121,7 +210,7 @@ async function deleteOrganisationUser(
     return {
       __typename: "OrganisationUser",
       ...organisation_user,
-    };
+    } as OrganisationUser;
   } catch (error) {
     return {
       __typename: "ApiDeleteError",
@@ -137,4 +226,6 @@ export {
   getOrganisationUser,
   updateOrganisationUser,
   deleteOrganisationUser,
+  setUserDefaultOrganisation,
+  getDefaultUserOrganisation,
 };

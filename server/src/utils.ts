@@ -1,6 +1,6 @@
 import { hash, compare } from "bcrypt";
 import { Request as JWTRequest } from "express-jwt";
-import { PrismaClient, User } from "@prisma/client";
+import { DistrictUserRoleType, PrismaClient, User } from "@prisma/client";
 import {
   ApiCreateError,
   ApiDeleteError,
@@ -174,6 +174,20 @@ const PRISMA_ERROR_CODES: Record<string, string> = {
   P4002: "The schema of the introspected database was inconsistent.",
 };
 
+function prepareDistrictUserRolesForCreate(user_roles: DistrictUserRoleType[]) {
+  return !user_roles?.length
+    ? [DistrictUserRoleType.USER]
+    : [...new Set([...user_roles, DistrictUserRoleType.USER])];
+}
+
+function prepareDistrictUserRolesForUpdate(
+  new_user_roles: DistrictUserRoleType[] | undefined
+) {
+  return !new_user_roles?.length
+    ? undefined
+    : [...new Set([...new_user_roles, DistrictUserRoleType.USER])];
+}
+
 function generateClientErrors<T>(error: T, field_name?: string): ErrorField[] {
   let errorFields: ErrorField[] = [];
   console.log("Chaiwa, see this error", error);
@@ -313,4 +327,6 @@ export {
   getApiUpdateError,
   getApiDeleteError,
   getApiBatchPayloadCreateError,
+  prepareDistrictUserRolesForCreate,
+  prepareDistrictUserRolesForUpdate,
 };

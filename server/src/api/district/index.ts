@@ -5,7 +5,9 @@ import {
   deleteDistrict,
   getDistrict,
   getDistricts,
+  getOrganisationsInDistrict,
   getProvince,
+  getResidences,
   updateDistrict,
 } from "../queries";
 
@@ -16,6 +18,8 @@ const typeDefs = gql`
     code: String!
     province_id: String!
     province: ProvinceResult
+    organisations_in_district: [CatchmentDistrict!]
+    residences: [Residence!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -75,6 +79,10 @@ const resolvers: Resolvers = {
   District: {
     province: (parent, _args, context) =>
       getProvince(parent.province_id, context),
+    residences: (parent, _args, context) =>
+      getResidences({ district_id: parent.id }, context),
+    organisations_in_district: (parent, _args, context) =>
+      getOrganisationsInDistrict(parent.id, context),
   },
 };
 
