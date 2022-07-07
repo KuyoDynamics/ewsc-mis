@@ -24,7 +24,12 @@ import {
 import { Logo } from "../logo";
 import { NavItem } from "../nav-item";
 import { NavLink, useLocation } from "react-router-dom";
-import { useGetCurrentUserQuery } from "../../../graphql/generated";
+import {
+  useGetCurrentUserQuery,
+  useGetDefaultUserDistrictLazyQuery,
+  useGetDefaultUserOrganisationLazyQuery,
+  User,
+} from "../../../graphql/generated";
 
 const items = [
   {
@@ -59,11 +64,54 @@ export const DashboardSidebar = (props: DashboardSidebarProps) => {
     defaultMatches: true,
     noSsr: false,
   });
-  const { loading, data, error } = useGetCurrentUserQuery({
+
+  const {
+    loading: loadingCurrentUser,
+    data: currentUserResponse,
+    error: currentUserError,
+  } = useGetCurrentUserQuery({
     fetchPolicy: "cache-first",
   });
 
+  const currentUser = React.useMemo(()=> currentUserResponse?.me.__typename === "User"? currentUserResponse.me : null,[currentUserResponse?.me.__typename])
+
+  const [
+    getDefaultDistrict,
+    {
+      loading: loadingDefaultDistrict,
+      data: DefaultDistrictResponse,
+      error: DefaultDistrictError,
+    },
+  ] = useGetDefaultUserDistrictLazyQuery();
+
+  const [getDefaultOrganisation, {loading: loadingDefaultOrg, data: DefaultOrgResponse, error: DefaultOrgError}]=useGetDefaultUserOrganisationLazyQuery();
+
   // const [] = useGetD
+  // console.log("laoding", loading);
+  // console.log("data", data);
+  // console.log("error", error);
+
+
+  useEffect(() => {
+    if(currentUser){
+      getDefaultOrganisation({
+        variables: {
+          userId: currentUser.id
+        }
+      })
+    }
+  }, [currentUser])
+
+  useEffect(() => {
+    if (currentUserResponse?.me.__typename === "User") {
+      getDefaultDistrict({
+        variables: {loadingCurrentUser
+          // organisationUserId: loadingCurrentUser.me.,
+          userId: loadingCurrentUser.me.id,
+        },
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (!pathname) {
@@ -78,7 +126,7 @@ export const DashboardSidebar = (props: DashboardSidebarProps) => {
   const renderContent = () => {
     if (loading) return <p>loading user scope...</p>;
     else if ((data && data.me.__typename === "ApiNotFoundError") || error)
-      return <p>failed to load use scope</p>;
+      return <p>failed to load user scope</p>;
     else if (data && data.me.__typename === "User")
       return (
         <>

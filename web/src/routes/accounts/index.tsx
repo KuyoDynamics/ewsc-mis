@@ -1,11 +1,11 @@
-import React from "react";
-import { Box, Container, Grid, Typography } from "@mui/material";
-import { AccountProfile } from "../../components/account/account-profile";
-import { AccountProfileDetails } from "../../components/account/account-profile-details";
-import { DashboardLayout } from "../../components/dashboard/dashboard-layout";
+import React from 'react';
+import { Box, Container, Grid, Typography } from '@mui/material';
+import AccountProfile from 'components/account/account-profile';
+import AccountProfileDetails from 'components/account/account-profile-details';
+// import DashboardLayout from 'components/dashboard/dashboard-layout';
 
-const Account = () => (
-  <>
+function Account() {
+  return (
     <Box
       component="main"
       sx={{
@@ -27,8 +27,8 @@ const Account = () => (
         </Grid>
       </Container>
     </Box>
-  </>
-);
+  );
+}
 
 // Account.getLayout = (page) => (
 //   <DashboardLayout>

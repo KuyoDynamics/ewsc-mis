@@ -2362,7 +2362,7 @@ export type User = {
   last_name: Scalars['String'];
   master_support: Scalars['Boolean'];
   theme?: Maybe<UserTheme>;
-  user_districts?: Maybe<Array<District>>;
+  user_districts?: Maybe<Array<DistrictUser>>;
   user_organisations?: Maybe<Array<OrganisationUser>>;
 };
 
@@ -4174,7 +4174,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   last_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   master_support?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
-  user_districts?: Resolver<Maybe<Array<ResolversTypes['District']>>, ParentType, ContextType>;
+  user_districts?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType>;
   user_organisations?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

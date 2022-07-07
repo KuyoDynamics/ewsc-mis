@@ -1,24 +1,24 @@
-import React, { useState } from "react";
-import { Box } from "@mui/material";
-import { styled } from "@mui/system";
-import { DashboardNavbar } from "./dashboard-navbar";
-import { DashboardSidebar } from "./dashboard-sidebar";
+import React, { useState } from 'react';
+import { styled } from '@mui/system';
+import { Box } from '@mui/material';
+import DashboardNavbar from 'components/dashboard/dashboard-navbar';
+import { DashboardSidebar } from 'components/dashboard/dashboard-sidebar';
 
-const DashboardLayoutRoot = styled("div")(({ theme }) => ({
-  display: "flex",
-  flex: "1 1 auto",
-  maxWidth: "100%",
+const DashboardLayoutRoot = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flex: '1 1 auto',
+  maxWidth: '100%',
   paddingTop: 64,
-  [theme.breakpoints.up("lg")]: {
+  [theme.breakpoints.up('lg')]: {
     paddingLeft: 280,
   },
 }));
 
 interface DashboardLayoutProps {
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const DashboardLayout = (props: DashboardLayoutProps) => {
+function DashboardLayout(props: DashboardLayoutProps) {
   const { children } = props;
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
@@ -27,10 +27,10 @@ export const DashboardLayout = (props: DashboardLayoutProps) => {
       <DashboardLayoutRoot>
         <Box
           sx={{
-            display: "flex",
-            flex: "1 1 auto",
-            flexDirection: "column",
-            width: "100%",
+            display: 'flex',
+            flex: '1 1 auto',
+            flexDirection: 'column',
+            width: '100%',
           }}
         >
           {children}
@@ -43,4 +43,6 @@ export const DashboardLayout = (props: DashboardLayoutProps) => {
       />
     </>
   );
-};
+}
+
+export default DashboardLayout;

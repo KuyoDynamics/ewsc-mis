@@ -1,11 +1,11 @@
-import React from "react";
-import { Box, Container, Typography } from "@mui/material";
-import { DashboardLayout } from "../../components/dashboard/dashboard-layout";
-import { SettingsNotifications } from "../../components/settings/notifications";
-import { SettingsPassword } from "../../components/settings/password";
+import React from 'react';
+import { Box, Container, Typography } from '@mui/material';
+import DashboardLayout from 'components/dashboard/dashboard-layout';
+import SettingsNotifications from 'components/settings/settings-notifications';
+import SettingsPassword from 'components/settings/settings-password';
 
-const Settings = () => (
-  <>
+function Settings() {
+  return (
     <Box
       component="main"
       sx={{
@@ -23,8 +23,8 @@ const Settings = () => (
         </Box>
       </Container>
     </Box>
-  </>
-);
+  );
+}
 
 Settings.getLayout = (page: any) => <DashboardLayout>{page}</DashboardLayout>;
 

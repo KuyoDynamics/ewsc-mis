@@ -1,0 +1,9 @@
+query GetDefaultUserOrganisation($userId: ID!) {
+  default_user_organisation(user_id: $userId) {
+    ... on Organisation {
+      id
+      name
+      logo
+    }
+  }
+}

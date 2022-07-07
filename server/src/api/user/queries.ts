@@ -11,6 +11,7 @@ import {
 import {
   District,
   DistrictResult,
+  DistrictUser,
   LoginResult,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
@@ -69,7 +70,7 @@ async function getUser(
 async function getUserDistricts(
   user_id: string,
   context: GraphQLContext
-): Promise<District[]> {
+): Promise<DistrictUser[]> {
   const result = await context.prisma.user.findUnique({
     where: {
       id: user_id,
@@ -77,25 +78,15 @@ async function getUserDistricts(
     select: {
       user_organisations: {
         select: {
-          district_users: {
-            select: {
-              catchment_district: {
-                select: {
-                  district: true,
-                },
-              },
-            },
-          },
+          district_users: true,
         },
       },
     },
   });
-  const districts = result?.user_organisations.flatMap((org_user) =>
-    org_user.district_users.flatMap(
-      (district_user) => district_user.catchment_district.district
-    )
+  const districts = result?.user_organisations.flatMap(
+    (org_user) => org_user.district_users
   );
-  return districts as District[];
+  return districts as DistrictUser[];
 }
 
 async function getDefaultUserDistrict(

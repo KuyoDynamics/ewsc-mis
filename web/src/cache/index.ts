@@ -1,6 +1,6 @@
-import { InMemoryCacheConfig, makeVar, ReactiveVar } from "@apollo/client";
-import jwt from "jwt-decode";
-import { StrictTypedTypePolicies } from "../../graphql/generated";
+import { InMemoryCacheConfig, makeVar, ReactiveVar } from '@apollo/client';
+import jwt from 'jwt-decode';
+import { StrictTypedTypePolicies } from '../../graphql/generated';
 
 interface IJwt {
   exp: number;
@@ -10,13 +10,13 @@ interface IJwt {
 }
 
 function isTokenExpired(): boolean {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
 
   if (token) {
     const { exp }: IJwt = jwt(token);
     const isExpired = exp < new Date().getTime() / 1000;
     if (isExpired) {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
     }
     return isExpired;
   }
@@ -25,7 +25,7 @@ function isTokenExpired(): boolean {
 
 const tokenExpired = isTokenExpired();
 
-let isLoggedInVar: ReactiveVar<boolean> = makeVar(tokenExpired);
+const isLoggedInVar: ReactiveVar<boolean> = makeVar(tokenExpired);
 
 const typePolicies: StrictTypedTypePolicies = {
   Query: {

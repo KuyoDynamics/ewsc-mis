@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -8,36 +8,36 @@ import {
   Divider,
   Grid,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
 const states = [
   {
-    value: "alabama",
-    label: "Alabama",
+    value: 'alabama',
+    label: 'Alabama',
   },
   {
-    value: "new-york",
-    label: "New York",
+    value: 'new-york',
+    label: 'New York',
   },
   {
-    value: "san-francisco",
-    label: "San Francisco",
+    value: 'san-francisco',
+    label: 'San Francisco',
   },
 ];
 
-export const AccountProfileDetails = (
+function AccountProfileDetails(
   props: React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,
     HTMLFormElement
   >
-) => {
+) {
   const [values, setValues] = useState({
-    firstName: "Katarina",
-    lastName: "Smith",
-    email: "demo@devias.io",
-    phone: "",
-    state: "Alabama",
-    country: "USA",
+    firstName: 'Katarina',
+    lastName: 'Smith',
+    email: 'demo@devias.io',
+    phone: '',
+    state: 'Alabama',
+    country: 'USA',
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +48,7 @@ export const AccountProfileDetails = (
   };
 
   return (
+    // eslint-disable-next-line react/jsx-props-no-spreading
     <form autoComplete="off" noValidate {...props}>
       <Card>
         <CardHeader subheader="The information can be edited" title="Profile" />
@@ -134,8 +135,8 @@ export const AccountProfileDetails = (
         <Divider />
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-end",
+            display: 'flex',
+            justifyContent: 'flex-end',
             p: 2,
           }}
         >
@@ -146,4 +147,6 @@ export const AccountProfileDetails = (
       </Card>
     </form>
   );
-};
+}
+
+export default AccountProfileDetails;

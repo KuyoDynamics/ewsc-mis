@@ -26,7 +26,7 @@ const typeDefs = gql`
     disabled: Boolean!
     master_support: Boolean!
     user_organisations: [OrganisationUser!]
-    user_districts: [District!]
+    user_districts: [DistrictUser!]
     hashed_confirmation_token: String
     confirmed_at: DateTime
     hashed_password_reset_token: String
