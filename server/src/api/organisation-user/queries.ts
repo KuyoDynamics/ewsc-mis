@@ -1,4 +1,4 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   MutationCreateOrganisationUserArgs,
   MutationDeleteOrganisationUserArgs,
@@ -9,7 +9,8 @@ import {
   OrganisationUserResult,
   QueryOrganisation_UserArgs,
   QueryOrganisation_UsersArgs,
-} from "../../libs/resolvers-types";
+  UserOrganisation,
+} from '../../libs/resolvers-types';
 
 async function getOrganisationUsers(
   args: QueryOrganisation_UsersArgs,
@@ -38,22 +39,57 @@ async function getOrganisationUser(
 
     if (!organisation_user) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The OrganisationUser with the id ${args.organisation_user_id} does not exist.`,
       };
     }
 
     return {
-      __typename: "OrganisationUser",
+      __typename: 'OrganisationUser',
       ...organisation_user,
     } as OrganisationUser;
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find OrganisationUser with the id ${args.organisation_user_id}.`,
       errors: generateClientErrors(error),
     };
   }
+}
+
+async function resolveUserDefaultOrganisation(
+  user_id: string,
+  context: GraphQLContext
+): Promise<UserOrganisation> {
+  const result = await context.prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+    select: {
+      id: true,
+      user_organisations: {
+        where: {
+          is_default_organisation: true,
+        },
+        select: {
+          is_default_organisation: true,
+          role: true,
+          organisation: true,
+        },
+      },
+    },
+  });
+
+  const default_organisation = result?.user_organisations.flatMap(
+    (user_org) => ({
+      user_id: result.id,
+      is_user_default_organisation: user_org.is_default_organisation,
+      user_organisation_role: user_org.role,
+      ...user_org.organisation,
+    })
+  )[0];
+
+  return default_organisation as UserOrganisation;
 }
 
 async function getDefaultUserOrganisation(
@@ -83,18 +119,18 @@ async function getDefaultUserOrganisation(
 
     if (!user_default_organisation) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The Default Organisation not found for organisation_user_id ${user_id}.`,
       };
     }
 
     return {
-      __typename: "Organisation",
+      __typename: 'Organisation',
       ...user_default_organisation,
     } as OrganisationResult;
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `The Default Organisation not found for organisation_user_id ${user_id}.`,
       errors: generateClientErrors(error),
     };
@@ -118,12 +154,12 @@ async function createOrganisationUser(
     });
 
     return {
-      __typename: "OrganisationUser",
+      __typename: 'OrganisationUser',
       ...organisation_user,
     } as OrganisationUser;
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create OrganisationUser.`,
       errors: generateClientErrors(error),
     };
@@ -145,14 +181,14 @@ async function updateOrganisationUser(
       },
     });
     return {
-      __typename: "OrganisationUser",
+      __typename: 'OrganisationUser',
       ...organisation_user,
     } as OrganisationUser;
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update OrganisationUser with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -182,16 +218,16 @@ async function setUserDefaultOrganisation(
       }),
     ]);
     return {
-      __typename: "OrganisationUser",
+      __typename: 'OrganisationUser',
       ...updateResult,
     } as OrganisationUser;
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update UserOrganisation as Default with ${{
         id: args.organisation_user_id,
       }}.`,
-      errors: generateClientErrors(error, "district_user_id"),
+      errors: generateClientErrors(error, 'district_user_id'),
     };
   }
 }
@@ -208,14 +244,14 @@ async function deleteOrganisationUser(
     });
 
     return {
-      __typename: "OrganisationUser",
+      __typename: 'OrganisationUser',
       ...organisation_user,
     } as OrganisationUser;
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete OrganisationUser with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -228,4 +264,5 @@ export {
   deleteOrganisationUser,
   setUserDefaultOrganisation,
   getDefaultUserOrganisation,
+  resolveUserDefaultOrganisation,
 };

@@ -1,10 +1,10 @@
-import React from "react";
-import { Box, Container, Grid } from "@mui/material";
+import React from 'react';
+import { Box, Container, Grid } from '@mui/material';
 // import { Sales } from "../../components/dashboard/sales-example";
-import { DashboardLayout } from "../../components/dashboard/dashboard-layout";
+// import { DashboardLayout } from '../../components/dashboard/dashboard-layout';
 
-const Dashboard = () => (
-  <>
+function Dashboard() {
+  return (
     <Box
       component="main"
       sx={{
@@ -41,8 +41,8 @@ const Dashboard = () => (
         </Grid>
       </Container>
     </Box>
-  </>
-);
+  );
+}
 
 // Dashboard.getLayout = (page) => (
 //   <DashboardLayout>

@@ -1,32 +1,33 @@
-import { setContext } from "@apollo/client/link/context";
-import { isLoggedInVar } from "../cache";
+import { setContext } from '@apollo/client/link/context';
+import { isLoggedInVar } from 'cache';
 
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      authorization: token ? `Bearer ${token}` : '',
     },
   };
 });
 
 function observeTokenForExternalChanges() {
-  window.addEventListener("storage", ({ key }) => {
-    if (key === "token" || !key) {
-      localStorage.removeItem("token");
+  window.addEventListener('storage', ({ key }) => {
+    if (key === 'token' || !key) {
+      localStorage.removeItem('token');
       isLoggedInVar(false);
     }
   });
 }
 
 function logout() {
-  localStorage.removeItem("token");
+  localStorage.removeItem('token');
   isLoggedInVar(false);
 }
 
 function setToken(token: string) {
-  localStorage.setItem("token", token);
+  localStorage.setItem('token', token);
+  console.log('Chaiwa, what was the token here?', token);
   isLoggedInVar(true);
 }
 

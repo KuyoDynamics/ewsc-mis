@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { isTokenExpired, isLoggedInVar } from "../../cache";
+import { useEffect } from 'react';
+import { isTokenExpired, isLoggedInVar } from 'cache';
 
 function CheckAuth({ children }: { children: JSX.Element }) {
   const tokenExpired = isTokenExpired();
@@ -8,7 +8,7 @@ function CheckAuth({ children }: { children: JSX.Element }) {
     isLoggedInVar(!tokenExpired);
   }, [tokenExpired]);
 
-  return <>{children}</>;
+  return { children };
 }
 
-export { CheckAuth };
+export default CheckAuth;

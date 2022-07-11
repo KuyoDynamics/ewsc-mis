@@ -1,10 +1,10 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   MutationCreateProvinceArgs,
   MutationUpdateProvinceArgs,
   Province,
   ProvinceResult,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 
 async function getProvinces(
   country_id: string,
@@ -34,21 +34,33 @@ async function getProvince(
 
     if (!province) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The Province with the id ${id} does not exist.`,
       };
     }
     return {
-      __typename: "Province",
+      __typename: 'Province',
       ...province,
     };
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find Province with the id ${id}.`,
       errors: generateClientErrors(error),
     };
   }
+}
+
+async function resolveProvince(
+  province_id: string,
+  context: GraphQLContext
+): Promise<Province> {
+  const result = await context.prisma.province.findUnique({
+    where: {
+      id: province_id,
+    },
+  });
+  return result as Province;
 }
 
 async function createProvince(
@@ -67,12 +79,12 @@ async function createProvince(
     });
 
     return {
-      __typename: "Province",
+      __typename: 'Province',
       ...province,
     };
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create Province.`,
       errors: generateClientErrors(error),
     };
@@ -91,14 +103,14 @@ async function deleteProvince(
     });
 
     return {
-      __typename: "Province",
+      __typename: 'Province',
       ...province,
     };
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete Province with id ${id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -120,14 +132,14 @@ async function updateProvince(
     });
 
     return {
-      __typename: "Province",
+      __typename: 'Province',
       ...province,
     };
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update Province with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -138,4 +150,5 @@ export {
   deleteProvince,
   getProvince,
   getProvinces,
+  resolveProvince
 };

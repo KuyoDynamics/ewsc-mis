@@ -4,30 +4,31 @@ import React, {
   Ref,
   ReactElement,
   MouseEvent,
-} from "react";
-import IconButton from "@mui/material/IconButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import SettingsIcon from "@mui/icons-material/SettingsSharp";
-import { useNavigate } from "react-router-dom";
-import { logout } from "../../utils/session";
-import { Avatar, Divider, Slide } from "@mui/material";
-import { UserCircle as UserCircleIcon } from "../../icons";
-import { TransitionProps } from "@mui/material/transitions";
-import { useGetCurrentUserQuery } from "../../../graphql/generated";
+} from 'react';
+import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import SettingsIcon from '@mui/icons-material/SettingsSharp';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, Divider, Slide } from '@mui/material';
+import { TransitionProps } from '@mui/material/transitions';
+import { logout } from 'utils/session';
+import { UserCircle as UserCircleIcon } from 'icons';
+import { useGetCurrentUserQuery } from '../../../graphql/generated';
 
-const Transition = forwardRef(function Transition(
-  props: TransitionProps & {
-    children: ReactElement<any, any>;
-  },
-  ref: Ref<unknown>
-) {
-  return <Slide direction="left" ref={ref} {...props} />;
-});
+const Transition = forwardRef(
+  (
+    props: TransitionProps & {
+      children: ReactElement<any, any>;
+    },
+    ref: Ref<unknown>
+    // eslint-disable-next-line react/jsx-props-no-spreading
+  ) => <Slide direction="left" ref={ref} {...props} />
+);
 
 function UserMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -40,8 +41,12 @@ function UserMenu() {
   };
 
   const { loading, data, error } = useGetCurrentUserQuery({
-    fetchPolicy: "cache-only",
+    fetchPolicy: 'cache-first',
   });
+
+  console.log('error', error);
+  console.log('data', data);
+  console.log('error', error);
 
   const navigate = useNavigate();
 
@@ -65,12 +70,12 @@ function UserMenu() {
         open={open}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: 'top',
+          horizontal: 'right',
         }}
         TransitionComponent={Transition}
         keepMounted
@@ -79,12 +84,12 @@ function UserMenu() {
         <Typography
           sx={{
             height: 40,
-            alignContent: "center",
-            textAlign: "center",
+            alignContent: 'center',
+            textAlign: 'center',
           }}
           component="div"
         >
-          {data?.me.__typename === "User" && !loading ? (
+          {data?.me.__typename === 'User' && !loading ? (
             `Hi, ${data.me.first_name}`
           ) : (
             <h1>loading...</h1>
@@ -94,7 +99,7 @@ function UserMenu() {
         <MenuItem
           id="account-settings"
           href="/account"
-          onClick={() => navigate("/account")}
+          onClick={() => navigate('/account')}
         >
           <ListItemIcon>
             <SettingsIcon />

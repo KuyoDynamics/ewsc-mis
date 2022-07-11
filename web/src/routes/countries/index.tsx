@@ -1,5 +1,4 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import React from 'react';
 // import { useGetCountriesQuery } from "../../../graphql/generated";
 
 function Countries() {
@@ -22,4 +21,4 @@ function Countries() {
   );
 }
 
-export { Countries };
+export default Countries;

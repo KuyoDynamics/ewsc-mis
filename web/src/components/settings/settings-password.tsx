@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -7,17 +7,17 @@ import {
   CardHeader,
   Divider,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
-export const SettingsPassword = (
+function SettingsPassword(
   props: React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,
     HTMLFormElement
   >
-) => {
+) {
   const [values, setValues] = useState({
-    password: "",
-    confirm: "",
+    password: '',
+    confirm: '',
   });
 
   const handleChange = (event: { target: { name: any; value: any } }) => {
@@ -28,6 +28,7 @@ export const SettingsPassword = (
   };
 
   return (
+    // eslint-disable-next-line react/jsx-props-no-spreading
     <form {...props}>
       <Card>
         <CardHeader subheader="Update password" title="Password" />
@@ -57,8 +58,8 @@ export const SettingsPassword = (
         <Divider />
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-end",
+            display: 'flex',
+            justifyContent: 'flex-end',
             p: 2,
           }}
         >
@@ -69,4 +70,6 @@ export const SettingsPassword = (
       </Card>
     </form>
   );
-};
+}
+
+export default SettingsPassword;

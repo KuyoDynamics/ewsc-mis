@@ -26,6 +26,29 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
+  type OrganisationUserView{
+    id: String!
+    first_name: String!
+    last_name: String!
+    email: String!
+    disabled: Boolean!
+    master_support: Boolean!
+    organisation_id: String!
+    organisation: UserOrganisation
+    role: OrganisationUserRoleType!
+    user_organisations: [UserOrganisation!]
+    user_districts: [UserDistrict!]
+    hashed_confirmation_token: String
+    confirmed_at: DateTime
+    hashed_password_reset_token: String
+    last_login: DateTime
+    theme: UserTheme
+    created_at: DateTime!
+    created_by: String!
+    last_modified_at: DateTime!
+    last_modified_by: String!
+  }
+
   extend type Query {
     organisation_users(organisation_id: ID!): [OrganisationUser!]
     organisation_user(organisation_user_id: ID!): OrganisationUserResult!

@@ -1,8 +1,9 @@
-import React from "react";
-import * as Yup from "yup";
-import { Link } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+/* eslint-disable react/jsx-props-no-spreading */
+import React from 'react';
+import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   Button,
@@ -12,19 +13,19 @@ import {
   FormHelperText,
   TextField,
   Typography,
-} from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-const Register = () => {
+function Register() {
   const validationSchema = Yup.object({
     email: Yup.string()
-      .email("Must be a valid email")
+      .email('Must be a valid email')
       .max(255)
-      .required("Email is required"),
-    firstName: Yup.string().max(255).required("First name is required"),
-    lastName: Yup.string().max(255).required("Last name is required"),
-    password: Yup.string().max(255).required("Password is required"),
-    policy: Yup.boolean().oneOf([true], "This field must be checked"),
+      .required('Email is required'),
+    firstName: Yup.string().max(255).required('First name is required'),
+    lastName: Yup.string().max(255).required('Last name is required'),
+    password: Yup.string().max(255).required('Password is required'),
+    policy: Yup.boolean().oneOf([true], 'This field must be checked'),
   });
 
   interface IDefaultValues {
@@ -36,10 +37,10 @@ const Register = () => {
   }
 
   const defaultValues: IDefaultValues = {
-    email: "",
-    firstName: "",
-    lastName: "",
-    password: "",
+    email: '',
+    firstName: '',
+    lastName: '',
+    password: '',
     policy: false,
   };
 
@@ -52,152 +53,143 @@ const Register = () => {
   } = useForm({
     defaultValues,
     resolver: yupResolver(validationSchema),
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   return (
-    <>
-      <Box
-        component="main"
-        sx={{
-          alignItems: "center",
-          display: "flex",
-          flexGrow: 1,
-          minHeight: "100%",
-        }}
-      >
-        <Container maxWidth="sm">
-          <Link to="/">
-            <Button
-              component="a"
-              startIcon={<ArrowBackIcon fontSize="small" />}
-            >
-              Dashboard
-            </Button>
-          </Link>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Box sx={{ my: 3 }}>
-              <Typography color="textPrimary" variant="h4">
-                Create a new account
-              </Typography>
-              <Typography color="textSecondary" gutterBottom variant="body2">
-                Use your email to create a new account
-              </Typography>
-            </Box>
-            <Controller
-              name="firstName"
-              control={control}
-              render={({ field, fieldState: { isTouched, error } }) => (
-                <TextField
-                  {...field}
-                  error={Boolean(isTouched && error)}
-                  helperText={error?.message}
-                  label="First Name"
-                  margin="normal"
-                  variant="outlined"
-                />
-              )}
-            />
-            <Controller
-              name="lastName"
-              control={control}
-              render={({ field, fieldState: { isTouched, error } }) => (
-                <TextField
-                  {...field}
-                  error={Boolean(isTouched && error)}
-                  helperText={error?.message}
-                  label="Last Name"
-                  margin="normal"
-                  variant="outlined"
-                />
-              )}
-            />
-            <Controller
-              name="email"
-              control={control}
-              render={({ field, fieldState: { isTouched, error } }) => (
-                <TextField
-                  {...field}
-                  error={Boolean(isTouched && error)}
-                  helperText={error?.message}
-                  label="Email"
-                  margin="normal"
-                  variant="outlined"
-                  type="email"
-                />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              render={({ field, fieldState: { isTouched, error } }) => (
-                <TextField
-                  {...field}
-                  error={Boolean(isTouched && error)}
-                  helperText={error?.message}
-                  label="Password"
-                  margin="normal"
-                  variant="outlined"
-                  type="password"
-                />
-              )}
-            />
-
-            <Box
-              sx={{
-                alignItems: "center",
-                display: "flex",
-                ml: -1,
-              }}
-            >
-              <Controller
-                name="policy"
-                control={control}
-                render={({ field }) => <Checkbox {...field} />}
+    <Box
+      component="main"
+      sx={{
+        alignItems: 'center',
+        display: 'flex',
+        flexGrow: 1,
+        minHeight: '100%',
+      }}
+    >
+      <Container maxWidth="sm">
+        <Link to="/">
+          <Button component="a" startIcon={<ArrowBackIcon fontSize="small" />}>
+            Dashboard
+          </Button>
+        </Link>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Box sx={{ my: 3 }}>
+            <Typography color="textPrimary" variant="h4">
+              Create a new account
+            </Typography>
+            <Typography color="textSecondary" gutterBottom variant="body2">
+              Use your email to create a new account
+            </Typography>
+          </Box>
+          <Controller
+            name="firstName"
+            control={control}
+            render={({ field, fieldState: { isTouched, error } }) => (
+              <TextField
+                {...field}
+                error={Boolean(isTouched && error)}
+                helperText={error?.message}
+                label="First Name"
+                margin="normal"
+                variant="outlined"
               />
-              <Typography color="textSecondary" variant="body2">
-                I have read the{" "}
-                <Link to="#">
-                  <MUILink
-                    color="primary"
-                    underline="always"
-                    variant="subtitle2"
-                  >
-                    Terms and Conditions
-                  </MUILink>
-                </Link>
-              </Typography>
-            </Box>
-            {Boolean(touchedFields.policy && errors.policy) && (
-              <FormHelperText error>
-                {typeof errors.policy === "string" && errors.policy}
-              </FormHelperText>
             )}
-            <Box sx={{ py: 2 }}>
-              <Button
-                color="primary"
-                disabled={isSubmitting}
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-              >
-                Sign Up Now
-              </Button>
-            </Box>
+          />
+          <Controller
+            name="lastName"
+            control={control}
+            render={({ field, fieldState: { isTouched, error } }) => (
+              <TextField
+                {...field}
+                error={Boolean(isTouched && error)}
+                helperText={error?.message}
+                label="Last Name"
+                margin="normal"
+                variant="outlined"
+              />
+            )}
+          />
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState: { isTouched, error } }) => (
+              <TextField
+                {...field}
+                error={Boolean(isTouched && error)}
+                helperText={error?.message}
+                label="Email"
+                margin="normal"
+                variant="outlined"
+                type="email"
+              />
+            )}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field, fieldState: { isTouched, error } }) => (
+              <TextField
+                {...field}
+                error={Boolean(isTouched && error)}
+                helperText={error?.message}
+                label="Password"
+                margin="normal"
+                variant="outlined"
+                type="password"
+              />
+            )}
+          />
+
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+              ml: -1,
+            }}
+          >
+            <Controller
+              name="policy"
+              control={control}
+              render={({ field }) => <Checkbox {...field} />}
+            />
             <Typography color="textSecondary" variant="body2">
-              Have an account?{" "}
-              <Link to="/login">
-                <MUILink variant="subtitle2" underline="hover">
-                  Sign In
+              I have read the{' '}
+              <Link to="/">
+                <MUILink color="primary" underline="always" variant="subtitle2">
+                  Terms and Conditions
                 </MUILink>
               </Link>
             </Typography>
-          </form>
-        </Container>
-      </Box>
-    </>
+          </Box>
+          {Boolean(touchedFields.policy && errors.policy) && (
+            <FormHelperText error>
+              {typeof errors.policy === 'string' && errors.policy}
+            </FormHelperText>
+          )}
+          <Box sx={{ py: 2 }}>
+            <Button
+              color="primary"
+              disabled={isSubmitting}
+              fullWidth
+              size="large"
+              type="submit"
+              variant="contained"
+            >
+              Sign Up Now
+            </Button>
+          </Box>
+          <Typography color="textSecondary" variant="body2">
+            Have an account?{' '}
+            <Link to="/login">
+              <MUILink variant="subtitle2" underline="hover">
+                Sign In
+              </MUILink>
+            </Link>
+          </Typography>
+        </form>
+      </Container>
+    </Box>
   );
-};
+}
 
 export default Register;

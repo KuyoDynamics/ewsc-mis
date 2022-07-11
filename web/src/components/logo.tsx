@@ -1,10 +1,11 @@
-import { styled } from "@mui/material/styles";
-import React from "react";
+/* eslint-disable react/jsx-props-no-spreading */
+import { styled } from '@mui/material/styles';
+import React from 'react';
 
 export const Logo = styled((props: LogoProps) => {
   const { variant, ...other } = props;
 
-  const color = variant === "light" ? "#C1C4D6" : "#5048E5";
+  const color = variant === 'light' ? '#C1C4D6' : '#5048E5';
 
   return (
     <svg
@@ -34,11 +35,11 @@ export const Logo = styled((props: LogoProps) => {
   );
 })``;
 
-export enum variantType {
-  light = "light",
-  primary = "primary",
+export enum VariantType {
+  light = 'light',
+  primary = 'primary',
 }
 
 type LogoProps = {
-  variant?: variantType;
+  variant?: VariantType;
 };
