@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import { Box } from '@mui/material';
 import DashboardNavbar from 'components/dashboard/dashboard-navbar';
-import { DashboardSidebar } from 'components/dashboard/dashboard-sidebar';
+import DashboardSidebar from 'components/dashboard/dashboard-sidebar';
 
 const DashboardLayoutRoot = styled('div')(({ theme }) => ({
   display: 'flex',

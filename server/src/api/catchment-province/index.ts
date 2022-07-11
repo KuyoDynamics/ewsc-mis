@@ -26,6 +26,22 @@ const typeDefs = gql`
     last_modified_by: String
   }
 
+  type CatchmentProvinceView{
+    id: ID!
+    code: String!
+    name: String!
+    disabled: Boolean!
+    organisation_id: String!
+    organisation: Organisation
+    catchment_districts: [CatchmentDistrictView!]
+    country_id: String!
+    country: Country
+    created_at: DateTime
+    created_by: String
+    last_modified_at: DateTime
+    last_modified_by: String
+  }
+
   type Query {
     catchment_provinces(organisation_id: ID!): [CatchmentProvince!]
     catchment_province(catchment_province_id: ID!): CatchmentProvinceResult!

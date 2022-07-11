@@ -29,6 +29,35 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
+  type OrganisationIndicatorView {
+
+    id: ID!
+    indicator_number: String!
+    description: String!
+    category: String!
+    type: IndicatorType!
+    contributing_organisation: String!
+
+    indicator_disaggregates: [IndicatorDisaggregate!]
+
+    report_template_id: String!
+    report_template: ReportTemplate
+
+    indicator_unit_id: String!
+    indicator_unit: IndicatorUnit
+
+    organisation_id: ID!
+    organisation: OrganisationResult
+
+    indicator_organisations: [Organisation!]
+
+    created_at: DateTime!
+    created_by: String!
+    last_modified_at: DateTime!
+    last_modified_by: String!
+
+  }
+
   extend type Query {
     organisation_indicators(organisation_id: ID!): [OrganisationIndicator!]
     organisation_indicator(id: ID!): OrganisationIndicatorResult!

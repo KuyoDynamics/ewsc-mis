@@ -253,6 +253,29 @@ export type CatchmentDistrictUpdateInput = {
   disabled: Scalars['Boolean'];
 };
 
+export type CatchmentDistrictView = {
+  __typename?: 'CatchmentDistrictView';
+  catchment_province?: Maybe<CatchmentProvinceView>;
+  catchment_province_id: Scalars['String'];
+  code: Scalars['String'];
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  disabled: Scalars['Boolean'];
+  district_users?: Maybe<Array<DistrictUser>>;
+  id: Scalars['ID'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  name: Scalars['String'];
+  organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
+  province?: Maybe<ProvinceResult>;
+  province_id: Scalars['String'];
+  reports?: Maybe<Array<Report>>;
+  residences?: Maybe<Array<Residence>>;
+  service_areas?: Maybe<Array<ServiceArea>>;
+  sewer_treatment_plants?: Maybe<Array<SewerTreatmentPlant>>;
+  water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
+};
+
 export type CatchmentProvince = {
   __typename?: 'CatchmentProvince';
   catchment_districts?: Maybe<Array<CatchmentDistrict>>;
@@ -272,6 +295,23 @@ export type CatchmentProvinceResult = ApiCreateError | ApiDeleteError | ApiNotFo
 
 export type CatchmentProvinceUpdateInput = {
   disabled: Scalars['Boolean'];
+};
+
+export type CatchmentProvinceView = {
+  __typename?: 'CatchmentProvinceView';
+  catchment_districts?: Maybe<Array<CatchmentDistrictView>>;
+  code: Scalars['String'];
+  country?: Maybe<Country>;
+  country_id: Scalars['String'];
+  created_at?: Maybe<Scalars['DateTime']>;
+  created_by?: Maybe<Scalars['String']>;
+  disabled: Scalars['Boolean'];
+  id: Scalars['ID'];
+  last_modified_at?: Maybe<Scalars['DateTime']>;
+  last_modified_by?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  organisation?: Maybe<Organisation>;
+  organisation_id: Scalars['String'];
 };
 
 export type Country = {
@@ -1550,6 +1590,28 @@ export type OrganisationIndicator = {
 
 export type OrganisationIndicatorResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | OrganisationIndicator;
 
+export type OrganisationIndicatorView = {
+  __typename?: 'OrganisationIndicatorView';
+  category: Scalars['String'];
+  contributing_organisation: Scalars['String'];
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  description: Scalars['String'];
+  id: Scalars['ID'];
+  indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
+  indicator_number: Scalars['String'];
+  indicator_organisations?: Maybe<Array<Organisation>>;
+  indicator_unit?: Maybe<IndicatorUnit>;
+  indicator_unit_id: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  organisation?: Maybe<OrganisationResult>;
+  organisation_id: Scalars['ID'];
+  report_template?: Maybe<ReportTemplate>;
+  report_template_id: Scalars['String'];
+  type: IndicatorType;
+};
+
 export type OrganisationReportTemplate = {
   __typename?: 'OrganisationReportTemplate';
   created_at: Scalars['DateTime'];
@@ -1565,6 +1627,24 @@ export type OrganisationReportTemplate = {
 };
 
 export type OrganisationReportTemplateResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | OrganisationReportTemplate;
+
+export type OrganisationReportTemplateView = {
+  __typename?: 'OrganisationReportTemplateView';
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  frequency: ReportingFrequency;
+  icon?: Maybe<Scalars['Byte']>;
+  id: Scalars['ID'];
+  indicators?: Maybe<Array<Indicator>>;
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  name: Scalars['String'];
+  organisation?: Maybe<Organisation>;
+  organisation_id: Scalars['ID'];
+  reports?: Maybe<Array<Report>>;
+  type: IndicatorType;
+  window: Scalars['Int'];
+};
 
 export type OrganisationResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | Organisation;
 
@@ -1601,6 +1681,30 @@ export enum OrganisationUserRoleType {
 
 export type OrganisationUserUpdateInput = {
   role: OrganisationUserRoleType;
+};
+
+export type OrganisationUserView = {
+  __typename?: 'OrganisationUserView';
+  confirmed_at?: Maybe<Scalars['DateTime']>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  disabled: Scalars['Boolean'];
+  email: Scalars['String'];
+  first_name: Scalars['String'];
+  hashed_confirmation_token?: Maybe<Scalars['String']>;
+  hashed_password_reset_token?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  last_login?: Maybe<Scalars['DateTime']>;
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  last_name: Scalars['String'];
+  master_support: Scalars['Boolean'];
+  organisation?: Maybe<UserOrganisation>;
+  organisation_id: Scalars['String'];
+  role: OrganisationUserRoleType;
+  theme?: Maybe<UserTheme>;
+  user_districts?: Maybe<Array<UserDistrict>>;
+  user_organisations?: Maybe<Array<UserOrganisation>>;
 };
 
 export type PasswordResetInput = {
@@ -1650,8 +1754,8 @@ export type Query = {
   catchment_provinces?: Maybe<Array<CatchmentProvince>>;
   countries?: Maybe<Array<Country>>;
   country: CountryResult;
-  default_user_district: DistrictResult;
-  default_user_organisation: OrganisationResult;
+  default_user_district: UserDistrictResult;
+  default_user_organisation: UserOrganisationResult;
   disaggregate: DisaggregateResult;
   disaggregate_option: DisaggregateOptionResult;
   disaggregate_options?: Maybe<Array<DisaggregateOption>>;
@@ -2362,13 +2466,36 @@ export type User = {
   last_name: Scalars['String'];
   master_support: Scalars['Boolean'];
   theme?: Maybe<UserTheme>;
-  user_districts?: Maybe<Array<DistrictUser>>;
-  user_organisations?: Maybe<Array<OrganisationUser>>;
+  user_default_organisation?: Maybe<UserOrganisation>;
+  user_organisations?: Maybe<Array<UserOrganisation>>;
 };
 
 export type UserDisableInput = {
   disabled: Scalars['Boolean'];
 };
+
+export type UserDistrict = {
+  __typename?: 'UserDistrict';
+  code: Scalars['String'];
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  disabled: Scalars['Boolean'];
+  id: Scalars['ID'];
+  is_default_user_district: Scalars['Boolean'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  name: Scalars['String'];
+  organisation?: Maybe<UserOrganisation>;
+  organisation_id: Scalars['ID'];
+  province?: Maybe<Province>;
+  province_id: Scalars['String'];
+  service_areas?: Maybe<Array<ServiceArea>>;
+  user?: Maybe<User>;
+  user_district_roles: Array<DistrictUserRoleType>;
+  user_id: Scalars['ID'];
+};
+
+export type UserDistrictResult = ApiNotFoundError | UserDistrict;
 
 export type UserInvitation = {
   __typename?: 'UserInvitation';
@@ -2381,6 +2508,32 @@ export type UserInvitation = {
 };
 
 export type UserInvitationResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | UserInvitation;
+
+export type UserOrganisation = {
+  __typename?: 'UserOrganisation';
+  catchment_provinces?: Maybe<Array<CatchmentProvinceView>>;
+  country?: Maybe<Country>;
+  country_id: Scalars['String'];
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  id: Scalars['ID'];
+  is_user_default_organisation: Scalars['Boolean'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+  logo?: Maybe<Scalars['Byte']>;
+  name: Scalars['String'];
+  organisation_indicators?: Maybe<Array<OrganisationIndicatorView>>;
+  organisation_report_templates?: Maybe<Array<OrganisationReportTemplateView>>;
+  reports?: Maybe<Array<Report>>;
+  user?: Maybe<User>;
+  user_default_district?: Maybe<UserDistrict>;
+  user_districts?: Maybe<Array<UserDistrict>>;
+  user_id: Scalars['ID'];
+  user_organisation_role: OrganisationUserRoleType;
+  users?: Maybe<Array<OrganisationUserView>>;
+};
+
+export type UserOrganisationResult = ApiNotFoundError | UserOrganisation;
 
 export type UserResult = ApiCreateError | ApiDeleteError | ApiNotFoundError | ApiUpdateError | User;
 
@@ -2593,9 +2746,11 @@ export type ResolversTypes = ResolversObject<{
   CatchmentDistrictInput: CatchmentDistrictInput;
   CatchmentDistrictResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['CatchmentDistrict'];
   CatchmentDistrictUpdateInput: CatchmentDistrictUpdateInput;
+  CatchmentDistrictView: ResolverTypeWrapper<Omit<CatchmentDistrictView, 'province'> & { province?: Maybe<ResolversTypes['ProvinceResult']> }>;
   CatchmentProvince: ResolverTypeWrapper<Omit<CatchmentProvince, 'organisation' | 'province'> & { organisation?: Maybe<ResolversTypes['OrganisationResult']>, province?: Maybe<ResolversTypes['ProvinceResult']> }>;
   CatchmentProvinceResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['CatchmentProvince'];
   CatchmentProvinceUpdateInput: CatchmentProvinceUpdateInput;
+  CatchmentProvinceView: ResolverTypeWrapper<CatchmentProvinceView>;
   Country: ResolverTypeWrapper<Country>;
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']>;
   CountryResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Country'];
@@ -2750,14 +2905,17 @@ export type ResolversTypes = ResolversObject<{
   Organisation: ResolverTypeWrapper<Omit<Organisation, 'country'> & { country?: Maybe<ResolversTypes['CountryResult']> }>;
   OrganisationIndicator: ResolverTypeWrapper<Omit<OrganisationIndicator, 'indicator' | 'organisation'> & { indicator?: Maybe<ResolversTypes['IndicatorResult']>, organisation?: Maybe<ResolversTypes['OrganisationResult']> }>;
   OrganisationIndicatorResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['OrganisationIndicator'];
+  OrganisationIndicatorView: ResolverTypeWrapper<Omit<OrganisationIndicatorView, 'organisation'> & { organisation?: Maybe<ResolversTypes['OrganisationResult']> }>;
   OrganisationReportTemplate: ResolverTypeWrapper<Omit<OrganisationReportTemplate, 'organisation' | 'report_template'> & { organisation?: Maybe<ResolversTypes['OrganisationResult']>, report_template?: Maybe<ResolversTypes['ReportTemplateResult']> }>;
   OrganisationReportTemplateResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['OrganisationReportTemplate'];
+  OrganisationReportTemplateView: ResolverTypeWrapper<OrganisationReportTemplateView>;
   OrganisationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Organisation'];
   OrganisationUpdateInput: OrganisationUpdateInput;
   OrganisationUser: ResolverTypeWrapper<Omit<OrganisationUser, 'default_district' | 'organisation' | 'user'> & { default_district?: Maybe<ResolversTypes['DistrictResult']>, organisation?: Maybe<ResolversTypes['OrganisationResult']>, user?: Maybe<ResolversTypes['UserResult']> }>;
   OrganisationUserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['OrganisationUser'];
   OrganisationUserRoleType: OrganisationUserRoleType;
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
+  OrganisationUserView: ResolverTypeWrapper<OrganisationUserView>;
   PasswordResetInput: PasswordResetInput;
   PasswordResetRequestInput: PasswordResetRequestInput;
   PasswordResetRequestPayload: ResolverTypeWrapper<PasswordResetRequestPayload>;
@@ -2843,8 +3001,12 @@ export type ResolversTypes = ResolversObject<{
   UpdateWaterTreatmentPlantPayload: ResolverTypeWrapper<UpdateWaterTreatmentPlantPayload>;
   User: ResolverTypeWrapper<User>;
   UserDisableInput: UserDisableInput;
+  UserDistrict: ResolverTypeWrapper<UserDistrict>;
+  UserDistrictResult: ResolversTypes['ApiNotFoundError'] | ResolversTypes['UserDistrict'];
   UserInvitation: ResolverTypeWrapper<UserInvitation>;
   UserInvitationResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['UserInvitation'];
+  UserOrganisation: ResolverTypeWrapper<UserOrganisation>;
+  UserOrganisationResult: ResolversTypes['ApiNotFoundError'] | ResolversTypes['UserOrganisation'];
   UserResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['User'];
   UserTheme: UserTheme;
   UserUpdateInput: UserUpdateInput;
@@ -2885,9 +3047,11 @@ export type ResolversParentTypes = ResolversObject<{
   CatchmentDistrictInput: CatchmentDistrictInput;
   CatchmentDistrictResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['CatchmentDistrict'];
   CatchmentDistrictUpdateInput: CatchmentDistrictUpdateInput;
+  CatchmentDistrictView: Omit<CatchmentDistrictView, 'province'> & { province?: Maybe<ResolversParentTypes['ProvinceResult']> };
   CatchmentProvince: Omit<CatchmentProvince, 'organisation' | 'province'> & { organisation?: Maybe<ResolversParentTypes['OrganisationResult']>, province?: Maybe<ResolversParentTypes['ProvinceResult']> };
   CatchmentProvinceResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['CatchmentProvince'];
   CatchmentProvinceUpdateInput: CatchmentProvinceUpdateInput;
+  CatchmentProvinceView: CatchmentProvinceView;
   Country: Country;
   CountryCode: Scalars['CountryCode'];
   CountryResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Country'];
@@ -3038,13 +3202,16 @@ export type ResolversParentTypes = ResolversObject<{
   Organisation: Omit<Organisation, 'country'> & { country?: Maybe<ResolversParentTypes['CountryResult']> };
   OrganisationIndicator: Omit<OrganisationIndicator, 'indicator' | 'organisation'> & { indicator?: Maybe<ResolversParentTypes['IndicatorResult']>, organisation?: Maybe<ResolversParentTypes['OrganisationResult']> };
   OrganisationIndicatorResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['OrganisationIndicator'];
+  OrganisationIndicatorView: Omit<OrganisationIndicatorView, 'organisation'> & { organisation?: Maybe<ResolversParentTypes['OrganisationResult']> };
   OrganisationReportTemplate: Omit<OrganisationReportTemplate, 'organisation' | 'report_template'> & { organisation?: Maybe<ResolversParentTypes['OrganisationResult']>, report_template?: Maybe<ResolversParentTypes['ReportTemplateResult']> };
   OrganisationReportTemplateResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['OrganisationReportTemplate'];
+  OrganisationReportTemplateView: OrganisationReportTemplateView;
   OrganisationResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Organisation'];
   OrganisationUpdateInput: OrganisationUpdateInput;
   OrganisationUser: Omit<OrganisationUser, 'default_district' | 'organisation' | 'user'> & { default_district?: Maybe<ResolversParentTypes['DistrictResult']>, organisation?: Maybe<ResolversParentTypes['OrganisationResult']>, user?: Maybe<ResolversParentTypes['UserResult']> };
   OrganisationUserResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['OrganisationUser'];
   OrganisationUserUpdateInput: OrganisationUserUpdateInput;
+  OrganisationUserView: OrganisationUserView;
   PasswordResetInput: PasswordResetInput;
   PasswordResetRequestInput: PasswordResetRequestInput;
   PasswordResetRequestPayload: PasswordResetRequestPayload;
@@ -3128,8 +3295,12 @@ export type ResolversParentTypes = ResolversObject<{
   UpdateWaterTreatmentPlantPayload: UpdateWaterTreatmentPlantPayload;
   User: User;
   UserDisableInput: UserDisableInput;
+  UserDistrict: UserDistrict;
+  UserDistrictResult: ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['UserDistrict'];
   UserInvitation: UserInvitation;
   UserInvitationResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['UserInvitation'];
+  UserOrganisation: UserOrganisation;
+  UserOrganisationResult: ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['UserOrganisation'];
   UserResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['User'];
   UserUpdateInput: UserUpdateInput;
   UtcOffset: Scalars['UtcOffset'];
@@ -3237,6 +3408,29 @@ export type CatchmentDistrictResultResolvers<ContextType = GraphQLContext, Paren
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'CatchmentDistrict', ParentType, ContextType>;
 }>;
 
+export type CatchmentDistrictViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentDistrictView'] = ResolversParentTypes['CatchmentDistrictView']> = ResolversObject<{
+  catchment_province?: Resolver<Maybe<ResolversTypes['CatchmentProvinceView']>, ParentType, ContextType>;
+  catchment_province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  district_users?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisations_in_district?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrict']>>, ParentType, ContextType>;
+  province?: Resolver<Maybe<ResolversTypes['ProvinceResult']>, ParentType, ContextType>;
+  province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  reports?: Resolver<Maybe<Array<ResolversTypes['Report']>>, ParentType, ContextType>;
+  residences?: Resolver<Maybe<Array<ResolversTypes['Residence']>>, ParentType, ContextType>;
+  service_areas?: Resolver<Maybe<Array<ResolversTypes['ServiceArea']>>, ParentType, ContextType>;
+  sewer_treatment_plants?: Resolver<Maybe<Array<ResolversTypes['SewerTreatmentPlant']>>, ParentType, ContextType>;
+  water_treatment_plants?: Resolver<Maybe<Array<ResolversTypes['WaterTreatmentPlant']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type CatchmentProvinceResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentProvince'] = ResolversParentTypes['CatchmentProvince']> = ResolversObject<{
   catchment_districts?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrict']>>, ParentType, ContextType>;
   created_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
@@ -3254,6 +3448,23 @@ export type CatchmentProvinceResolvers<ContextType = GraphQLContext, ParentType 
 
 export type CatchmentProvinceResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentProvinceResult'] = ResolversParentTypes['CatchmentProvinceResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'CatchmentProvince', ParentType, ContextType>;
+}>;
+
+export type CatchmentProvinceViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentProvinceView'] = ResolversParentTypes['CatchmentProvinceView']> = ResolversObject<{
+  catchment_districts?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrictView']>>, ParentType, ContextType>;
+  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType>;
+  country_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  created_by?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  last_modified_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  last_modified_by?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation?: Resolver<Maybe<ResolversTypes['Organisation']>, ParentType, ContextType>;
+  organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type CountryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = ResolversObject<{
@@ -3775,6 +3986,28 @@ export type OrganisationIndicatorResultResolvers<ContextType = GraphQLContext, P
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'OrganisationIndicator', ParentType, ContextType>;
 }>;
 
+export type OrganisationIndicatorViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationIndicatorView'] = ResolversParentTypes['OrganisationIndicatorView']> = ResolversObject<{
+  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  contributing_organisation?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  indicator_disaggregates?: Resolver<Maybe<Array<ResolversTypes['IndicatorDisaggregate']>>, ParentType, ContextType>;
+  indicator_number?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  indicator_organisations?: Resolver<Maybe<Array<ResolversTypes['Organisation']>>, ParentType, ContextType>;
+  indicator_unit?: Resolver<Maybe<ResolversTypes['IndicatorUnit']>, ParentType, ContextType>;
+  indicator_unit_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation?: Resolver<Maybe<ResolversTypes['OrganisationResult']>, ParentType, ContextType>;
+  organisation_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  report_template?: Resolver<Maybe<ResolversTypes['ReportTemplate']>, ParentType, ContextType>;
+  report_template_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['IndicatorType'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type OrganisationReportTemplateResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationReportTemplate'] = ResolversParentTypes['OrganisationReportTemplate']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3791,6 +4024,24 @@ export type OrganisationReportTemplateResolvers<ContextType = GraphQLContext, Pa
 
 export type OrganisationReportTemplateResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationReportTemplateResult'] = ResolversParentTypes['OrganisationReportTemplateResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'OrganisationReportTemplate', ParentType, ContextType>;
+}>;
+
+export type OrganisationReportTemplateViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationReportTemplateView'] = ResolversParentTypes['OrganisationReportTemplateView']> = ResolversObject<{
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  frequency?: Resolver<ResolversTypes['ReportingFrequency'], ParentType, ContextType>;
+  icon?: Resolver<Maybe<ResolversTypes['Byte']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  indicators?: Resolver<Maybe<Array<ResolversTypes['Indicator']>>, ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation?: Resolver<Maybe<ResolversTypes['Organisation']>, ParentType, ContextType>;
+  organisation_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  reports?: Resolver<Maybe<Array<ResolversTypes['Report']>>, ParentType, ContextType>;
+  type?: Resolver<ResolversTypes['IndicatorType'], ParentType, ContextType>;
+  window?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type OrganisationResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationResult'] = ResolversParentTypes['OrganisationResult']> = ResolversObject<{
@@ -3816,6 +4067,30 @@ export type OrganisationUserResolvers<ContextType = GraphQLContext, ParentType e
 
 export type OrganisationUserResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationUserResult'] = ResolversParentTypes['OrganisationUserResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'OrganisationUser', ParentType, ContextType>;
+}>;
+
+export type OrganisationUserViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['OrganisationUserView'] = ResolversParentTypes['OrganisationUserView']> = ResolversObject<{
+  confirmed_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  first_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  hashed_confirmation_token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hashed_password_reset_token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  last_login?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  last_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  master_support?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  organisation?: Resolver<Maybe<ResolversTypes['UserOrganisation']>, ParentType, ContextType>;
+  organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  role?: Resolver<ResolversTypes['OrganisationUserRoleType'], ParentType, ContextType>;
+  theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
+  user_districts?: Resolver<Maybe<Array<ResolversTypes['UserDistrict']>>, ParentType, ContextType>;
+  user_organisations?: Resolver<Maybe<Array<ResolversTypes['UserOrganisation']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type PasswordResetRequestPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PasswordResetRequestPayload'] = ResolversParentTypes['PasswordResetRequestPayload']> = ResolversObject<{
@@ -3876,8 +4151,8 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   catchment_provinces?: Resolver<Maybe<Array<ResolversTypes['CatchmentProvince']>>, ParentType, ContextType, RequireFields<QueryCatchment_ProvincesArgs, 'organisation_id'>>;
   countries?: Resolver<Maybe<Array<ResolversTypes['Country']>>, ParentType, ContextType>;
   country?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<QueryCountryArgs, 'id'>>;
-  default_user_district?: Resolver<ResolversTypes['DistrictResult'], ParentType, ContextType, RequireFields<QueryDefault_User_DistrictArgs, 'organisation_user_id' | 'user_id'>>;
-  default_user_organisation?: Resolver<ResolversTypes['OrganisationResult'], ParentType, ContextType, RequireFields<QueryDefault_User_OrganisationArgs, 'user_id'>>;
+  default_user_district?: Resolver<ResolversTypes['UserDistrictResult'], ParentType, ContextType, RequireFields<QueryDefault_User_DistrictArgs, 'organisation_user_id' | 'user_id'>>;
+  default_user_organisation?: Resolver<ResolversTypes['UserOrganisationResult'], ParentType, ContextType, RequireFields<QueryDefault_User_OrganisationArgs, 'user_id'>>;
   disaggregate?: Resolver<ResolversTypes['DisaggregateResult'], ParentType, ContextType, RequireFields<QueryDisaggregateArgs, 'id'>>;
   disaggregate_option?: Resolver<ResolversTypes['DisaggregateOptionResult'], ParentType, ContextType, RequireFields<QueryDisaggregate_OptionArgs, 'id'>>;
   disaggregate_options?: Resolver<Maybe<Array<ResolversTypes['DisaggregateOption']>>, ParentType, ContextType>;
@@ -4174,9 +4449,34 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   last_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   master_support?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
-  user_districts?: Resolver<Maybe<Array<ResolversTypes['DistrictUser']>>, ParentType, ContextType>;
-  user_organisations?: Resolver<Maybe<Array<ResolversTypes['OrganisationUser']>>, ParentType, ContextType>;
+  user_default_organisation?: Resolver<Maybe<ResolversTypes['UserOrganisation']>, ParentType, ContextType>;
+  user_organisations?: Resolver<Maybe<Array<ResolversTypes['UserOrganisation']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserDistrictResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserDistrict'] = ResolversParentTypes['UserDistrict']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  is_default_user_district?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation?: Resolver<Maybe<ResolversTypes['UserOrganisation']>, ParentType, ContextType>;
+  organisation_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  province?: Resolver<Maybe<ResolversTypes['Province']>, ParentType, ContextType>;
+  province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  service_areas?: Resolver<Maybe<Array<ResolversTypes['ServiceArea']>>, ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  user_district_roles?: Resolver<Array<ResolversTypes['DistrictUserRoleType']>, ParentType, ContextType>;
+  user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserDistrictResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserDistrictResult'] = ResolversParentTypes['UserDistrictResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiNotFoundError' | 'UserDistrict', ParentType, ContextType>;
 }>;
 
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
@@ -4191,6 +4491,34 @@ export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType ext
 
 export type UserInvitationResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitationResult'] = ResolversParentTypes['UserInvitationResult']> = ResolversObject<{
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'UserInvitation', ParentType, ContextType>;
+}>;
+
+export type UserOrganisationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserOrganisation'] = ResolversParentTypes['UserOrganisation']> = ResolversObject<{
+  catchment_provinces?: Resolver<Maybe<Array<ResolversTypes['CatchmentProvinceView']>>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType>;
+  country_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  is_user_default_organisation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  logo?: Resolver<Maybe<ResolversTypes['Byte']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation_indicators?: Resolver<Maybe<Array<ResolversTypes['OrganisationIndicatorView']>>, ParentType, ContextType>;
+  organisation_report_templates?: Resolver<Maybe<Array<ResolversTypes['OrganisationReportTemplateView']>>, ParentType, ContextType>;
+  reports?: Resolver<Maybe<Array<ResolversTypes['Report']>>, ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  user_default_district?: Resolver<Maybe<ResolversTypes['UserDistrict']>, ParentType, ContextType>;
+  user_districts?: Resolver<Maybe<Array<ResolversTypes['UserDistrict']>>, ParentType, ContextType>;
+  user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  user_organisation_role?: Resolver<ResolversTypes['OrganisationUserRoleType'], ParentType, ContextType>;
+  users?: Resolver<Maybe<Array<ResolversTypes['OrganisationUserView']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserOrganisationResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserOrganisationResult'] = ResolversParentTypes['UserOrganisationResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ApiNotFoundError' | 'UserOrganisation', ParentType, ContextType>;
 }>;
 
 export type UserResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserResult'] = ResolversParentTypes['UserResult']> = ResolversObject<{
@@ -4292,8 +4620,10 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   Byte?: GraphQLScalarType;
   CatchmentDistrict?: CatchmentDistrictResolvers<ContextType>;
   CatchmentDistrictResult?: CatchmentDistrictResultResolvers<ContextType>;
+  CatchmentDistrictView?: CatchmentDistrictViewResolvers<ContextType>;
   CatchmentProvince?: CatchmentProvinceResolvers<ContextType>;
   CatchmentProvinceResult?: CatchmentProvinceResultResolvers<ContextType>;
+  CatchmentProvinceView?: CatchmentProvinceViewResolvers<ContextType>;
   Country?: CountryResolvers<ContextType>;
   CountryCode?: GraphQLScalarType;
   CountryResult?: CountryResultResolvers<ContextType>;
@@ -4365,11 +4695,14 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   Organisation?: OrganisationResolvers<ContextType>;
   OrganisationIndicator?: OrganisationIndicatorResolvers<ContextType>;
   OrganisationIndicatorResult?: OrganisationIndicatorResultResolvers<ContextType>;
+  OrganisationIndicatorView?: OrganisationIndicatorViewResolvers<ContextType>;
   OrganisationReportTemplate?: OrganisationReportTemplateResolvers<ContextType>;
   OrganisationReportTemplateResult?: OrganisationReportTemplateResultResolvers<ContextType>;
+  OrganisationReportTemplateView?: OrganisationReportTemplateViewResolvers<ContextType>;
   OrganisationResult?: OrganisationResultResolvers<ContextType>;
   OrganisationUser?: OrganisationUserResolvers<ContextType>;
   OrganisationUserResult?: OrganisationUserResultResolvers<ContextType>;
+  OrganisationUserView?: OrganisationUserViewResolvers<ContextType>;
   PasswordResetRequestPayload?: PasswordResetRequestPayloadResolvers<ContextType>;
   PasswordResetRequestResult?: PasswordResetRequestResultResolvers<ContextType>;
   PasswordResetResult?: PasswordResetResultResolvers<ContextType>;
@@ -4414,8 +4747,12 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   UpdateWaterStorageTankPayload?: UpdateWaterStorageTankPayloadResolvers<ContextType>;
   UpdateWaterTreatmentPlantPayload?: UpdateWaterTreatmentPlantPayloadResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserDistrict?: UserDistrictResolvers<ContextType>;
+  UserDistrictResult?: UserDistrictResultResolvers<ContextType>;
   UserInvitation?: UserInvitationResolvers<ContextType>;
   UserInvitationResult?: UserInvitationResultResolvers<ContextType>;
+  UserOrganisation?: UserOrganisationResolvers<ContextType>;
+  UserOrganisationResult?: UserOrganisationResultResolvers<ContextType>;
   UserResult?: UserResultResolvers<ContextType>;
   UtcOffset?: GraphQLScalarType;
   Void?: GraphQLScalarType;

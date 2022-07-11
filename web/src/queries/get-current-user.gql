@@ -8,46 +8,36 @@ query GetCurrentUser {
       first_name
       last_name
       email
-      user_districts {
-        id
-        roles
-        is_default_user_district
-        catchment_district {
-          ... on CatchmentDistrict {
-            id
-            district {
-              ... on District {
-                id
-                name
-                province {
-                  ... on Province {
-                    id
-                    name
-                    country {
-                      ... on Country {
-                        id
-                        code
-                        flag
-                        name
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
       user_organisations {
         id
-        is_default_organisation
-        role
-        organisation {
-          ... on Organisation {
+        name
+        logo
+        is_user_default_organisation
+        country {
+          id
+          name
+        }
+      }
+      user_default_organisation {
+        id
+        name
+        logo
+        is_user_default_organisation
+        user_districts {
+          id
+          name
+          code
+          is_default_user_district
+          province {
             id
             name
-            logo
+            code
           }
+        }
+        country {
+          code
+          name
+          flag
         }
       }
     }

@@ -27,6 +27,7 @@ import {
   QueryDefault_User_DistrictArgs,
   QueryUserArgs,
   User,
+  UserOrganisation,
   UserResult,
 } from "../../libs/resolvers-types";
 
@@ -153,18 +154,38 @@ async function getDefaultUserDistrict(
   }
 }
 
+
+
 async function getUserOrganisations(
   user_id: string,
   context: GraphQLContext
-): Promise<OrganisationUser[]> {
-  const user_orgs = await context.prisma.user
+): Promise<UserOrganisation[]> {
+  const result = await context.prisma.user
     .findUnique({
       where: {
         id: user_id,
       },
+      select:{
+        id: true,
+        user_organisations: {
+          select: {
+            is_default_organisation: true,
+            role: true,
+            organisation: true,
+          }
+        }
+      }
     })
-    .user_organisations();
-  return user_orgs as OrganisationUser[];
+
+const user_orgs = result?.user_organisations.flatMap(user_org=>(
+  {
+    ...user_org.organisation, 
+    user_id: result.id, 
+    is_user_default_organisation: user_org.is_default_organisation, 
+    user_organisation_role: user_org.role
+  }));
+    
+  return user_orgs as UserOrganisation[];
 }
 
 async function createUser(

@@ -3,3 +3,4 @@ dist
 coverage
 graphql
 public
+webpack.config.ts

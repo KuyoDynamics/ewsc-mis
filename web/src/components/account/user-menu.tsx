@@ -41,9 +41,11 @@ function UserMenu() {
   };
 
   const { loading, data, error } = useGetCurrentUserQuery({
-    fetchPolicy: 'cache-only',
+    fetchPolicy: 'cache-first',
   });
 
+  console.log('error', error);
+  console.log('data', data);
   console.log('error', error);
 
   const navigate = useNavigate();

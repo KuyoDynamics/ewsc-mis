@@ -253,6 +253,29 @@ export type CatchmentDistrictUpdateInput = {
   disabled: Scalars['Boolean'];
 };
 
+export type CatchmentDistrictView = {
+  __typename?: 'CatchmentDistrictView';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  code: Scalars['String'];
+  province_id: Scalars['String'];
+  province?: Maybe<ProvinceResult>;
+  organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
+  residences?: Maybe<Array<Residence>>;
+  disabled: Scalars['Boolean'];
+  catchment_province_id: Scalars['String'];
+  catchment_province?: Maybe<CatchmentProvinceView>;
+  water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
+  service_areas?: Maybe<Array<ServiceArea>>;
+  sewer_treatment_plants?: Maybe<Array<SewerTreatmentPlant>>;
+  reports?: Maybe<Array<Report>>;
+  district_users?: Maybe<Array<DistrictUser>>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+};
+
 export type CatchmentProvince = {
   __typename?: 'CatchmentProvince';
   id: Scalars['ID'];
@@ -272,6 +295,23 @@ export type CatchmentProvinceResult = CatchmentProvince | ApiNotFoundError | Api
 
 export type CatchmentProvinceUpdateInput = {
   disabled: Scalars['Boolean'];
+};
+
+export type CatchmentProvinceView = {
+  __typename?: 'CatchmentProvinceView';
+  id: Scalars['ID'];
+  code: Scalars['String'];
+  name: Scalars['String'];
+  disabled: Scalars['Boolean'];
+  organisation_id: Scalars['String'];
+  organisation?: Maybe<Organisation>;
+  catchment_districts?: Maybe<Array<CatchmentDistrictView>>;
+  country_id: Scalars['String'];
+  country?: Maybe<Country>;
+  created_at?: Maybe<Scalars['DateTime']>;
+  created_by?: Maybe<Scalars['String']>;
+  last_modified_at?: Maybe<Scalars['DateTime']>;
+  last_modified_by?: Maybe<Scalars['String']>;
 };
 
 export type Country = {
@@ -1550,6 +1590,28 @@ export type OrganisationIndicator = {
 
 export type OrganisationIndicatorResult = OrganisationIndicator | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
 
+export type OrganisationIndicatorView = {
+  __typename?: 'OrganisationIndicatorView';
+  id: Scalars['ID'];
+  indicator_number: Scalars['String'];
+  description: Scalars['String'];
+  category: Scalars['String'];
+  type: IndicatorType;
+  contributing_organisation: Scalars['String'];
+  indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
+  report_template_id: Scalars['String'];
+  report_template?: Maybe<ReportTemplate>;
+  indicator_unit_id: Scalars['String'];
+  indicator_unit?: Maybe<IndicatorUnit>;
+  organisation_id: Scalars['ID'];
+  organisation?: Maybe<OrganisationResult>;
+  indicator_organisations?: Maybe<Array<Organisation>>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+};
+
 export type OrganisationReportTemplate = {
   __typename?: 'OrganisationReportTemplate';
   id: Scalars['ID'];
@@ -1565,6 +1627,24 @@ export type OrganisationReportTemplate = {
 };
 
 export type OrganisationReportTemplateResult = OrganisationReportTemplate | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
+
+export type OrganisationReportTemplateView = {
+  __typename?: 'OrganisationReportTemplateView';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  type: IndicatorType;
+  frequency: ReportingFrequency;
+  window: Scalars['Int'];
+  icon?: Maybe<Scalars['Byte']>;
+  indicators?: Maybe<Array<Indicator>>;
+  organisation_id: Scalars['ID'];
+  organisation?: Maybe<Organisation>;
+  reports?: Maybe<Array<Report>>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+};
 
 export type OrganisationResult = Organisation | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
 
@@ -1601,6 +1681,30 @@ export enum OrganisationUserRoleType {
 
 export type OrganisationUserUpdateInput = {
   role: OrganisationUserRoleType;
+};
+
+export type OrganisationUserView = {
+  __typename?: 'OrganisationUserView';
+  id: Scalars['String'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  email: Scalars['String'];
+  disabled: Scalars['Boolean'];
+  master_support: Scalars['Boolean'];
+  organisation_id: Scalars['String'];
+  organisation?: Maybe<UserOrganisation>;
+  role: OrganisationUserRoleType;
+  user_organisations?: Maybe<Array<UserOrganisation>>;
+  user_districts?: Maybe<Array<UserDistrict>>;
+  hashed_confirmation_token?: Maybe<Scalars['String']>;
+  confirmed_at?: Maybe<Scalars['DateTime']>;
+  hashed_password_reset_token?: Maybe<Scalars['String']>;
+  last_login?: Maybe<Scalars['DateTime']>;
+  theme?: Maybe<UserTheme>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
 };
 
 export type PasswordResetInput = {
@@ -1650,8 +1754,8 @@ export type Query = {
   catchment_provinces?: Maybe<Array<CatchmentProvince>>;
   countries?: Maybe<Array<Country>>;
   country: CountryResult;
-  default_user_district: DistrictResult;
-  default_user_organisation: OrganisationResult;
+  default_user_district: UserDistrictResult;
+  default_user_organisation: UserOrganisationResult;
   disaggregate: DisaggregateResult;
   disaggregate_option: DisaggregateOptionResult;
   disaggregate_options?: Maybe<Array<DisaggregateOption>>;
@@ -2359,8 +2463,8 @@ export type User = {
   email: Scalars['String'];
   disabled: Scalars['Boolean'];
   master_support: Scalars['Boolean'];
-  user_organisations?: Maybe<Array<OrganisationUser>>;
-  user_districts?: Maybe<Array<DistrictUser>>;
+  user_organisations?: Maybe<Array<UserOrganisation>>;
+  user_default_organisation?: Maybe<UserOrganisation>;
   hashed_confirmation_token?: Maybe<Scalars['String']>;
   confirmed_at?: Maybe<Scalars['DateTime']>;
   hashed_password_reset_token?: Maybe<Scalars['String']>;
@@ -2376,6 +2480,29 @@ export type UserDisableInput = {
   disabled: Scalars['Boolean'];
 };
 
+export type UserDistrict = {
+  __typename?: 'UserDistrict';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  code: Scalars['String'];
+  user_id: Scalars['ID'];
+  user?: Maybe<User>;
+  organisation_id: Scalars['ID'];
+  organisation?: Maybe<UserOrganisation>;
+  is_default_user_district: Scalars['Boolean'];
+  disabled: Scalars['Boolean'];
+  user_district_roles: Array<DistrictUserRoleType>;
+  province_id: Scalars['String'];
+  province?: Maybe<Province>;
+  service_areas?: Maybe<Array<ServiceArea>>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+};
+
+export type UserDistrictResult = UserDistrict | ApiNotFoundError;
+
 export type UserInvitation = {
   __typename?: 'UserInvitation';
   id: Scalars['ID'];
@@ -2387,6 +2514,32 @@ export type UserInvitation = {
 };
 
 export type UserInvitationResult = UserInvitation | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
+
+export type UserOrganisation = {
+  __typename?: 'UserOrganisation';
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  logo?: Maybe<Scalars['Byte']>;
+  user_id: Scalars['ID'];
+  user?: Maybe<User>;
+  is_user_default_organisation: Scalars['Boolean'];
+  user_default_district?: Maybe<UserDistrict>;
+  user_districts?: Maybe<Array<UserDistrict>>;
+  user_organisation_role: OrganisationUserRoleType;
+  country_id: Scalars['String'];
+  country?: Maybe<Country>;
+  catchment_provinces?: Maybe<Array<CatchmentProvinceView>>;
+  users?: Maybe<Array<OrganisationUserView>>;
+  organisation_report_templates?: Maybe<Array<OrganisationReportTemplateView>>;
+  organisation_indicators?: Maybe<Array<OrganisationIndicatorView>>;
+  reports?: Maybe<Array<Report>>;
+  created_at: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  last_modified_at: Scalars['DateTime'];
+  last_modified_by: Scalars['String'];
+};
+
+export type UserOrganisationResult = UserOrganisation | ApiNotFoundError;
 
 export type UserResult = User | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
 
@@ -2514,22 +2667,7 @@ export type WaterTreatmentPlantUpdateInput = {
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, user_districts?: Array<{ __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType>, is_default_user_district: boolean, catchment_district?: { __typename?: 'CatchmentDistrict', id: string, district?: { __typename?: 'District', id: string, name: string, province?: { __typename?: 'Province', id: string, name: string, country?: { __typename?: 'Country', id: string, code: string, flag?: any | null, name: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null }> | null, user_organisations?: Array<{ __typename?: 'OrganisationUser', id: string, is_default_organisation: boolean, role: OrganisationUserRoleType, organisation?: { __typename?: 'Organisation', id: string, name: string, logo?: any | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null }> | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
-
-export type GetDefaultUserDistrictQueryVariables = Exact<{
-  userId: Scalars['ID'];
-  organisationUserId: Scalars['ID'];
-}>;
-
-
-export type GetDefaultUserDistrictQuery = { __typename?: 'Query', default_user_district: { __typename?: 'District', id: string, name: string, code: string, province?: { __typename?: 'Province', id: string, name: string, code: string, country?: { __typename?: 'Country', id: string, name: string, code: string, flag?: any | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
-
-export type GetDefaultUserOrganisationQueryVariables = Exact<{
-  userId: Scalars['ID'];
-}>;
-
-
-export type GetDefaultUserOrganisationQuery = { __typename?: 'Query', default_user_organisation: { __typename?: 'Organisation', id: string, name: string, logo?: any | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -2550,46 +2688,36 @@ export const GetCurrentUserDocument = gql`
       first_name
       last_name
       email
-      user_districts {
-        id
-        roles
-        is_default_user_district
-        catchment_district {
-          ... on CatchmentDistrict {
-            id
-            district {
-              ... on District {
-                id
-                name
-                province {
-                  ... on Province {
-                    id
-                    name
-                    country {
-                      ... on Country {
-                        id
-                        code
-                        flag
-                        name
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
       user_organisations {
         id
-        is_default_organisation
-        role
-        organisation {
-          ... on Organisation {
+        name
+        logo
+        is_user_default_organisation
+        country {
+          id
+          name
+        }
+      }
+      user_default_organisation {
+        id
+        name
+        logo
+        is_user_default_organisation
+        user_districts {
+          id
+          name
+          code
+          is_default_user_district
+          province {
             id
             name
-            logo
+            code
           }
+        }
+        country {
+          code
+          name
+          flag
         }
       }
     }
@@ -2623,103 +2751,6 @@ export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
 export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
-export const GetDefaultUserDistrictDocument = gql`
-    query GetDefaultUserDistrict($userId: ID!, $organisationUserId: ID!) {
-  default_user_district(
-    user_id: $userId
-    organisation_user_id: $organisationUserId
-  ) {
-    ... on District {
-      id
-      name
-      code
-      province {
-        ... on Province {
-          id
-          name
-          code
-          country {
-            ... on Country {
-              id
-              name
-              code
-              flag
-            }
-          }
-        }
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetDefaultUserDistrictQuery__
- *
- * To run a query within a React component, call `useGetDefaultUserDistrictQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDefaultUserDistrictQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetDefaultUserDistrictQuery({
- *   variables: {
- *      userId: // value for 'userId'
- *      organisationUserId: // value for 'organisationUserId'
- *   },
- * });
- */
-export function useGetDefaultUserDistrictQuery(baseOptions: Apollo.QueryHookOptions<GetDefaultUserDistrictQuery, GetDefaultUserDistrictQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetDefaultUserDistrictQuery, GetDefaultUserDistrictQueryVariables>(GetDefaultUserDistrictDocument, options);
-      }
-export function useGetDefaultUserDistrictLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDefaultUserDistrictQuery, GetDefaultUserDistrictQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetDefaultUserDistrictQuery, GetDefaultUserDistrictQueryVariables>(GetDefaultUserDistrictDocument, options);
-        }
-export type GetDefaultUserDistrictQueryHookResult = ReturnType<typeof useGetDefaultUserDistrictQuery>;
-export type GetDefaultUserDistrictLazyQueryHookResult = ReturnType<typeof useGetDefaultUserDistrictLazyQuery>;
-export type GetDefaultUserDistrictQueryResult = Apollo.QueryResult<GetDefaultUserDistrictQuery, GetDefaultUserDistrictQueryVariables>;
-export const GetDefaultUserOrganisationDocument = gql`
-    query GetDefaultUserOrganisation($userId: ID!) {
-  default_user_organisation(user_id: $userId) {
-    ... on Organisation {
-      id
-      name
-      logo
-    }
-  }
-}
-    `;
-
-/**
- * __useGetDefaultUserOrganisationQuery__
- *
- * To run a query within a React component, call `useGetDefaultUserOrganisationQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetDefaultUserOrganisationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetDefaultUserOrganisationQuery({
- *   variables: {
- *      userId: // value for 'userId'
- *   },
- * });
- */
-export function useGetDefaultUserOrganisationQuery(baseOptions: Apollo.QueryHookOptions<GetDefaultUserOrganisationQuery, GetDefaultUserOrganisationQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetDefaultUserOrganisationQuery, GetDefaultUserOrganisationQueryVariables>(GetDefaultUserOrganisationDocument, options);
-      }
-export function useGetDefaultUserOrganisationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDefaultUserOrganisationQuery, GetDefaultUserOrganisationQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetDefaultUserOrganisationQuery, GetDefaultUserOrganisationQueryVariables>(GetDefaultUserOrganisationDocument, options);
-        }
-export type GetDefaultUserOrganisationQueryHookResult = ReturnType<typeof useGetDefaultUserOrganisationQuery>;
-export type GetDefaultUserOrganisationLazyQueryHookResult = ReturnType<typeof useGetDefaultUserOrganisationLazyQuery>;
-export type GetDefaultUserOrganisationQueryResult = Apollo.QueryResult<GetDefaultUserOrganisationQuery, GetDefaultUserOrganisationQueryVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -2824,6 +2855,28 @@ export type CatchmentDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type CatchmentDistrictViewKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'organisations_in_district' | 'residences' | 'disabled' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'reports' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictViewKeySpecifier)[];
+export type CatchmentDistrictViewFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	code?: FieldPolicy<any> | FieldReadFunction<any>,
+	province_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	province?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisations_in_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	residences?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province?: FieldPolicy<any> | FieldReadFunction<any>,
+	water_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_areas?: FieldPolicy<any> | FieldReadFunction<any>,
+	sewer_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
+	reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_users?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type CatchmentProvinceKeySpecifier = ('id' | 'disabled' | 'province_id' | 'province' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceKeySpecifier)[];
 export type CatchmentProvinceFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2833,6 +2886,22 @@ export type CatchmentProvinceFieldPolicy = {
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type CatchmentProvinceViewKeySpecifier = ('id' | 'code' | 'name' | 'disabled' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'country_id' | 'country' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceViewKeySpecifier)[];
+export type CatchmentProvinceViewFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	code?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	country_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	country?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3140,11 +3209,49 @@ export type OrganisationIndicatorFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type OrganisationIndicatorViewKeySpecifier = ('id' | 'indicator_number' | 'description' | 'category' | 'type' | 'contributing_organisation' | 'indicator_disaggregates' | 'report_template_id' | 'report_template' | 'indicator_unit_id' | 'indicator_unit' | 'organisation_id' | 'organisation' | 'indicator_organisations' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationIndicatorViewKeySpecifier)[];
+export type OrganisationIndicatorViewFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_number?: FieldPolicy<any> | FieldReadFunction<any>,
+	description?: FieldPolicy<any> | FieldReadFunction<any>,
+	category?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	contributing_organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_disaggregates?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_unit_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_unit?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicator_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type OrganisationReportTemplateKeySpecifier = ('id' | 'report_template_id' | 'report_template' | 'organisation_id' | 'organisation' | 'reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationReportTemplateKeySpecifier)[];
 export type OrganisationReportTemplateFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	report_template_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	report_template?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OrganisationReportTemplateViewKeySpecifier = ('id' | 'name' | 'type' | 'frequency' | 'window' | 'icon' | 'indicators' | 'organisation_id' | 'organisation' | 'reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationReportTemplateViewKeySpecifier)[];
+export type OrganisationReportTemplateViewFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	type?: FieldPolicy<any> | FieldReadFunction<any>,
+	frequency?: FieldPolicy<any> | FieldReadFunction<any>,
+	window?: FieldPolicy<any> | FieldReadFunction<any>,
+	icon?: FieldPolicy<any> | FieldReadFunction<any>,
+	indicators?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	reports?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3164,6 +3271,29 @@ export type OrganisationUserFieldPolicy = {
 	default_district?: FieldPolicy<any> | FieldReadFunction<any>,
 	role?: FieldPolicy<any> | FieldReadFunction<any>,
 	district_roles?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type OrganisationUserViewKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'organisation_id' | 'organisation' | 'role' | 'user_organisations' | 'user_districts' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationUserViewKeySpecifier)[];
+export type OrganisationUserViewFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	first_name?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_name?: FieldPolicy<any> | FieldReadFunction<any>,
+	email?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	master_support?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	role?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	hashed_confirmation_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	confirmed_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	hashed_password_reset_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_login?: FieldPolicy<any> | FieldReadFunction<any>,
+	theme?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3384,7 +3514,7 @@ export type UpdateWaterTreatmentPlantPayloadKeySpecifier = ('water_treatment_pla
 export type UpdateWaterTreatmentPlantPayloadFieldPolicy = {
 	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'user_organisations' | 'user_districts' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserKeySpecifier)[];
+export type UserKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'user_organisations' | 'user_default_organisation' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserKeySpecifier)[];
 export type UserFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	first_name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3393,12 +3523,32 @@ export type UserFieldPolicy = {
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
 	master_support?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
-	user_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_default_organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	hashed_confirmation_token?: FieldPolicy<any> | FieldReadFunction<any>,
 	confirmed_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	hashed_password_reset_token?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_login?: FieldPolicy<any> | FieldReadFunction<any>,
 	theme?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
+export type UserDistrictFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	code?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	user?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	is_default_user_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_district_roles?: FieldPolicy<any> | FieldReadFunction<any>,
+	province_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	province?: FieldPolicy<any> | FieldReadFunction<any>,
+	service_areas?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3412,6 +3562,29 @@ export type UserInvitationFieldPolicy = {
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_district_ids?: FieldPolicy<any> | FieldReadFunction<any>,
 	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>
+};
+export type UserOrganisationKeySpecifier = ('id' | 'name' | 'logo' | 'user_id' | 'user' | 'is_user_default_organisation' | 'user_default_district' | 'user_districts' | 'user_organisation_role' | 'country_id' | 'country' | 'catchment_provinces' | 'users' | 'organisation_report_templates' | 'organisation_indicators' | 'reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserOrganisationKeySpecifier)[];
+export type UserOrganisationFieldPolicy = {
+	id?: FieldPolicy<any> | FieldReadFunction<any>,
+	name?: FieldPolicy<any> | FieldReadFunction<any>,
+	logo?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	user?: FieldPolicy<any> | FieldReadFunction<any>,
+	is_user_default_organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_default_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_districts?: FieldPolicy<any> | FieldReadFunction<any>,
+	user_organisation_role?: FieldPolicy<any> | FieldReadFunction<any>,
+	country_id?: FieldPolicy<any> | FieldReadFunction<any>,
+	country?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_provinces?: FieldPolicy<any> | FieldReadFunction<any>,
+	users?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_report_templates?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_indicators?: FieldPolicy<any> | FieldReadFunction<any>,
+	reports?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	created_by?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
+	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type WaterNetworkKeySpecifier = ('id' | 'name' | 'plant_id' | 'water_treatment_plant' | 'type' | 'water_network_water_connections' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | WaterNetworkKeySpecifier)[];
 export type WaterNetworkFieldPolicy = {
@@ -3513,9 +3686,17 @@ export type StrictTypedTypePolicies = {
 		keyFields?: false | CatchmentDistrictKeySpecifier | (() => undefined | CatchmentDistrictKeySpecifier),
 		fields?: CatchmentDistrictFieldPolicy,
 	},
+	CatchmentDistrictView?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CatchmentDistrictViewKeySpecifier | (() => undefined | CatchmentDistrictViewKeySpecifier),
+		fields?: CatchmentDistrictViewFieldPolicy,
+	},
 	CatchmentProvince?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | CatchmentProvinceKeySpecifier | (() => undefined | CatchmentProvinceKeySpecifier),
 		fields?: CatchmentProvinceFieldPolicy,
+	},
+	CatchmentProvinceView?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | CatchmentProvinceViewKeySpecifier | (() => undefined | CatchmentProvinceViewKeySpecifier),
+		fields?: CatchmentProvinceViewFieldPolicy,
 	},
 	Country?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | CountryKeySpecifier | (() => undefined | CountryKeySpecifier),
@@ -3605,13 +3786,25 @@ export type StrictTypedTypePolicies = {
 		keyFields?: false | OrganisationIndicatorKeySpecifier | (() => undefined | OrganisationIndicatorKeySpecifier),
 		fields?: OrganisationIndicatorFieldPolicy,
 	},
+	OrganisationIndicatorView?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationIndicatorViewKeySpecifier | (() => undefined | OrganisationIndicatorViewKeySpecifier),
+		fields?: OrganisationIndicatorViewFieldPolicy,
+	},
 	OrganisationReportTemplate?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | OrganisationReportTemplateKeySpecifier | (() => undefined | OrganisationReportTemplateKeySpecifier),
 		fields?: OrganisationReportTemplateFieldPolicy,
 	},
+	OrganisationReportTemplateView?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationReportTemplateViewKeySpecifier | (() => undefined | OrganisationReportTemplateViewKeySpecifier),
+		fields?: OrganisationReportTemplateViewFieldPolicy,
+	},
 	OrganisationUser?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | OrganisationUserKeySpecifier | (() => undefined | OrganisationUserKeySpecifier),
 		fields?: OrganisationUserFieldPolicy,
+	},
+	OrganisationUserView?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | OrganisationUserViewKeySpecifier | (() => undefined | OrganisationUserViewKeySpecifier),
+		fields?: OrganisationUserViewFieldPolicy,
 	},
 	PasswordResetRequestPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | PasswordResetRequestPayloadKeySpecifier | (() => undefined | PasswordResetRequestPayloadKeySpecifier),
@@ -3677,9 +3870,17 @@ export type StrictTypedTypePolicies = {
 		keyFields?: false | UserKeySpecifier | (() => undefined | UserKeySpecifier),
 		fields?: UserFieldPolicy,
 	},
+	UserDistrict?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UserDistrictKeySpecifier | (() => undefined | UserDistrictKeySpecifier),
+		fields?: UserDistrictFieldPolicy,
+	},
 	UserInvitation?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | UserInvitationKeySpecifier | (() => undefined | UserInvitationKeySpecifier),
 		fields?: UserInvitationFieldPolicy,
+	},
+	UserOrganisation?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | UserOrganisationKeySpecifier | (() => undefined | UserOrganisationKeySpecifier),
+		fields?: UserOrganisationFieldPolicy,
 	},
 	WaterNetwork?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | WaterNetworkKeySpecifier | (() => undefined | WaterNetworkKeySpecifier),

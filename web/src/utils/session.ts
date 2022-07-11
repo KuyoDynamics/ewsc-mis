@@ -27,6 +27,7 @@ function logout() {
 
 function setToken(token: string) {
   localStorage.setItem('token', token);
+  console.log('Chaiwa, what was the token here?', token);
   isLoggedInVar(true);
 }
 

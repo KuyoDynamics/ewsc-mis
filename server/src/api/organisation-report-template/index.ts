@@ -29,6 +29,27 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
+  type OrganisationReportTemplateView{
+    id: ID!
+    name: String!
+    type: IndicatorType!
+    frequency: ReportingFrequency!
+    window: Int!
+    icon: Byte
+
+    indicators: [Indicator!]
+   
+    organisation_id: ID!
+    organisation: Organisation
+
+    reports: [Report!]
+
+    created_at: DateTime!
+    created_by: String!
+    last_modified_at: DateTime!
+    last_modified_by: String!
+  }
+
   extend type Query {
     organisation_report_templates(
       organisation_id: ID!

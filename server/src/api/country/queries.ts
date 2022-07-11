@@ -1,11 +1,11 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   Country,
   CountryResult,
   MutationCreateCountryArgs,
   MutationDeleteCountryArgs,
   MutationUpdateCountryArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 
 async function getCountries(context: GraphQLContext): Promise<Country[]> {
   return context.prisma.country.findMany({});
@@ -22,22 +22,36 @@ async function getCountry(
     });
     if (!country) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The Country with the id ${id} does not exist.`,
       };
     }
 
     return {
-      __typename: "Country",
+      __typename: 'Country',
       ...country,
     };
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find Country with the id ${id}.`,
       errors: generateClientErrors(error),
     };
   }
+}
+
+async function resolveCountry(
+  id: string,
+  context: GraphQLContext
+): Promise<Country | null> {
+  console.log('what is country id', id);
+  const country = await context.prisma.country.findUnique({
+    where: {
+      id,
+    },
+  });
+  console.log('country', country);
+  return country;
 }
 
 async function createCountry(
@@ -56,12 +70,12 @@ async function createCountry(
     });
 
     return {
-      __typename: "Country",
+      __typename: 'Country',
       ...country,
     };
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create ServiceArea.`,
       errors: generateClientErrors(error),
     };
@@ -80,14 +94,14 @@ async function deleteCountry(
     });
 
     return {
-      __typename: "Country",
+      __typename: 'Country',
       ...country,
     };
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete Country with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -108,14 +122,14 @@ async function updateCountry(
       },
     });
     return {
-      __typename: "Country",
+      __typename: 'Country',
       ...country,
     };
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update Country with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -126,4 +140,5 @@ export {
   createCountry,
   deleteCountry,
   updateCountry,
+  resolveCountry,
 };

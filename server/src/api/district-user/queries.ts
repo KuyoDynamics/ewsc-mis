@@ -3,7 +3,7 @@ import {
   GraphQLContext,
   prepareDistrictUserRolesForCreate,
   prepareDistrictUserRolesForUpdate,
-} from "../../utils";
+} from '../../utils';
 import {
   DistrictUser,
   DistrictUserResult,
@@ -13,7 +13,8 @@ import {
   MutationUpdateUserRolesForDistrictArgs,
   QueryDistrict_UserArgs,
   QueryDistrict_UsersArgs,
-} from "../../libs/resolvers-types";
+  UserDistrict,
+} from '../../libs/resolvers-types';
 
 async function getDistrictUsers(
   args: QueryDistrict_UsersArgs,
@@ -29,6 +30,60 @@ async function getDistrictUsers(
   return res as DistrictUser[];
 }
 
+async function resolveUserDistricts(
+  user_id: string,
+  organisation_id: string,
+  context: GraphQLContext
+): Promise<UserDistrict[]> {
+  const result = await context.prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+    select: {
+      id: true,
+      user_organisations: {
+        select: {
+          district_users: {
+            where: {
+              organisation_user: {
+                organisation_id,
+              },
+            },
+            select: {
+              is_default_user_district: true,
+              roles: true,
+              organisation_user: {
+                select: {
+                  organisation_id: true,
+                },
+              },
+              catchment_district: {
+                select: {
+                  disabled: true,
+                  district: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const user_districts = result?.user_organisations.flatMap((user_org) =>
+    user_org.district_users.flatMap((district_user) => ({
+      user_id: result.id,
+      user_district_roles: district_user.roles,
+      organisation_id: district_user.organisation_user.organisation_id,
+      is_default_user_district: district_user.is_default_user_district,
+      disabled: district_user.catchment_district.disabled,
+      ...district_user.catchment_district.district,
+    }))
+  );
+
+  return user_districts as UserDistrict[];
+}
+
 async function getDistrictUser(
   args: QueryDistrict_UserArgs,
   context: GraphQLContext
@@ -42,18 +97,18 @@ async function getDistrictUser(
 
     if (!district_user) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The DistrictUser with the id ${args.district_user_id} does not exist.`,
       };
     }
 
     return {
-      __typename: "DistrictUser",
+      __typename: 'DistrictUser',
       ...district_user,
     } as DistrictUser;
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find DistrictUser with the id ${args.district_user_id}.`,
       errors: generateClientErrors(error),
     };
@@ -75,12 +130,12 @@ async function createDistrictUser(
       },
     });
     return {
-      __typename: "DistrictUser",
+      __typename: 'DistrictUser',
       ...district_user,
     } as DistrictUser;
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create DistrictUser.`,
       errors: generateClientErrors(error),
     };
@@ -102,17 +157,17 @@ async function updateUserRolesForDistrict(
       },
     });
     return {
-      __typename: "DistrictUser",
+      __typename: 'DistrictUser',
       ...district_user,
     } as DistrictUserResult;
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update new roles for User's District with ${{
         district_user_id: args.input.district_user_id,
         roles: args.input.new_roles,
       }}.`,
-      errors: generateClientErrors(error, "district_user_id"),
+      errors: generateClientErrors(error, 'district_user_id'),
     };
   }
 }
@@ -142,17 +197,17 @@ async function setUserDefaultDistrict(
       }),
     ]);
     return {
-      __typename: "DistrictUser",
+      __typename: 'DistrictUser',
       ...updateResult,
     } as DistrictUserResult;
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update UserDistrict as Default with ${{
         district_user_id: args.input.district_user_id,
         organisation_user_id: args.input.organisation_user_id,
       }}.`,
-      errors: generateClientErrors(error, "district_user_id"),
+      errors: generateClientErrors(error, 'district_user_id'),
     };
   }
 }
@@ -169,14 +224,14 @@ async function deleteDistrictUser(
     });
 
     return {
-      __typename: "DistrictUser",
+      __typename: 'DistrictUser',
       ...district_user,
     } as DistrictUser;
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete DistrictUser with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -188,4 +243,5 @@ export {
   getDistrictUser,
   setUserDefaultDistrict,
   updateUserRolesForDistrict,
+  resolveUserDistricts,
 };

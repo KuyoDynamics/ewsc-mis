@@ -36,6 +36,31 @@ const typeDefs = gql`
     last_modified_by: String!
   }
 
+  type CatchmentDistrictView {
+    id: ID!
+    name: String!
+    code: String!
+    province_id: String!
+    province: ProvinceResult
+    organisations_in_district: [CatchmentDistrict!]
+    residences: [Residence!]
+
+    disabled: Boolean!
+    catchment_province_id: String!
+    catchment_province: CatchmentProvinceView
+    water_treatment_plants: [WaterTreatmentPlant!]
+    service_areas: [ServiceArea!]
+    sewer_treatment_plants: [SewerTreatmentPlant!]
+    reports: [Report!]
+    district_users: [DistrictUser!]
+    
+
+    created_at: DateTime!
+    created_by: String!
+    last_modified_at: DateTime!
+    last_modified_by: String!
+  }
+
   extend type Query {
     catchment_districts(catchment_province_id: ID!): [CatchmentDistrict!]
     catchment_district(catchment_district_id: ID!): CatchmentDistrictResult!
