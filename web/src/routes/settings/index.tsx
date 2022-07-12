@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography } from '@mui/material';
-import DashboardLayout from 'components/dashboard/dashboard-layout';
+import DashboardLayout from 'components/app/app-layout';
 import SettingsNotifications from 'components/settings/settings-notifications';
 import SettingsPassword from 'components/settings/settings-password';
 

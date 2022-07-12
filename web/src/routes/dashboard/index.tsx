@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Grid } from '@mui/material';
+import { Box, Container, Grid, Skeleton } from '@mui/material';
 // import { Sales } from "../../components/dashboard/sales-example";
 // import { DashboardLayout } from '../../components/dashboard/dashboard-layout';
 
@@ -16,6 +16,11 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
             {/* <Budget /> */}
+            <Box sx={{ width: 300, margin: '2rem' }}>
+              <Skeleton />
+              <Skeleton animation="wave" />
+              <Skeleton animation={false} />
+            </Box>
           </Grid>
           <Grid item xl={3} lg={3} sm={6} xs={12}>
             {/* <TotalCustomers /> */}

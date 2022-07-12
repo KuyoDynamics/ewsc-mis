@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
@@ -7,9 +7,10 @@ import {
   Theme,
   Typography,
   useMediaQuery,
+  SwipeableDrawer,
 } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   Users as UsersIcon,
   ChartBar as ChartBarIcon,
@@ -17,6 +18,11 @@ import {
   Selector as SelectorIcon,
   ShoppingBag as ShoppingBagIcon,
 } from 'icons';
+import {
+  FireExtinguisher,
+  Public as PublicIcon,
+  Paid as PaidIcon,
+} from '@mui/icons-material';
 
 import NavItem from 'components/nav-item';
 import { useGetCurrentUserQuery } from '../../../graphql/generated';
@@ -29,13 +35,28 @@ const items = [
   },
   {
     href: '/technical',
-    icon: <UsersIcon fontSize="small" />,
+    icon: <FireExtinguisher fontSize="small" />,
     title: 'Technical',
   },
   {
     href: '/commercial',
     icon: <ShoppingBagIcon fontSize="small" />,
     title: 'Commercial',
+  },
+  {
+    href: '/public_relations',
+    icon: <PublicIcon fontSize="small" />,
+    title: 'Public Relations',
+  },
+  {
+    href: '/personnel',
+    icon: <UsersIcon fontSize="small" />,
+    title: 'Personnel',
+  },
+  {
+    href: '/finance',
+    icon: <PaidIcon fontSize="small" />,
+    title: 'Finance',
   },
 ];
 
@@ -47,14 +68,19 @@ const adminTasks = [
   },
 ];
 
-type DashboardSidebarProps = {
-  onClose: (event?: {}, reason?: 'backdropClick' | 'escapeKeyDown') => void;
+type AppSidebarProps = {
+  toggleDrawer: (
+    open: boolean
+  ) => (event: React.KeyboardEvent | React.MouseEvent) => void;
   open: boolean;
 };
 
-function DashboardSidebar(props: DashboardSidebarProps) {
-  const { open, onClose } = props;
-  const { pathname } = useLocation();
+const iOS =
+  typeof navigator !== 'undefined' &&
+  /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+function AppSidebar(props: AppSidebarProps) {
+  const { open, toggleDrawer } = props;
   const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'), {
     defaultMatches: true,
     noSsr: false,
@@ -85,16 +111,6 @@ function DashboardSidebar(props: DashboardSidebarProps) {
         : null,
     [currentUserResponse]
   );
-
-  useEffect(() => {
-    if (!pathname) {
-      return;
-    }
-
-    if (open) {
-      onClose?.();
-    }
-  }, [onClose, open, pathname]);
 
   const renderContent = () => {
     if (loadingCurrentUser) return <p>loading user scope...</p>;
@@ -160,7 +176,12 @@ function DashboardSidebar(props: DashboardSidebarProps) {
               my: 3,
             }}
           />
-          <Box sx={{ flexGrow: 1 }}>
+          <Box
+            sx={{ flexGrow: 1 }}
+            role="presentation"
+            onClick={toggleDrawer(false)}
+            onKeyDown={toggleDrawer(false)}
+          >
             {items.map((item) => (
               <NavItem
                 key={item.title}
@@ -176,7 +197,12 @@ function DashboardSidebar(props: DashboardSidebarProps) {
               my: 3,
             }}
           />
-          <Box sx={{ flexGrow: 1 }}>
+          <Box
+            sx={{ flexGrow: 1 }}
+            role="presentation"
+            onClick={toggleDrawer(false)}
+            onKeyDown={toggleDrawer(false)}
+          >
             {adminTasks.map((item) => (
               <NavItem
                 key={item.title}
@@ -197,7 +223,7 @@ function DashboardSidebar(props: DashboardSidebarProps) {
               Need more features?
             </Typography>
             <Typography color="neutral.500" variant="body2">
-              Check out our Pro solution template.
+              Check out other solutions by Kuyo Dynamics.
             </Typography>
             <Box
               sx={{
@@ -210,9 +236,9 @@ function DashboardSidebar(props: DashboardSidebarProps) {
                 },
               }}
             >
-              <img alt="Go to pro" src="/static/images/sidebar_pro.png" />
+              <img alt="Kuyo" src="/static/images/sidebar_pro.png" />
             </Box>
-            <NavLink to="https://material-kit-pro-react.devias.io/">
+            <NavLink to="https://kuyodynamics.com">
               <Button
                 color="secondary"
                 component="a"
@@ -221,7 +247,7 @@ function DashboardSidebar(props: DashboardSidebarProps) {
                 sx={{ mt: 2 }}
                 variant="contained"
               >
-                Pro Live Preview
+                Kuyo Dynamics
               </Button>
             </NavLink>
           </Box>
@@ -250,10 +276,11 @@ function DashboardSidebar(props: DashboardSidebarProps) {
   }
 
   return (
-    <Drawer
+    <SwipeableDrawer
       anchor="left"
-      onClose={onClose}
+      onClose={toggleDrawer(false)}
       open={open}
+      onOpen={toggleDrawer(true)}
       PaperProps={{
         sx: {
           backgroundColor: 'neutral.900',
@@ -263,10 +290,12 @@ function DashboardSidebar(props: DashboardSidebarProps) {
       }}
       sx={{ zIndex: (theme) => theme.zIndex.appBar + 100 }}
       variant="temporary"
+      disableBackdropTransition={!iOS}
+      disableDiscovery={iOS}
     >
       {renderContent()}
-    </Drawer>
+    </SwipeableDrawer>
   );
 }
 
-export default DashboardSidebar;
+export default AppSidebar;

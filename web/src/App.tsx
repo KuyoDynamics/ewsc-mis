@@ -1,15 +1,13 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Dashboard from 'routes/dashboard';
-import DashboardLayout from 'components/dashboard/dashboard-layout';
+import AppLayout from 'components/app/app-layout';
 
 function App() {
   return (
     <div className="App">
-      <DashboardLayout>
-        <Dashboard />
-      </DashboardLayout>
-      <Outlet />
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
     </div>
   );
 }

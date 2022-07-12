@@ -7,6 +7,7 @@ import {
   ApolloProvider,
   createHttpLink,
 } from '@apollo/client';
+
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { ThemeProvider } from '@mui/material/styles';
@@ -18,6 +19,7 @@ import Login from 'routes/login';
 import PrivateRoute from 'components/authentication/private-route';
 import { cacheConfig } from 'cache';
 import { authLink, observeTokenForExternalChanges } from 'utils/session';
+import Dashboard from 'routes/dashboard';
 
 observeTokenForExternalChanges();
 
@@ -42,19 +44,20 @@ root.render(
         <CssBaseline />
         <BrowserRouter>
           <Routes>
-            <Route path="/">
+            {/* <Route index element={<App />} /> */}
+            <Route path="/" element={<App />}>
               <Route
                 index
                 element={
                   <PrivateRoute>
-                    <App />
+                    <Dashboard />
                   </PrivateRoute>
                 }
               />
-
-              <Route path="login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Route>
+            <Route path="login" element={<Login />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
