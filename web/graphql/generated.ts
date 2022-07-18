@@ -1693,6 +1693,7 @@ export type OrganisationUserView = {
   master_support: Scalars['Boolean'];
   organisation_id: Scalars['String'];
   organisation?: Maybe<UserOrganisation>;
+  organisation_user_id: Scalars['String'];
   role: OrganisationUserRoleType;
   user_organisations?: Maybe<Array<UserOrganisation>>;
   user_districts?: Maybe<Array<UserDistrict>>;
@@ -1700,7 +1701,7 @@ export type OrganisationUserView = {
   confirmed_at?: Maybe<Scalars['DateTime']>;
   hashed_password_reset_token?: Maybe<Scalars['String']>;
   last_login?: Maybe<Scalars['DateTime']>;
-  theme?: Maybe<UserTheme>;
+  theme: UserTheme;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   last_modified_at: Scalars['DateTime'];
@@ -2664,10 +2665,22 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type DisableUserMutationVariables = Exact<{
+  input: DisableUserInput;
+}>;
+
+
+export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __typename?: 'User', id: string, disabled: boolean } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetDefaultOrganisationUsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDefaultOrganisationUsersQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, users?: Array<{ __typename?: 'OrganisationUserView', id: string, organisation_user_id: string, last_name: string, first_name: string, email: string, master_support: boolean, disabled: boolean, role: OrganisationUserRoleType, theme: UserTheme }> | null } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -2676,7 +2689,50 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken: any, id: string } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
 
+export type UpdateUserOrganisationRoleMutationVariables = Exact<{
+  input: UpdateOrganisationUserInput;
+}>;
 
+
+export type UpdateUserOrganisationRoleMutation = { __typename?: 'Mutation', updateOrganisationUser: { __typename?: 'OrganisationUser', id: string, role: OrganisationUserRoleType } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+
+export const DisableUserDocument = gql`
+    mutation DisableUser($input: DisableUserInput!) {
+  disableUser(input: $input) {
+    ... on User {
+      id
+      disabled
+    }
+  }
+}
+    `;
+export type DisableUserMutationFn = Apollo.MutationFunction<DisableUserMutation, DisableUserMutationVariables>;
+
+/**
+ * __useDisableUserMutation__
+ *
+ * To run a mutation, you first call `useDisableUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDisableUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [disableUserMutation, { data, loading, error }] = useDisableUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDisableUserMutation(baseOptions?: Apollo.MutationHookOptions<DisableUserMutation, DisableUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DisableUserMutation, DisableUserMutationVariables>(DisableUserDocument, options);
+      }
+export type DisableUserMutationHookResult = ReturnType<typeof useDisableUserMutation>;
+export type DisableUserMutationResult = Apollo.MutationResult<DisableUserMutation>;
+export type DisableUserMutationOptions = Apollo.BaseMutationOptions<DisableUserMutation, DisableUserMutationVariables>;
 export const GetCurrentUserDocument = gql`
     query GetCurrentUser {
   me {
@@ -2688,6 +2744,7 @@ export const GetCurrentUserDocument = gql`
       first_name
       last_name
       email
+      disabled
       user_organisations {
         id
         name
@@ -2751,6 +2808,56 @@ export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
 export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const GetDefaultOrganisationUsersDocument = gql`
+    query GetDefaultOrganisationUsers {
+  me {
+    ... on User {
+      id
+      user_default_organisation {
+        id
+        users {
+          id
+          organisation_user_id
+          last_name
+          first_name
+          email
+          master_support
+          disabled
+          role
+          theme
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDefaultOrganisationUsersQuery__
+ *
+ * To run a query within a React component, call `useGetDefaultOrganisationUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDefaultOrganisationUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDefaultOrganisationUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDefaultOrganisationUsersQuery(baseOptions?: Apollo.QueryHookOptions<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>(GetDefaultOrganisationUsersDocument, options);
+      }
+export function useGetDefaultOrganisationUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>(GetDefaultOrganisationUsersDocument, options);
+        }
+export type GetDefaultOrganisationUsersQueryHookResult = ReturnType<typeof useGetDefaultOrganisationUsersQuery>;
+export type GetDefaultOrganisationUsersLazyQueryHookResult = ReturnType<typeof useGetDefaultOrganisationUsersLazyQuery>;
+export type GetDefaultOrganisationUsersQueryResult = Apollo.QueryResult<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -2794,6 +2901,42 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const UpdateUserOrganisationRoleDocument = gql`
+    mutation UpdateUserOrganisationRole($input: UpdateOrganisationUserInput!) {
+  updateOrganisationUser(input: $input) {
+    ... on OrganisationUser {
+      id
+      role
+    }
+  }
+}
+    `;
+export type UpdateUserOrganisationRoleMutationFn = Apollo.MutationFunction<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>;
+
+/**
+ * __useUpdateUserOrganisationRoleMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserOrganisationRoleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserOrganisationRoleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserOrganisationRoleMutation, { data, loading, error }] = useUpdateUserOrganisationRoleMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserOrganisationRoleMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>(UpdateUserOrganisationRoleDocument, options);
+      }
+export type UpdateUserOrganisationRoleMutationHookResult = ReturnType<typeof useUpdateUserOrganisationRoleMutation>;
+export type UpdateUserOrganisationRoleMutationResult = Apollo.MutationResult<UpdateUserOrganisationRoleMutation>;
+export type UpdateUserOrganisationRoleMutationOptions = Apollo.BaseMutationOptions<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>;
 export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier)[];
 export type ApiBatchPayloadFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>
@@ -3276,7 +3419,7 @@ export type OrganisationUserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type OrganisationUserViewKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'organisation_id' | 'organisation' | 'role' | 'user_organisations' | 'user_districts' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationUserViewKeySpecifier)[];
+export type OrganisationUserViewKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'organisation_id' | 'organisation' | 'organisation_user_id' | 'role' | 'user_organisations' | 'user_districts' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationUserViewKeySpecifier)[];
 export type OrganisationUserViewFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	first_name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3286,6 +3429,7 @@ export type OrganisationUserViewFieldPolicy = {
 	master_support?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_user_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	role?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_districts?: FieldPolicy<any> | FieldReadFunction<any>,

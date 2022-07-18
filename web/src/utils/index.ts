@@ -32,3 +32,14 @@
 //   const [context, ...restArgs] = args;
 //     return context.readField(...restArgs);
 // };
+
+const getEnumKeys = <T>(
+  enumToDeconstruct: T
+): Array<keyof typeof enumToDeconstruct> => {
+  return Object.keys(enumToDeconstruct) as Array<
+    keyof typeof enumToDeconstruct
+  >;
+};
+
+// eslint-disable-next-line import/prefer-default-export
+export { getEnumKeys };

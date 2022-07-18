@@ -1,0 +1,8 @@
+mutation DisableUser($input: DisableUserInput!) {
+  disableUser(input: $input) {
+    ... on User {
+      id
+      disabled
+    }
+  }
+}

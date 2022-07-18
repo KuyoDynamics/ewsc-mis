@@ -8,7 +8,9 @@ const AppLayoutRoot = styled('div')(({ theme }) => ({
   display: 'flex',
   flex: '1 1 auto',
   maxWidth: '100%',
-  paddingTop: 64,
+  flexDirection: 'column',
+  alignItems: 'center',
+  // paddingTop: 64,
   [theme.breakpoints.up('lg')]: {
     paddingLeft: 280,
   },
@@ -38,7 +40,7 @@ function AppLayout(props: AppLayoutProps) {
   return (
     <>
       <AppLayoutRoot>
-        <Box
+        {/* <Box
           sx={{
             display: 'flex',
             flex: '1 1 auto',
@@ -47,8 +49,8 @@ function AppLayout(props: AppLayoutProps) {
             alignItems: 'center',
           }}
         >
-          {children}
-        </Box>
+        </Box> */}
+        {children}
       </AppLayoutRoot>
       <AppSidebar toggleDrawer={toggleDrawer} open={isSidebarOpen} />
       <AppNavbar onSidebarOpen={toggleDrawer(true)} />

@@ -1701,8 +1701,9 @@ export type OrganisationUserView = {
   master_support: Scalars['Boolean'];
   organisation?: Maybe<UserOrganisation>;
   organisation_id: Scalars['String'];
+  organisation_user_id: Scalars['String'];
   role: OrganisationUserRoleType;
-  theme?: Maybe<UserTheme>;
+  theme: UserTheme;
   user_districts?: Maybe<Array<UserDistrict>>;
   user_organisations?: Maybe<Array<UserOrganisation>>;
 };
@@ -4086,8 +4087,9 @@ export type OrganisationUserViewResolvers<ContextType = GraphQLContext, ParentTy
   master_support?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   organisation?: Resolver<Maybe<ResolversTypes['UserOrganisation']>, ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation_user_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['OrganisationUserRoleType'], ParentType, ContextType>;
-  theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
+  theme?: Resolver<ResolversTypes['UserTheme'], ParentType, ContextType>;
   user_districts?: Resolver<Maybe<Array<ResolversTypes['UserDistrict']>>, ParentType, ContextType>;
   user_organisations?: Resolver<Maybe<Array<ResolversTypes['UserOrganisation']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

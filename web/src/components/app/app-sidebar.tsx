@@ -62,9 +62,9 @@ const items = [
 
 const adminTasks = [
   {
-    href: '/settings',
+    href: '/admin',
     icon: <CogIcon fontSize="small" />,
-    title: 'Settings',
+    title: 'Admin',
   },
 ];
 

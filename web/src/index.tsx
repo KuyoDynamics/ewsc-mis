@@ -20,6 +20,7 @@ import PrivateRoute from 'components/authentication/private-route';
 import { cacheConfig } from 'cache';
 import { authLink, observeTokenForExternalChanges } from 'utils/session';
 import Dashboard from 'routes/dashboard';
+import Admin from 'routes/admin';
 
 observeTokenForExternalChanges();
 
@@ -51,6 +52,14 @@ root.render(
                 element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <PrivateRoute>
+                    <Admin />
                   </PrivateRoute>
                 }
               />

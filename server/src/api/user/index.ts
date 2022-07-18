@@ -19,6 +19,7 @@ import {
   resolveUserDefaultOrganisation,
   resolveUserDistricts,
   resolveProvince,
+  resolveOrganisationUsers,
 } from '../queries';
 
 const typeDefs = gql`
@@ -228,6 +229,8 @@ const resolvers: Resolvers = {
       resolveCountry(parent.country_id, context),
     user_districts: (parent, _args, context) =>
       resolveUserDistricts(parent.user_id, parent.id, context),
+    users: (parent, _args, context) =>
+      resolveOrganisationUsers(parent.id, context),
   },
   UserDistrict: {
     province: (parent, _args, context) =>

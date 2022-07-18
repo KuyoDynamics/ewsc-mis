@@ -1,0 +1,8 @@
+mutation UpdateUserOrganisationRole($input: UpdateOrganisationUserInput!) {
+  updateOrganisationUser(input: $input) {
+    ... on OrganisationUser {
+      id
+      role
+    }
+  }
+}

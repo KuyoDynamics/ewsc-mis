@@ -1,0 +1,21 @@
+query GetDefaultOrganisationUsers {
+  me {
+    ... on User {
+      id
+      user_default_organisation {
+        id
+        users {
+          id
+          organisation_user_id
+          last_name
+          first_name
+          email
+          master_support
+          disabled
+          role
+          theme
+        }
+      }
+    }
+  }
+}

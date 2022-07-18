@@ -8,6 +8,7 @@ query GetCurrentUser {
       first_name
       last_name
       email
+      disabled
       user_organisations {
         id
         name
