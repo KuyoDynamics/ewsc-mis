@@ -1,3 +1,4 @@
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { isLoggedInVar } from 'cache';
 
@@ -11,24 +12,25 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-function observeTokenForExternalChanges() {
+function logout(client: ApolloClient<object>) {
+  localStorage.removeItem('token');
+  localStorage.removeItem('apollo-cache-persist');
+  isLoggedInVar(false);
+  client.clearStore();
+}
+
+function observeTokenForExternalChanges(client: ApolloClient<object>) {
   window.addEventListener('storage', ({ key }) => {
-    if (key === 'token' || !key) {
-      localStorage.removeItem('token');
-      isLoggedInVar(false);
+    if (key === 'token' || key === 'apollo-cache-persist' || !key) {
+      logout(client);
     }
   });
 }
 
-function logout() {
-  localStorage.removeItem('token');
-  isLoggedInVar(false);
-}
-
-function setToken(token: string) {
+function setToken(token: string, client: ApolloClient<object>) {
   localStorage.setItem('token', token);
-  console.log('Chaiwa, what was the token here?', token);
   isLoggedInVar(true);
+  client.resetStore();
 }
 
 export { logout, setToken, authLink, observeTokenForExternalChanges };

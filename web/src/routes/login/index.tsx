@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { Box, Button, Container, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useReactiveVar } from '@apollo/client';
+import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
 import { isLoggedInVar } from 'cache';
 import FormInput from 'components/form-input/form-input';
@@ -28,6 +28,7 @@ type FormInputs = {
 
 function Login() {
   const location: any = useLocation();
+  const client = useApolloClient();
 
   const navigate = useNavigate();
 
@@ -64,7 +65,7 @@ function Login() {
       },
       onCompleted: (result) => {
         if (result.login.__typename === 'LoginSuccess') {
-          setToken(result.login.accessToken);
+          setToken(result.login.accessToken, client);
         } else if (result.login.__typename === 'ApiLoginError') {
           result.login.errors?.forEach((err) =>
             setError(err.field as 'email' | 'password', {

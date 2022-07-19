@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
+  Button,
   CircularProgress,
   FormControl,
-  InputLabel,
   MenuItem,
   Switch,
   TableCell,
@@ -11,16 +10,18 @@ import {
 } from '@mui/material';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { styled, useTheme } from '@mui/material/styles';
-import { HeadCellType } from 'components/data-table';
 import { Link } from 'react-router-dom';
+import { ViewList } from '@mui/icons-material';
 import { getEnumKeys } from 'utils';
 import {
   GetDefaultOrganisationUsersDocument,
   OrganisationUserRoleType,
   useDisableUserMutation,
   useGetCurrentUserQuery,
+  UserDistrict,
   useUpdateUserOrganisationRoleMutation,
 } from '../../../graphql/generated';
+import UserDistrictList from './user-district-list';
 
 export type UserItemType = {
   id: string;
@@ -28,6 +29,7 @@ export type UserItemType = {
   name: string;
   role: OrganisationUserRoleType;
   disabled: boolean;
+  user_districts: UserDistrict[];
   // [key: string]: any;
 };
 
@@ -110,16 +112,16 @@ export interface UserItemProps {
   row: UserItemType;
   // eslint-disable-next-line react/require-default-props
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
-  headCells: HeadCellType[];
+  // headCells: HeadCellType[];
 }
 
-function UserItem({ align, headCells, row: user }: UserItemProps) {
-  console.log('Chaiwa, what is item in UserItem?', user);
+function UserItem({ align, row: user }: UserItemProps) {
   const [switchValue, setSwitchValue] = useState(false);
   const [orgUserRole, setOrgUserRole] = useState(user.role);
+  const [open, setOpen] = useState(false);
 
   const { data } = useGetCurrentUserQuery({
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'cache-first',
   });
 
   const [
@@ -151,6 +153,14 @@ function UserItem({ align, headCells, row: user }: UserItemProps) {
     setSwitchValue(!switchValue);
   };
 
+  const handleModalClose = () => {
+    setOpen(false);
+  };
+
+  const handleModalOpen = () => {
+    setOpen(true);
+  };
+
   const handleUserRoleChange = (event: SelectChangeEvent) => {
     setOrgUserRole(event.target.value as OrganisationUserRoleType);
   };
@@ -161,7 +171,7 @@ function UserItem({ align, headCells, row: user }: UserItemProps) {
         input: {
           id: user.id,
           update: {
-            disabled: !switchValue,
+            disabled: switchValue,
           },
         },
       },
@@ -183,76 +193,72 @@ function UserItem({ align, headCells, row: user }: UserItemProps) {
     });
   }, [orgUserRole, updateUserOrgRole, user.organisation_user_id]);
 
+  const isCurrentUser = currentUser?.id === user.id;
   return (
     <>
-      {headCells.map((cell) => {
-        const value = user[cell.id as keyof UserItemType] || '---';
-        const isCurrentUser = currentUser?.id === user.id;
-        if (cell.id === 'name') {
-          return (
-            <TableCell align={align}>
-              {value !== '---' ? <Link to="/user-details">{value}</Link> : null}
-            </TableCell>
-          );
-        }
-        if (cell.id === 'role') {
-          return (
-            <Box sx={{ minWidth: 120 }}>
-              <FormControl fullWidth size="small">
-                <Select
-                  id="role"
-                  value={value as OrganisationUserRoleType}
-                  onChange={handleUserRoleChange}
-                >
-                  {getEnumKeys(OrganisationUserRoleType)
-                    .filter((role) => role !== 'Support' && role !== 'Owner')
-                    .map((key) => (
-                      <MenuItem key={key} value={OrganisationUserRoleType[key]}>
-                        {key}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Box>
-          );
-        }
-        if (typeof value === 'boolean') {
-          return (
-            <TableCell align={align}>
-              <Tooltip
-                title={
-                  isCurrentUser ? 'You cannot disable your own account.' : ''
-                }
-              >
-                <AntSwitch
-                  name={cell.id}
-                  checked={user.disabled}
-                  disabled={isCurrentUser}
-                  disableRipple={isCurrentUser}
-                  disableFocusRipple={isCurrentUser}
-                  disableTouchRipple={isCurrentUser}
-                  // checkedIcon={
-                  //   <SwitchIcon
-                  //     loading={disablingUser}
-                  //     switchValue={user.disabled}
-                  //   />
-                  // }
-                  // icon={
-                  //   <SwitchIcon
-                  //     loading={disablingUser}
-                  //     switchValue={user.disabled}
-                  //   />
-                  // }
-                  onChange={handleChange}
-                  inputProps={{ 'aria-label': 'user disabled' }}
-                />
-              </Tooltip>
-            </TableCell>
-          );
-        }
+      <TableCell align={align}>
+        <Link to="/user-details">{user.name}</Link>
+      </TableCell>
+      <FormControl fullWidth size="small" variant="filled">
+        <Select id="role" value={orgUserRole} onChange={handleUserRoleChange}>
+          {getEnumKeys(OrganisationUserRoleType)
+            .filter((role) => role !== 'Support' && role !== 'Owner')
+            .map((key) => (
+              <MenuItem key={key} value={OrganisationUserRoleType[key]}>
+                {key}
+              </MenuItem>
+            ))}
+        </Select>
+      </FormControl>
 
-        return <TableCell align={align}>{value ?? '---'}</TableCell>;
-      })}
+      <TableCell align={align}>
+        <Button
+          variant="text"
+          size="small"
+          endIcon={<ViewList />}
+          onClick={handleModalOpen}
+        >
+          {user.user_districts.length === 1
+            ? user.user_districts[0].name
+            : `${user.user_districts.length} districts`}
+        </Button>
+        <UserDistrictList
+          userDistricts={user.user_districts}
+          userName={user.name}
+          onClose={handleModalClose}
+          open={open}
+        />
+      </TableCell>
+
+      <TableCell align={align}>
+        <Tooltip
+          title={isCurrentUser ? 'You cannot disable your own account.' : ''}
+        >
+          <AntSwitch
+            name="disabled"
+            checked={user.disabled}
+            disabled={isCurrentUser}
+            disableRipple={isCurrentUser}
+            disableFocusRipple={isCurrentUser}
+            disableTouchRipple={isCurrentUser}
+            // checkedIcon={
+            //   <SwitchIcon
+            //     loading={disablingUser}
+            //     switchValue={user.disabled}
+            //   />
+            // }
+            // icon={
+            //   <SwitchIcon
+            //     loading={disablingUser}
+            //     switchValue={user.disabled}
+            //   />
+            // }
+            onChange={handleChange}
+            inputProps={{ 'aria-label': 'user disabled' }}
+          />
+        </Tooltip>
+      </TableCell>
+      {/* <TableCell align={align}>{value ?? '---'}</TableCell> */}
     </>
   );
 }

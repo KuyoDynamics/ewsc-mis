@@ -52,6 +52,7 @@ const typeDefs = gql`
     organisation_id: ID!
     organisation: UserOrganisation
     is_default_user_district: Boolean!
+    district_user_id: ID!
     disabled: Boolean!
     user_district_roles: [DistrictUserRoleType!]!
     province_id: String!

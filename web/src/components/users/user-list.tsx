@@ -1,7 +1,7 @@
 import React from 'react';
 import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
+import UserItem from 'components/users/user-item';
 import { useGetDefaultOrganisationUsersQuery } from '../../../graphql/generated';
-import UserItem from './user-item';
 
 // const UserItemFC = (props: UserItemProps)=>{return(<UserItem ...props />)}
 
@@ -18,10 +18,13 @@ function UserList() {
             name: `${user.last_name} ${user.first_name} `,
             role: user.role,
             disabled: user.disabled,
+            user_districts: user.user_districts,
           }))
         : null,
     [data]
   );
+
+  console.log('organisationUsers in UserList', organisationUsers);
 
   const rows: TableDataType[] = organisationUsers!;
   const headCells: HeadCellType[] = [
@@ -38,7 +41,7 @@ function UserList() {
       label: 'Organisation Role',
     },
     {
-      id: 'districts',
+      id: 'user_districts',
       numeric: false,
       disablePadding: true,
       label: 'User Districts',
@@ -51,7 +54,6 @@ function UserList() {
     },
   ];
 
-  console.log('organisation_users', organisationUsers);
   if (loading) return <p>loading organisation users...</p>;
   if (error) return <p>failed to load organisation users</p>;
 

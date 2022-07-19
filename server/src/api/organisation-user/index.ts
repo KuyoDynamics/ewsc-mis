@@ -8,6 +8,7 @@ import {
   updateOrganisationUser,
   getOrganisation,
   getUser,
+  resolveUserDistricts,
 } from '../queries';
 const typeDefs = gql`
   type OrganisationUser {
@@ -101,6 +102,10 @@ const resolvers: Resolvers = {
     user: (parent, _args, context) => getUser({ id: parent.user_id }, context),
     organisation: (parent, _args, context) =>
       getOrganisation(parent.organisation_id, context),
+  },
+  OrganisationUserView: {
+    user_districts: (parent, _args, context) =>
+      resolveUserDistricts(parent.id, parent.organisation_id, context),
   },
   Query: {
     organisation_users: (_, args, context) =>

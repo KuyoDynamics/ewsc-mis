@@ -2491,6 +2491,7 @@ export type UserDistrict = {
   organisation_id: Scalars['ID'];
   organisation?: Maybe<UserOrganisation>;
   is_default_user_district: Scalars['Boolean'];
+  district_user_id: Scalars['ID'];
   disabled: Scalars['Boolean'];
   user_district_roles: Array<DistrictUserRoleType>;
   province_id: Scalars['String'];
@@ -2680,7 +2681,7 @@ export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'Us
 export type GetDefaultOrganisationUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDefaultOrganisationUsersQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, users?: Array<{ __typename?: 'OrganisationUserView', id: string, organisation_user_id: string, last_name: string, first_name: string, email: string, master_support: boolean, disabled: boolean, role: OrganisationUserRoleType, theme: UserTheme }> | null } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetDefaultOrganisationUsersQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, users?: Array<{ __typename?: 'OrganisationUserView', id: string, organisation_user_id: string, last_name: string, first_name: string, email: string, master_support: boolean, disabled: boolean, role: OrganisationUserRoleType, theme: UserTheme, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, code: string, name: string, disabled: boolean, is_default_user_district: boolean, district_user_id: string, user_district_roles: Array<DistrictUserRoleType>, province?: { __typename?: 'Province', id: string, name: string } | null }> | null }> | null } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -2695,6 +2696,13 @@ export type UpdateUserOrganisationRoleMutationVariables = Exact<{
 
 
 export type UpdateUserOrganisationRoleMutation = { __typename?: 'Mutation', updateOrganisationUser: { __typename?: 'OrganisationUser', id: string, role: OrganisationUserRoleType } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type UpdateUserRolesForDistrictMutationVariables = Exact<{
+  input: UpdateUserRolesForDistrictInput;
+}>;
+
+
+export type UpdateUserRolesForDistrictMutation = { __typename?: 'Mutation', updateUserRolesForDistrict: { __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType> } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 
 export const DisableUserDocument = gql`
@@ -2825,6 +2833,19 @@ export const GetDefaultOrganisationUsersDocument = gql`
           disabled
           role
           theme
+          user_districts {
+            id
+            code
+            name
+            disabled
+            is_default_user_district
+            district_user_id
+            user_district_roles
+            province {
+              id
+              name
+            }
+          }
         }
       }
     }
@@ -2937,6 +2958,42 @@ export function useUpdateUserOrganisationRoleMutation(baseOptions?: Apollo.Mutat
 export type UpdateUserOrganisationRoleMutationHookResult = ReturnType<typeof useUpdateUserOrganisationRoleMutation>;
 export type UpdateUserOrganisationRoleMutationResult = Apollo.MutationResult<UpdateUserOrganisationRoleMutation>;
 export type UpdateUserOrganisationRoleMutationOptions = Apollo.BaseMutationOptions<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>;
+export const UpdateUserRolesForDistrictDocument = gql`
+    mutation UpdateUserRolesForDistrict($input: UpdateUserRolesForDistrictInput!) {
+  updateUserRolesForDistrict(input: $input) {
+    ... on DistrictUser {
+      id
+      roles
+    }
+  }
+}
+    `;
+export type UpdateUserRolesForDistrictMutationFn = Apollo.MutationFunction<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>;
+
+/**
+ * __useUpdateUserRolesForDistrictMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserRolesForDistrictMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserRolesForDistrictMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserRolesForDistrictMutation, { data, loading, error }] = useUpdateUserRolesForDistrictMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserRolesForDistrictMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>(UpdateUserRolesForDistrictDocument, options);
+      }
+export type UpdateUserRolesForDistrictMutationHookResult = ReturnType<typeof useUpdateUserRolesForDistrictMutation>;
+export type UpdateUserRolesForDistrictMutationResult = Apollo.MutationResult<UpdateUserRolesForDistrictMutation>;
+export type UpdateUserRolesForDistrictMutationOptions = Apollo.BaseMutationOptions<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>;
 export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier)[];
 export type ApiBatchPayloadFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>
@@ -3678,7 +3735,7 @@ export type UserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
+export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'district_user_id' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
 export type UserDistrictFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3688,6 +3745,7 @@ export type UserDistrictFieldPolicy = {
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	is_default_user_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_user_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_district_roles?: FieldPolicy<any> | FieldReadFunction<any>,
 	province_id?: FieldPolicy<any> | FieldReadFunction<any>,

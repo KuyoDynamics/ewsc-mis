@@ -5,7 +5,16 @@ import path from 'path';
 // in case you run into any typescript error when configuring `devServer`
 import 'webpack-dev-server';
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
+
 const config: webpack.Configuration = {
+  experiments: {
+    topLevelAwait: true,
+  },
   mode: 'development',
   entry: {
     main: './src/index.tsx',

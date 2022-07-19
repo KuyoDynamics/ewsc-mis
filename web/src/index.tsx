@@ -1,38 +1,38 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink,
-} from '@apollo/client';
-
+import { ApolloClient, ApolloProvider, createHttpLink } from '@apollo/client';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
 import App from 'App';
 import theme from 'theme';
 import NotFound from 'components/404';
 import Login from 'routes/login';
 import PrivateRoute from 'components/authentication/private-route';
-import { cacheConfig } from 'cache';
 import { authLink, observeTokenForExternalChanges } from 'utils/session';
 import Dashboard from 'routes/dashboard';
 import Admin from 'routes/admin';
-
-observeTokenForExternalChanges();
+import { cache } from 'cache';
 
 const httpLink = createHttpLink({
   uri: '/api',
 });
 
+await persistCache({
+  cache,
+  storage: new LocalStorageWrapper(window.localStorage),
+});
+
 const client = new ApolloClient({
   connectToDevTools: true,
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(cacheConfig),
+  cache,
 });
+
+observeTokenForExternalChanges(client);
 
 const container = document.getElementById('root');
 

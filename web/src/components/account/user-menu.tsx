@@ -16,6 +16,7 @@ import SettingsIcon from '@mui/icons-material/SettingsSharp';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, Divider, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
+import { useApolloClient } from '@apollo/client';
 import { logout } from 'utils/session';
 import { UserCircle as UserCircleIcon } from 'icons';
 import { useGetCurrentUserQuery } from '../../../graphql/generated';
@@ -31,6 +32,7 @@ const Transition = forwardRef(
 );
 
 function UserMenu() {
+  const client = useApolloClient();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleMouseOver = (event: MouseEvent<HTMLButtonElement>) => {
@@ -106,7 +108,7 @@ function UserMenu() {
           </ListItemIcon>
           <ListItemText primary="Account Settings" />
         </MenuItem>
-        <MenuItem id="logout" onClick={() => logout()}>
+        <MenuItem id="logout" onClick={() => logout(client)}>
           <ListItemIcon>
             <ExitToAppIcon />
           </ListItemIcon>

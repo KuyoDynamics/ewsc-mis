@@ -2481,6 +2481,7 @@ export type UserDistrict = {
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   disabled: Scalars['Boolean'];
+  district_user_id: Scalars['ID'];
   id: Scalars['ID'];
   is_default_user_district: Scalars['Boolean'];
   last_modified_at: Scalars['DateTime'];
@@ -4461,6 +4462,7 @@ export type UserDistrictResolvers<ContextType = GraphQLContext, ParentType exten
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  district_user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   is_default_user_district?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;

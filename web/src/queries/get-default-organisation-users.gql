@@ -14,6 +14,19 @@ query GetDefaultOrganisationUsers {
           disabled
           role
           theme
+          user_districts {
+            id
+            code
+            name
+            disabled
+            is_default_user_district
+            district_user_id
+            user_district_roles
+            province {
+              id
+              name
+            }
+          }
         }
       }
     }

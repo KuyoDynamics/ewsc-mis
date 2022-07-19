@@ -285,7 +285,7 @@ function DataTable({
         />
         <TableContainer>
           <Table
-            sx={{ minWidth: 750 }}
+            // sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -329,7 +329,6 @@ function DataTable({
                           }}
                         />
                       </TableCell>
-                      {/* Add component here */}
                       <ItemComponent
                         row={row}
                         headCells={headCells}
@@ -343,9 +342,10 @@ function DataTable({
                 <TableRow
                   style={{
                     height: (dense ? 33 : 53) * emptyRows,
+                    alignContent: 'bottom',
                   }}
                 >
-                  <TableCell colSpan={6} />
+                  {/* <TableCell colSpan={6} /> */}
                 </TableRow>
               )}
             </TableBody>

@@ -1,4 +1,9 @@
-import { InMemoryCacheConfig, makeVar, ReactiveVar } from '@apollo/client';
+import {
+  InMemoryCacheConfig,
+  InMemoryCache,
+  makeVar,
+  ReactiveVar,
+} from '@apollo/client';
 import jwt from 'jwt-decode';
 import { StrictTypedTypePolicies } from '../../graphql/generated';
 
@@ -43,4 +48,6 @@ const cacheConfig: InMemoryCacheConfig = {
   typePolicies,
 };
 
-export { isTokenExpired, isLoggedInVar, cacheConfig };
+const cache = new InMemoryCache(cacheConfig);
+
+export { isTokenExpired, isLoggedInVar, cache };
