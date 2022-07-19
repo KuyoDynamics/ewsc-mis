@@ -16,10 +16,11 @@ import SettingsIcon from '@mui/icons-material/SettingsSharp';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, Divider, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { logout } from 'utils/session';
 import { UserCircle as UserCircleIcon } from 'icons';
-import { useGetCurrentUserQuery } from '../../../graphql/generated';
+import { currentUserVar } from 'cache';
+import { User } from '../../../graphql/generated';
 
 const Transition = forwardRef(
   (
@@ -42,13 +43,9 @@ function UserMenu() {
     setAnchorEl(null);
   };
 
-  const { loading, data, error } = useGetCurrentUserQuery({
-    fetchPolicy: 'cache-first',
-  });
+  const currentUser = useReactiveVar(currentUserVar) as User;
 
-  console.log('error', error);
-  console.log('data', data);
-  console.log('error', error);
+  console.log('currentUser in UserMenu', currentUser);
 
   const navigate = useNavigate();
 
@@ -91,11 +88,7 @@ function UserMenu() {
           }}
           component="div"
         >
-          {data?.me.__typename === 'User' && !loading ? (
-            `Hi, ${data.me.first_name}`
-          ) : (
-            <h1>loading...</h1>
-          )}
+          {currentUser ? `Hi, ${currentUser.first_name}` : <h1>loading...</h1>}
         </Typography>
         <Divider />
         <MenuItem

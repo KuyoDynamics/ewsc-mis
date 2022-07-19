@@ -12,16 +12,17 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { styled, useTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import { ViewList } from '@mui/icons-material';
+import { useReactiveVar } from '@apollo/client';
+import { currentUserVar } from 'cache';
 import { getEnumKeys } from 'utils';
+import UserDistrictList from './user-district-list';
 import {
   GetDefaultOrganisationUsersDocument,
   OrganisationUserRoleType,
   useDisableUserMutation,
-  useGetCurrentUserQuery,
   UserDistrict,
   useUpdateUserOrganisationRoleMutation,
 } from '../../../graphql/generated';
-import UserDistrictList from './user-district-list';
 
 export type UserItemType = {
   id: string;
@@ -120,9 +121,7 @@ function UserItem({ align, row: user }: UserItemProps) {
   const [orgUserRole, setOrgUserRole] = useState(user.role);
   const [open, setOpen] = useState(false);
 
-  const { data } = useGetCurrentUserQuery({
-    fetchPolicy: 'cache-first',
-  });
+  const currentUser = useReactiveVar(currentUserVar);
 
   const [
     disableUser,
@@ -141,13 +140,6 @@ function UserItem({ align, row: user }: UserItemProps) {
       error: updateUserOrgRoleError,
     },
   ] = useUpdateUserOrganisationRoleMutation();
-
-  const currentUser = React.useMemo(
-    () => (data?.me.__typename === 'User' ? data.me : null),
-    [data]
-  );
-
-  console.log('currentUser?.id === user.id', currentUser?.id === user.id);
 
   const handleChange = () => {
     setSwitchValue(!switchValue);

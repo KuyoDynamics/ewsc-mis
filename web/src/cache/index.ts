@@ -5,7 +5,7 @@ import {
   ReactiveVar,
 } from '@apollo/client';
 import jwt from 'jwt-decode';
-import { StrictTypedTypePolicies } from '../../graphql/generated';
+import { StrictTypedTypePolicies, User } from '../../graphql/generated';
 
 interface IJwt {
   exp: number;
@@ -32,6 +32,8 @@ const tokenExpired = isTokenExpired();
 
 const isLoggedInVar: ReactiveVar<boolean> = makeVar(tokenExpired);
 
+const currentUserVar: ReactiveVar<any> = makeVar(null);
+
 const typePolicies: StrictTypedTypePolicies = {
   Query: {
     fields: {
@@ -50,4 +52,4 @@ const cacheConfig: InMemoryCacheConfig = {
 
 const cache = new InMemoryCache(cacheConfig);
 
-export { isTokenExpired, isLoggedInVar, cache };
+export { isTokenExpired, isLoggedInVar, cache, currentUserVar };

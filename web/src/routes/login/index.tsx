@@ -6,9 +6,13 @@ import { Box, Button, Container, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
-import { isLoggedInVar } from 'cache';
+import { currentUserVar, isLoggedInVar } from 'cache';
 import FormInput from 'components/form-input/form-input';
-import { useLoginMutation } from '../../../graphql/generated';
+import {
+  useGetCurrentUserLazyQuery,
+  useLoginMutation,
+  User,
+} from '../../../graphql/generated';
 
 const schema = Yup.object({
   email: Yup.string()
@@ -44,15 +48,34 @@ function Login() {
 
   const [login, { loading: logginIn }] = useLoginMutation();
 
+  const [getCurrentUser, { data: currentUserResponse }] =
+    useGetCurrentUserLazyQuery();
+
+  const currentUser = React.useMemo(
+    () =>
+      currentUserResponse?.me.__typename === 'User'
+        ? currentUserResponse.me
+        : null,
+    [currentUserResponse]
+  );
+
   const isLoggedIn = useReactiveVar(isLoggedInVar);
 
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
+    currentUserVar(currentUser as User);
+  }, [currentUser]);
+
+  useEffect(() => {
     if (isLoggedIn) {
-      navigate(from, { replace: true });
+      getCurrentUser({
+        fetchPolicy: 'network-only',
+      }).then(() => {
+        navigate(from, { replace: true });
+      });
     }
-  }, [isLoggedIn, from, navigate]);
+  }, [isLoggedIn, from, navigate, getCurrentUser]);
 
   const onSubmit = async (values: any) => {
     login({
