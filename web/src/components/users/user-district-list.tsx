@@ -1,7 +1,7 @@
 import React from 'react';
 import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
 import UserDistrictItem from 'components/users/user-district-item';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, PaperProps } from '@mui/material';
 import DraggablePaper from 'components/draggable-paper';
 import { UserDistrict } from '../../../graphql/generated';
 
@@ -33,6 +33,11 @@ const headCells: HeadCellType[] = [
   },
 ];
 
+function DraggableUserDistrictsList(props: PaperProps) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <DraggablePaper {...props} handle="#user-district-dialog-title" />;
+}
+
 function UserDistrictList({
   userDistricts,
   userName,
@@ -49,8 +54,8 @@ function UserDistrictList({
     <Dialog
       onClose={handleModalClose}
       open={open}
-      PaperComponent={DraggablePaper}
-      aria-labelledby="draggable-dialog-title"
+      PaperComponent={DraggableUserDistrictsList}
+      aria-label="user district list dialog"
       sx={{
         '& .MuiDialog-container': {
           '& .MuiPaper-root': {
@@ -59,10 +64,8 @@ function UserDistrictList({
           },
         },
       }}
-      // fullWidth
-      // maxWidth="lg"
     >
-      <DialogTitle style={{ cursor: 'move' }} id="draggable-dialog-title" />
+      <DialogTitle style={{ cursor: 'move' }} id="user-district-dialog-title" />
       <DialogContent>
         <DataTable
           rows={rows}

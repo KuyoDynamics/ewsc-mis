@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
 import { currentUserVar, isLoggedInVar } from 'cache';
-import FormInput from 'components/form-input/form-input';
+import FormInput from 'components/form-input-helpers/form-input';
 import {
   useGetCurrentUserLazyQuery,
   useLoginMutation,

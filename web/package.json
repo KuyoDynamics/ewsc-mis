@@ -81,6 +81,7 @@
     "react-draggable": "^4.4.5",
     "react-hook-form": "^7.33.0",
     "react-router-dom": "^6.3.0",
+    "react-select": "^5.4.0",
     "yup": "^0.32.11"
   }
 }

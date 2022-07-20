@@ -143,6 +143,10 @@ interface EnhancedTableToolbarProps {
   title: string;
 }
 
+interface ITableActionButtonProps {
+  [key: string]: any;
+}
+
 interface DataTableProps {
   rows: TableDataType[];
   headCells: HeadCellType[];
@@ -154,6 +158,8 @@ interface DataTableProps {
   toolBarTitle: string;
   // eslint-disable-next-line react/require-default-props
   TableActionButton?: React.ElementType;
+  // eslint-disable-next-line react/require-default-props
+  tableActionButtonProps?: ITableActionButtonProps;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
@@ -217,12 +223,15 @@ function DataTable({
   ItemComponent,
   toolBarTitle,
   TableActionButton,
+  tableActionButtonProps,
 }: DataTableProps) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof TableDataType>('name');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  console.log('tableActionButtonProps', tableActionButtonProps);
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
@@ -382,7 +391,10 @@ function DataTable({
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Box>
-          {TableActionButton && <TableActionButton />}
+          {TableActionButton && (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <TableActionButton {...tableActionButtonProps} />
+          )}
         </Box>
       </Paper>
     </Box>

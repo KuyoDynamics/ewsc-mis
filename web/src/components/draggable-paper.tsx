@@ -1,14 +1,17 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import Paper, { PaperProps } from '@mui/material/Paper';
+import Paper from '@mui/material/Paper';
 import Draggable from 'react-draggable';
 
-function DraggablePaper(props: PaperProps) {
+interface IDraggablePaperProps {
+  [key: string]: any;
+  handle: string;
+}
+
+function DraggablePaper({ handle, ...props }: IDraggablePaperProps) {
+  // console.log('handle,props', handle, props);
   return (
-    <Draggable
-      handle="#draggable-dialog-title"
-      cancel={'[class*="MuiDialogContent-root"]'}
-    >
+    <Draggable handle={handle} cancel={'[class*="MuiDialogContent-root"]'}>
       <Paper {...props} />
     </Draggable>
   );

@@ -10,15 +10,13 @@ import {
   ListItemText,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { getEnumKeys } from 'utils';
+import { USER_DISTRICT_ROLE_OPTIONS } from 'utils';
 import {
   DistrictUserRoleType,
   GetDefaultOrganisationUsersDocument,
   UserDistrict,
   useUpdateUserRolesForDistrictMutation,
 } from '../../../graphql/generated';
-
-const userDistrictRoleOptions = getEnumKeys(DistrictUserRoleType);
 
 export interface UserDistrictProps {
   row: UserDistrict;
@@ -52,10 +50,6 @@ function UserDistrictItem({ align, row: userDistrict }: UserDistrictProps) {
     () => userRoleState.filter((role) => role !== 'USER'),
     [userRoleState]
   );
-
-  console.log('userRoleState', userRoleState);
-
-  console.log('newUserRoles', newUserRoles);
 
   const handleChange = (event: SelectChangeEvent<typeof userRoleState>) => {
     const {
@@ -97,16 +91,10 @@ function UserDistrictItem({ align, row: userDistrict }: UserDistrictProps) {
           MenuProps={MenuProps}
           onChange={handleChange}
         >
-          {userDistrictRoleOptions.map((key) => (
-            <MenuItem
-              key={key}
-              value={DistrictUserRoleType[key]}
-              disabled={key === 'User'}
-            >
-              <Checkbox
-                checked={userRoleState.indexOf(DistrictUserRoleType[key]) > -1}
-              />
-              <ListItemText primary={key} />
+          {USER_DISTRICT_ROLE_OPTIONS.map((option) => (
+            <MenuItem key={option} value={option}>
+              <Checkbox checked={userRoleState.indexOf(option) > -1} />
+              <ListItemText primary={option} />
             </MenuItem>
           ))}
         </Select>

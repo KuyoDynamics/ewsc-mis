@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
 import UserItem from 'components/users/user-item';
 import { Alert, Fab, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Pending } from '@mui/icons-material';
 import { useGetDefaultOrganisationUsersQuery } from '../../../graphql/generated';
+import UserInvitationForm from './user-invitation-form';
 
-function UserInvitationButton() {
+interface IUserInvitationButtonProps {
+  onClick: (event: any) => void;
+}
+function UserInvitationButton({ onClick }: IUserInvitationButtonProps) {
+  console.log('onClick in UserInvitationButton', onclick);
   return (
     <>
       <Alert
@@ -26,6 +31,7 @@ function UserInvitationButton() {
         aria-label="invite user"
         title="Add User"
         sx={{ mr: '20px', ml: '20px' }}
+        onClick={onClick}
       >
         <AddIcon />
       </Fab>
@@ -34,6 +40,10 @@ function UserInvitationButton() {
 }
 
 function UserList() {
+  const [showInvitationModal, setShowInvitationModal] = useState(false);
+
+  console.log('showInvitationModal', showInvitationModal);
+
   const { loading, data, error } = useGetDefaultOrganisationUsersQuery({
     fetchPolicy: 'cache-first',
   });
@@ -80,17 +90,29 @@ function UserList() {
     },
   ];
 
+  const handleShowInvitationModal = () => setShowInvitationModal(true);
+  const handleHideInvitationModal = () => setShowInvitationModal(false);
+
   if (loading) return <p>loading organisation users...</p>;
   if (error) return <p>failed to load organisation users</p>;
 
   return (
-    <DataTable
-      rows={rows}
-      headCells={headCells}
-      ItemComponent={UserItem}
-      toolBarTitle="User List"
-      TableActionButton={UserInvitationButton}
-    />
+    <>
+      <DataTable
+        rows={rows}
+        headCells={headCells}
+        ItemComponent={UserItem}
+        toolBarTitle="User List"
+        TableActionButton={UserInvitationButton}
+        tableActionButtonProps={{
+          onClick: handleShowInvitationModal,
+        }}
+      />
+      <UserInvitationForm
+        open={showInvitationModal}
+        onClose={handleHideInvitationModal}
+      />
+    </>
   );
 }
 

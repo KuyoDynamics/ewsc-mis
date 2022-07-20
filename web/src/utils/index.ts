@@ -5,6 +5,11 @@
 //   StoreObject,
 // } from '@apollo/client/cache';
 
+import {
+  DistrictUserRoleType,
+  OrganisationUserRoleType,
+} from '../../graphql/generated';
+
 // type DeepReference<X> = X extends Record<string, any>
 //   ? X extends { id: string }
 //     ? Reference
@@ -41,5 +46,15 @@ const getEnumKeys = <T>(
   >;
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { getEnumKeys };
+const USER_DISTRICT_ROLE_OPTIONS: string[] =
+  Object.values(DistrictUserRoleType);
+
+const USER_ORGANISATION_ROLE_OPTIONS: string[] = Object.values(
+  OrganisationUserRoleType
+);
+
+export {
+  getEnumKeys,
+  USER_DISTRICT_ROLE_OPTIONS,
+  USER_ORGANISATION_ROLE_OPTIONS,
+};
