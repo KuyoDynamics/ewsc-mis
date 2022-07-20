@@ -11,7 +11,18 @@ import {
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { styled, useTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import { ViewList } from '@mui/icons-material';
+import {
+  ArrowDropDownCircleOutlined,
+  ArrowDropDownOutlined,
+  EditLocation,
+  EditLocationAlt,
+  EditLocationOutlined,
+  More,
+  MoreHoriz,
+  MoreOutlined,
+  MoreTime,
+  ViewList,
+} from '@mui/icons-material';
 import { useReactiveVar } from '@apollo/client';
 import { currentUserVar } from 'cache';
 import { getEnumKeys } from 'utils';
@@ -20,6 +31,7 @@ import {
   GetDefaultOrganisationUsersDocument,
   OrganisationUserRoleType,
   useDisableUserMutation,
+  User,
   UserDistrict,
   useUpdateUserOrganisationRoleMutation,
 } from '../../../graphql/generated';
@@ -121,7 +133,7 @@ function UserItem({ align, row: user }: UserItemProps) {
   const [orgUserRole, setOrgUserRole] = useState(user.role);
   const [open, setOpen] = useState(false);
 
-  const currentUser = useReactiveVar(currentUserVar);
+  const currentUser = useReactiveVar(currentUserVar) as User;
 
   const [
     disableUser,
@@ -185,29 +197,46 @@ function UserItem({ align, row: user }: UserItemProps) {
     });
   }, [orgUserRole, updateUserOrgRole, user.organisation_user_id]);
 
+  //   <FormControl fullWidth size="small" variant="filled">
+  //   <Select id="role" value={orgUserRole} onChange={handleUserRoleChange}>
+  //     {getEnumKeys(OrganisationUserRoleType)
+  //       .filter((role) => role !== 'Support' && role !== 'Owner')
+  //       .map((key) => (
+  //         <MenuItem key={key} value={OrganisationUserRoleType[key]}>
+  //           {key}
+  //         </MenuItem>
+  //       ))}
+  //   </Select>
+  // </FormControl>
+
   const isCurrentUser = currentUser?.id === user.id;
   return (
     <>
       <TableCell align={align}>
         <Link to="/user-details">{user.name}</Link>
       </TableCell>
-      <FormControl fullWidth size="small" variant="filled">
-        <Select id="role" value={orgUserRole} onChange={handleUserRoleChange}>
-          {getEnumKeys(OrganisationUserRoleType)
-            .filter((role) => role !== 'Support' && role !== 'Owner')
-            .map((key) => (
-              <MenuItem key={key} value={OrganisationUserRoleType[key]}>
-                {key}
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
 
       <TableCell align={align}>
         <Button
           variant="text"
           size="small"
-          endIcon={<ViewList />}
+          endIcon={<ArrowDropDownOutlined />}
+          // onClick={handleRolesModalOpen}
+        >
+          {user.role}
+        </Button>
+      </TableCell>
+      <TableCell align={align}>
+        <Button
+          variant="text"
+          size="small"
+          endIcon={
+            user.user_districts.length > 1 ? (
+              <MoreHoriz />
+            ) : (
+              <EditLocationOutlined />
+            )
+          }
           onClick={handleModalOpen}
         >
           {user.user_districts.length === 1

@@ -1,9 +1,37 @@
 import React from 'react';
 import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
 import UserItem from 'components/users/user-item';
+import { Alert, Fab, IconButton } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Pending } from '@mui/icons-material';
 import { useGetDefaultOrganisationUsersQuery } from '../../../graphql/generated';
 
-// const UserItemFC = (props: UserItemProps)=>{return(<UserItem ...props />)}
+function UserInvitationButton() {
+  return (
+    <>
+      <Alert
+        variant="standard"
+        severity="info"
+        action={
+          <IconButton aria-label="view invitations" color="inherit">
+            <Pending />
+          </IconButton>
+        }
+      >
+        5 invitations pending user action
+      </Alert>
+      <Fab
+        size="small"
+        color="primary"
+        aria-label="invite user"
+        title="Add User"
+        sx={{ mr: '20px', ml: '20px' }}
+      >
+        <AddIcon />
+      </Fab>
+    </>
+  );
+}
 
 function UserList() {
   const { loading, data, error } = useGetDefaultOrganisationUsersQuery({
@@ -23,8 +51,6 @@ function UserList() {
         : null,
     [data]
   );
-
-  console.log('organisationUsers in UserList', organisationUsers);
 
   const rows: TableDataType[] = organisationUsers!;
   const headCells: HeadCellType[] = [
@@ -63,6 +89,7 @@ function UserList() {
       headCells={headCells}
       ItemComponent={UserItem}
       toolBarTitle="User List"
+      TableActionButton={UserInvitationButton}
     />
   );
 }

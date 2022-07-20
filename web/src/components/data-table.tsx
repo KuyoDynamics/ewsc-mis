@@ -152,6 +152,8 @@ interface DataTableProps {
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
   ItemComponent: React.ElementType;
   toolBarTitle: string;
+  // eslint-disable-next-line react/require-default-props
+  TableActionButton?: React.ElementType;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
@@ -214,6 +216,7 @@ function DataTable({
   align,
   ItemComponent,
   toolBarTitle,
+  TableActionButton,
 }: DataTableProps) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof TableDataType>('name');
@@ -323,7 +326,9 @@ function DataTable({
                         <Checkbox
                           color="primary"
                           checked={isItemSelected}
-                          onClick={(e) => console.log('e', e)}
+                          onClick={(event) =>
+                            handleClick(event, row.id as string)
+                          }
                           inputProps={{
                             'aria-labelledby': labelId,
                           }}
@@ -351,15 +356,34 @@ function DataTable({
             </TableBody>
           </Table>
         </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+
+        <Box
+          sx={{
+            // width: '100%',
+            // overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
+          }}
+        >
+          <Box sx={{ flexGrow: 1 }}>
+            <TablePagination
+              // sx={{
+              //   // width: '600px',
+              //   float: 'left',
+              //   // flex: '',
+              // }}
+              rowsPerPageOptions={[5, 10, 25]}
+              // component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Box>
+          {TableActionButton && <TableActionButton />}
+        </Box>
       </Paper>
     </Box>
   );
