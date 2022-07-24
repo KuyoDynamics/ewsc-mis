@@ -21,7 +21,6 @@ async function createUserInvitation(
     const invitation_data = {
       email_addresses: args.input.email_addresses,
       organisation_id: args.input.organisation_id,
-      invited_by: context.user.email,
       catchment_districts: args.input.catchment_districts,
       id,
     };
@@ -57,7 +56,7 @@ async function createUserInvitation(
       },
       process.env.JWT_SECRET!,
       {
-        issuer: invitation_data.invited_by,
+        issuer: context.user.email,
         audience:
           invitation_data.catchment_districts?.map(
             (item) => item.catchment_district_id

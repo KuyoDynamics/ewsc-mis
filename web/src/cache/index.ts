@@ -32,7 +32,7 @@ const tokenExpired = isTokenExpired();
 
 const isLoggedInVar: ReactiveVar<boolean> = makeVar(tokenExpired);
 
-const currentUserVar: ReactiveVar<any> = makeVar(null);
+const currentUserVar: ReactiveVar<User> = makeVar(null as unknown as User);
 
 const typePolicies: StrictTypedTypePolicies = {
   Query: {

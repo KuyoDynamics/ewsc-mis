@@ -20,7 +20,6 @@ import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { logout } from 'utils/session';
 import { UserCircle as UserCircleIcon } from 'icons';
 import { currentUserVar } from 'cache';
-import { User } from '../../../graphql/generated';
 
 const Transition = forwardRef(
   (
@@ -43,9 +42,7 @@ function UserMenu() {
     setAnchorEl(null);
   };
 
-  const currentUser = useReactiveVar(currentUserVar) as User;
-
-  console.log('currentUser in UserMenu', currentUser);
+  const currentUser = useReactiveVar(currentUserVar);
 
   const navigate = useNavigate();
 

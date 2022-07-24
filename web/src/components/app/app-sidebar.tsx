@@ -88,7 +88,7 @@ function AppSidebar(props: AppSidebarProps) {
     noSsr: false,
   });
 
-  const currentUser = useReactiveVar(currentUserVar) as User;
+  const currentUser = useReactiveVar(currentUserVar);
 
   const defaultDistrict = React.useMemo(
     () =>

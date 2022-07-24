@@ -552,7 +552,7 @@ export type CreateUserInvitationInput = {
   email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id: Scalars['ID'];
   organisation_role: OrganisationUserRoleType;
-  catchment_districts: Array<CreateUserInvitationCatchmentDistrictInput>;
+  catchment_districts?: InputMaybe<Array<CreateUserInvitationCatchmentDistrictInput>>;
 };
 
 export type CreateWaterNetworkInput = {
@@ -2670,7 +2670,7 @@ export type CreateUserInvitationMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: { __typename?: 'UserInvitation', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: { __typename?: 'UserInvitation', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type DisableUserMutationVariables = Exact<{
   input: DisableUserInput;
@@ -2716,6 +2716,13 @@ export const CreateUserInvitationDocument = gql`
   createUserInvitation(input: $input) {
     ... on UserInvitation {
       id
+    }
+    ... on ApiCreateError {
+      message
+      errors {
+        field
+        message
+      }
     }
   }
 }

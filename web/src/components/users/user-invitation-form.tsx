@@ -1,7 +1,9 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Alert,
   Box,
   Button,
   Dialog,
@@ -9,15 +11,21 @@ import {
   DialogTitle,
   MenuItem,
   PaperProps,
+  TextField,
   Typography,
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useForm } from 'react-hook-form';
+import { useReactiveVar } from '@apollo/client';
 import DraggablePaper from 'components/draggable-paper';
 import FormSelect from 'components/form-input-helpers/form-select';
 import { USER_ORGANISATION_ROLE_OPTIONS } from 'utils';
 import FormTagInput from 'components/form-input-helpers/form-tag-input';
+import { currentUserVar } from 'cache';
 import {
+  ApiCreateError,
   CreateUserInvitationInput,
+  OrganisationUserRoleType,
   useCreateUserInvitationMutation,
 } from '../../../graphql/generated';
 
@@ -34,6 +42,10 @@ const schema = Yup.object({
   email_addresses: Yup.array()
     .of(Yup.string().email('Invalid email'))
     .min(1, 'At least 1 email is expected'),
+  organisation_role: Yup.mixed<OrganisationUserRoleType>()
+    .oneOf(USER_ORGANISATION_ROLE_OPTIONS as OrganisationUserRoleType[])
+    .required(),
+  organisation_id: Yup.string().uuid('invalid organisation id').required(),
 });
 
 function DraggableUserInvitationForm(props: PaperProps) {
@@ -55,18 +67,49 @@ const isValidTag = (tag: string): boolean => {
 };
 
 function InvitationForm() {
+  const currentUser = useReactiveVar(currentUserVar);
+
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, errors },
+    formState: {
+      isSubmitting,
+      isValid,
+      errors,
+      isDirty,
+      isSubmitSuccessful,
+      isSubmitted,
+      submitCount,
+    },
     register,
   } = useForm<UserInvitationFormInputs>({
     resolver: yupResolver(schema),
     mode: 'all',
   });
 
-  const [createUserInvite, { loading, data, error: inviteCreateError }] =
-    useCreateUserInvitationMutation();
+  const [
+    createUserInvite,
+    { loading, data: serverResponse, error: inviteCreateError },
+  ] = useCreateUserInvitationMutation();
+
+  const submitting = isSubmitting || loading;
+
+  const apiCreateError = React.useMemo(
+    () =>
+      serverResponse?.createUserInvitation.__typename === 'ApiCreateError'
+        ? (serverResponse.createUserInvitation as ApiCreateError)
+        : null,
+    [serverResponse]
+  );
+
+  console.log('apiCreate Error', apiCreateError);
+  console.log(
+    ' isDirty,isSubmitSuccessful,isSubmitted,submitCount',
+    isDirty,
+    isSubmitSuccessful,
+    isSubmitted,
+    submitCount
+  );
 
   const onSubmit = async (values: UserInvitationFormInputs) => {
     console.log('values', values);
@@ -84,6 +127,13 @@ function InvitationForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      {(apiCreateError?.errors?.some((err) => err.field === 'unknown') ||
+        (apiCreateError?.message && !apiCreateError?.errors)) && (
+        <Box>
+          <Alert severity="error">{`${apiCreateError.message}. Please contact support or try again!`}</Alert>
+        </Box>
+      )}
+
       <FormTagInput
         id="email_addresses"
         name="email_addresses"
@@ -114,17 +164,27 @@ function InvitationForm() {
       </FormSelect>
 
       <Box sx={{ py: 2 }}>
-        <Button
+        <LoadingButton
           color="primary"
-          disabled={isSubmitting || !isValid}
+          disabled={submitting || !isValid}
           fullWidth
           size="large"
           type="submit"
           variant="contained"
+          loading={submitting}
+          loadingPosition="end"
         >
-          {isSubmitting ? 'sending invitation...' : 'Send Invite'}
-        </Button>
+          {submitting ? 'Sending invitation...' : 'Send Invite'}
+        </LoadingButton>
       </Box>
+
+      <TextField
+        id="organisation_id"
+        type="hidden"
+        style={{ display: 'none' }}
+        value={currentUser?.user_default_organisation?.id}
+        {...register('organisation_id')}
+      />
     </form>
   );
 }

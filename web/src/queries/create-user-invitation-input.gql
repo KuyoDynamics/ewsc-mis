@@ -3,5 +3,12 @@ mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
     ... on UserInvitation {
       id
     }
+    ... on ApiCreateError {
+      message
+      errors {
+        field
+        message
+      }
+    }
   }
 }
