@@ -133,7 +133,7 @@ async function getUserInvitations(
               hasEvery: email_addresses,
             }
           : undefined,
-        organisation_id: organisation_id || undefined,
+        organisation_id: organisation_id,
       },
     },
   });

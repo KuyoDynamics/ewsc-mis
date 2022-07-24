@@ -1,48 +1,12 @@
 import React, { useState } from 'react';
 import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
 import UserItem from 'components/users/user-item';
-import { Alert, Fab, IconButton } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { Pending } from '@mui/icons-material';
+import UserInvitationForm from 'components/users/user-invitation-form';
+import UserInvitationButton from 'components/users/user-invitation-button';
 import { useGetDefaultOrganisationUsersQuery } from '../../../graphql/generated';
-import UserInvitationForm from './user-invitation-form';
-
-interface IUserInvitationButtonProps {
-  onClick: (event: any) => void;
-}
-function UserInvitationButton({ onClick }: IUserInvitationButtonProps) {
-  console.log('onClick in UserInvitationButton', onclick);
-  return (
-    <>
-      <Alert
-        variant="standard"
-        severity="info"
-        action={
-          <IconButton aria-label="view invitations" color="inherit">
-            <Pending />
-          </IconButton>
-        }
-      >
-        5 invitations pending user action
-      </Alert>
-      <Fab
-        size="small"
-        color="primary"
-        aria-label="invite user"
-        title="Add User"
-        sx={{ mr: '20px', ml: '20px' }}
-        onClick={onClick}
-      >
-        <AddIcon />
-      </Fab>
-    </>
-  );
-}
 
 function UserList() {
   const [showInvitationModal, setShowInvitationModal] = useState(false);
-
-  console.log('showInvitationModal', showInvitationModal);
 
   const { loading, data, error } = useGetDefaultOrganisationUsersQuery({
     fetchPolicy: 'cache-first',

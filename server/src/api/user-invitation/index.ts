@@ -36,8 +36,8 @@ const typeDefs = gql`
   }
 
   input SearchUserInvitationsInput {
-    email_addresses: [EmailAddress!]!
-    organisation_id: ID
+    email_addresses: [EmailAddress!]
+    organisation_id: ID!
     catchment_district_ids: [ID!]
   }
 

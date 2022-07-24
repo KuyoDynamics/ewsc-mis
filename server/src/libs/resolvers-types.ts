@@ -2192,8 +2192,8 @@ export type ResidenceUpdateInput = {
 
 export type SearchUserInvitationsInput = {
   catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
-  email_addresses: Array<Scalars['EmailAddress']>;
-  organisation_id?: InputMaybe<Scalars['ID']>;
+  email_addresses?: InputMaybe<Array<Scalars['EmailAddress']>>;
+  organisation_id: Scalars['ID'];
 };
 
 export type ServiceArea = {
