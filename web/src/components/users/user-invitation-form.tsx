@@ -1,4 +1,4 @@
-import React, { KeyboardEventHandler, useState } from 'react';
+import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -12,14 +12,13 @@ import {
   Typography,
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { OnChangeValue } from 'react-select';
 import DraggablePaper from 'components/draggable-paper';
 import FormSelect from 'components/form-input-helpers/form-select';
-import FormReactCreatableSelect from 'components/form-input-helpers/form-react-select';
 import { USER_ORGANISATION_ROLE_OPTIONS } from 'utils';
+import FormTagInput from 'components/form-input-helpers/form-tag-input';
 import {
-  DistrictUserRoleType,
-  OrganisationUserRoleType,
+  CreateUserInvitationInput,
+  useCreateUserInvitationMutation,
 } from '../../../graphql/generated';
 
 interface IUserInvitationFormProps {
@@ -27,36 +26,14 @@ interface IUserInvitationFormProps {
   onClose: (event: any) => void;
 }
 
-type FormInputs = {
-  district: string;
-  emailAddresses: string[];
-  districtRoles: DistrictUserRoleType[];
-};
+export type UserInvitationFormInputs = {
+  include_districts: boolean;
+} & CreateUserInvitationInput;
 
 const schema = Yup.object({
-  district: Yup.string()
-    .uuid('Invalid district id')
-    .required('District is required'),
-  //   emailAddresses: Yup.array().of(
-  //     Yup.string()
-  //       .email('Must be a valid email')
-  //       .max(255)
-  //       .required('Email is required')
-  //   ),
-  //   organisationRole: Yup.array(
-  //     Yup.mixed()
-  //       .oneOf<DistrictUserRoleType>(
-  //         Object.values(DistrictUserRoleType) as DistrictUserRoleType[]
-  //       )
-  //       .required()
-  //   )
-  //     .min(1)
-  //     .ensure(),
-  organisationRole: Yup.mixed()
-    .oneOf<OrganisationUserRoleType>(
-      Object.values(OrganisationUserRoleType) as OrganisationUserRoleType[]
-    )
-    .required(),
+  email_addresses: Yup.array()
+    .of(Yup.string().email('Invalid email'))
+    .min(1, 'At least 1 email is expected'),
 });
 
 function DraggableUserInvitationForm(props: PaperProps) {
@@ -64,83 +41,66 @@ function DraggableUserInvitationForm(props: PaperProps) {
   return <DraggablePaper {...props} handle="#user-inivation-dialog-title" />;
 }
 
-interface Option {
-  readonly label: string;
-  readonly value: string;
-}
+const emailSchema = Yup.object().shape({
+  tag: Yup.string().email(),
+});
+
+const isValidTag = (tag: string): boolean => {
+  try {
+    emailSchema.validateSync({ tag });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 function InvitationForm() {
-  const [emails, setEmails] = useState<readonly Option[]>([]);
-  const [emailInputValue, setEmailInputValue] = useState('');
-
-  const handleEmailValueChange = (
-    value: OnChangeValue<Option, true>
-    // actionMeta: ActionMeta<Option>
-  ) => {
-    setEmails(value);
-  };
-
-  const handleInputChange = (input: string) => {
-    setEmailInputValue(input);
-  };
-
-  const createOption = (label: string) => ({
-    label,
-    value: label,
-  });
-
-  const handleKeyDown: KeyboardEventHandler<HTMLDivElement> = (event) => {
-    if (!emailInputValue) return;
-
-    switch (event.key) {
-      case 'Enter':
-      case ',':
-      case 'Tab':
-        setEmailInputValue('');
-        setEmails((currentEmails) => [
-          ...currentEmails,
-          createOption(emailInputValue),
-        ]);
-        event.preventDefault();
-        break;
-      default:
-        break;
-    }
-  };
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid },
-    // setError,
-  } = useForm<FormInputs>({
+    formState: { isSubmitting, isValid, errors },
+    register,
+  } = useForm<UserInvitationFormInputs>({
     resolver: yupResolver(schema),
-    mode: 'onChange',
+    mode: 'all',
   });
 
-  const onSubmit = async (values: any) => {
+  const [createUserInvite, { loading, data, error: inviteCreateError }] =
+    useCreateUserInvitationMutation();
+
+  const onSubmit = async (values: UserInvitationFormInputs) => {
     console.log('values', values);
+    createUserInvite({
+      variables: {
+        input: {
+          catchment_districts: values.catchment_districts,
+          email_addresses: values.email_addresses,
+          organisation_id: values.organisation_id,
+          organisation_role: values.organisation_role,
+        },
+      },
+    });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <FormReactCreatableSelect
+      <FormTagInput
+        id="email_addresses"
+        name="email_addresses"
+        label="Email Addresses"
         control={control}
-        name="emailAddresses"
-        components={{ DropdownIndicator: null }}
-        inputValue={emailInputValue}
-        isClearable
-        isMulti
-        menuIsOpen={false}
-        onChange={handleEmailValueChange}
-        onInputChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        // placeholder="Type something and press enter..."
-        value={emails}
+        variant="outlined"
+        margin="normal"
+        fullWidth
+        multiline
+        maxRows={4}
+        isValidTag={isValidTag}
+        register={register}
       />
 
       <FormSelect
         control={control}
-        name="organisationRole"
+        name="organisation_role"
         id="organisationRole"
         fullWidth
         label="Organisation Role"
@@ -180,13 +140,13 @@ function UserInvitationForm({ open, onClose }: IUserInvitationFormProps) {
         '& .MuiDialog-container': {
           '& .MuiPaper-root': {
             width: '100%',
-            maxWidth: '500px', // Set your width here
+            maxWidth: '500px',
           },
         },
       }}
     >
       <DialogTitle id="user-inivation-dialog-title">
-        <Typography color="textPrimary" variant="h4">
+        <Typography color="textPrimary" variant="h6">
           New User Invitation Form
         </Typography>
         <Typography color="textSecondary" gutterBottom variant="body2">

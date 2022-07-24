@@ -1,17 +1,17 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createUserInvitation,
   deleteUserInvitation,
   getUserInvitation,
   getUserInvitations,
-} from "./queries";
+} from './queries';
 
 const typeDefs = gql`
   type UserInvitation {
     id: ID!
     ttl: DateTime!
-    email: EmailAddress!
+    email_addresses: [EmailAddress!]!
     organisation_id: String!
     catchment_district_ids: [String!]
     invitation_token: String!
@@ -36,17 +36,16 @@ const typeDefs = gql`
   }
 
   input SearchUserInvitationsInput {
-    email: EmailAddress
+    email_addresses: [EmailAddress!]!
     organisation_id: ID
     catchment_district_ids: [ID!]
   }
 
   input CreateUserInvitationInput {
-    email: EmailAddress!
+    email_addresses: [EmailAddress!]!
     organisation_id: ID!
     organisation_role: OrganisationUserRoleType!
-    catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]!
-    invited_by: EmailAddress!
+    catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]
   }
 
   input CreateUserInvitationCatchmentDistrictInput {

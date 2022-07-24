@@ -549,11 +549,10 @@ export type CreateUserInvitationCatchmentDistrictInput = {
 };
 
 export type CreateUserInvitationInput = {
-  email: Scalars['EmailAddress'];
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id: Scalars['ID'];
   organisation_role: OrganisationUserRoleType;
   catchment_districts: Array<CreateUserInvitationCatchmentDistrictInput>;
-  invited_by: Scalars['EmailAddress'];
 };
 
 export type CreateWaterNetworkInput = {
@@ -2198,7 +2197,7 @@ export type ResidenceUpdateInput = {
 };
 
 export type SearchUserInvitationsInput = {
-  email?: InputMaybe<Scalars['EmailAddress']>;
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id?: InputMaybe<Scalars['ID']>;
   catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
 };
@@ -2509,7 +2508,7 @@ export type UserInvitation = {
   __typename?: 'UserInvitation';
   id: Scalars['ID'];
   ttl: Scalars['DateTime'];
-  email: Scalars['EmailAddress'];
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id: Scalars['String'];
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   invitation_token: Scalars['String'];
@@ -2666,6 +2665,13 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type CreateUserInvitationMutationVariables = Exact<{
+  input: CreateUserInvitationInput;
+}>;
+
+
+export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: { __typename?: 'UserInvitation', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type DisableUserMutationVariables = Exact<{
   input: DisableUserInput;
 }>;
@@ -2705,6 +2711,41 @@ export type UpdateUserRolesForDistrictMutationVariables = Exact<{
 export type UpdateUserRolesForDistrictMutation = { __typename?: 'Mutation', updateUserRolesForDistrict: { __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType> } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 
+export const CreateUserInvitationDocument = gql`
+    mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
+  createUserInvitation(input: $input) {
+    ... on UserInvitation {
+      id
+    }
+  }
+}
+    `;
+export type CreateUserInvitationMutationFn = Apollo.MutationFunction<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>;
+
+/**
+ * __useCreateUserInvitationMutation__
+ *
+ * To run a mutation, you first call `useCreateUserInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserInvitationMutation, { data, loading, error }] = useCreateUserInvitationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateUserInvitationMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>(CreateUserInvitationDocument, options);
+      }
+export type CreateUserInvitationMutationHookResult = ReturnType<typeof useCreateUserInvitationMutation>;
+export type CreateUserInvitationMutationResult = Apollo.MutationResult<CreateUserInvitationMutation>;
+export type CreateUserInvitationMutationOptions = Apollo.BaseMutationOptions<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>;
 export const DisableUserDocument = gql`
     mutation DisableUser($input: DisableUserInput!) {
   disableUser(input: $input) {
@@ -3756,11 +3797,11 @@ export type UserDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
+export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email_addresses' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
 export type UserInvitationFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	ttl?: FieldPolicy<any> | FieldReadFunction<any>,
-	email?: FieldPolicy<any> | FieldReadFunction<any>,
+	email_addresses?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_district_ids?: FieldPolicy<any> | FieldReadFunction<any>,
 	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>

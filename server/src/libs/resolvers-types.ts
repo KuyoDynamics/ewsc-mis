@@ -549,9 +549,8 @@ export type CreateUserInvitationCatchmentDistrictInput = {
 };
 
 export type CreateUserInvitationInput = {
-  catchment_districts: Array<CreateUserInvitationCatchmentDistrictInput>;
-  email: Scalars['EmailAddress'];
-  invited_by: Scalars['EmailAddress'];
+  catchment_districts?: InputMaybe<Array<CreateUserInvitationCatchmentDistrictInput>>;
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id: Scalars['ID'];
   organisation_role: OrganisationUserRoleType;
 };
@@ -2193,7 +2192,7 @@ export type ResidenceUpdateInput = {
 
 export type SearchUserInvitationsInput = {
   catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
-  email?: InputMaybe<Scalars['EmailAddress']>;
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id?: InputMaybe<Scalars['ID']>;
 };
 
@@ -2502,7 +2501,7 @@ export type UserDistrictResult = ApiNotFoundError | UserDistrict;
 export type UserInvitation = {
   __typename?: 'UserInvitation';
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
-  email: Scalars['EmailAddress'];
+  email_addresses: Array<Scalars['EmailAddress']>;
   id: Scalars['ID'];
   invitation_token: Scalars['String'];
   organisation_id: Scalars['String'];
@@ -4485,7 +4484,7 @@ export type UserDistrictResultResolvers<ContextType = GraphQLContext, ParentType
 
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
   catchment_district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  email?: Resolver<ResolversTypes['EmailAddress'], ParentType, ContextType>;
+  email_addresses?: Resolver<Array<ResolversTypes['EmailAddress']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invitation_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

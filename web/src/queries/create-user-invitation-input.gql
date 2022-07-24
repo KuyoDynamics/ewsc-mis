@@ -1,0 +1,7 @@
+mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
+  createUserInvitation(input: $input) {
+    ... on UserInvitation {
+      id
+    }
+  }
+}
