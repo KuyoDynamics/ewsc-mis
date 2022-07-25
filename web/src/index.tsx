@@ -1,21 +1,15 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ApolloClient, ApolloProvider, createHttpLink } from '@apollo/client';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
-import App from 'App';
 import theme from 'theme';
-import NotFound from 'components/404';
-import Login from 'routes/login';
-import PrivateRoute from 'components/authentication/private-route';
 import { authLink, observeTokenForExternalChanges } from 'utils/session';
-import Dashboard from 'routes/dashboard';
-import Admin from 'routes/admin';
 import { cache } from 'cache';
+import AppRouter from 'app-router';
 
 const httpLink = createHttpLink({
   uri: '/api',
@@ -43,32 +37,7 @@ root.render(
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <BrowserRouter>
-          <Routes>
-            {/* <Route index element={<App />} /> */}
-            <Route path="/" element={<App />}>
-              <Route
-                index
-                element={
-                  <PrivateRoute>
-                    <Dashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/admin"
-                element={
-                  <PrivateRoute>
-                    <Admin />
-                  </PrivateRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-            <Route path="login" element={<Login />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppRouter />
       </ThemeProvider>
     </LocalizationProvider>
   </ApolloProvider>

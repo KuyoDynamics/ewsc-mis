@@ -1,11 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useState } from 'react';
+import React from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Alert,
   Box,
-  Button,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -25,13 +24,14 @@ import { currentUserVar } from 'cache';
 import {
   ApiCreateError,
   CreateUserInvitationInput,
+  GetUserInvitationsDocument,
   OrganisationUserRoleType,
   useCreateUserInvitationMutation,
 } from '../../../graphql/generated';
 
 interface IUserInvitationFormProps {
   open: boolean;
-  onClose: (event: any) => void;
+  onClose: () => void;
 }
 
 export type UserInvitationFormInputs = {
@@ -66,21 +66,17 @@ const isValidTag = (tag: string): boolean => {
   }
 };
 
-function InvitationForm() {
+interface InvitationFormProps {
+  onClose: () => void;
+}
+
+function InvitationForm({ onClose }: InvitationFormProps) {
   const currentUser = useReactiveVar(currentUserVar);
 
   const {
     handleSubmit,
     control,
-    formState: {
-      isSubmitting,
-      isValid,
-      errors,
-      isDirty,
-      isSubmitSuccessful,
-      isSubmitted,
-      submitCount,
-    },
+    formState: { isSubmitting, isValid },
     register,
   } = useForm<UserInvitationFormInputs>({
     resolver: yupResolver(schema),
@@ -90,7 +86,9 @@ function InvitationForm() {
   const [
     createUserInvite,
     { loading, data: serverResponse, error: inviteCreateError },
-  ] = useCreateUserInvitationMutation();
+  ] = useCreateUserInvitationMutation({
+    refetchQueries: [GetUserInvitationsDocument],
+  });
 
   const submitting = isSubmitting || loading;
 
@@ -102,17 +100,7 @@ function InvitationForm() {
     [serverResponse]
   );
 
-  console.log('apiCreate Error', apiCreateError);
-  console.log(
-    ' isDirty,isSubmitSuccessful,isSubmitted,submitCount',
-    isDirty,
-    isSubmitSuccessful,
-    isSubmitted,
-    submitCount
-  );
-
   const onSubmit = async (values: UserInvitationFormInputs) => {
-    console.log('values', values);
     createUserInvite({
       variables: {
         input: {
@@ -121,6 +109,19 @@ function InvitationForm() {
           organisation_id: values.organisation_id,
           organisation_role: values.organisation_role,
         },
+      },
+      onCompleted: (result) => {
+        if (result.createUserInvitation.__typename === 'UserInvitation') {
+          onClose();
+        } else if (
+          result.createUserInvitation.__typename === 'ApiCreateError'
+        ) {
+          // Set Errors
+        }
+      },
+      onError: (err) => {
+        // throw it and let it be handled by the Error Boundary
+        console.log('Chaiwa, something bad happened', err);
       },
     });
   };
@@ -214,7 +215,7 @@ function UserInvitationForm({ open, onClose }: IUserInvitationFormProps) {
         </Typography>
       </DialogTitle>
       <DialogContent>
-        <InvitationForm />
+        <InvitationForm onClose={onClose} />
       </DialogContent>
     </Dialog>
   );

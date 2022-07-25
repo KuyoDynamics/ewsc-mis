@@ -5,6 +5,7 @@ import {
   ReactiveVar,
 } from '@apollo/client';
 import jwt from 'jwt-decode';
+import { isExpired } from 'utils';
 import { StrictTypedTypePolicies, User } from '../../graphql/generated';
 
 interface IJwt {
@@ -19,11 +20,11 @@ function isTokenExpired(): boolean {
 
   if (token) {
     const { exp }: IJwt = jwt(token);
-    const isExpired = exp < new Date().getTime() / 1000;
-    if (isExpired) {
+    const expired = isExpired(exp);
+    if (expired) {
       localStorage.removeItem('token');
     }
-    return isExpired;
+    return expired;
   }
   return true;
 }

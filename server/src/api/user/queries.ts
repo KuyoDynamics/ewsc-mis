@@ -1,5 +1,5 @@
 import { AuthenticationError } from 'apollo-server-core';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import {
   encryptPassword,
@@ -9,6 +9,7 @@ import {
   prepareDistrictUserRolesForCreate,
 } from '../../utils';
 import {
+  CatchmentDistrictInput,
   DistrictResult,
   DistrictUser,
   LoginResult,
@@ -211,6 +212,12 @@ async function createUser(
   }
 }
 
+type InvitationPayloadType = {
+  emails: string[];
+  organisation_role: string;
+  catchment_districts?: CatchmentDistrictInput[];
+} & JwtPayload;
+
 async function createInvitedUser(
   args: MutationCreateInvitedUserArgs,
   context: GraphQLContext
@@ -234,9 +241,11 @@ async function createInvitedUser(
       };
     }
 
-    const emails = jwt.decode(user_invitation.invitation_token);
+    const payload = jwt.decode(
+      user_invitation.invitation_token
+    ) as InvitationPayloadType;
 
-    if (!emails![email as keyof typeof emails]) {
+    if (payload.emails.indexOf(email) === -1) {
       return {
         __typename: 'ApiCreateError',
         message: `Failed to create User because we do not recognise the invitation or it expited.${catchment_districts.map(

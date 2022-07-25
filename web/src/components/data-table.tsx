@@ -3,7 +3,7 @@ import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import TableCell, { TableCellProps } from '@mui/material/TableCell';
+import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
@@ -18,7 +18,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { UserItemType } from './users/user-item';
+import { AlignOption } from './users/user-pending-invitation-item';
 
 export type TableDataType = Record<string, any>;
 
@@ -78,6 +78,8 @@ interface EnhancedTableProps {
   orderBy: string;
   rowCount: number;
   headCells: HeadCellType[];
+  // eslint-disable-next-line react/require-default-props
+  align?: AlignOption;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
@@ -89,6 +91,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     rowCount,
     onRequestSort,
     headCells,
+    align,
   } = props;
   const createSortHandler =
     (property: keyof TableDataType) => (event: React.MouseEvent<unknown>) => {
@@ -115,7 +118,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
+            align={align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -153,7 +156,7 @@ interface DataTableProps {
   // eslint-disable-next-line react/require-default-props
   dense?: boolean;
   // eslint-disable-next-line react/require-default-props
-  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
+  align?: AlignOption;
   ItemComponent: React.ElementType;
   toolBarTitle: string;
   // eslint-disable-next-line react/require-default-props
@@ -231,8 +234,6 @@ function DataTable({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  console.log('tableActionButtonProps', tableActionButtonProps);
-
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
     property: keyof TableDataType
@@ -240,6 +241,7 @@ function DataTable({
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+    console.log('property', property);
   };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -309,6 +311,7 @@ function DataTable({
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
+              align={align!}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:

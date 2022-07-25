@@ -2,6 +2,11 @@ mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
   createUserInvitation(input: $input) {
     ... on UserInvitation {
       id
+      catchment_district_ids
+      email_addresses
+      invitation_token
+      organisation_id
+      ttl
     }
     ... on ApiCreateError {
       message

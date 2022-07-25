@@ -18,20 +18,20 @@ async function createUserInvitation(
     const id = uuidv4();
     const ttl = addDays(new Date(), 5);
 
-    const invitation_data = {
-      email_addresses: args.input.email_addresses,
-      organisation_id: args.input.organisation_id,
-      catchment_districts: args.input.catchment_districts,
-      id,
-    };
+    const {
+      catchment_districts,
+      organisation_id,
+      organisation_role,
+      email_addresses,
+    } = args.input;
 
-    if (invitation_data.catchment_districts) {
+    if (catchment_districts) {
       const disabled_catchment_districts =
         await context.prisma.catchmentDistrict.findMany({
           where: {
             AND: {
               id: {
-                in: invitation_data.catchment_districts.map(
+                in: catchment_districts.map(
                   (item) => item.catchment_district_id
                 ),
               },
@@ -43,7 +43,7 @@ async function createUserInvitation(
       if (disabled_catchment_districts) {
         return {
           __typename: 'ApiCreateError',
-          message: `Failed to create UserInvitation because the following catchment districts are disabled.${invitation_data.catchment_districts.map(
+          message: `Failed to create UserInvitation because the following catchment districts are disabled.${catchment_districts.map(
             (item) => item.catchment_district_id
           )}`,
         };
@@ -52,29 +52,31 @@ async function createUserInvitation(
 
     const invitation_token = jwt.sign(
       {
-        emails: invitation_data.email_addresses,
+        emails: email_addresses,
+        organisation_role: organisation_role,
+        catchment_districts: catchment_districts,
       },
       process.env.JWT_SECRET!,
       {
         issuer: context.user.email,
-        audience:
-          invitation_data.catchment_districts?.map(
-            (item) => item.catchment_district_id
-          ) ?? invitation_data.organisation_id,
-        subject: invitation_data.organisation_id,
-        jwtid: invitation_data.id,
-        expiresIn: '5 days',
+        audience: organisation_id,
+        subject: organisation_id,
+        jwtid: id,
+        expiresIn: '2s',
       }
     );
 
-    const requiredInput = {
-      ...invitation_data,
-      ttl,
-      invitation_token,
-    };
-
     const user_invitation = await context.prisma.userInvitation.create({
-      data: requiredInput,
+      data: {
+        id,
+        organisation_id,
+        catchment_district_ids: catchment_districts?.map(
+          (item) => item.catchment_district_id
+        ),
+        email_addresses,
+        ttl,
+        invitation_token,
+      },
     });
 
     return {
