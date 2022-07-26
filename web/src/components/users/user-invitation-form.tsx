@@ -28,6 +28,8 @@ import {
   OrganisationUserRoleType,
   useCreateUserInvitationMutation,
 } from '../../../graphql/generated';
+import UserDistrictLists from './user-district-list2';
+import UserDistrictList2 from './user-district-list2';
 
 interface IUserInvitationFormProps {
   open: boolean;
@@ -163,6 +165,8 @@ function InvitationForm({ onClose }: InvitationFormProps) {
           <MenuItem value={option}>{option}</MenuItem>
         ))}
       </FormSelect>
+
+      <UserDistrictList2 />
 
       <Box sx={{ py: 2 }}>
         <LoadingButton

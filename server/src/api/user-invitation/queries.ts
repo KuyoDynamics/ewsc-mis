@@ -62,7 +62,7 @@ async function createUserInvitation(
         audience: organisation_id,
         subject: organisation_id,
         jwtid: id,
-        expiresIn: '2s',
+        expiresIn: '5 days',
       }
     );
 

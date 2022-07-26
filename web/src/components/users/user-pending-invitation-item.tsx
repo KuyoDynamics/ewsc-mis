@@ -1,19 +1,14 @@
 import React from 'react';
-import { Button, Chip, TableCell, IconButton, Typography } from '@mui/material';
+import { Button, Chip, TableCell, Typography } from '@mui/material';
 import Badge, { BadgeProps } from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 
-import {
-  CalendarMonthOutlined,
-  EditLocationOutlined,
-  LocationCity,
-  MoreHoriz,
-} from '@mui/icons-material';
+import { LocationCity } from '@mui/icons-material';
+import { getDateDiff } from 'utils';
 import {
   CatchmentDistrictInput,
   OrganisationUserRoleType,
 } from '../../../graphql/generated';
-import { getDateDiff, isExpired } from 'utils';
 
 export type AlignOption = 'inherit' | 'left' | 'center' | 'right' | 'justify';
 
@@ -54,15 +49,9 @@ function UserPendingInvitationItem({
     email_status,
   },
 }: PendingInvitationItemProps) {
-  // const dv = created_at.);
-  // console.log('date version of created_at', dv);
   const daysReamining = getDateDiff(expires_at, new Date());
   const now = new Date();
-  console.log('expires_at', expires_at);
-  console.log('now', now);
-  console.log('expires_at > now?', expires_at.getTime() > now.getTime());
   const expired = expires_at.getTime() < now.getTime();
-  console.log('expired?', expired);
   return (
     <>
       <TableCell align={align}>{email}</TableCell>
@@ -88,12 +77,10 @@ function UserPendingInvitationItem({
           variant="outlined"
           sx={{
             height: '100%',
-            // marginLeft: 'none',
             borderColor: expired ? 'red' : 'initial',
           }}
         />
       </TableCell>
-      {/* <TableCell align={align}>{expires_at.toDateString()}</TableCell> */}
       <TableCell align={align}>
         <Button
           disabled={!catchment_districts}
