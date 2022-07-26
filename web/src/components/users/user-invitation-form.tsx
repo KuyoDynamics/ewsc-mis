@@ -28,7 +28,6 @@ import {
   OrganisationUserRoleType,
   useCreateUserInvitationMutation,
 } from '../../../graphql/generated';
-import UserDistrictLists from './user-district-list2';
 import UserDistrictList2 from './user-district-list2';
 
 interface IUserInvitationFormProps {

@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import React from 'react';
+import React, { ReactElement } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
@@ -17,33 +17,9 @@ import {
 } from '@mui/x-data-grid';
 import { randomId } from '@mui/x-data-grid-generator';
 
-interface EditToolbarProps {
+export interface EditToolbarProps {
   setRows: (newRows: any) => void;
   setRowModesModel: (newModel: any) => void;
-}
-
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
-
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows: any) => [
-      ...oldRows,
-      { id, name: '', role: '', isNew: true },
-    ]);
-    setRowModesModel((oldModel: any) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
-  };
-
-  return (
-    <GridToolbarContainer>
-      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add District
-      </Button>
-    </GridToolbarContainer>
-  );
 }
 
 export interface IFullFeaturedCrudGrid {
@@ -52,6 +28,7 @@ export interface IFullFeaturedCrudGrid {
   rowModesModel: GridRowModesModel;
   setRowModesModel: (newModel: any) => void;
   setRows: (newRows: any) => void;
+  EditToolBar: (props: EditToolbarProps) => ReactElement<any, any> | null;
 }
 
 export default function FullFeaturedCrudGrid({
@@ -60,6 +37,7 @@ export default function FullFeaturedCrudGrid({
   rowModesModel,
   setRowModesModel,
   setRows,
+  EditToolBar,
 }: IFullFeaturedCrudGrid) {
   const handleRowEditStart = (
     params: GridRowParams,
@@ -105,7 +83,7 @@ export default function FullFeaturedCrudGrid({
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         components={{
-          Toolbar: EditToolbar,
+          Toolbar: EditToolBar,
         }}
         componentsProps={{
           toolbar: { setRows, setRowModesModel },
