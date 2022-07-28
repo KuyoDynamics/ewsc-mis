@@ -72,6 +72,9 @@ function UserDistrictList({
           headCells={headCells}
           ItemComponent={UserDistrictItem}
           toolBarTitle={`Districts Assigned to ${userName}`}
+          handleDelete={(selectedItems: readonly string[]) =>
+            console.log('Nothing yet', selectedItems)
+          }
           align="left"
         />
       </DialogContent>

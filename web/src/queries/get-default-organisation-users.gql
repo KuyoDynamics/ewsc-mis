@@ -21,6 +21,7 @@ query GetDefaultOrganisationUsers {
             disabled
             is_default_user_district
             district_user_id
+            catchment_district_id
             user_district_roles
             province {
               id

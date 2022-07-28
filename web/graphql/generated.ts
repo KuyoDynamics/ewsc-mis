@@ -2487,6 +2487,7 @@ export type UserDistrict = {
   code: Scalars['String'];
   user_id: Scalars['ID'];
   user?: Maybe<User>;
+  catchment_district_id: Scalars['ID'];
   organisation_id: Scalars['ID'];
   organisation?: Maybe<UserOrganisation>;
   is_default_user_district: Scalars['Boolean'];
@@ -2670,7 +2671,14 @@ export type CreateUserInvitationMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: { __typename?: 'UserInvitation', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: { __typename?: 'UserInvitation', id: string, catchment_district_ids?: Array<string> | null, email_addresses: Array<any>, invitation_token: string, organisation_id: string, ttl: any } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type DeleteUserInvitationMutationVariables = Exact<{
+  input: DeleteUserInvitationInput;
+}>;
+
+
+export type DeleteUserInvitationMutation = { __typename?: 'Mutation', deleteUserInvitation: { __typename?: 'UserInvitation', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
 
 export type DisableUserMutationVariables = Exact<{
   input: DisableUserInput;
@@ -2682,12 +2690,12 @@ export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __ty
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, users?: Array<{ __typename?: 'OrganisationUserView', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, organisation_id: string, organisation_user_id: string, role: OrganisationUserRoleType, hashed_confirmation_token?: string | null, confirmed_at?: any | null, hashed_password_reset_token?: string | null, last_login?: any | null, theme: UserTheme }> | null, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, catchment_district_id: string, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type GetDefaultOrganisationUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDefaultOrganisationUsersQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, users?: Array<{ __typename?: 'OrganisationUserView', id: string, organisation_user_id: string, last_name: string, first_name: string, email: string, master_support: boolean, disabled: boolean, role: OrganisationUserRoleType, theme: UserTheme, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, code: string, name: string, disabled: boolean, is_default_user_district: boolean, district_user_id: string, user_district_roles: Array<DistrictUserRoleType>, province?: { __typename?: 'Province', id: string, name: string } | null }> | null }> | null } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetDefaultOrganisationUsersQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, users?: Array<{ __typename?: 'OrganisationUserView', id: string, organisation_user_id: string, last_name: string, first_name: string, email: string, master_support: boolean, disabled: boolean, role: OrganisationUserRoleType, theme: UserTheme, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, code: string, name: string, disabled: boolean, is_default_user_district: boolean, district_user_id: string, catchment_district_id: string, user_district_roles: Array<DistrictUserRoleType>, province?: { __typename?: 'Province', id: string, name: string } | null }> | null }> | null } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type GetUserInvitationsQueryVariables = Exact<{
   args: SearchUserInvitationsInput;
@@ -2723,6 +2731,11 @@ export const CreateUserInvitationDocument = gql`
   createUserInvitation(input: $input) {
     ... on UserInvitation {
       id
+      catchment_district_ids
+      email_addresses
+      invitation_token
+      organisation_id
+      ttl
     }
     ... on ApiCreateError {
       message
@@ -2760,6 +2773,48 @@ export function useCreateUserInvitationMutation(baseOptions?: Apollo.MutationHoo
 export type CreateUserInvitationMutationHookResult = ReturnType<typeof useCreateUserInvitationMutation>;
 export type CreateUserInvitationMutationResult = Apollo.MutationResult<CreateUserInvitationMutation>;
 export type CreateUserInvitationMutationOptions = Apollo.BaseMutationOptions<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>;
+export const DeleteUserInvitationDocument = gql`
+    mutation DeleteUserInvitation($input: DeleteUserInvitationInput!) {
+  deleteUserInvitation(input: $input) {
+    ... on UserInvitation {
+      id
+    }
+    ... on ApiDeleteError {
+      message
+      errors {
+        field
+        message
+      }
+    }
+  }
+}
+    `;
+export type DeleteUserInvitationMutationFn = Apollo.MutationFunction<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>;
+
+/**
+ * __useDeleteUserInvitationMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserInvitationMutation, { data, loading, error }] = useDeleteUserInvitationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteUserInvitationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>(DeleteUserInvitationDocument, options);
+      }
+export type DeleteUserInvitationMutationHookResult = ReturnType<typeof useDeleteUserInvitationMutation>;
+export type DeleteUserInvitationMutationResult = Apollo.MutationResult<DeleteUserInvitationMutation>;
+export type DeleteUserInvitationMutationOptions = Apollo.BaseMutationOptions<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>;
 export const DisableUserDocument = gql`
     mutation DisableUser($input: DisableUserInput!) {
   disableUser(input: $input) {
@@ -2823,11 +2878,28 @@ export const GetCurrentUserDocument = gql`
         name
         logo
         is_user_default_organisation
+        users {
+          id
+          first_name
+          last_name
+          email
+          disabled
+          master_support
+          organisation_id
+          organisation_user_id
+          role
+          hashed_confirmation_token
+          confirmed_at
+          hashed_password_reset_token
+          last_login
+          theme
+        }
         user_districts {
           id
           name
           code
           is_default_user_district
+          catchment_district_id
           province {
             id
             name
@@ -2895,6 +2967,7 @@ export const GetDefaultOrganisationUsersDocument = gql`
             disabled
             is_default_user_district
             district_user_id
+            catchment_district_id
             user_district_roles
             province {
               id
@@ -3830,13 +3903,14 @@ export type UserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'district_user_id' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
+export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'catchment_district_id' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'district_user_id' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
 export type UserDistrictFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	code?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	user?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	is_default_user_district?: FieldPolicy<any> | FieldReadFunction<any>,

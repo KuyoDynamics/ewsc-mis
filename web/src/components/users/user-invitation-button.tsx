@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Pending } from '@mui/icons-material';
 import { Alert, Fab, IconButton, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useReactiveVar } from '@apollo/client';
-import { currentUserVar } from 'cache';
-import UserPendingInvitationList from 'components/users/user-pending-invitation-list';
-import { getUserInvitations } from 'utils';
-import { useGetUserInvitationsQuery } from '../../../graphql/generated';
 import { useNavigate } from 'react-router-dom';
+import useGetUserInvitations from 'utils/hooks/use-get-user-invitations';
 
 interface IUserInvitationButtonProps {
   onClick: (event: any) => void;
@@ -15,27 +11,12 @@ interface IUserInvitationButtonProps {
 function UserInvitationButton({ onClick }: IUserInvitationButtonProps) {
   const navigate = useNavigate();
 
-  const currentUser = useReactiveVar(currentUserVar);
+  const { count } = useGetUserInvitations('network-only');
 
-  const { loading, data, error } = useGetUserInvitationsQuery({
-    fetchPolicy: 'network-only',
-    variables: {
-      args: {
-        organisation_id: currentUser?.user_default_organisation?.id! || '',
-      },
-    },
-  });
-
-  const userInvitations = data?.user_invitations ?? null;
-
-  const rows = userInvitations ? getUserInvitations(userInvitations) : [];
-
-  console.log('rows', rows);
-
-  const handleNavigate = () => navigate('/invitations', { state: rows });
+  const handleNavigate = () => navigate('/invitations');
   return (
     <>
-      {rows.length > 0 && (
+      {count > 0 && (
         <Alert
           variant="standard"
           severity="info"
@@ -49,7 +30,7 @@ function UserInvitationButton({ onClick }: IUserInvitationButtonProps) {
             </IconButton>
           }
         >
-          {`${rows.length} invitation(s) pending user action`}
+          {`${count} invitation(s) pending user action`}
         </Alert>
       )}
       <Tooltip title="Add user">

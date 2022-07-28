@@ -11,10 +11,14 @@ import {
 } from 'react-hook-form';
 import { UserInvitationFormInputs } from 'components/users/user-invitation-form';
 
+interface ITagValidationPayload {
+  valid: boolean;
+  message: string | null;
+}
 type FormInputTagsProps = {
   name: string;
   control: Control<any, any>;
-  isValidTag: (tag: string) => boolean;
+  isValidTag: (tag: string) => ITagValidationPayload;
   register: UseFormRegister<UserInvitationFormInputs>;
 } & TextFieldProps;
 
@@ -76,14 +80,19 @@ function FormTagInput({
             renderTags={(values, getTagProps) =>
               values.flat().map((tag, index) => (
                 <Tooltip
+                  PopperProps={{
+                    hidden: isValidTag(tag).valid,
+                  }}
                   title={
-                    error && Array.isArray(error) ? error[index]?.message : ''
+                    error && Array.isArray(error)
+                      ? error[index]?.message
+                      : isValidTag(tag).message
                   }
                 >
                   <Chip
                     deleteIcon={<CloseIcon />}
                     label={tag}
-                    color={isValidTag(tag) ? 'primary' : 'error'}
+                    color={isValidTag(tag).valid ? 'primary' : 'error'}
                     {...getTagProps({ index })}
                   />
                 </Tooltip>

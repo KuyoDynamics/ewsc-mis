@@ -40,12 +40,41 @@ async function createUserInvitation(
           },
         });
 
-      if (disabled_catchment_districts) {
+      if (disabled_catchment_districts?.length > 0) {
         return {
           __typename: 'ApiCreateError',
-          message: `Failed to create UserInvitation because the following catchment districts are disabled.${catchment_districts.map(
-            (item) => item.catchment_district_id
+          message: `Failed to create UserInvitation because the following catchment districts are disabled.${disabled_catchment_districts.map(
+            (item) => item.id
           )}`,
+        };
+      }
+
+      const existing_invitations = await context.prisma.$transaction(
+        email_addresses.map((email) =>
+          context.prisma.userInvitation.findFirst({
+            where: {
+              AND: {
+                email_addresses: {
+                  has: email,
+                },
+              },
+            },
+          })
+        )
+      );
+
+      const existing_emails = existing_invitations
+        ?.flatMap((invite) => invite?.email_addresses)
+        .map((email) => email);
+
+      const duplicate_emails = existing_emails.filter(
+        (email) => email_addresses.indexOf(email) > -1
+      );
+
+      if (duplicate_emails?.length > 0) {
+        return {
+          __typename: 'ApiCreateError',
+          message: `Failed to create UserInvitation because the following email address are have already been invited: ${duplicate_emails}`,
         };
       }
     }

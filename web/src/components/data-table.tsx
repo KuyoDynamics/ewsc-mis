@@ -1,3 +1,5 @@
+/* eslint-disable react/require-default-props */
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -144,6 +146,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
   numSelected: number;
   title: string;
+  handleDelete: () => void;
 }
 
 interface ITableActionButtonProps {
@@ -153,20 +156,17 @@ interface ITableActionButtonProps {
 interface DataTableProps {
   rows: TableDataType[];
   headCells: HeadCellType[];
-  // eslint-disable-next-line react/require-default-props
   dense?: boolean;
-  // eslint-disable-next-line react/require-default-props
   align?: AlignOption;
   ItemComponent: React.ElementType;
   toolBarTitle: string;
-  // eslint-disable-next-line react/require-default-props
   TableActionButton?: React.ElementType;
-  // eslint-disable-next-line react/require-default-props
   tableActionButtonProps?: ITableActionButtonProps;
+  handleDelete: (selectedItems: readonly string[]) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, title } = props;
+  const { numSelected, title, handleDelete } = props;
 
   return (
     <Toolbar
@@ -203,7 +203,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={handleDelete}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -227,12 +227,15 @@ function DataTable({
   toolBarTitle,
   TableActionButton,
   tableActionButtonProps,
+  handleDelete,
 }: DataTableProps) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof TableDataType>('name');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  console.log('Chaiwa, what is selected', selected);
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
@@ -241,7 +244,6 @@ function DataTable({
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-    console.log('property', property);
   };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,13 +298,10 @@ function DataTable({
         <EnhancedTableToolbar
           numSelected={selected.length}
           title={toolBarTitle}
+          handleDelete={() => handleDelete(selected)}
         />
         <TableContainer>
-          <Table
-            // sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
+          <Table aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
             <EnhancedTableHead
               headCells={headCells}
               numSelected={selected.length}
@@ -311,7 +310,7 @@ function DataTable({
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
-              align={align!}
+              align={align}
             />
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
@@ -320,6 +319,7 @@ function DataTable({
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id as string);
+                  console.log('Chaiwa, what is the value of row?', row);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow
@@ -361,9 +361,7 @@ function DataTable({
                     height: (dense ? 33 : 53) * emptyRows,
                     alignContent: 'bottom',
                   }}
-                >
-                  {/* <TableCell colSpan={6} /> */}
-                </TableRow>
+                />
               )}
             </TableBody>
           </Table>
@@ -371,8 +369,6 @@ function DataTable({
 
         <Box
           sx={{
-            // width: '100%',
-            // overflow: 'hidden',
             display: 'flex',
             flexDirection: 'row',
             flexWrap: 'nowrap',
@@ -380,13 +376,7 @@ function DataTable({
         >
           <Box sx={{ flexGrow: 1 }}>
             <TablePagination
-              // sx={{
-              //   // width: '600px',
-              //   float: 'left',
-              //   // flex: '',
-              // }}
               rowsPerPageOptions={[5, 10, 25]}
-              // component="div"
               count={rows.length}
               rowsPerPage={rowsPerPage}
               page={page}
@@ -395,7 +385,6 @@ function DataTable({
             />
           </Box>
           {TableActionButton && (
-            // eslint-disable-next-line react/jsx-props-no-spreading
             <TableActionButton {...tableActionButtonProps} />
           )}
         </Box>

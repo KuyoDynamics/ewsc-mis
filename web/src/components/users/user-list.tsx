@@ -57,6 +57,8 @@ function UserList() {
   const handleShowInvitationModal = () => setShowInvitationModal(true);
   const handleHideInvitationModal = () => setShowInvitationModal(false);
 
+  // const dummy: readonly string[] = [];
+
   if (loading) return <p>loading organisation users...</p>;
   if (error) return <p>failed to load organisation users</p>;
 
@@ -68,6 +70,9 @@ function UserList() {
         ItemComponent={UserItem}
         toolBarTitle="User List"
         TableActionButton={UserInvitationButton}
+        handleDelete={(dummy: any) =>
+          console.log('nothing is being deleted', dummy)
+        }
         tableActionButtonProps={{
           onClick: handleShowInvitationModal,
         }}

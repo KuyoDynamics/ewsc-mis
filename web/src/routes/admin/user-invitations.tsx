@@ -1,12 +1,8 @@
 import React from 'react';
 import UserPendingInvitationList from 'components/users/user-pending-invitation-list';
-import { useLocation } from 'react-router-dom';
-import { IPendingUserInvitation } from 'components/users/user-pending-invitation-item';
 import { Box, Typography } from '@mui/material';
 
 function UserInvitations() {
-  const location = useLocation();
-  const userInvitations = location.state as IPendingUserInvitation[];
   return (
     <Box
       component="main"
@@ -19,7 +15,7 @@ function UserInvitations() {
       <Typography sx={{ mt: 3 }} variant="h4">
         User Invitations
       </Typography>
-      <UserPendingInvitationList userInvitations={userInvitations} />;
+      <UserPendingInvitationList />;
     </Box>
   );
 }

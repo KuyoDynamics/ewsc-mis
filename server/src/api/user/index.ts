@@ -46,6 +46,7 @@ const typeDefs = gql`
     code: String!
     user_id: ID!
     user: User
+    catchment_district_id: ID!
     organisation_id: ID!
     organisation: UserOrganisation
     is_default_user_district: Boolean!

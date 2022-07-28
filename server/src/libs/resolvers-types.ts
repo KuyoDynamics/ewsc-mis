@@ -2476,6 +2476,7 @@ export type UserDisableInput = {
 
 export type UserDistrict = {
   __typename?: 'UserDistrict';
+  catchment_district_id: Scalars['ID'];
   code: Scalars['String'];
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -4457,6 +4458,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
 }>;
 
 export type UserDistrictResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserDistrict'] = ResolversParentTypes['UserDistrict']> = ResolversObject<{
+  catchment_district_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

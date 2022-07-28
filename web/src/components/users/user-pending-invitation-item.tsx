@@ -13,6 +13,7 @@ import {
 export type AlignOption = 'inherit' | 'left' | 'center' | 'right' | 'justify';
 
 export interface IPendingUserInvitation {
+  id: string;
   email: string;
   organisation_role: OrganisationUserRoleType;
   organisation_id: string;

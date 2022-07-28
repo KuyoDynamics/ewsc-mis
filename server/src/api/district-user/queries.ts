@@ -60,6 +60,7 @@ async function resolveUserDistricts(
               },
               catchment_district: {
                 select: {
+                  id: true,
                   disabled: true,
                   district: true,
                 },
@@ -79,6 +80,7 @@ async function resolveUserDistricts(
       organisation_id: district_user.organisation_user.organisation_id,
       is_default_user_district: district_user.is_default_user_district,
       disabled: district_user.catchment_district.disabled,
+      catchment_district_id: district_user.catchment_district.id,
       ...district_user.catchment_district.district,
     }))
   );

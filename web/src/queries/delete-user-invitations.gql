@@ -1,0 +1,14 @@
+mutation DeleteUserInvitation($input: DeleteUserInvitationInput!) {
+  deleteUserInvitation(input: $input) {
+    ... on UserInvitation {
+      id
+    }
+    ... on ApiDeleteError {
+      message
+      errors {
+        field
+        message
+      }
+    }
+  }
+}

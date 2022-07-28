@@ -111,8 +111,6 @@ async function resolveUserDefaultOrganisation(
     },
   });
 
-  console.log('Result', result);
-
   const default_organisation = result?.user_organisations.flatMap(
     (user_org) => ({
       user_id: result.id,
@@ -121,8 +119,6 @@ async function resolveUserDefaultOrganisation(
       ...user_org.organisation,
     })
   )[0];
-
-  console.log('default_organisation', default_organisation);
 
   return default_organisation as UserOrganisation;
 }
