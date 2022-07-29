@@ -180,7 +180,9 @@ export type ApiBatchPayloadResult = ApiBatchPayload | ApiOperationError;
 export type ApiCreateError = ApiError & {
   __typename?: 'ApiCreateError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiDeleteError = ApiError & {
@@ -826,6 +828,7 @@ export type ErrorField = {
   __typename?: 'ErrorField';
   field: Scalars['String'];
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type Indicator = {
@@ -968,7 +971,7 @@ export type Mutation = {
   createSewerNetwork: SewerNetworkResult;
   createSewerTreatmentPlant: SewerTreatmentPlantResult;
   createUser: UserResult;
-  createUserInvitation: UserInvitationResult;
+  createUserInvitation: Array<UserInvitationResult>;
   createWaterNetwork: WaterNetworkResult;
   createWaterProductionSite?: Maybe<CreateWaterProductionSitePayload>;
   createWaterStorageTank?: Maybe<CreateWaterStorageTankPayload>;
@@ -2502,7 +2505,7 @@ export type UserDistrictResult = ApiNotFoundError | UserDistrict;
 export type UserInvitation = {
   __typename?: 'UserInvitation';
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
-  email_addresses: Array<Scalars['EmailAddress']>;
+  email: Scalars['EmailAddress'];
   id: Scalars['ID'];
   invitation_token: Scalars['String'];
   organisation_id: Scalars['String'];
@@ -3334,7 +3337,9 @@ export type ApiBatchPayloadResultResolvers<ContextType = GraphQLContext, ParentT
 
 export type ApiCreateErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiCreateError'] = ResolversParentTypes['ApiCreateError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3629,6 +3634,7 @@ export interface EmailAddressScalarConfig extends GraphQLScalarTypeConfig<Resolv
 export type ErrorFieldResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ErrorField'] = ResolversParentTypes['ErrorField']> = ResolversObject<{
   field?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3835,7 +3841,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateSewerNetworkArgs, 'input'>>;
   createSewerTreatmentPlant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<MutationCreateSewerTreatmentPlantArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
-  createUserInvitation?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
+  createUserInvitation?: Resolver<Array<ResolversTypes['UserInvitationResult']>, ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
   createWaterNetwork?: Resolver<ResolversTypes['WaterNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateWaterNetworkArgs, 'input'>>;
   createWaterProductionSite?: Resolver<Maybe<ResolversTypes['CreateWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterProductionSiteArgs, 'input'>>;
   createWaterStorageTank?: Resolver<Maybe<ResolversTypes['CreateWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterStorageTankArgs, 'input'>>;
@@ -4486,7 +4492,7 @@ export type UserDistrictResultResolvers<ContextType = GraphQLContext, ParentType
 
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
   catchment_district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  email_addresses?: Resolver<Array<ResolversTypes['EmailAddress']>, ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['EmailAddress'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invitation_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

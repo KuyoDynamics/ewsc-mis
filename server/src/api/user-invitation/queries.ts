@@ -13,9 +13,8 @@ import { GraphQLContext, addDays, generateClientErrors } from '../../utils';
 async function createUserInvitation(
   args: MutationCreateUserInvitationArgs,
   context: GraphQLContext
-): Promise<UserInvitationResult> {
+): Promise<UserInvitationResult[]> {
   try {
-    const id = uuidv4();
     const ttl = addDays(new Date(), 5);
 
     const {
@@ -41,83 +40,104 @@ async function createUserInvitation(
         });
 
       if (disabled_catchment_districts?.length > 0) {
-        return {
+        return disabled_catchment_districts.map((item) => ({
           __typename: 'ApiCreateError',
-          message: `Failed to create UserInvitation because the following catchment districts are disabled.${disabled_catchment_districts.map(
-            (item) => item.id
-          )}`,
-        };
-      }
-
-      const existing_invitations = await context.prisma.$transaction(
-        email_addresses.map((email) =>
-          context.prisma.userInvitation.findFirst({
-            where: {
-              AND: {
-                email_addresses: {
-                  has: email,
-                },
-              },
-            },
-          })
-        )
-      );
-
-      const existing_emails = existing_invitations
-        ?.flatMap((invite) => invite?.email_addresses)
-        .map((email) => email);
-
-      const duplicate_emails = existing_emails.filter(
-        (email) => email_addresses.indexOf(email) > -1
-      );
-
-      if (duplicate_emails?.length > 0) {
-        return {
-          __typename: 'ApiCreateError',
-          message: `Failed to create UserInvitation because the following email address are have already been invited: ${duplicate_emails}`,
-        };
+          message: `catchment district ${item.id} is disabled`,
+          field: 'catchment_districts',
+          value: item.id,
+        }));
       }
     }
 
-    const invitation_token = jwt.sign(
-      {
-        emails: email_addresses,
-        organisation_role: organisation_role,
-        catchment_districts: catchment_districts,
-      },
-      process.env.JWT_SECRET!,
-      {
-        issuer: context.user.email,
-        audience: organisation_id,
-        subject: organisation_id,
-        jwtid: id,
-        expiresIn: '5 days',
-      }
+    const existing_invitations = await context.prisma.$transaction(
+      email_addresses.map((email) =>
+        context.prisma.userInvitation.findFirst({
+          where: {
+            AND: {
+              email,
+              organisation_id,
+            },
+          },
+          select: {
+            email: true,
+          },
+        })
+      )
     );
 
-    const user_invitation = await context.prisma.userInvitation.create({
-      data: {
+    const duplicate_emails = existing_invitations
+      ?.map((invite) => invite?.email)
+      .filter((email) => email_addresses.indexOf(email) > -1);
+
+    if (duplicate_emails?.length > 0) {
+      return duplicate_emails.map((email) => ({
+        __typename: 'ApiCreateError',
+        message: `${email} has already been invited to this organisation`,
+        field: 'email_addresses',
+        value: email,
+      }));
+    }
+
+    const invitation_tokens = email_addresses.map((email) => {
+      const id = uuidv4();
+      return {
         id,
         organisation_id,
         catchment_district_ids: catchment_districts?.map(
           (item) => item.catchment_district_id
         ),
-        email_addresses,
+        email,
         ttl,
-        invitation_token,
-      },
+        invitation_token: jwt.sign(
+          {
+            email,
+            organisation_role: organisation_role,
+            catchment_districts: catchment_districts,
+          },
+          process.env.JWT_SECRET!,
+          {
+            issuer: context.user.email,
+            audience: organisation_id,
+            subject: organisation_id,
+            jwtid: id,
+            expiresIn: '5 days',
+          }
+        ),
+      };
     });
 
-    return {
-      __typename: 'UserInvitation',
-      ...user_invitation,
-    };
+    const user_invitations = await Promise.allSettled(
+      invitation_tokens.map((data) =>
+        context.prisma.userInvitation.create({
+          data,
+        })
+      )
+    );
+
+    console.log('user_invitations', user_invitations);
+
+    return user_invitations.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return {
+          __typename: 'UserInvitation',
+          ...result.value,
+        };
+      }
+      return {
+        __typename: 'ApiCreateError',
+        message: result.reason,
+        field: 'email_addresses',
+        value: invitation_tokens[index].email,
+      };
+    });
   } catch (error) {
-    return {
-      __typename: 'ApiCreateError',
-      message: `Failed to create UserInvitation.`,
-      errors: generateClientErrors(error),
-    };
+    return [
+      {
+        __typename: 'ApiCreateError',
+        message: `Failed to create UserInvitation.`,
+        errors: generateClientErrors(error),
+      },
+    ];
   }
 }
 
@@ -138,7 +158,7 @@ async function deleteUserInvitation(
   } catch (error) {
     return {
       __typename: 'ApiDeleteError',
-      message: `Failed to delete User with id ${args.input.id}.`,
+      message: `Failed to delete User Invitation with id ${args.input.id}.`,
       errors: generateClientErrors(error, 'id'),
     };
   }
@@ -159,9 +179,9 @@ async function getUserInvitations(
               hasEvery: catchment_district_ids,
             }
           : undefined,
-        email_addresses: email_addresses
+        email: email_addresses
           ? {
-              hasEvery: email_addresses,
+              in: email_addresses,
             }
           : undefined,
         organisation_id: organisation_id,

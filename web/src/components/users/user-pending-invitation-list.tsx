@@ -47,11 +47,11 @@ function UserPendingInvitationList() {
   const [deleteUserInvitation, { data, loading, error }] =
     useDeleteUserInvitationMutation();
 
-  const handleDelete = (selectedItems: readonly string[]) => {
+  const handleDelete = async (selectedItems: readonly string[]) => {
     console.log('selected items to delete', selectedItems);
-    selectedItems.forEach((id) => {
-      if (id) {
-        deleteUserInvitation({
+    const operations = await Promise.all(
+      selectedItems.map((id) => {
+        return deleteUserInvitation({
           variables: {
             input: {
               id,
@@ -59,8 +59,10 @@ function UserPendingInvitationList() {
           },
           refetchQueries: [GetUserInvitationsDocument],
         });
-      }
-    });
+      })
+    );
+
+    console.log('operations', operations);
   };
 
   console.log('server data after user invitation delete', data);

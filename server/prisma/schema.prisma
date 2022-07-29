@@ -230,7 +230,7 @@ model DistrictUser {
 model UserInvitation {
   id                     String   @id @db.Uuid
   ttl                    DateTime
-  email_addresses        String[]
+  email                  String
   organisation_id        String   @db.Uuid
   catchment_district_ids String[] @db.Uuid
   invitation_token       String   @unique

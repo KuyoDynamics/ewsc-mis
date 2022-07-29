@@ -100,6 +100,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
       onRequestSort(event, property);
     };
 
+  console.log('EnhancedTableHead: numSelected,rowCount', numSelected, rowCount);
   const sortOrderDescription =
     order === 'desc' ? 'sorted descending' : 'sorted ascending';
 

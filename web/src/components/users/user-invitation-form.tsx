@@ -213,7 +213,7 @@ function InvitationForm({ onClose }: InvitationFormProps) {
         fullWidth
         label="Organisation Role"
         variant="outlined"
-        defaultValue={OrganisationUserRoleType.User}
+        defaultValue="USER"
       >
         {USER_ORGANISATION_ROLE_OPTIONS.filter(
           (op) => !['SUPPORT', 'OWNER'].includes(op)

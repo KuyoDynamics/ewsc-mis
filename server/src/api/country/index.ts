@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createCountry,
   deleteCountry,
@@ -8,7 +8,7 @@ import {
   getOrganisations,
   getProvinces,
   updateCountry,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type Country {
@@ -42,6 +42,7 @@ const typeDefs = gql`
   type ErrorField {
     field: String!
     message: String!
+    value: String
   }
 
   type ApiOperationError implements ApiError {
@@ -62,6 +63,8 @@ const typeDefs = gql`
 
   type ApiCreateError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 

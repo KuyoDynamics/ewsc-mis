@@ -11,7 +11,7 @@ const typeDefs = gql`
   type UserInvitation {
     id: ID!
     ttl: DateTime!
-    email_addresses: [EmailAddress!]!
+    email: EmailAddress!
     organisation_id: String!
     catchment_district_ids: [String!]
     invitation_token: String!
@@ -25,7 +25,7 @@ const typeDefs = gql`
   extend type Mutation {
     createUserInvitation(
       input: CreateUserInvitationInput!
-    ): UserInvitationResult!
+    ): [UserInvitationResult!]!
     deleteUserInvitation(
       input: DeleteUserInvitationInput!
     ): UserInvitationResult!
