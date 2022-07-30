@@ -1,10 +1,13 @@
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { mergeResolvers } from "@graphql-tools/merge";
-import typeDefs from "../typedefs";
-import resolvers from "../resolvers";
-import { applyMiddleware } from "graphql-middleware";
-import { permissions as permissionsMiddleware } from "../../permissions";
-import { deleteUserInvitationMiddleware } from "../../middleware";
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { mergeResolvers } from '@graphql-tools/merge';
+import typeDefs from '../typedefs';
+import resolvers from '../resolvers';
+import { applyMiddleware } from 'graphql-middleware';
+import { permissions as permissionsMiddleware } from '../../permissions';
+import {
+  deleteUserInvitationMiddleware,
+  sendInvitationEmailMiddleware,
+} from '../../middleware';
 
 const schema = applyMiddleware(
   makeExecutableSchema({
@@ -12,7 +15,8 @@ const schema = applyMiddleware(
     resolvers: mergeResolvers(resolvers),
   }),
   permissionsMiddleware,
-  deleteUserInvitationMiddleware
+  deleteUserInvitationMiddleware,
+  sendInvitationEmailMiddleware
 );
 
 export { schema };

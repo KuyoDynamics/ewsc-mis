@@ -35,9 +35,14 @@ async function startApolloServer(
   app.use('/sendEmail', async (req, resp) => {
     try {
       await sendEmail(
-        'chaiwa.berian@gmail.com',
+        'EWSC',
+        'chaiwa.berian34@kim.com',
         'EWSC-MIS Invitation',
-        '<a href="/api?id=12122">Click Here<a/>'
+        '<a href="/api?id=12122">Click Here<a/>',
+        (err, info) => {
+          console.log('error in callback', err);
+          console.log('info in callback', info);
+        }
       );
 
       resp.send('Email sent');

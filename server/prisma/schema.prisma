@@ -228,12 +228,13 @@ model DistrictUser {
 }
 
 model UserInvitation {
-  id                     String   @id @db.Uuid
+  id                     String      @id @db.Uuid
   ttl                    DateTime
   email                  String
-  organisation_id        String   @db.Uuid
-  catchment_district_ids String[] @db.Uuid
-  invitation_token       String   @unique
+  organisation_id        String      @db.Uuid
+  catchment_district_ids String[]    @db.Uuid
+  invitation_token       String      @unique
+  email_status           EmailStatus @default(PENDING)
 
   @@map("user_invitation")
 }
@@ -819,6 +820,13 @@ enum ApprovalStatus {
 
 //   @@map("report_type_option")
 // }
+
+enum EmailStatus {
+  ACCEPTED @map("accepted")
+  REJECTED @map("rejected")
+  FAILED   @map("failed")
+  PENDING  @map("pending")
+}
 
 enum ReportingFrequency {
   WEEKLY     @map("weekly")

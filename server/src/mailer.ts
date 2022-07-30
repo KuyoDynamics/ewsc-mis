@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 let transporter = nodemailer.createTransport({
   host: process.env.MAILER_HOST,
@@ -13,17 +14,22 @@ let transporter = nodemailer.createTransport({
   },
 });
 
-async function sendEmail(to: string, subject: string, html: string) {
-  let info = await transporter.sendMail({
-    from: `'"EWSC MIS 👻" <${process.env.MAILER_USER}>'`, // sender address
-    to, // list of receivers
-    subject, // Subject line
-    html, // html body
-  });
-
-  console.log('Message Info:', info);
-
-  console.log('Message sent: %s', info.messageId);
+async function sendEmail(
+  organisation_name: string,
+  to: string,
+  subject: string,
+  html: string,
+  callback: (err: Error | null, info: SMTPTransport.SentMessageInfo) => void
+) {
+  transporter.sendMail(
+    {
+      from: `'"${organisation_name} MIS 👻" <${process.env.MAILER_USER}>'`, // sender address
+      to, // list of receivers
+      subject, // Subject line
+      html, // html body
+    },
+    callback
+  );
 }
 
 export { sendEmail };
