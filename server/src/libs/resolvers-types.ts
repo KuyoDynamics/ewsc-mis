@@ -824,6 +824,13 @@ export enum DistrictUserRoleType {
   User = 'USER'
 }
 
+export enum EmailStatus {
+  Accepted = 'ACCEPTED',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED'
+}
+
 export type ErrorField = {
   __typename?: 'ErrorField';
   field: Scalars['String'];
@@ -2506,6 +2513,7 @@ export type UserInvitation = {
   __typename?: 'UserInvitation';
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   email: Scalars['EmailAddress'];
+  email_status: EmailStatus;
   id: Scalars['ID'];
   invitation_token: Scalars['String'];
   organisation_id: Scalars['String'];
@@ -2854,6 +2862,7 @@ export type ResolversTypes = ResolversObject<{
   DistrictUserRoleType: DistrictUserRoleType;
   Duration: ResolverTypeWrapper<Scalars['Duration']>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']>;
+  EmailStatus: EmailStatus;
   ErrorField: ResolverTypeWrapper<ErrorField>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   GUID: ResolverTypeWrapper<Scalars['GUID']>;
@@ -4493,6 +4502,7 @@ export type UserDistrictResultResolvers<ContextType = GraphQLContext, ParentType
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
   catchment_district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['EmailAddress'], ParentType, ContextType>;
+  email_status?: Resolver<ResolversTypes['EmailStatus'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invitation_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

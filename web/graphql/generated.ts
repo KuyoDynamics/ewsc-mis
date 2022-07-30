@@ -824,6 +824,13 @@ export enum DistrictUserRoleType {
   User = 'USER'
 }
 
+export enum EmailStatus {
+  Accepted = 'ACCEPTED',
+  Rejected = 'REJECTED',
+  Failed = 'FAILED',
+  Pending = 'PENDING'
+}
+
 export type ErrorField = {
   __typename?: 'ErrorField';
   field: Scalars['String'];
@@ -2516,6 +2523,7 @@ export type UserInvitation = {
   organisation_id: Scalars['String'];
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   invitation_token: Scalars['String'];
+  email_status: EmailStatus;
 };
 
 export type UserInvitationResult = UserInvitation | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
@@ -2705,7 +2713,7 @@ export type GetUserInvitationsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', id: string, organisation_id: string, email: any, catchment_district_ids?: Array<string> | null, invitation_token: string, ttl: any }> | null };
+export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', id: string, organisation_id: string, email: any, catchment_district_ids?: Array<string> | null, invitation_token: string, ttl: any, email_status: EmailStatus }> | null };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -3018,6 +3026,7 @@ export const GetUserInvitationsDocument = gql`
       catchment_district_ids
       invitation_token
       ttl
+      email_status
     }
   }
 }
@@ -3931,14 +3940,15 @@ export type UserDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
+export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | 'email_status' | UserInvitationKeySpecifier)[];
 export type UserInvitationFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	ttl?: FieldPolicy<any> | FieldReadFunction<any>,
 	email?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_district_ids?: FieldPolicy<any> | FieldReadFunction<any>,
-	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>
+	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	email_status?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type UserOrganisationKeySpecifier = ('id' | 'name' | 'logo' | 'user_id' | 'user' | 'is_user_default_organisation' | 'user_default_district' | 'user_districts' | 'user_organisation_role' | 'country_id' | 'country' | 'catchment_provinces' | 'users' | 'organisation_report_templates' | 'organisation_indicators' | 'reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserOrganisationKeySpecifier)[];
 export type UserOrganisationFieldPolicy = {

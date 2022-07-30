@@ -3,11 +3,18 @@ import { Button, Chip, TableCell, Typography } from '@mui/material';
 import Badge, { BadgeProps } from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 
-import { LocationCity } from '@mui/icons-material';
+import {
+  Check,
+  Error,
+  HourglassTop,
+  LocationCity,
+  Pending,
+} from '@mui/icons-material';
 import { getDateDiff } from 'utils';
 import {
   CatchmentDistrictInput,
   OrganisationUserRoleType,
+  EmailStatus,
 } from '../../../graphql/generated';
 
 export type AlignOption = 'inherit' | 'left' | 'center' | 'right' | 'justify';
@@ -20,7 +27,7 @@ export interface IPendingUserInvitation {
   catchment_districts?: CatchmentDistrictInput[];
   created_at: Date;
   expires_at: Date;
-  email_status: string;
+  email_status: EmailStatus;
 }
 
 export interface PendingInvitationItemProps {
@@ -53,6 +60,19 @@ function UserPendingInvitationItem({
   const daysReamining = getDateDiff(expires_at, new Date());
   const now = new Date();
   const expired = expires_at.getTime() < now.getTime();
+  const renderEmailStatus = (status: EmailStatus) => {
+    switch (status) {
+      case EmailStatus.Pending:
+        return <HourglassTop />;
+      case EmailStatus.Accepted:
+        return <Check color="success" />;
+      case EmailStatus.Failed:
+      case EmailStatus.Rejected:
+        return <Error />;
+      default:
+        return status;
+    }
+  };
   return (
     <>
       <TableCell align={align}>{email}</TableCell>
@@ -95,7 +115,7 @@ function UserPendingInvitationItem({
             : '---'}
         </Button>
       </TableCell>
-      <TableCell align={align}>{email_status}</TableCell>
+      <TableCell align={align}>{renderEmailStatus(email_status)}</TableCell>
     </>
   );
 }

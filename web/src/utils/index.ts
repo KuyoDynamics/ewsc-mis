@@ -40,7 +40,7 @@ function getUserInvitations(userInvitations: UserInvitation[]) {
       catchment_districts: token.catchment_districts,
       created_at: new Date(token.iat! * 1000),
       expires_at: new Date(token.exp! * 1000),
-      email_status: 'not sent',
+      email_status: invite.email_status,
     };
   });
   return rows;

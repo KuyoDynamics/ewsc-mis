@@ -15,6 +15,7 @@ const typeDefs = gql`
     organisation_id: String!
     catchment_district_ids: [String!]
     invitation_token: String!
+    email_status: EmailStatus!
   }
 
   extend type Query {
@@ -59,6 +60,13 @@ const typeDefs = gql`
     | ApiCreateError
     | ApiUpdateError
     | ApiDeleteError
+
+  enum EmailStatus {
+    ACCEPTED
+    REJECTED
+    FAILED
+    PENDING
+  }
 `;
 
 const resolvers: Resolvers = {

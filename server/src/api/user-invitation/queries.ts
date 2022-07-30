@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import {
+  EmailStatus,
   MutationCreateUserInvitationArgs,
   MutationDeleteUserInvitationArgs,
   QueryUser_InvitationArgs,
@@ -88,6 +89,7 @@ async function createUserInvitation(
     const invitation_tokens = email_addresses.map((email) => {
       const id = uuidv4();
       return {
+        email_status: EmailStatus.Pending,
         id,
         organisation_id,
         catchment_district_ids: catchment_districts?.map(
@@ -127,7 +129,7 @@ async function createUserInvitation(
       if (result.status === 'fulfilled') {
         return {
           __typename: 'UserInvitation',
-          ...result.value,
+          ...(result.value as UserInvitation),
         };
       }
       return {
@@ -160,7 +162,7 @@ async function deleteUserInvitation(
     });
     return {
       __typename: 'UserInvitation',
-      ...user_invitation,
+      ...(user_invitation as UserInvitation),
     };
   } catch (error) {
     return {
@@ -195,7 +197,7 @@ async function getUserInvitations(
       },
     },
   });
-  return user_invitations;
+  return user_invitations as UserInvitation[];
 }
 
 async function getUserInvitation(
@@ -218,7 +220,7 @@ async function getUserInvitation(
 
     return {
       __typename: 'UserInvitation',
-      ...user_invitation,
+      ...(user_invitation as UserInvitation),
     };
   } catch (error) {
     return {
