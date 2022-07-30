@@ -825,10 +825,10 @@ export enum DistrictUserRoleType {
 }
 
 export enum EmailStatus {
-  Accepted = 'ACCEPTED',
   Failed = 'FAILED',
   Pending = 'PENDING',
-  Rejected = 'REJECTED'
+  Rejected = 'REJECTED',
+  Sent = 'SENT'
 }
 
 export type ErrorField = {

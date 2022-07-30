@@ -62,7 +62,7 @@ const typeDefs = gql`
     | ApiDeleteError
 
   enum EmailStatus {
-    ACCEPTED
+    SENT
     REJECTED
     FAILED
     PENDING

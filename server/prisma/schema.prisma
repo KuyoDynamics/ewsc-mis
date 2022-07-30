@@ -241,7 +241,7 @@ model UserInvitation {
 
 model CatchmentDistrict {
   id       String  @id @default(uuid()) @db.Uuid
-  disabled Boolean @default(true)
+  disabled Boolean @default(false)
 
   // Relation Fields
   district_id String   @db.Uuid
@@ -822,7 +822,7 @@ enum ApprovalStatus {
 // }
 
 enum EmailStatus {
-  ACCEPTED @map("accepted")
+  SENT     @map("sent")
   REJECTED @map("rejected")
   FAILED   @map("failed")
   PENDING  @map("pending")

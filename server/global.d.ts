@@ -11,5 +11,6 @@ declare namespace NodeJS {
     MAILER_PASS: string;
     MAILER_HOST: string;
     MAILER_PORT: string;
+    HOST_URL: string;
   }
 }

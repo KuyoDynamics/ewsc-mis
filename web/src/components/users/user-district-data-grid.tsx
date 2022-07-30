@@ -145,6 +145,8 @@ function UserDistrictDataGrid({
 
   const currentUser = useReactiveVar(currentUserVar);
 
+  console.log('currentUser in UserDistrictDataGrid', currentUser);
+
   const inviteCatchmentDistricts: CreateUserInvitationCatchmentDistrictInput[] =
     React.useMemo(
       () =>

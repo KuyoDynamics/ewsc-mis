@@ -825,7 +825,7 @@ export enum DistrictUserRoleType {
 }
 
 export enum EmailStatus {
-  Accepted = 'ACCEPTED',
+  Sent = 'SENT',
   Rejected = 'REJECTED',
   Failed = 'FAILED',
   Pending = 'PENDING'

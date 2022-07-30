@@ -64,8 +64,8 @@ function UserPendingInvitationItem({
     switch (status) {
       case EmailStatus.Pending:
         return <HourglassTop />;
-      case EmailStatus.Accepted:
-        return <Check color="success" />;
+      case EmailStatus.Sent:
+        return <Check />;
       case EmailStatus.Failed:
       case EmailStatus.Rejected:
         return <Error />;

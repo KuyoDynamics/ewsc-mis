@@ -96,7 +96,7 @@ function InvitationForm({ onClose }: InvitationFormProps) {
   >([]);
 
   const { data: invitationData } = useGetUserInvitationsQuery({
-    fetchPolicy: 'cache-only',
+    fetchPolicy: 'cache-first',
     variables: {
       args: {
         organisation_id: currentUser?.user_default_organisation?.id! || '',

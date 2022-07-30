@@ -194,8 +194,8 @@ async function createUser(
         first_name: args.input.first_name,
         last_name: args.input.last_name,
         password: await encryptPassword(args.input.password),
-        created_by: context.user.email,
-        last_modified_by: context.user.email,
+        created_by: context.user?.email || 'system@kuyodynamics.com',
+        last_modified_by: context.user?.email || 'system@kuyodynamics.com',
       },
     });
 

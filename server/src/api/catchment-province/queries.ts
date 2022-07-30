@@ -1,11 +1,12 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   CatchmentProvince,
   CatchmentProvinceResult,
+  CatchmentProvinceView,
   MutationCreateCatchmentProvinceArgs,
   MutationDeleteCatchmentProvinceArgs,
   MutationUpdateCatchmentProvinceArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 
 async function getCatchmentProvinces(
   organisation_id: string,
@@ -18,6 +19,32 @@ async function getCatchmentProvinces(
       },
     })
     .catchment_provinces();
+}
+
+async function resolveCatchmentProvinces(
+  organisation_id: string,
+  context: GraphQLContext
+): Promise<CatchmentProvinceView[]> {
+  const result = await context.prisma.organisation.findUnique({
+    where: {
+      id: organisation_id,
+    },
+    include: {
+      catchment_provinces: {
+        include: {
+          province: true,
+        },
+      },
+    },
+  });
+
+  const catchmentProvincesView =
+    result?.catchment_provinces.map((cp) => ({
+      ...cp.province,
+      disabled: cp.disabled,
+      organisation_id: cp.organisation_id,
+    })) ?? null;
+  return catchmentProvincesView as CatchmentProvinceView[];
 }
 
 async function getCatchmentProvince(
@@ -34,18 +61,18 @@ async function getCatchmentProvince(
 
     if (!catchment_province) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The CatchmentProvince with the id ${id}} does not exist.`,
       };
     }
 
     return {
-      __typename: "CatchmentProvince",
+      __typename: 'CatchmentProvince',
       ...catchment_province,
     };
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find CatchmentProvince with the id ${id}.`,
       errors: generateClientErrors(error),
     };
@@ -66,12 +93,12 @@ async function createCatchmentProvince(
       },
     });
     return {
-      __typename: "CatchmentProvince",
+      __typename: 'CatchmentProvince',
       ...catchment_province,
     };
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create CatchmentProvince.`,
       errors: generateClientErrors(error),
     };
@@ -93,14 +120,14 @@ async function updateCatchmentProvince(
       },
     });
     return {
-      __typename: "CatchmentProvince",
+      __typename: 'CatchmentProvince',
       ...catchment_province,
     };
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update CatchmentProvince with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -116,14 +143,14 @@ async function deleteCatchmentProvince(
       },
     });
     return {
-      __typename: "CatchmentProvince",
+      __typename: 'CatchmentProvince',
       ...catchment_province,
     };
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete CatchmentProvince with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -134,4 +161,5 @@ export {
   createCatchmentProvince,
   updateCatchmentProvince,
   deleteCatchmentProvince,
+  resolveCatchmentProvinces,
 };

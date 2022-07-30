@@ -1,11 +1,11 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   CatchmentDistrict,
   CatchmentDistrictResult,
   MutationCreateCatchmentDistrictArgs,
   MutationDeleteCatchmentDistrictArgs,
   MutationUpdateCatchmentDistrictArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 
 async function getCatchmentDistricts(
   id: string,
@@ -20,6 +20,8 @@ async function getCatchmentDistricts(
     .catchment_districts();
 }
 
+async function resolveCatchmentDistricts(params: type) {}
+
 async function getCatchmentDistrict(
   id: string,
   context: GraphQLContext
@@ -33,17 +35,17 @@ async function getCatchmentDistrict(
       });
     if (!catchment_district) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The CatchmentDistrict with the id ${id}} does not exist.`,
       };
     }
     return {
-      __typename: "CatchmentDistrict",
+      __typename: 'CatchmentDistrict',
       ...catchment_district,
     };
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find CatchmentDistrict with the id ${id}.`,
       errors: generateClientErrors(error),
     };
@@ -65,12 +67,12 @@ async function createCatchmentDistrict(
     });
 
     return {
-      __typename: "CatchmentDistrict",
+      __typename: 'CatchmentDistrict',
       ...catchment_district,
     };
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create CatchmentDistrict.`,
       errors: generateClientErrors(error),
     };
@@ -92,14 +94,14 @@ async function updateCatchmentDistrict(
       },
     });
     return {
-      __typename: "CatchmentDistrict",
+      __typename: 'CatchmentDistrict',
       ...catchment_district,
     };
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update CatchmentDistrict with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -115,14 +117,14 @@ async function deleteCatchmentDistrict(
       },
     });
     return {
-      __typename: "CatchmentDistrict",
+      __typename: 'CatchmentDistrict',
       ...catchment_district,
     };
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete CatchmentDistrict with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
