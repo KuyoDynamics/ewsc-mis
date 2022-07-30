@@ -1,12 +1,19 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
-import { Chip, TextField, TextFieldProps, Tooltip } from '@mui/material';
+import {
+  Chip,
+  FormHelperText,
+  TextField,
+  TextFieldProps,
+  Tooltip,
+} from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import {
   Control,
   Controller,
   FieldError,
+  FieldErrors,
   UseFormRegister,
 } from 'react-hook-form';
 import { UserInvitationFormInputs } from 'components/users/user-invitation-form';
@@ -20,12 +27,14 @@ type FormInputTagsProps = {
   control: Control<any, any>;
   isValidTag: (tag: string) => ITagValidationPayload;
   register: UseFormRegister<UserInvitationFormInputs>;
+  errors: FieldErrors;
 } & TextFieldProps;
 
 function FormTagInput({
   name,
   control,
   isValidTag,
+  errors,
   ...otherProps
 }: FormInputTagsProps) {
   const [value, setValue] = React.useState<string[]>([]);
@@ -65,7 +74,7 @@ function FormTagInput({
       render={({
         field: { onChange },
         fieldState: { error },
-        formState: { errors },
+        // formState: { errors },
       }) => {
         const fieldInputError = errors[name]
           ? (errors[name] as unknown as Array<FieldError>)[0]
@@ -102,15 +111,22 @@ function FormTagInput({
             onChange={(_, data) => onChange(data)}
             onInputChange={handleInputChange}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                {...otherProps}
-                name={name}
-                error={!!fieldInputError}
-                helperText={fieldInputError && fieldInputError.message}
-                variant="outlined"
-                InputProps={{ ...params.InputProps }}
-              />
+              <>
+                <TextField
+                  {...params}
+                  {...otherProps}
+                  name={name}
+                  error={!!fieldInputError}
+                  helperText={fieldInputError && fieldInputError.message}
+                  variant="outlined"
+                  InputProps={{ ...params.InputProps }}
+                />
+                {errors[name] && (
+                  <FormHelperText>
+                    {errors[name]?.message?.toString()}
+                  </FormHelperText>
+                )}
+              </>
             )}
           />
         );

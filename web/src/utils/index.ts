@@ -23,27 +23,26 @@ const USER_ORGANISATION_ROLE_OPTIONS: string[] = Object.values(
 );
 
 type TokenPayloadType = {
-  emails: string[];
+  email: string;
   organisation_role: OrganisationUserRoleType;
   catchment_districts?: CatchmentDistrictInput[];
 } & JwtPayload;
 
 function getUserInvitations(userInvitations: UserInvitation[]) {
-  const tokenInfo: TokenPayloadType[] = userInvitations.map((invite) =>
-    jwtDecode(invite.invitation_token)
-  );
-  const rows: IPendingUserInvitation[] = tokenInfo.flatMap((token) =>
-    token.emails.map((email) => ({
+  const rows: IPendingUserInvitation[] = userInvitations.map((invite) => {
+    const token: TokenPayloadType = jwtDecode(invite.invitation_token);
+
+    return {
       id: token.jti!,
-      email,
+      email: token.email,
       organisation_role: token.organisation_role,
       organisation_id: token.sub!,
       catchment_districts: token.catchment_districts,
       created_at: new Date(token.iat! * 1000),
       expires_at: new Date(token.exp! * 1000),
       email_status: 'not sent',
-    }))
-  );
+    };
+  });
   return rows;
 }
 

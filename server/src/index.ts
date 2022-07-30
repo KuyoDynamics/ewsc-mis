@@ -1,15 +1,16 @@
-import { ApolloServer } from "apollo-server-express";
-import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
-import { WebSocketServer } from "ws";
-import { useServer } from "graphql-ws/lib/use/ws";
-import { PrismaClient } from "@prisma/client";
-import express from "express";
-import http from "http";
-import { GraphQLSchema } from "graphql";
-import dotenv from "dotenv";
-import { expressjwt } from "express-jwt";
-import { schema } from "./api/schema";
-import { createContext } from "./utils";
+import { ApolloServer } from 'apollo-server-express';
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
+import { PrismaClient } from '@prisma/client';
+import express from 'express';
+import http from 'http';
+import { GraphQLSchema } from 'graphql';
+import dotenv from 'dotenv';
+import { expressjwt } from 'express-jwt';
+import { schema } from './api/schema';
+import { createContext } from './utils';
+import { sendEmail } from './mailer';
 
 const prisma = new PrismaClient();
 
@@ -24,12 +25,27 @@ async function startApolloServer(
   app.use(
     expressjwt({
       secret: process.env.JWT_SECRET!,
-      algorithms: ["HS256"],
+      algorithms: ['HS256'],
       credentialsRequired: false,
     })
   );
 
-  app.use(express.static("public"));
+  app.use(express.static('public'));
+
+  app.use('/sendEmail', async (req, resp) => {
+    try {
+      await sendEmail(
+        'chaiwa.berian@gmail.com',
+        'EWSC-MIS Invitation',
+        '<a href="/api?id=12122">Click Here<a/>'
+      );
+
+      resp.send('Email sent');
+    } catch (error) {
+      console.log('Email error', error);
+      resp.send('Failed to send email');
+    }
+  });
 
   // Express global error handler
   app.use(function (_err: any, _req: any, _res: any, next: any) {
@@ -42,7 +58,7 @@ async function startApolloServer(
   // 2. Websocket Server
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: "/",
+    path: '/',
   });
 
   const wsServerCleanup = useServer({ schema: gqlSchema }, wsServer);
@@ -74,7 +90,7 @@ async function startApolloServer(
 
   await server.start();
   server.applyMiddleware({
-    path: "/api",
+    path: '/api',
     app,
   });
 

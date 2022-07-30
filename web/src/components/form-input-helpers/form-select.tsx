@@ -7,11 +7,12 @@ import {
   InputLabel,
   FormControl,
 } from '@mui/material';
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldErrors } from 'react-hook-form';
 
 type FormSelectProps = {
   name: string;
   control: Control<any, any>;
+  errors: FieldErrors;
 } & SelectProps;
 
 function FormSelect({
@@ -21,6 +22,7 @@ function FormSelect({
   fullWidth,
   control,
   children,
+  errors,
   ...otherProps
 }: FormSelectProps) {
   return (
@@ -40,7 +42,11 @@ function FormSelect({
             >
               {children}
             </Select>
-            <FormHelperText>{isTouched && error?.message}</FormHelperText>
+            {isTouched && (error || errors) && (
+              <FormHelperText>
+                {error?.message ?? errors[name]?.message?.toString()}
+              </FormHelperText>
+            )}
           </FormControl>
         );
       }}

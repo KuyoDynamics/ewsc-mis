@@ -3,17 +3,15 @@ mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
     ... on UserInvitation {
       id
       catchment_district_ids
-      email_addresses
+      email
       invitation_token
       organisation_id
       ttl
     }
     ... on ApiCreateError {
       message
-      errors {
-        field
-        message
-      }
+      field
+      value
     }
   }
 }

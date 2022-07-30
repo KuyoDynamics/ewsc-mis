@@ -1,6 +1,6 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
@@ -204,7 +204,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton onClick={handleDelete}>
+          <IconButton onClick={handleDelete} color="error">
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -236,7 +236,8 @@ function DataTable({
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  console.log('Chaiwa, what is selected', selected);
+  console.log('Chaiwa, what is selected DataTable', selected);
+  console.log('Chaiwa, what is rows in DataTable', rows);
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,
@@ -293,6 +294,10 @@ function DataTable({
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
+  useEffect(() => {
+    setSelected([]);
+  }, [rows]);
+
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -320,7 +325,6 @@ function DataTable({
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id as string);
-                  console.log('Chaiwa, what is the value of row?', row);
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow

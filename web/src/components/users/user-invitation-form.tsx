@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useReactiveVar } from '@apollo/client';
 import DraggablePaper from 'components/draggable-paper';
 import FormSelect from 'components/form-input-helpers/form-select';
@@ -24,10 +24,8 @@ import FormTagInput from 'components/form-input-helpers/form-tag-input';
 import { currentUserVar } from 'cache';
 import UserDistrictDataGrid from 'components/users/user-district-data-grid';
 import {
-  ApiCreateError,
   CreateUserInvitationCatchmentDistrictInput,
   CreateUserInvitationInput,
-  DistrictUserRoleType,
   GetUserInvitationsDocument,
   OrganisationUserRoleType,
   useCreateUserInvitationMutation,
@@ -120,9 +118,10 @@ function InvitationForm({ onClose }: InvitationFormProps) {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid },
+    formState: { isSubmitting, isValid, errors },
     register,
     setValue,
+    setError,
   } = useForm<UserInvitationFormInputs>({
     resolver: yupResolver(schema),
     mode: 'all',
@@ -137,11 +136,14 @@ function InvitationForm({ onClose }: InvitationFormProps) {
 
   const submitting = isSubmitting || loading;
 
-  const apiCreateError = React.useMemo(
+  const apiCreateErrors = React.useMemo(
     () =>
-      serverResponse?.createUserInvitation.__typename === 'ApiCreateError'
-        ? (serverResponse.createUserInvitation as ApiCreateError)
-        : null,
+      serverResponse?.createUserInvitation.map((response) => {
+        if (response.__typename === 'ApiCreateError') {
+          return response;
+        }
+        return;
+      }) ?? null,
     [serverResponse]
   );
 
@@ -156,12 +158,21 @@ function InvitationForm({ onClose }: InvitationFormProps) {
         },
       },
       onCompleted: (result) => {
-        if (result.createUserInvitation.__typename === 'UserInvitation') {
-          onClose();
-        } else if (
-          result.createUserInvitation.__typename === 'ApiCreateError'
+        if (
+          !result.createUserInvitation.some(
+            (item) => item.__typename === 'ApiCreateError'
+          )
         ) {
-          // Set Errors
+          onClose();
+        } else {
+          result.createUserInvitation.forEach((item) => {
+            if (item.__typename === 'ApiCreateError') {
+              setError(item.field as keyof UserInvitationFormInputs, {
+                type: 'serverSide',
+                message: item.message,
+              });
+            }
+          });
         }
       },
       onError: (err) => {
@@ -184,10 +195,22 @@ function InvitationForm({ onClose }: InvitationFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {(apiCreateError?.errors?.some((err) => err.field === 'unknown') ||
-        (apiCreateError?.message && !apiCreateError?.errors)) && (
+      {apiCreateErrors?.some((err) => err?.field === 'unknown') && (
         <Box>
-          <Alert severity="error">{`${apiCreateError.message}. Please contact support or try again!`}</Alert>
+          <Alert severity="error">
+            Failed to complete this invitation. Please contact support or try
+            again!
+          </Alert>
+        </Box>
+      )}
+
+      {(errors.catchment_districts || errors.email_addresses) && (
+        <Box>
+          <Alert severity="error">
+            {errors.catchment_districts?.message ||
+              errors.email_addresses?.message}
+            . Please contact support or try again!`
+          </Alert>
         </Box>
       )}
 
@@ -204,6 +227,7 @@ function InvitationForm({ onClose }: InvitationFormProps) {
         maxRows={4}
         isValidTag={isValidTag(invitedEmails, existingOrganisationUserEmails)}
         register={register}
+        errors={errors}
       />
 
       <FormSelect
@@ -213,7 +237,7 @@ function InvitationForm({ onClose }: InvitationFormProps) {
         fullWidth
         label="Organisation Role"
         variant="outlined"
-        defaultValue="USER"
+        errors={errors}
       >
         {USER_ORGANISATION_ROLE_OPTIONS.filter(
           (op) => !['SUPPORT', 'OWNER'].includes(op)

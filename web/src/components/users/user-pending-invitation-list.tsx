@@ -31,7 +31,7 @@ const headCells: HeadCellType[] = [
     id: 'catchment_districts',
     numeric: false,
     disablePadding: true,
-    label: 'Districts',
+    label: 'User Districts',
   },
   {
     id: 'email_status',
@@ -44,12 +44,11 @@ const headCells: HeadCellType[] = [
 function UserPendingInvitationList() {
   const { rows } = useGetUserInvitations('cache-first');
 
-  const [deleteUserInvitation, { data, loading, error }] =
+  const [deleteUserInvitation, { data, loading: deleting, error }] =
     useDeleteUserInvitationMutation();
 
   const handleDelete = async (selectedItems: readonly string[]) => {
-    console.log('selected items to delete', selectedItems);
-    const operations = await Promise.all(
+    const operations = await Promise.allSettled(
       selectedItems.map((id) => {
         return deleteUserInvitation({
           variables: {
@@ -64,8 +63,6 @@ function UserPendingInvitationList() {
 
     console.log('operations', operations);
   };
-
-  console.log('server data after user invitation delete', data);
 
   return (
     <DataTable

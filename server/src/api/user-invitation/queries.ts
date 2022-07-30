@@ -37,12 +37,19 @@ async function createUserInvitation(
               disabled: true,
             },
           },
+          include: {
+            district: {
+              select: {
+                name: true,
+              },
+            },
+          },
         });
 
       if (disabled_catchment_districts?.length > 0) {
         return disabled_catchment_districts.map((item) => ({
           __typename: 'ApiCreateError',
-          message: `catchment district ${item.id} is disabled`,
+          message: `Catchment District ${item.district.name} is disabled`,
           field: 'catchment_districts',
           value: item.id,
         }));

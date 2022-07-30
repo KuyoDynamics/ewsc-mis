@@ -180,6 +180,8 @@ export type ApiBatchPayloadResult = ApiBatchPayload | ApiOperationError;
 export type ApiCreateError = ApiError & {
   __typename?: 'ApiCreateError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
@@ -826,6 +828,7 @@ export type ErrorField = {
   __typename?: 'ErrorField';
   field: Scalars['String'];
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type Indicator = {
@@ -970,7 +973,7 @@ export type Mutation = {
   setUserDefaultDistrict: DistrictUserResult;
   updateUserRolesForDistrict: DistrictUserResult;
   deleteDistrictUser: DistrictUserResult;
-  createUserInvitation: UserInvitationResult;
+  createUserInvitation: Array<UserInvitationResult>;
   deleteUserInvitation: UserInvitationResult;
   createResidence: ResidenceResult;
   updateResidence: ResidenceResult;
@@ -2509,7 +2512,7 @@ export type UserInvitation = {
   __typename?: 'UserInvitation';
   id: Scalars['ID'];
   ttl: Scalars['DateTime'];
-  email_addresses: Array<Scalars['EmailAddress']>;
+  email: Scalars['EmailAddress'];
   organisation_id: Scalars['String'];
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   invitation_token: Scalars['String'];
@@ -2671,7 +2674,7 @@ export type CreateUserInvitationMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: { __typename?: 'UserInvitation', id: string, catchment_district_ids?: Array<string> | null, email_addresses: Array<any>, invitation_token: string, organisation_id: string, ttl: any } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: Array<{ __typename?: 'UserInvitation', id: string, catchment_district_ids?: Array<string> | null, email: any, invitation_token: string, organisation_id: string, ttl: any } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' }> };
 
 export type DeleteUserInvitationMutationVariables = Exact<{
   input: DeleteUserInvitationInput;
@@ -2702,7 +2705,7 @@ export type GetUserInvitationsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', catchment_district_ids?: Array<string> | null, id: string, email_addresses: Array<any>, invitation_token: string, organisation_id: string, ttl: any }> | null };
+export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', id: string, organisation_id: string, email: any, catchment_district_ids?: Array<string> | null, invitation_token: string, ttl: any }> | null };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -2732,17 +2735,15 @@ export const CreateUserInvitationDocument = gql`
     ... on UserInvitation {
       id
       catchment_district_ids
-      email_addresses
+      email
       invitation_token
       organisation_id
       ttl
     }
     ... on ApiCreateError {
       message
-      errors {
-        field
-        message
-      }
+      field
+      value
     }
   }
 }
@@ -3010,12 +3011,14 @@ export type GetDefaultOrganisationUsersQueryResult = Apollo.QueryResult<GetDefau
 export const GetUserInvitationsDocument = gql`
     query getUserInvitations($args: SearchUserInvitationsInput!) {
   user_invitations(args: $args) {
-    catchment_district_ids
-    id
-    email_addresses
-    invitation_token
-    organisation_id
-    ttl
+    ... on UserInvitation {
+      id
+      organisation_id
+      email
+      catchment_district_ids
+      invitation_token
+      ttl
+    }
   }
 }
     `;
@@ -3166,9 +3169,11 @@ export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier
 export type ApiBatchPayloadFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiCreateErrorKeySpecifier = ('message' | 'errors' | ApiCreateErrorKeySpecifier)[];
+export type ApiCreateErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiCreateErrorKeySpecifier)[];
 export type ApiCreateErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type ApiDeleteErrorKeySpecifier = ('message' | 'errors' | ApiDeleteErrorKeySpecifier)[];
@@ -3368,10 +3373,11 @@ export type DistrictUserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ErrorFieldKeySpecifier = ('field' | 'message' | ErrorFieldKeySpecifier)[];
+export type ErrorFieldKeySpecifier = ('field' | 'message' | 'value' | ErrorFieldKeySpecifier)[];
 export type ErrorFieldFieldPolicy = {
 	field?: FieldPolicy<any> | FieldReadFunction<any>,
-	message?: FieldPolicy<any> | FieldReadFunction<any>
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type IndicatorKeySpecifier = ('id' | 'indicator_number' | 'description' | 'category' | 'type' | 'contributing_organisation' | 'report_template_id' | 'report_template' | 'indicator_unit_id' | 'indicator_unit' | 'indicator_organisations' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | IndicatorKeySpecifier)[];
 export type IndicatorFieldPolicy = {
@@ -3925,11 +3931,11 @@ export type UserDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email_addresses' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
+export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
 export type UserInvitationFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	ttl?: FieldPolicy<any> | FieldReadFunction<any>,
-	email_addresses?: FieldPolicy<any> | FieldReadFunction<any>,
+	email?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_district_ids?: FieldPolicy<any> | FieldReadFunction<any>,
 	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>

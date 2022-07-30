@@ -10,7 +10,8 @@
     "lib": ["ESNext"],
     "esModuleInterop": true,
     "moduleResolution": "Node",
-    "types": ["node"]
+    "types": ["node"],
+    "typeRoots": ["./global.d.ts"]
   },
   "exclude": ["node_modules"],
   "ts-node": {
