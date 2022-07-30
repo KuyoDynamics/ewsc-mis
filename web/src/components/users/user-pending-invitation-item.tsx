@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Chip, TableCell, Typography } from '@mui/material';
+import { Button, Chip, TableCell, Tooltip, Typography } from '@mui/material';
 import Badge, { BadgeProps } from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 
@@ -115,7 +115,11 @@ function UserPendingInvitationItem({
             : '---'}
         </Button>
       </TableCell>
-      <TableCell align={align}>{renderEmailStatus(email_status)}</TableCell>
+      <TableCell align={align}>
+        <Tooltip title={email_status.toString()}>
+          {renderEmailStatus(email_status)}
+        </Tooltip>
+      </TableCell>
     </>
   );
 }
