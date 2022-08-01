@@ -73,6 +73,9 @@ function UserList() {
         handleDelete={(dummy: any) =>
           console.log('nothing is being deleted', dummy)
         }
+        handleResend={(selectedItems: readonly string[]) =>
+          console.log('Nothing yet')
+        }
         tableActionButtonProps={{
           onClick: handleShowInvitationModal,
         }}

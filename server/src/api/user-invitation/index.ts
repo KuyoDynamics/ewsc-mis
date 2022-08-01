@@ -1,5 +1,6 @@
 import { gql } from 'apollo-server-express';
 import { Resolvers } from '../../libs/resolvers-types';
+import { sendInvitation } from '../../mailer';
 import {
   createUserInvitation,
   deleteUserInvitation,
@@ -27,6 +28,7 @@ const typeDefs = gql`
     createUserInvitation(
       input: CreateUserInvitationInput!
     ): [UserInvitationResult!]!
+    sendUserInvitationEmail(input: SendInvitationEmailInput!): Void
     deleteUserInvitation(
       input: DeleteUserInvitationInput!
     ): UserInvitationResult!
@@ -58,6 +60,12 @@ const typeDefs = gql`
     roles: [DistrictUserRoleType!]!
   }
 
+  input SendInvitationEmailInput {
+    email: String!
+    invitation_id: String!
+    organisation_name: String!
+  }
+
   union UserInvitationResult =
       UserInvitation
     | ApiNotFoundError
@@ -83,6 +91,14 @@ const resolvers: Resolvers = {
       createUserInvitation(args, context),
     deleteUserInvitation: (_, args, context) =>
       deleteUserInvitation(args, context),
+    sendUserInvitationEmail: (_, args, context) => {
+      sendInvitation(
+        args.input.email,
+        args.input.invitation_id,
+        args.input.organisation_name,
+        context
+      );
+    },
   },
   Subscription: {
     userInvitationUpdated: {

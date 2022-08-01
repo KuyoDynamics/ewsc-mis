@@ -1020,6 +1020,7 @@ export type Mutation = {
   login: LoginResult;
   requestPasswordReset: PasswordResetRequestResult;
   resetPassword: PasswordResetResult;
+  sendUserInvitationEmail?: Maybe<Scalars['Void']>;
   setUserDefaultDistrict: DistrictUserResult;
   setUserDefaultProject: OrganisationUserResult;
   updateCatchmentDistrict: CatchmentDistrictResult;
@@ -1407,6 +1408,11 @@ export type MutationRequestPasswordResetArgs = {
 
 export type MutationResetPasswordArgs = {
   input: PasswordResetInput;
+};
+
+
+export type MutationSendUserInvitationEmailArgs = {
+  input: SendInvitationEmailInput;
 };
 
 
@@ -2208,6 +2214,12 @@ export type SearchUserInvitationsInput = {
   organisation_id: Scalars['ID'];
 };
 
+export type SendInvitationEmailInput = {
+  email: Scalars['String'];
+  invitation_id: Scalars['String'];
+  organisation_name: Scalars['String'];
+};
+
 export type ServiceArea = {
   __typename?: 'ServiceArea';
   catchment_district: CatchmentDistrictResult;
@@ -2967,6 +2979,7 @@ export type ResolversTypes = ResolversObject<{
   RoutingNumber: ResolverTypeWrapper<Scalars['RoutingNumber']>;
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']>;
   SearchUserInvitationsInput: SearchUserInvitationsInput;
+  SendInvitationEmailInput: SendInvitationEmailInput;
   ServiceArea: ResolverTypeWrapper<Omit<ServiceArea, 'catchment_district' | 'residence'> & { catchment_district: ResolversTypes['CatchmentDistrictResult'], residence?: Maybe<ResolversTypes['ResidenceResult']> }>;
   ServiceAreaResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceArea'];
   ServiceAreaSewerConnection: ResolverTypeWrapper<Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversTypes['SewerNetworkResult']> }>;
@@ -3262,6 +3275,7 @@ export type ResolversParentTypes = ResolversObject<{
   RoutingNumber: Scalars['RoutingNumber'];
   SafeInt: Scalars['SafeInt'];
   SearchUserInvitationsInput: SearchUserInvitationsInput;
+  SendInvitationEmailInput: SendInvitationEmailInput;
   ServiceArea: Omit<ServiceArea, 'catchment_district' | 'residence'> & { catchment_district: ResolversParentTypes['CatchmentDistrictResult'], residence?: Maybe<ResolversParentTypes['ResidenceResult']> };
   ServiceAreaResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceArea'];
   ServiceAreaSewerConnection: Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversParentTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversParentTypes['SewerNetworkResult']> };
@@ -3901,6 +3915,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   login?: Resolver<ResolversTypes['LoginResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   requestPasswordReset?: Resolver<ResolversTypes['PasswordResetRequestResult'], ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
   resetPassword?: Resolver<ResolversTypes['PasswordResetResult'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'input'>>;
+  sendUserInvitationEmail?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType, RequireFields<MutationSendUserInvitationEmailArgs, 'input'>>;
   setUserDefaultDistrict?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultDistrictArgs, 'input'>>;
   setUserDefaultProject?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultProjectArgs, 'organisation_user_id'>>;
   updateCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;

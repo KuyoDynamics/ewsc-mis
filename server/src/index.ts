@@ -11,6 +11,7 @@ import { expressjwt } from 'express-jwt';
 import { schema } from './api/schema';
 import { createContext } from './utils';
 import { PubSub } from 'graphql-subscriptions';
+import { JwtPayload } from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -51,7 +52,7 @@ async function startApolloServer(
   const wsServerCleanup = useServer(
     {
       schema: gqlSchema,
-      context: (ctx, msg, args) => ({ pubSub }), // <-- SOLVES IT
+      context: (_ctx, _msg, _args) => createContext(null, prismaClient, pubSub), // <-- SOLVES IT
     },
     wsServer
   );

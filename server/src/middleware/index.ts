@@ -1,14 +1,10 @@
-// import { PubSub } from 'graphql-subscriptions';
-import { GraphQLContext } from '../utils';
+import { Organisation } from '@prisma/client';
 import {
   MutationCreateInvitedUserArgs,
-  UserInvitation,
   UserInvitationResult,
 } from '../libs/resolvers-types';
-import { sendEmail } from '../mailer';
-import { EmailStatus, Organisation } from '@prisma/client';
-
-// const pubSub = new PubSub();
+import { GraphQLContext } from '../utils';
+import { sendInvitation } from '../mailer';
 
 const deleteUserInvitationMiddleware = {
   Mutation: {
@@ -56,8 +52,6 @@ const sendInvitationEmailMiddleware = {
         info
       );
 
-      console.log('userInvitationResult', userInvitationResult);
-
       const userInvitation: UserInvitationResult | undefined =
         userInvitationResult.find(
           (item) => item.__typename === 'UserInvitation'
@@ -73,7 +67,7 @@ const sendInvitationEmailMiddleware = {
           });
         } catch (error) {
           console.log(
-            'Error occure before sending email to invited users',
+            'Error occured before sending email to invited users',
             error
           );
         }
@@ -81,48 +75,12 @@ const sendInvitationEmailMiddleware = {
 
       userInvitationResult.forEach(async (item) => {
         if (item.__typename === 'UserInvitation') {
-          try {
-            const url = `${process.env.HOST_URL}//signup?id=${item.id}`;
-            sendEmail(
-              organisation?.name ?? '',
-              item.email,
-              `${organisation?.name} MIS Invitation`,
-              `<p>To join and start using the ${organisation?.name} MIS, please click on the link below. If clicking does not work, copy the url and paste in the broswer:</p>
-              <br/>
-              <a href=${url}>${url}<a/>`,
-              async (err, information) => {
-                const emailStatus: EmailStatus = err
-                  ? EmailStatus.FAILED
-                  : information?.accepted?.indexOf(item.email) > -1
-                  ? EmailStatus.SENT
-                  : EmailStatus.REJECTED;
-                try {
-                  const result = await context.prisma.userInvitation.update({
-                    where: {
-                      id: item.id,
-                    },
-                    data: {
-                      email_status: emailStatus,
-                    },
-                  });
-
-                  context.pubSub.publish('USER_INVITATION_UPDATED', {
-                    userInvitationUpdated: result,
-                  });
-                } catch (error) {
-                  console.log(
-                    'Error during email sending. Failed to update Invitation Email Status:',
-                    error
-                  );
-                }
-              }
-            );
-          } catch (error) {
-            console.log(
-              'Error occured during sending email for UserInvitation',
-              error
-            );
-          }
+          await sendInvitation(
+            item.email,
+            item.id,
+            organisation?.name ?? '',
+            context
+          );
         }
       });
 

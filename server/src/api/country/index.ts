@@ -122,6 +122,7 @@ const typeDefs = gql`
   scalar JWT
   scalar Float
   scalar Byte
+  scalar Void
 `;
 
 const resolvers: Resolvers = {

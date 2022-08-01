@@ -983,6 +983,7 @@ export type Mutation = {
   updateUserRolesForDistrict: DistrictUserResult;
   deleteDistrictUser: DistrictUserResult;
   createUserInvitation: Array<UserInvitationResult>;
+  sendUserInvitationEmail?: Maybe<Scalars['Void']>;
   deleteUserInvitation: UserInvitationResult;
   createResidence: ResidenceResult;
   updateResidence: ResidenceResult;
@@ -1222,6 +1223,11 @@ export type MutationDeleteDistrictUserArgs = {
 
 export type MutationCreateUserInvitationArgs = {
   input: CreateUserInvitationInput;
+};
+
+
+export type MutationSendUserInvitationEmailArgs = {
+  input: SendInvitationEmailInput;
 };
 
 
@@ -2214,6 +2220,12 @@ export type SearchUserInvitationsInput = {
   catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
 };
 
+export type SendInvitationEmailInput = {
+  email: Scalars['String'];
+  invitation_id: Scalars['String'];
+  organisation_name: Scalars['String'];
+};
+
 export type ServiceArea = {
   __typename?: 'ServiceArea';
   id: Scalars['ID'];
@@ -2734,6 +2746,13 @@ export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]
 
 export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
 
+export type SendUserInvitationEmailMutationVariables = Exact<{
+  input: SendInvitationEmailInput;
+}>;
+
+
+export type SendUserInvitationEmailMutation = { __typename?: 'Mutation', sendUserInvitationEmail?: any | null };
+
 export type UpdateUserOrganisationRoleMutationVariables = Exact<{
   input: UpdateOrganisationUserInput;
 }>;
@@ -3158,6 +3177,37 @@ export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.Subs
       }
 export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
 export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
+export const SendUserInvitationEmailDocument = gql`
+    mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
+  sendUserInvitationEmail(input: $input)
+}
+    `;
+export type SendUserInvitationEmailMutationFn = Apollo.MutationFunction<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>;
+
+/**
+ * __useSendUserInvitationEmailMutation__
+ *
+ * To run a mutation, you first call `useSendUserInvitationEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendUserInvitationEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendUserInvitationEmailMutation, { data, loading, error }] = useSendUserInvitationEmailMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSendUserInvitationEmailMutation(baseOptions?: Apollo.MutationHookOptions<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>(SendUserInvitationEmailDocument, options);
+      }
+export type SendUserInvitationEmailMutationHookResult = ReturnType<typeof useSendUserInvitationEmailMutation>;
+export type SendUserInvitationEmailMutationResult = Apollo.MutationResult<SendUserInvitationEmailMutation>;
+export type SendUserInvitationEmailMutationOptions = Apollo.BaseMutationOptions<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>;
 export const UpdateUserOrganisationRoleDocument = gql`
     mutation UpdateUserOrganisationRole($input: UpdateOrganisationUserInput!) {
   updateOrganisationUser(input: $input) {
@@ -3507,7 +3557,7 @@ export type LoginSuccessFieldPolicy = {
 	accessToken?: FieldPolicy<any> | FieldReadFunction<any>,
 	id?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'resetPassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'setUserDefaultProject' | 'deleteOrganisationUser' | 'createDistrictUser' | 'setUserDefaultDistrict' | 'updateUserRolesForDistrict' | 'deleteDistrictUser' | 'createUserInvitation' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'resetPassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'setUserDefaultProject' | 'deleteOrganisationUser' | 'createDistrictUser' | 'setUserDefaultDistrict' | 'updateUserRolesForDistrict' | 'deleteDistrictUser' | 'createUserInvitation' | 'sendUserInvitationEmail' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
 	createCountry?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteCountry?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3544,6 +3594,7 @@ export type MutationFieldPolicy = {
 	updateUserRolesForDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteDistrictUser?: FieldPolicy<any> | FieldReadFunction<any>,
 	createUserInvitation?: FieldPolicy<any> | FieldReadFunction<any>,
+	sendUserInvitationEmail?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteUserInvitation?: FieldPolicy<any> | FieldReadFunction<any>,
 	createResidence?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateResidence?: FieldPolicy<any> | FieldReadFunction<any>,

@@ -7,6 +7,7 @@ import {
   GetUserInvitationsDocument,
   useDeleteUserInvitationMutation,
   useOnUserInvitationUpdatedSubscription,
+  useSendUserInvitationEmailMutation,
 } from '../../../graphql/generated';
 
 const headCells: HeadCellType[] = [
@@ -49,6 +50,8 @@ function UserPendingInvitationList() {
   const [deleteUserInvitation, { data, loading: deleting, error }] =
     useDeleteUserInvitationMutation();
 
+  const [sendUserInvitationEmail] = useSendUserInvitationEmailMutation();
+
   const handleDelete = async (selectedItems: readonly string[]) => {
     const operations = await Promise.allSettled(
       selectedItems.map((id) => {
@@ -64,6 +67,24 @@ function UserPendingInvitationList() {
     );
   };
 
+  // TODO: figure out how to send email and org name
+  const handleResend = async (selectedItems: readonly string[]) => {
+    const operations = await Promise.allSettled(
+      selectedItems.map((id) => {
+        return sendUserInvitationEmail({
+          variables: {
+            input: {
+              email: '',
+              organisation_name: '',
+              invitation_id: id,
+            },
+          },
+          // refetchQueries: [GetUserInvitationsDocument],
+        });
+      })
+    );
+  };
+
   return (
     <DataTable
       rows={rows}
@@ -71,6 +92,7 @@ function UserPendingInvitationList() {
       ItemComponent={UserPendingInvitationItem}
       toolBarTitle="Pending User Invitations"
       handleDelete={handleDelete}
+      handleResend={handleResend}
     />
   );
 }

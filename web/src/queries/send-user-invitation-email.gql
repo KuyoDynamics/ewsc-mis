@@ -1,0 +1,3 @@
+mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
+  sendUserInvitationEmail(input: $input)
+}

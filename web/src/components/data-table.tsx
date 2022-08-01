@@ -21,6 +21,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { AlignOption } from './users/user-pending-invitation-item';
+import {
+  CancelScheduleSend,
+  MailOutline,
+  ScheduleSend,
+} from '@mui/icons-material';
 
 export type TableDataType = Record<string, any>;
 
@@ -147,6 +152,7 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   title: string;
   handleDelete: () => void;
+  handleResend: () => void;
 }
 
 interface ITableActionButtonProps {
@@ -163,10 +169,11 @@ interface DataTableProps {
   TableActionButton?: React.ElementType;
   tableActionButtonProps?: ITableActionButtonProps;
   handleDelete: (selectedItems: readonly string[]) => void;
+  handleResend: (selectedItems: readonly string[]) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, title, handleDelete } = props;
+  const { numSelected, title, handleDelete, handleResend } = props;
 
   return (
     <Toolbar
@@ -202,9 +209,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title="Delete">
+        <Tooltip title="Resend Invite">
+          <IconButton onClick={handleResend} color="primary">
+            <ScheduleSend />
+          </IconButton>
+        </Tooltip>
+      ) : null}
+      {numSelected > 0 ? (
+        <Tooltip title="Cancel Invite">
           <IconButton onClick={handleDelete} color="error">
-            <DeleteIcon />
+            <CancelScheduleSend />
           </IconButton>
         </Tooltip>
       ) : (
@@ -228,6 +242,7 @@ function DataTable({
   TableActionButton,
   tableActionButtonProps,
   handleDelete,
+  handleResend,
 }: DataTableProps) {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof TableDataType>('name');
@@ -301,6 +316,7 @@ function DataTable({
           numSelected={selected.length}
           title={toolBarTitle}
           handleDelete={() => handleDelete(selected)}
+          handleResend={() => handleResend(selected)}
         />
         <TableContainer>
           <Table aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>

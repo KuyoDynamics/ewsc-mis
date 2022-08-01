@@ -37,13 +37,13 @@ type GraphQLContext = {
 };
 
 async function createContext(
-  req: JWTRequest,
+  req: JWTRequest | null,
   prismaClient: PrismaClient,
   pubSub: PubSub
 ): Promise<GraphQLContext> {
   let user;
   try {
-    if (!req.auth) {
+    if (!req?.auth) {
       user = null;
     } else {
       user = await prismaClient.user.findUnique({

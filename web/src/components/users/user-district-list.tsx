@@ -75,6 +75,9 @@ function UserDistrictList({
           handleDelete={(selectedItems: readonly string[]) =>
             console.log('Nothing yet', selectedItems)
           }
+          handleResend={(selectedItems: readonly string[]) =>
+            console.log('Nothing yet')
+          }
           align="left"
         />
       </DialogContent>
