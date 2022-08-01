@@ -1,7 +1,7 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-param-reassign */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
@@ -11,6 +11,7 @@ import {
   GridActionsCellItem,
   GridColumns,
   GridEventListener,
+  GridPreProcessEditCellProps,
   GridRenderEditCellParams,
   GridRowId,
   GridRowModel,
@@ -22,6 +23,7 @@ import {
   MuiEvent,
   useGridApiContext,
 } from '@mui/x-data-grid';
+import * as Yup from 'yup';
 
 import { randomId } from '@mui/x-data-grid-generator';
 import {
@@ -39,7 +41,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useReactiveVar } from '@apollo/client';
-import { USER_DISTRICT_ROLE_OPTIONS } from 'utils';
+import { getCatchmentDistricts, USER_DISTRICT_ROLE_OPTIONS } from 'utils';
 import { currentUserVar } from 'cache';
 import { CreateUserInvitationCatchmentDistrictInput } from '../../../graphql/generated';
 
@@ -141,11 +143,10 @@ function UserDistrictDataGrid({
 }: IUserDistrictDataGridProps) {
   const [rowModesModel, setRowModesModel] =
     React.useState<GridRowModesModel>(initialRowModesModel);
-  const [rows, setRows] = React.useState<GridRowsProp>(initialRows);
+  const [rows, setRows] = useState<GridRowsProp>(initialRows);
+  const [rowErrors, setRowErrors] = useState({ isPristine: true });
 
   const currentUser = useReactiveVar(currentUserVar);
-
-  console.log('currentUser in UserDistrictDataGrid', currentUser);
 
   const inviteCatchmentDistricts: CreateUserInvitationCatchmentDistrictInput[] =
     React.useMemo(
@@ -156,6 +157,17 @@ function UserDistrictDataGrid({
         })),
       [rows]
     );
+
+  const catchmentDistrictOptions: { label: string; value: string }[] =
+    React.useMemo(
+      () =>
+        getCatchmentDistricts(currentUser)?.map((item) => ({
+          label: item!.name,
+          value: item!.catchment_district_id,
+        })) ?? [],
+      [currentUser]
+    );
+
   const handleEditClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
@@ -205,12 +217,7 @@ function UserDistrictDataGrid({
       field: 'catchment_district_id',
       headerName: 'District',
       type: 'singleSelect',
-      valueOptions: currentUser.user_default_organisation?.user_districts
-        ? currentUser.user_default_organisation.user_districts.map((item) => ({
-            label: item.name,
-            value: item.catchment_district_id,
-          }))
-        : [],
+      valueOptions: catchmentDistrictOptions,
       valueFormatter: ({ value, field, api }) => {
         const colDef = api.getColumn(field);
 
@@ -224,6 +231,23 @@ function UserDistrictDataGrid({
       },
       width: 180,
       editable: true,
+      preProcessEditCellProps: (params: GridPreProcessEditCellProps) => {
+        let hasError: boolean = false;
+        try {
+          Yup.string()
+            .uuid('Invalid District')
+            .required('Catchment district is required')
+            .validateSync(params.props.value);
+        } catch (err) {
+          hasError = true;
+        }
+        setRowErrors({
+          ...rowErrors,
+          isPristine: false,
+          [params.id as string]: hasError,
+        });
+        return { ...params.props, error: hasError };
+      },
     },
     {
       field: 'roles',
@@ -248,6 +272,7 @@ function UserDistrictDataGrid({
         if (isInEditMode) {
           return [
             <GridActionsCellItem
+              disabled={Object.values(rowErrors).some((err) => err === true)}
               icon={<SaveIcon />}
               label="Save"
               onClick={handleSaveClick(id)}

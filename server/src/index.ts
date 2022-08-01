@@ -10,7 +10,7 @@ import dotenv from 'dotenv';
 import { expressjwt } from 'express-jwt';
 import { schema } from './api/schema';
 import { createContext } from './utils';
-import { sendEmail } from './mailer';
+import { PubSub } from 'graphql-subscriptions';
 
 const prisma = new PrismaClient();
 
@@ -32,26 +32,6 @@ async function startApolloServer(
 
   app.use(express.static('public'));
 
-  app.use('/sendEmail', async (req, resp) => {
-    try {
-      await sendEmail(
-        'EWSC',
-        'chaiwa.berian34@kim.com',
-        'EWSC-MIS Invitation',
-        '<a href="/api?id=12122">Click Here<a/>',
-        (err, info) => {
-          console.log('error in callback', err);
-          console.log('info in callback', info);
-        }
-      );
-
-      resp.send('Email sent');
-    } catch (error) {
-      console.log('Email error', error);
-      resp.send('Failed to send email');
-    }
-  });
-
   // Express global error handler
   app.use(function (_err: any, _req: any, _res: any, next: any) {
     next();
@@ -63,19 +43,28 @@ async function startApolloServer(
   // 2. Websocket Server
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/',
+    path: '/api',
   });
 
-  const wsServerCleanup = useServer({ schema: gqlSchema }, wsServer);
+  const pubSub = new PubSub();
+
+  const wsServerCleanup = useServer(
+    {
+      schema: gqlSchema,
+      context: (ctx, msg, args) => ({ pubSub }), // <-- SOLVES IT
+    },
+    wsServer
+  );
 
   // 3. Apollo Server
   const server = new ApolloServer({
     schema,
     context: ({ req }) => {
-      return createContext(req, prismaClient);
+      return createContext(req, prismaClient, pubSub);
     },
     introspection: true,
     csrfPrevention: true,
+    cache: 'bounded',
     plugins: [
       // Proper shutdown for the HTTP server.
       ApolloServerPluginDrainHttpServer({ httpServer }),

@@ -257,6 +257,7 @@ export type CatchmentDistrictUpdateInput = {
 
 export type CatchmentDistrictView = {
   __typename?: 'CatchmentDistrictView';
+  catchment_district_id: Scalars['String'];
   catchment_province?: Maybe<CatchmentProvinceView>;
   catchment_province_id: Scalars['String'];
   code: Scalars['String'];
@@ -302,6 +303,7 @@ export type CatchmentProvinceUpdateInput = {
 export type CatchmentProvinceView = {
   __typename?: 'CatchmentProvinceView';
   catchment_districts?: Maybe<Array<CatchmentDistrictView>>;
+  catchment_province_id: Scalars['String'];
   code: Scalars['String'];
   country?: Maybe<Country>;
   country_id: Scalars['String'];
@@ -2312,6 +2314,11 @@ export type SewerTreatmentPlantUpdateInput = {
   ponds: Scalars['Int'];
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  userInvitationUpdated: UserInvitation;
+};
+
 export type UpdateCatchmentDistrictInput = {
   id: Scalars['ID'];
   update: CatchmentDistrictUpdateInput;
@@ -2976,6 +2983,7 @@ export type ResolversTypes = ResolversObject<{
   SewerTreatmentPlantResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['SewerTreatmentPlant'];
   SewerTreatmentPlantUpdateInput: SewerTreatmentPlantUpdateInput;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Subscription: ResolverTypeWrapper<{}>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
   TimeZone: ResolverTypeWrapper<Scalars['TimeZone']>;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']>;
@@ -3270,6 +3278,7 @@ export type ResolversParentTypes = ResolversObject<{
   SewerTreatmentPlantResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['SewerTreatmentPlant'];
   SewerTreatmentPlantUpdateInput: SewerTreatmentPlantUpdateInput;
   String: Scalars['String'];
+  Subscription: {};
   Time: Scalars['Time'];
   TimeZone: Scalars['TimeZone'];
   Timestamp: Scalars['Timestamp'];
@@ -3425,6 +3434,7 @@ export type CatchmentDistrictResultResolvers<ContextType = GraphQLContext, Paren
 }>;
 
 export type CatchmentDistrictViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentDistrictView'] = ResolversParentTypes['CatchmentDistrictView']> = ResolversObject<{
+  catchment_district_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   catchment_province?: Resolver<Maybe<ResolversTypes['CatchmentProvinceView']>, ParentType, ContextType>;
   catchment_province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3468,6 +3478,7 @@ export type CatchmentProvinceResultResolvers<ContextType = GraphQLContext, Paren
 
 export type CatchmentProvinceViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentProvinceView'] = ResolversParentTypes['CatchmentProvinceView']> = ResolversObject<{
   catchment_districts?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrictView']>>, ParentType, ContextType>;
+  catchment_province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType>;
   country_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -4399,6 +4410,10 @@ export type SewerTreatmentPlantResultResolvers<ContextType = GraphQLContext, Par
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'SewerTreatmentPlant', ParentType, ContextType>;
 }>;
 
+export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
+  userInvitationUpdated?: SubscriptionResolver<ResolversTypes['UserInvitation'], "userInvitationUpdated", ParentType, ContextType>;
+}>;
+
 export interface TimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Time'], any> {
   name: 'Time';
 }
@@ -4755,6 +4770,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   SewerNetworkResult?: SewerNetworkResultResolvers<ContextType>;
   SewerTreatmentPlant?: SewerTreatmentPlantResolvers<ContextType>;
   SewerTreatmentPlantResult?: SewerTreatmentPlantResultResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
   Time?: GraphQLScalarType;
   TimeZone?: GraphQLScalarType;
   Timestamp?: GraphQLScalarType;

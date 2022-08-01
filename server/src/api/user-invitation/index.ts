@@ -32,6 +32,10 @@ const typeDefs = gql`
     ): UserInvitationResult!
   }
 
+  type Subscription {
+    userInvitationUpdated: UserInvitation!
+  }
+
   input DeleteUserInvitationInput {
     id: String!
   }
@@ -79,6 +83,15 @@ const resolvers: Resolvers = {
       createUserInvitation(args, context),
     deleteUserInvitation: (_, args, context) =>
       deleteUserInvitation(args, context),
+  },
+  Subscription: {
+    userInvitationUpdated: {
+      // Also apply withFilter to only subscribe to organisation user invitation updates
+      //@ts-ignore
+      subscribe: (_parent, _args, context) => {
+        return context.pubSub.asyncIterator(['USER_INVITATION_UPDATED']);
+      },
+    },
   },
 };
 

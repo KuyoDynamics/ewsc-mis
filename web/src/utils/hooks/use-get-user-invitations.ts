@@ -13,6 +13,7 @@ const useGetUserInvitations = (fetchPolicy: FetchPolicy) => {
         organisation_id: currentUser?.user_default_organisation?.id! || '',
       },
     },
+    // pollInterval: 500,
   });
 
   const rows = getUserInvitations(data?.user_invitations ?? []) ?? [];

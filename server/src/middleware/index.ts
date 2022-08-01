@@ -1,3 +1,4 @@
+// import { PubSub } from 'graphql-subscriptions';
 import { GraphQLContext } from '../utils';
 import {
   MutationCreateInvitedUserArgs,
@@ -6,6 +7,8 @@ import {
 } from '../libs/resolvers-types';
 import { sendEmail } from '../mailer';
 import { EmailStatus, Organisation } from '@prisma/client';
+
+// const pubSub = new PubSub();
 
 const deleteUserInvitationMiddleware = {
   Mutation: {
@@ -94,13 +97,17 @@ const sendInvitationEmailMiddleware = {
                   ? EmailStatus.SENT
                   : EmailStatus.REJECTED;
                 try {
-                  const _result = await context.prisma.userInvitation.update({
+                  const result = await context.prisma.userInvitation.update({
                     where: {
                       id: item.id,
                     },
                     data: {
                       email_status: emailStatus,
                     },
+                  });
+
+                  context.pubSub.publish('USER_INVITATION_UPDATED', {
+                    userInvitationUpdated: result,
                   });
                 } catch (error) {
                   console.log(

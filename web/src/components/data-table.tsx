@@ -100,7 +100,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
       onRequestSort(event, property);
     };
 
-  console.log('EnhancedTableHead: numSelected,rowCount', numSelected, rowCount);
   const sortOrderDescription =
     order === 'desc' ? 'sorted descending' : 'sorted ascending';
 
@@ -235,9 +234,6 @@ function DataTable({
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  console.log('Chaiwa, what is selected DataTable', selected);
-  console.log('Chaiwa, what is rows in DataTable', rows);
 
   const handleRequestSort = (
     _event: React.MouseEvent<unknown>,

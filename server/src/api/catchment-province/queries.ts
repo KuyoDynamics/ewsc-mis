@@ -42,6 +42,7 @@ async function resolveCatchmentProvinces(
     result?.catchment_provinces.map((cp) => ({
       ...cp.province,
       disabled: cp.disabled,
+      catchment_province_id: cp.id,
       organisation_id: cp.organisation_id,
     })) ?? null;
   return catchmentProvincesView as CatchmentProvinceView[];

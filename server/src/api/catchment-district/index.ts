@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createCatchmentDistrict,
   deleteCatchmentDistrict,
@@ -14,7 +14,7 @@ import {
   getDistrictUsers,
   getReports,
   getReportsByCatchmentDistrict,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type CatchmentDistrict {
@@ -46,6 +46,7 @@ const typeDefs = gql`
     residences: [Residence!]
 
     disabled: Boolean!
+    catchment_district_id: String!
     catchment_province_id: String!
     catchment_province: CatchmentProvinceView
     water_treatment_plants: [WaterTreatmentPlant!]
@@ -53,7 +54,6 @@ const typeDefs = gql`
     sewer_treatment_plants: [SewerTreatmentPlant!]
     reports: [Report!]
     district_users: [DistrictUser!]
-    
 
     created_at: DateTime!
     created_by: String!

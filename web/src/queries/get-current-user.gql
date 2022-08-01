@@ -52,6 +52,20 @@ query GetCurrentUser {
             code
           }
         }
+        catchment_provinces {
+          id
+          code
+          name
+          disabled
+          catchment_districts {
+            id
+            name
+            code
+            disabled
+            catchment_district_id
+            catchment_province_id
+          }
+        }
         country {
           code
           name

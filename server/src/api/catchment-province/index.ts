@@ -8,6 +8,7 @@ import {
   getCatchmentProvinces,
   getOrganisation,
   getProvince,
+  resolveCatchmentDistricts,
   updateCatchmentProvince,
 } from '../queries';
 
@@ -31,6 +32,7 @@ const typeDefs = gql`
     code: String!
     name: String!
     disabled: Boolean!
+    catchment_province_id: String!
     organisation_id: String!
     organisation: Organisation
     catchment_districts: [CatchmentDistrictView!]
@@ -108,9 +110,10 @@ const resolvers: Resolvers = {
     catchment_districts: ({ id }, _args, context) =>
       getCatchmentDistricts(id, context),
   },
-  // CatchmentProvinceView: {
-  //   catchment_districts: (parent, _args, context)=>
-  // }
+  CatchmentProvinceView: {
+    catchment_districts: (parent, _args, context) =>
+      resolveCatchmentDistricts(parent.catchment_province_id, context),
+  },
 };
 
 export {

@@ -3,13 +3,7 @@ import { Button, Chip, TableCell, Tooltip, Typography } from '@mui/material';
 import Badge, { BadgeProps } from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 
-import {
-  Check,
-  Error,
-  HourglassTop,
-  LocationCity,
-  Pending,
-} from '@mui/icons-material';
+import { Check, Error, HourglassTop, LocationCity } from '@mui/icons-material';
 import { getDateDiff } from 'utils';
 import {
   CatchmentDistrictInput,
@@ -108,7 +102,6 @@ function UserPendingInvitationItem({
           variant="text"
           size="small"
           endIcon={<LocationCity />}
-          //   onClick={handleModalOpen}
         >
           {catchment_districts
             ? `${catchment_districts.length} district(s)`

@@ -4,16 +4,20 @@ import { Alert, Fab, IconButton, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import useGetUserInvitations from 'utils/hooks/use-get-user-invitations';
+import { useOnUserInvitationUpdatedSubscription } from '../../../graphql/generated';
 
 interface IUserInvitationButtonProps {
   onClick: (event: any) => void;
 }
 function UserInvitationButton({ onClick }: IUserInvitationButtonProps) {
+  useOnUserInvitationUpdatedSubscription();
+
   const navigate = useNavigate();
 
   const { count } = useGetUserInvitations('network-only');
 
   const handleNavigate = () => navigate('/invitations');
+
   return (
     <>
       {count > 0 && (

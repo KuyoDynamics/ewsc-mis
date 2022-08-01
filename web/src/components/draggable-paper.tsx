@@ -9,7 +9,6 @@ interface IDraggablePaperProps {
 }
 
 function DraggablePaper({ handle, ...props }: IDraggablePaperProps) {
-  // console.log('handle,props', handle, props);
   return (
     <Draggable handle={handle} cancel={'[class*="MuiDialogContent-root"]'}>
       <Paper {...props} />

@@ -265,6 +265,7 @@ export type CatchmentDistrictView = {
   organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
   residences?: Maybe<Array<Residence>>;
   disabled: Scalars['Boolean'];
+  catchment_district_id: Scalars['String'];
   catchment_province_id: Scalars['String'];
   catchment_province?: Maybe<CatchmentProvinceView>;
   water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
@@ -305,6 +306,7 @@ export type CatchmentProvinceView = {
   code: Scalars['String'];
   name: Scalars['String'];
   disabled: Scalars['Boolean'];
+  catchment_province_id: Scalars['String'];
   organisation_id: Scalars['String'];
   organisation?: Maybe<Organisation>;
   catchment_districts?: Maybe<Array<CatchmentDistrictView>>;
@@ -2318,6 +2320,11 @@ export type SewerTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  userInvitationUpdated: UserInvitation;
+};
+
 export type UpdateCatchmentDistrictInput = {
   id: Scalars['ID'];
   update: CatchmentDistrictUpdateInput;
@@ -2701,7 +2708,7 @@ export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __ty
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, users?: Array<{ __typename?: 'OrganisationUserView', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, organisation_id: string, organisation_user_id: string, role: OrganisationUserRoleType, hashed_confirmation_token?: string | null, confirmed_at?: any | null, hashed_password_reset_token?: string | null, last_login?: any | null, theme: UserTheme }> | null, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, catchment_district_id: string, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, users?: Array<{ __typename?: 'OrganisationUserView', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, organisation_id: string, organisation_user_id: string, role: OrganisationUserRoleType, hashed_confirmation_token?: string | null, confirmed_at?: any | null, hashed_password_reset_token?: string | null, last_login?: any | null, theme: UserTheme }> | null, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, catchment_district_id: string, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, catchment_provinces?: Array<{ __typename?: 'CatchmentProvinceView', id: string, code: string, name: string, disabled: boolean, catchment_districts?: Array<{ __typename?: 'CatchmentDistrictView', id: string, name: string, code: string, disabled: boolean, catchment_district_id: string, catchment_province_id: string }> | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type GetDefaultOrganisationUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2721,6 +2728,11 @@ export type LoginMutationVariables = Exact<{
 
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken: any, id: string } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
+
+export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
 
 export type UpdateUserOrganisationRoleMutationVariables = Exact<{
   input: UpdateOrganisationUserInput;
@@ -2915,6 +2927,20 @@ export const GetCurrentUserDocument = gql`
             code
           }
         }
+        catchment_provinces {
+          id
+          code
+          name
+          disabled
+          catchment_districts {
+            id
+            name
+            code
+            disabled
+            catchment_district_id
+            catchment_province_id
+          }
+        }
         country {
           code
           name
@@ -3102,6 +3128,36 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const OnUserInvitationUpdatedDocument = gql`
+    subscription OnUserInvitationUpdated {
+  userInvitationUpdated {
+    id
+    email_status
+  }
+}
+    `;
+
+/**
+ * __useOnUserInvitationUpdatedSubscription__
+ *
+ * To run a query within a React component, call `useOnUserInvitationUpdatedSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useOnUserInvitationUpdatedSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOnUserInvitationUpdatedSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.SubscriptionHookOptions<OnUserInvitationUpdatedSubscription, OnUserInvitationUpdatedSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<OnUserInvitationUpdatedSubscription, OnUserInvitationUpdatedSubscriptionVariables>(OnUserInvitationUpdatedDocument, options);
+      }
+export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
+export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
 export const UpdateUserOrganisationRoleDocument = gql`
     mutation UpdateUserOrganisationRole($input: UpdateOrganisationUserInput!) {
   updateOrganisationUser(input: $input) {
@@ -3237,7 +3293,7 @@ export type CatchmentDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type CatchmentDistrictViewKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'organisations_in_district' | 'residences' | 'disabled' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'reports' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictViewKeySpecifier)[];
+export type CatchmentDistrictViewKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'organisations_in_district' | 'residences' | 'disabled' | 'catchment_district_id' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'reports' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictViewKeySpecifier)[];
 export type CatchmentDistrictViewFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3247,6 +3303,7 @@ export type CatchmentDistrictViewFieldPolicy = {
 	organisations_in_district?: FieldPolicy<any> | FieldReadFunction<any>,
 	residences?: FieldPolicy<any> | FieldReadFunction<any>,
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_province_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_province?: FieldPolicy<any> | FieldReadFunction<any>,
 	water_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3273,12 +3330,13 @@ export type CatchmentProvinceFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type CatchmentProvinceViewKeySpecifier = ('id' | 'code' | 'name' | 'disabled' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'country_id' | 'country' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceViewKeySpecifier)[];
+export type CatchmentProvinceViewKeySpecifier = ('id' | 'code' | 'name' | 'disabled' | 'catchment_province_id' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'country_id' | 'country' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceViewKeySpecifier)[];
 export type CatchmentProvinceViewFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	code?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_districts?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3882,6 +3940,10 @@ export type SewerTreatmentPlantFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type SubscriptionKeySpecifier = ('userInvitationUpdated' | SubscriptionKeySpecifier)[];
+export type SubscriptionFieldPolicy = {
+	userInvitationUpdated?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type UpdateSewerTreatmentPlantPayloadKeySpecifier = ('sewer_treatment_plant' | UpdateSewerTreatmentPlantPayloadKeySpecifier)[];
 export type UpdateSewerTreatmentPlantPayloadFieldPolicy = {
 	sewer_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
@@ -4236,6 +4298,10 @@ export type StrictTypedTypePolicies = {
 	SewerTreatmentPlant?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | SewerTreatmentPlantKeySpecifier | (() => undefined | SewerTreatmentPlantKeySpecifier),
 		fields?: SewerTreatmentPlantFieldPolicy,
+	},
+	Subscription?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | SubscriptionKeySpecifier | (() => undefined | SubscriptionKeySpecifier),
+		fields?: SubscriptionFieldPolicy,
 	},
 	UpdateSewerTreatmentPlantPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | UpdateSewerTreatmentPlantPayloadKeySpecifier | (() => undefined | UpdateSewerTreatmentPlantPayloadKeySpecifier),

@@ -4,6 +4,7 @@ import {
   CatchmentDistrictInput,
   DistrictUserRoleType,
   OrganisationUserRoleType,
+  User,
   UserInvitation,
 } from '../../graphql/generated';
 
@@ -46,6 +47,12 @@ function getUserInvitations(userInvitations: UserInvitation[]) {
   return rows;
 }
 
+function getCatchmentDistricts(currentUser: User) {
+  return currentUser.user_default_organisation?.catchment_provinces?.flatMap(
+    (cp) => cp.catchment_districts?.filter((district) => !district.disabled)
+  );
+}
+
 function getDateDiff(date1: Date, date2: Date) {
   return Math.round(
     (date1.getTime() - date2.getTime()) / (1000 * 60 * 60 * 24)
@@ -59,6 +66,7 @@ function isExpired(dateInMilliSeconds: number): boolean {
 export {
   getEnumKeys,
   getUserInvitations,
+  getCatchmentDistricts,
   getDateDiff,
   isExpired,
   USER_DISTRICT_ROLE_OPTIONS,

@@ -2,6 +2,7 @@ import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   CatchmentDistrict,
   CatchmentDistrictResult,
+  CatchmentDistrictView,
   MutationCreateCatchmentDistrictArgs,
   MutationDeleteCatchmentDistrictArgs,
   MutationUpdateCatchmentDistrictArgs,
@@ -20,7 +21,32 @@ async function getCatchmentDistricts(
     .catchment_districts();
 }
 
-async function resolveCatchmentDistricts(params: type) {}
+async function resolveCatchmentDistricts(
+  catchment_province_id: string,
+  context: GraphQLContext
+): Promise<CatchmentDistrictView[]> {
+  const result = await context.prisma.catchmentProvince.findUnique({
+    where: {
+      id: catchment_province_id,
+    },
+    include: {
+      catchment_districts: {
+        include: {
+          district: true,
+        },
+      },
+    },
+  });
+
+  const catchmentDistrictViews = result?.catchment_districts.map((cd) => ({
+    ...cd.district,
+    disabled: cd.disabled,
+    catchment_district_id: cd.id,
+    catchment_province_id: result.id,
+  }));
+
+  return catchmentDistrictViews as CatchmentDistrictView[];
+}
 
 async function getCatchmentDistrict(
   id: string,
@@ -135,4 +161,5 @@ export {
   createCatchmentDistrict,
   updateCatchmentDistrict,
   deleteCatchmentDistrict,
+  resolveCatchmentDistricts,
 };

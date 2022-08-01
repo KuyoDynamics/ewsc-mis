@@ -6,6 +6,7 @@ import useGetUserInvitations from 'utils/hooks/use-get-user-invitations';
 import {
   GetUserInvitationsDocument,
   useDeleteUserInvitationMutation,
+  useOnUserInvitationUpdatedSubscription,
 } from '../../../graphql/generated';
 
 const headCells: HeadCellType[] = [
@@ -42,7 +43,8 @@ const headCells: HeadCellType[] = [
 ];
 
 function UserPendingInvitationList() {
-  const { rows } = useGetUserInvitations('cache-first');
+  const { rows } = useGetUserInvitations('network-only');
+  useOnUserInvitationUpdatedSubscription();
 
   const [deleteUserInvitation, { data, loading: deleting, error }] =
     useDeleteUserInvitationMutation();
@@ -60,8 +62,6 @@ function UserPendingInvitationList() {
         });
       })
     );
-
-    console.log('operations', operations);
   };
 
   return (
@@ -71,10 +71,6 @@ function UserPendingInvitationList() {
       ItemComponent={UserPendingInvitationItem}
       toolBarTitle="Pending User Invitations"
       handleDelete={handleDelete}
-      // TableActionButton={UserInvitationButton}
-      // tableActionButtonProps={{
-      //   onClick: handleShowInvitationModal,
-      // }}
     />
   );
 }
