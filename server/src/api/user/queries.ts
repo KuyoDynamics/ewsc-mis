@@ -294,6 +294,8 @@ async function createInvitedUser(
         user_organisations: {
           create: {
             organisation_id,
+            is_default_organisation: true,
+            // Also add the Organisation Role
             created_by: context.user.email,
             last_modified_by: context.user.email,
             district_users: {
