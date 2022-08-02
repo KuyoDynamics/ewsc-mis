@@ -1,15 +1,15 @@
-import { AuthenticationError } from "apollo-server-core";
-import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
+import { AuthenticationError } from 'apollo-server-core';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 import {
   encryptPassword,
   isValidPassword,
   GraphQLContext,
   generateClientErrors,
   prepareDistrictUserRolesForCreate,
-} from "../../utils";
+} from '../../utils';
 import {
-  District,
+  CatchmentDistrictInput,
   DistrictResult,
   DistrictUser,
   LoginResult,
@@ -21,7 +21,7 @@ import {
   MutationRequestPasswordResetArgs,
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
-  OrganisationUser,
+  OrganisationUserRoleType,
   PasswordResetRequestResult,
   PasswordResetResult,
   QueryDefault_User_DistrictArgs,
@@ -29,7 +29,7 @@ import {
   User,
   UserOrganisation,
   UserResult,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 
 async function getUsers(context: GraphQLContext): Promise<User[]> {
   const result = await context.prisma.user.findMany({});
@@ -50,18 +50,18 @@ async function getUser(
 
     if (!user) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The User with the id ${args.id} does not exist.`,
       };
     }
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...user,
     } as User;
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find User with the id ${args.id}.`,
       errors: generateClientErrors(error),
     };
@@ -130,7 +130,7 @@ async function getDefaultUserDistrict(
 
     if (!district) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The Default District not found for organisation_user_id ${{
           user_id: args.user_id,
           user_organisation_id: args.organisation_user_id,
@@ -139,12 +139,12 @@ async function getDefaultUserDistrict(
     }
 
     return {
-      __typename: "District",
+      __typename: 'District',
       ...district,
     };
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find Default District for organisation_user_id ${{
         user_id: args.user_id,
         user_organisation_id: args.organisation_user_id,
@@ -154,37 +154,33 @@ async function getDefaultUserDistrict(
   }
 }
 
-
-
 async function getUserOrganisations(
   user_id: string,
   context: GraphQLContext
 ): Promise<UserOrganisation[]> {
-  const result = await context.prisma.user
-    .findUnique({
-      where: {
-        id: user_id,
+  const result = await context.prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+    select: {
+      id: true,
+      user_organisations: {
+        select: {
+          is_default_organisation: true,
+          role: true,
+          organisation: true,
+        },
       },
-      select:{
-        id: true,
-        user_organisations: {
-          select: {
-            is_default_organisation: true,
-            role: true,
-            organisation: true,
-          }
-        }
-      }
-    })
+    },
+  });
 
-const user_orgs = result?.user_organisations.flatMap(user_org=>(
-  {
-    ...user_org.organisation, 
-    user_id: result.id, 
-    is_user_default_organisation: user_org.is_default_organisation, 
-    user_organisation_role: user_org.role
+  const user_orgs = result?.user_organisations.flatMap((user_org) => ({
+    ...user_org.organisation,
+    user_id: result.id,
+    is_user_default_organisation: user_org.is_default_organisation,
+    user_organisation_role: user_org.role,
   }));
-    
+
   return user_orgs as UserOrganisation[];
 }
 
@@ -199,75 +195,94 @@ async function createUser(
         first_name: args.input.first_name,
         last_name: args.input.last_name,
         password: await encryptPassword(args.input.password),
-        created_by: context.user.email,
-        last_modified_by: context.user.email,
+        created_by: context.user?.email || 'system@kuyodynamics.com',
+        last_modified_by: context.user?.email || 'system@kuyodynamics.com',
       },
     });
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...user,
     } as UserResult;
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create User.`,
       errors: generateClientErrors(error),
     };
   }
 }
 
+type InvitationPayloadType = {
+  email: string;
+  organisation_role: string;
+  catchment_districts?: CatchmentDistrictInput[];
+} & JwtPayload;
+
 async function createInvitedUser(
   args: MutationCreateInvitedUserArgs,
   context: GraphQLContext
 ): Promise<UserResult> {
   try {
-    const { email, first_name, last_name, password } = args.input.user_details;
-    const { catchment_districts, organisation_id } = args.input;
+    const { email, first_name, last_name, password, user_invitation_id } =
+      args.input;
 
     const user_invitation = await context.prisma.userInvitation.findUnique({
       where: {
-        id: args.input.user_invitation_id,
+        id: user_invitation_id,
       },
     });
 
     if (!user_invitation) {
       return {
-        __typename: "ApiCreateError",
-        message: `Failed to create User because we do not recognise the invitation or it expited.${catchment_districts.map(
-          (item) => item.catchment_district_id
-        )}`,
+        __typename: 'ApiCreateError',
+        message:
+          'Failed to create User because we do not recognise the invitation or it expited',
       };
     }
 
-    const invited_by = jwt.decode(user_invitation.invitation_token);
+    const payload = jwt.decode(
+      user_invitation.invitation_token
+    ) as InvitationPayloadType;
+
+    if (payload.email !== email) {
+      return {
+        __typename: 'ApiCreateError',
+        message: `Failed to create User because we do not recognise the invitation for this email:${email}`,
+      };
+    }
 
     const disabled_catchment_districts =
       await context.prisma.catchmentDistrict.findMany({
         where: {
           AND: {
             id: {
-              in: catchment_districts.map((item) => item.catchment_district_id),
+              in: user_invitation.catchment_district_ids.map((id) => id),
             },
             disabled: true,
           },
         },
+        include: {
+          district: true,
+        },
       });
 
-    if (disabled_catchment_districts) {
+    console.log('disabled_catchment_districts', disabled_catchment_districts);
+
+    if (disabled_catchment_districts?.length > 0) {
       return {
-        __typename: "ApiCreateError",
-        message: `Failed to create User because the following catchment districts are disabled.${catchment_districts.map(
-          (item) => item.catchment_district_id
+        __typename: 'ApiCreateError',
+        message: `Failed to create User because the following catchment districts are disabled.${disabled_catchment_districts.map(
+          (item) => item.district.name
         )}`,
       };
     }
 
-    const user_districts = catchment_districts.map((item) => ({
+    const user_districts = payload.catchment_districts?.map((item) => ({
       roles: prepareDistrictUserRolesForCreate(item.roles),
       catchment_district_id: item.catchment_district_id,
-      created_by: invited_by as string,
-      last_modified_by: invited_by as string,
+      created_by: context.user.email,
+      last_modified_by: context.user.email,
     }));
 
     const user = await context.prisma.user.create({
@@ -277,16 +292,19 @@ async function createInvitedUser(
         email,
         password: await encryptPassword(password),
         // master_support: false,
-        created_by: invited_by as string,
-        last_modified_by: invited_by as string,
+        created_by: context.user.email,
+        last_modified_by: context.user.email,
         user_organisations: {
           create: {
-            organisation_id,
-            created_by: invited_by as string,
-            last_modified_by: invited_by as string,
+            organisation_id: user_invitation.organisation_id,
+            is_default_organisation: true,
+            // Also add the Organisation Role
+            role: payload.organisation_role as OrganisationUserRoleType,
+            created_by: context.user.email,
+            last_modified_by: context.user.email,
             district_users: {
               createMany: {
-                data: user_districts,
+                data: user_districts!,
                 skipDuplicates: true,
               },
             },
@@ -296,12 +314,12 @@ async function createInvitedUser(
     });
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...user,
     } as UserResult;
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create User.`,
       errors: generateClientErrors(error),
     };
@@ -326,14 +344,14 @@ async function updateUser(
     });
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...user,
     } as UserResult;
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update User with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -350,14 +368,14 @@ async function deleteUser(
     });
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...user,
     } as UserResult;
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete User with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -378,14 +396,14 @@ async function disableUser(
     });
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...user,
     } as UserResult;
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to disable/enable User with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -403,27 +421,27 @@ async function login(
     });
 
     if (!user)
-      throw new AuthenticationError("No account found for this email.", {
-        field: "email",
+      throw new AuthenticationError('No account found for this email.', {
+        field: 'email',
       });
 
     if (user.disabled)
-      throw new AuthenticationError("Account is disabled.", { field: "email" });
+      throw new AuthenticationError('Account is disabled.', { field: 'email' });
 
     if (!(await isValidPassword(args.input.password, user.password)))
-      throw new AuthenticationError("Invalid password.", { field: "password" });
+      throw new AuthenticationError('Invalid password.', { field: 'password' });
 
     try {
       accessToken = jwt.sign({}, process.env.JWT_SECRET!, {
-        algorithm: "HS256",
+        algorithm: 'HS256',
         subject: user.id,
-        expiresIn: "1d",
+        expiresIn: '1d',
       });
     } catch (error) {
-      console.log("Failed to generate access token.", error);
+      console.log('Failed to generate access token.', error);
       // Also send to Sentry
-      throw new AuthenticationError("Failed to generate access token.", {
-        field: "email",
+      throw new AuthenticationError('Failed to generate access token.', {
+        field: 'email',
       });
     }
 
@@ -436,19 +454,19 @@ async function login(
       },
     });
     return {
-      __typename: "LoginSuccess",
+      __typename: 'LoginSuccess',
       accessToken,
       id: user.id,
     };
   } catch (error) {
     return {
-      __typename: "ApiLoginError",
-      message: "Login Failed.",
+      __typename: 'ApiLoginError',
+      message: 'Login Failed.',
       errors: generateClientErrors(
         error,
         error instanceof AuthenticationError
           ? error.extensions.field
-          : "email,password"
+          : 'email,password'
       ),
     };
   }
@@ -467,9 +485,9 @@ async function requestPasswordReset(
     });
 
     if (!user)
-      throw new AuthenticationError("Account with this email does not exit.");
+      throw new AuthenticationError('Account with this email does not exit.');
 
-    if (user.disabled) throw new AuthenticationError("Account is disabled.");
+    if (user.disabled) throw new AuthenticationError('Account is disabled.');
 
     hashed_password_reset_token = uuidv4();
 
@@ -486,14 +504,14 @@ async function requestPasswordReset(
     // We can send email at this point like this, async. After we figure out sending emails, we will not return
     // Email.password_recovery_email(user, token) |> Mailer.deliver_later()
     return {
-      __typename: "PasswordResetRequestPayload",
+      __typename: 'PasswordResetRequestPayload',
       hashed_password_reset_token,
     };
   } catch (error) {
     return {
-      __typename: "ApiPasswordResetError",
-      message: "Password Reset Request Failed.",
-      errors: generateClientErrors(error, "email,password"),
+      __typename: 'ApiPasswordResetError',
+      message: 'Password Reset Request Failed.',
+      errors: generateClientErrors(error, 'email,password'),
     };
   }
 }
@@ -509,9 +527,9 @@ async function resetPassword(
       },
     });
 
-    if (!user) throw new AuthenticationError("Invalid password reset link.");
+    if (!user) throw new AuthenticationError('Invalid password reset link.');
 
-    if (user.disabled) throw new AuthenticationError("Account is disabled.");
+    if (user.disabled) throw new AuthenticationError('Account is disabled.');
 
     const updatedUser = await context.prisma.user.update({
       where: {
@@ -519,20 +537,20 @@ async function resetPassword(
       },
       data: {
         password: await encryptPassword(args.input.password),
-        hashed_password_reset_token: "",
+        hashed_password_reset_token: '',
         last_modified_by: user.email,
       },
     });
 
     return {
-      __typename: "User",
+      __typename: 'User',
       ...updatedUser,
     } as PasswordResetResult;
   } catch (error) {
     return {
-      __typename: "ApiPasswordResetError",
-      message: "Password Reset Failed.",
-      errors: generateClientErrors(error, "email"),
+      __typename: 'ApiPasswordResetError',
+      message: 'Password Reset Failed.',
+      errors: generateClientErrors(error, 'email'),
     };
   }
 }

@@ -1,0 +1,6 @@
+subscription OnUserInvitationUpdated {
+  userInvitationUpdated {
+    id
+    email_status
+  }
+}

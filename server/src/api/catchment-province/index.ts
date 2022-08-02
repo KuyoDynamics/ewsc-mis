@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createCatchmentProvince,
   deleteCatchmentProvince,
@@ -8,8 +8,9 @@ import {
   getCatchmentProvinces,
   getOrganisation,
   getProvince,
+  resolveCatchmentDistricts,
   updateCatchmentProvince,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type CatchmentProvince {
@@ -26,11 +27,12 @@ const typeDefs = gql`
     last_modified_by: String
   }
 
-  type CatchmentProvinceView{
+  type CatchmentProvinceView {
     id: ID!
     code: String!
     name: String!
     disabled: Boolean!
+    catchment_province_id: String!
     organisation_id: String!
     organisation: Organisation
     catchment_districts: [CatchmentDistrictView!]
@@ -107,6 +109,10 @@ const resolvers: Resolvers = {
       getOrganisation(organisation_id, context),
     catchment_districts: ({ id }, _args, context) =>
       getCatchmentDistricts(id, context),
+  },
+  CatchmentProvinceView: {
+    catchment_districts: (parent, _args, context) =>
+      resolveCatchmentDistricts(parent.catchment_province_id, context),
   },
 };
 

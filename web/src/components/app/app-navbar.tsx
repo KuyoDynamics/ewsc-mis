@@ -9,25 +9,24 @@ import {
   Tooltip,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import { Bell as BellIcon } from 'icons';
 import theme from 'theme';
 import UserMenu from 'components/account/user-menu';
 
-const DashboardNavbarRoot = styled(AppBar)({
+const AppNavbarRoot = styled(AppBar)({
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows instanceof Array ? theme.shadows[3] : undefined,
 });
 
-type DashboardNavbarProps = {
+type AppNavbarProps = {
   onSidebarOpen: (event: any) => void;
 };
 
-function DashboardNavbar(props: DashboardNavbarProps) {
+function AppNavbar(props: AppNavbarProps) {
   const { onSidebarOpen } = props;
 
   return (
-    <DashboardNavbarRoot
+    <AppNavbarRoot
       sx={{
         left: {
           lg: 280,
@@ -56,11 +55,6 @@ function DashboardNavbar(props: DashboardNavbarProps) {
         >
           <MenuIcon fontSize="small" />
         </IconButton>
-        <Tooltip title="Search">
-          <IconButton sx={{ ml: 1 }}>
-            <SearchIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
         <Box sx={{ flexGrow: 1 }} />
         <Tooltip title="Notifications">
           <IconButton sx={{ ml: 1 }}>
@@ -71,8 +65,8 @@ function DashboardNavbar(props: DashboardNavbarProps) {
         </Tooltip>
         <UserMenu />
       </Toolbar>
-    </DashboardNavbarRoot>
+    </AppNavbarRoot>
   );
 }
 
-export default DashboardNavbar;
+export default AppNavbar;

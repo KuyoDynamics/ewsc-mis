@@ -44,13 +44,11 @@ async function resolveCountry(
   id: string,
   context: GraphQLContext
 ): Promise<Country | null> {
-  console.log('what is country id', id);
   const country = await context.prisma.country.findUnique({
     where: {
       id,
     },
   });
-  console.log('country', country);
   return country;
 }
 

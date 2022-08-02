@@ -1,11 +1,14 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { EmailStatus } from '@prisma/client';
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
+import { sendInvitation } from '../../mailer';
 import {
   createUserInvitation,
   deleteUserInvitation,
   getUserInvitation,
   getUserInvitations,
-} from "./queries";
+  sendUserInvitationEmail,
+} from './queries';
 
 const typeDefs = gql`
   type UserInvitation {
@@ -15,6 +18,7 @@ const typeDefs = gql`
     organisation_id: String!
     catchment_district_ids: [String!]
     invitation_token: String!
+    email_status: EmailStatus!
   }
 
   extend type Query {
@@ -25,10 +29,17 @@ const typeDefs = gql`
   extend type Mutation {
     createUserInvitation(
       input: CreateUserInvitationInput!
+    ): [UserInvitationResult!]!
+    sendUserInvitationEmail(
+      input: SendInvitationEmailInput!
     ): UserInvitationResult!
     deleteUserInvitation(
       input: DeleteUserInvitationInput!
     ): UserInvitationResult!
+  }
+
+  type Subscription {
+    userInvitationUpdated: UserInvitation!
   }
 
   input DeleteUserInvitationInput {
@@ -36,22 +47,27 @@ const typeDefs = gql`
   }
 
   input SearchUserInvitationsInput {
-    email: EmailAddress
-    organisation_id: ID
+    email_addresses: [EmailAddress!]
+    organisation_id: ID!
     catchment_district_ids: [ID!]
   }
 
   input CreateUserInvitationInput {
-    email: EmailAddress!
+    email_addresses: [EmailAddress!]!
     organisation_id: ID!
     organisation_role: OrganisationUserRoleType!
-    catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]!
-    invited_by: EmailAddress!
+    catchment_districts: [CreateUserInvitationCatchmentDistrictInput!]
   }
 
   input CreateUserInvitationCatchmentDistrictInput {
     catchment_district_id: ID!
     roles: [DistrictUserRoleType!]!
+  }
+
+  input SendInvitationEmailInput {
+    email: String!
+    invitation_id: String!
+    organisation_name: String!
   }
 
   union UserInvitationResult =
@@ -60,6 +76,13 @@ const typeDefs = gql`
     | ApiCreateError
     | ApiUpdateError
     | ApiDeleteError
+
+  enum EmailStatus {
+    SENT
+    REJECTED
+    FAILED
+    PENDING
+  }
 `;
 
 const resolvers: Resolvers = {
@@ -72,6 +95,17 @@ const resolvers: Resolvers = {
       createUserInvitation(args, context),
     deleteUserInvitation: (_, args, context) =>
       deleteUserInvitation(args, context),
+    sendUserInvitationEmail: (_, args, context) =>
+      sendUserInvitationEmail(args, context),
+  },
+  Subscription: {
+    userInvitationUpdated: {
+      // Also apply withFilter to only subscribe to organisation user invitation updates
+      //@ts-ignore
+      subscribe: (_parent, _args, context) => {
+        return context.pubSub.asyncIterator(['USER_INVITATION_UPDATED']);
+      },
+    },
   },
 };
 

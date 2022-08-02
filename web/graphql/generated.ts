@@ -180,6 +180,8 @@ export type ApiBatchPayloadResult = ApiBatchPayload | ApiOperationError;
 export type ApiCreateError = ApiError & {
   __typename?: 'ApiCreateError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
@@ -263,6 +265,7 @@ export type CatchmentDistrictView = {
   organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
   residences?: Maybe<Array<Residence>>;
   disabled: Scalars['Boolean'];
+  catchment_district_id: Scalars['String'];
   catchment_province_id: Scalars['String'];
   catchment_province?: Maybe<CatchmentProvinceView>;
   water_treatment_plants?: Maybe<Array<WaterTreatmentPlant>>;
@@ -303,6 +306,7 @@ export type CatchmentProvinceView = {
   code: Scalars['String'];
   name: Scalars['String'];
   disabled: Scalars['Boolean'];
+  catchment_province_id: Scalars['String'];
   organisation_id: Scalars['String'];
   organisation?: Maybe<Organisation>;
   catchment_districts?: Maybe<Array<CatchmentDistrictView>>;
@@ -420,9 +424,10 @@ export type CreateIndicatorUnitInput = {
 
 export type CreateInvitedUserInput = {
   user_invitation_id: Scalars['ID'];
-  organisation_id: Scalars['ID'];
-  catchment_districts: Array<CatchmentDistrictInput>;
-  user_details: CreateUserInput;
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type CreateOptionInput = {
@@ -549,11 +554,10 @@ export type CreateUserInvitationCatchmentDistrictInput = {
 };
 
 export type CreateUserInvitationInput = {
-  email: Scalars['EmailAddress'];
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id: Scalars['ID'];
   organisation_role: OrganisationUserRoleType;
-  catchment_districts: Array<CreateUserInvitationCatchmentDistrictInput>;
-  invited_by: Scalars['EmailAddress'];
+  catchment_districts?: InputMaybe<Array<CreateUserInvitationCatchmentDistrictInput>>;
 };
 
 export type CreateWaterNetworkInput = {
@@ -823,10 +827,18 @@ export enum DistrictUserRoleType {
   User = 'USER'
 }
 
+export enum EmailStatus {
+  Sent = 'SENT',
+  Rejected = 'REJECTED',
+  Failed = 'FAILED',
+  Pending = 'PENDING'
+}
+
 export type ErrorField = {
   __typename?: 'ErrorField';
   field: Scalars['String'];
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type Indicator = {
@@ -971,7 +983,8 @@ export type Mutation = {
   setUserDefaultDistrict: DistrictUserResult;
   updateUserRolesForDistrict: DistrictUserResult;
   deleteDistrictUser: DistrictUserResult;
-  createUserInvitation: UserInvitationResult;
+  createUserInvitation: Array<UserInvitationResult>;
+  sendUserInvitationEmail: UserInvitationResult;
   deleteUserInvitation: UserInvitationResult;
   createResidence: ResidenceResult;
   updateResidence: ResidenceResult;
@@ -1211,6 +1224,11 @@ export type MutationDeleteDistrictUserArgs = {
 
 export type MutationCreateUserInvitationArgs = {
   input: CreateUserInvitationInput;
+};
+
+
+export type MutationSendUserInvitationEmailArgs = {
+  input: SendInvitationEmailInput;
 };
 
 
@@ -1693,6 +1711,7 @@ export type OrganisationUserView = {
   master_support: Scalars['Boolean'];
   organisation_id: Scalars['String'];
   organisation?: Maybe<UserOrganisation>;
+  organisation_user_id: Scalars['String'];
   role: OrganisationUserRoleType;
   user_organisations?: Maybe<Array<UserOrganisation>>;
   user_districts?: Maybe<Array<UserDistrict>>;
@@ -1700,7 +1719,7 @@ export type OrganisationUserView = {
   confirmed_at?: Maybe<Scalars['DateTime']>;
   hashed_password_reset_token?: Maybe<Scalars['String']>;
   last_login?: Maybe<Scalars['DateTime']>;
-  theme?: Maybe<UserTheme>;
+  theme: UserTheme;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   last_modified_at: Scalars['DateTime'];
@@ -2197,9 +2216,15 @@ export type ResidenceUpdateInput = {
 };
 
 export type SearchUserInvitationsInput = {
-  email?: InputMaybe<Scalars['EmailAddress']>;
-  organisation_id?: InputMaybe<Scalars['ID']>;
+  email_addresses?: InputMaybe<Array<Scalars['EmailAddress']>>;
+  organisation_id: Scalars['ID'];
   catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
+};
+
+export type SendInvitationEmailInput = {
+  email: Scalars['String'];
+  invitation_id: Scalars['String'];
+  organisation_name: Scalars['String'];
 };
 
 export type ServiceArea = {
@@ -2306,6 +2331,11 @@ export type SewerTreatmentPlantUpdateInput = {
   ponds: Scalars['Int'];
   capacity: Scalars['Float'];
   gps?: InputMaybe<Scalars['String']>;
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  userInvitationUpdated: UserInvitation;
 };
 
 export type UpdateCatchmentDistrictInput = {
@@ -2487,9 +2517,11 @@ export type UserDistrict = {
   code: Scalars['String'];
   user_id: Scalars['ID'];
   user?: Maybe<User>;
+  catchment_district_id: Scalars['ID'];
   organisation_id: Scalars['ID'];
   organisation?: Maybe<UserOrganisation>;
   is_default_user_district: Scalars['Boolean'];
+  district_user_id: Scalars['ID'];
   disabled: Scalars['Boolean'];
   user_district_roles: Array<DistrictUserRoleType>;
   province_id: Scalars['String'];
@@ -2511,6 +2543,7 @@ export type UserInvitation = {
   organisation_id: Scalars['String'];
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   invitation_token: Scalars['String'];
+  email_status: EmailStatus;
 };
 
 export type UserInvitationResult = UserInvitation | ApiNotFoundError | ApiCreateError | ApiUpdateError | ApiDeleteError;
@@ -2664,10 +2697,50 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type CreateInvitedUserMutationVariables = Exact<{
+  input: CreateInvitedUserInput;
+}>;
+
+
+export type CreateInvitedUserMutation = { __typename?: 'Mutation', createInvitedUser: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, theme?: UserTheme | null, created_at: any, created_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type CreateUserInvitationMutationVariables = Exact<{
+  input: CreateUserInvitationInput;
+}>;
+
+
+export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: Array<{ __typename?: 'UserInvitation', id: string, catchment_district_ids?: Array<string> | null, email: any, invitation_token: string, organisation_id: string, ttl: any } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' }> };
+
+export type DeleteUserInvitationMutationVariables = Exact<{
+  input: DeleteUserInvitationInput;
+}>;
+
+
+export type DeleteUserInvitationMutation = { __typename?: 'Mutation', deleteUserInvitation: { __typename?: 'UserInvitation', id: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
+
+export type DisableUserMutationVariables = Exact<{
+  input: DisableUserInput;
+}>;
+
+
+export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __typename?: 'User', id: string, disabled: boolean } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, users?: Array<{ __typename?: 'OrganisationUserView', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, organisation_id: string, organisation_user_id: string, role: OrganisationUserRoleType, hashed_confirmation_token?: string | null, confirmed_at?: any | null, hashed_password_reset_token?: string | null, last_login?: any | null, theme: UserTheme }> | null, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, catchment_district_id: string, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, catchment_provinces?: Array<{ __typename?: 'CatchmentProvinceView', id: string, code: string, name: string, disabled: boolean, catchment_districts?: Array<{ __typename?: 'CatchmentDistrictView', id: string, name: string, code: string, disabled: boolean, catchment_district_id: string, catchment_province_id: string }> | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetDefaultOrganisationUsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDefaultOrganisationUsersQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, users?: Array<{ __typename?: 'OrganisationUserView', id: string, organisation_user_id: string, last_name: string, first_name: string, email: string, master_support: boolean, disabled: boolean, role: OrganisationUserRoleType, theme: UserTheme, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, code: string, name: string, disabled: boolean, is_default_user_district: boolean, district_user_id: string, catchment_district_id: string, user_district_roles: Array<DistrictUserRoleType>, province?: { __typename?: 'Province', id: string, name: string } | null }> | null }> | null } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetUserInvitationsQueryVariables = Exact<{
+  args: SearchUserInvitationsInput;
+}>;
+
+
+export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', id: string, organisation_id: string, email: any, catchment_district_ids?: Array<string> | null, invitation_token: string, ttl: any, email_status: EmailStatus }> | null };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -2676,7 +2749,209 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken: any, id: string } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
 
+export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
+
+export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
+
+export type SendUserInvitationEmailMutationVariables = Exact<{
+  input: SendInvitationEmailInput;
+}>;
+
+
+export type SendUserInvitationEmailMutation = { __typename?: 'Mutation', sendUserInvitationEmail: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string } | { __typename?: 'ApiDeleteError' } };
+
+export type UpdateUserOrganisationRoleMutationVariables = Exact<{
+  input: UpdateOrganisationUserInput;
+}>;
+
+
+export type UpdateUserOrganisationRoleMutation = { __typename?: 'Mutation', updateOrganisationUser: { __typename?: 'OrganisationUser', id: string, role: OrganisationUserRoleType } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type UpdateUserRolesForDistrictMutationVariables = Exact<{
+  input: UpdateUserRolesForDistrictInput;
+}>;
+
+
+export type UpdateUserRolesForDistrictMutation = { __typename?: 'Mutation', updateUserRolesForDistrict: { __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType> } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+
+export const CreateInvitedUserDocument = gql`
+    mutation CreateInvitedUser($input: CreateInvitedUserInput!) {
+  createInvitedUser(input: $input) {
+    ... on User {
+      id
+      first_name
+      last_name
+      email
+      disabled
+      master_support
+      theme
+      created_at
+      created_by
+    }
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateInvitedUserMutationFn = Apollo.MutationFunction<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>;
+
+/**
+ * __useCreateInvitedUserMutation__
+ *
+ * To run a mutation, you first call `useCreateInvitedUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateInvitedUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createInvitedUserMutation, { data, loading, error }] = useCreateInvitedUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateInvitedUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>(CreateInvitedUserDocument, options);
+      }
+export type CreateInvitedUserMutationHookResult = ReturnType<typeof useCreateInvitedUserMutation>;
+export type CreateInvitedUserMutationResult = Apollo.MutationResult<CreateInvitedUserMutation>;
+export type CreateInvitedUserMutationOptions = Apollo.BaseMutationOptions<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>;
+export const CreateUserInvitationDocument = gql`
+    mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
+  createUserInvitation(input: $input) {
+    ... on UserInvitation {
+      id
+      catchment_district_ids
+      email
+      invitation_token
+      organisation_id
+      ttl
+    }
+    ... on ApiCreateError {
+      message
+      field
+      value
+    }
+  }
+}
+    `;
+export type CreateUserInvitationMutationFn = Apollo.MutationFunction<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>;
+
+/**
+ * __useCreateUserInvitationMutation__
+ *
+ * To run a mutation, you first call `useCreateUserInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserInvitationMutation, { data, loading, error }] = useCreateUserInvitationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateUserInvitationMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>(CreateUserInvitationDocument, options);
+      }
+export type CreateUserInvitationMutationHookResult = ReturnType<typeof useCreateUserInvitationMutation>;
+export type CreateUserInvitationMutationResult = Apollo.MutationResult<CreateUserInvitationMutation>;
+export type CreateUserInvitationMutationOptions = Apollo.BaseMutationOptions<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>;
+export const DeleteUserInvitationDocument = gql`
+    mutation DeleteUserInvitation($input: DeleteUserInvitationInput!) {
+  deleteUserInvitation(input: $input) {
+    ... on UserInvitation {
+      id
+    }
+    ... on ApiDeleteError {
+      message
+      errors {
+        field
+        message
+      }
+    }
+  }
+}
+    `;
+export type DeleteUserInvitationMutationFn = Apollo.MutationFunction<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>;
+
+/**
+ * __useDeleteUserInvitationMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserInvitationMutation, { data, loading, error }] = useDeleteUserInvitationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteUserInvitationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>(DeleteUserInvitationDocument, options);
+      }
+export type DeleteUserInvitationMutationHookResult = ReturnType<typeof useDeleteUserInvitationMutation>;
+export type DeleteUserInvitationMutationResult = Apollo.MutationResult<DeleteUserInvitationMutation>;
+export type DeleteUserInvitationMutationOptions = Apollo.BaseMutationOptions<DeleteUserInvitationMutation, DeleteUserInvitationMutationVariables>;
+export const DisableUserDocument = gql`
+    mutation DisableUser($input: DisableUserInput!) {
+  disableUser(input: $input) {
+    ... on User {
+      id
+      disabled
+    }
+  }
+}
+    `;
+export type DisableUserMutationFn = Apollo.MutationFunction<DisableUserMutation, DisableUserMutationVariables>;
+
+/**
+ * __useDisableUserMutation__
+ *
+ * To run a mutation, you first call `useDisableUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDisableUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [disableUserMutation, { data, loading, error }] = useDisableUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDisableUserMutation(baseOptions?: Apollo.MutationHookOptions<DisableUserMutation, DisableUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DisableUserMutation, DisableUserMutationVariables>(DisableUserDocument, options);
+      }
+export type DisableUserMutationHookResult = ReturnType<typeof useDisableUserMutation>;
+export type DisableUserMutationResult = Apollo.MutationResult<DisableUserMutation>;
+export type DisableUserMutationOptions = Apollo.BaseMutationOptions<DisableUserMutation, DisableUserMutationVariables>;
 export const GetCurrentUserDocument = gql`
     query GetCurrentUser {
   me {
@@ -2688,6 +2963,7 @@ export const GetCurrentUserDocument = gql`
       first_name
       last_name
       email
+      disabled
       user_organisations {
         id
         name
@@ -2703,15 +2979,46 @@ export const GetCurrentUserDocument = gql`
         name
         logo
         is_user_default_organisation
+        users {
+          id
+          first_name
+          last_name
+          email
+          disabled
+          master_support
+          organisation_id
+          organisation_user_id
+          role
+          hashed_confirmation_token
+          confirmed_at
+          hashed_password_reset_token
+          last_login
+          theme
+        }
         user_districts {
           id
           name
           code
           is_default_user_district
+          catchment_district_id
           province {
             id
             name
             code
+          }
+        }
+        catchment_provinces {
+          id
+          code
+          name
+          disabled
+          catchment_districts {
+            id
+            name
+            code
+            disabled
+            catchment_district_id
+            catchment_province_id
           }
         }
         country {
@@ -2751,6 +3058,113 @@ export function useGetCurrentUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQuery>;
 export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>;
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const GetDefaultOrganisationUsersDocument = gql`
+    query GetDefaultOrganisationUsers {
+  me {
+    ... on User {
+      id
+      user_default_organisation {
+        id
+        users {
+          id
+          organisation_user_id
+          last_name
+          first_name
+          email
+          master_support
+          disabled
+          role
+          theme
+          user_districts {
+            id
+            code
+            name
+            disabled
+            is_default_user_district
+            district_user_id
+            catchment_district_id
+            user_district_roles
+            province {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDefaultOrganisationUsersQuery__
+ *
+ * To run a query within a React component, call `useGetDefaultOrganisationUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDefaultOrganisationUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDefaultOrganisationUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDefaultOrganisationUsersQuery(baseOptions?: Apollo.QueryHookOptions<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>(GetDefaultOrganisationUsersDocument, options);
+      }
+export function useGetDefaultOrganisationUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>(GetDefaultOrganisationUsersDocument, options);
+        }
+export type GetDefaultOrganisationUsersQueryHookResult = ReturnType<typeof useGetDefaultOrganisationUsersQuery>;
+export type GetDefaultOrganisationUsersLazyQueryHookResult = ReturnType<typeof useGetDefaultOrganisationUsersLazyQuery>;
+export type GetDefaultOrganisationUsersQueryResult = Apollo.QueryResult<GetDefaultOrganisationUsersQuery, GetDefaultOrganisationUsersQueryVariables>;
+export const GetUserInvitationsDocument = gql`
+    query getUserInvitations($args: SearchUserInvitationsInput!) {
+  user_invitations(args: $args) {
+    ... on UserInvitation {
+      id
+      organisation_id
+      email
+      catchment_district_ids
+      invitation_token
+      ttl
+      email_status
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserInvitationsQuery__
+ *
+ * To run a query within a React component, call `useGetUserInvitationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserInvitationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserInvitationsQuery({
+ *   variables: {
+ *      args: // value for 'args'
+ *   },
+ * });
+ */
+export function useGetUserInvitationsQuery(baseOptions: Apollo.QueryHookOptions<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>(GetUserInvitationsDocument, options);
+      }
+export function useGetUserInvitationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>(GetUserInvitationsDocument, options);
+        }
+export type GetUserInvitationsQueryHookResult = ReturnType<typeof useGetUserInvitationsQuery>;
+export type GetUserInvitationsLazyQueryHookResult = ReturnType<typeof useGetUserInvitationsLazyQuery>;
+export type GetUserInvitationsQueryResult = Apollo.QueryResult<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -2794,13 +3208,156 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const OnUserInvitationUpdatedDocument = gql`
+    subscription OnUserInvitationUpdated {
+  userInvitationUpdated {
+    id
+    email_status
+  }
+}
+    `;
+
+/**
+ * __useOnUserInvitationUpdatedSubscription__
+ *
+ * To run a query within a React component, call `useOnUserInvitationUpdatedSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useOnUserInvitationUpdatedSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOnUserInvitationUpdatedSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.SubscriptionHookOptions<OnUserInvitationUpdatedSubscription, OnUserInvitationUpdatedSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<OnUserInvitationUpdatedSubscription, OnUserInvitationUpdatedSubscriptionVariables>(OnUserInvitationUpdatedDocument, options);
+      }
+export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
+export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
+export const SendUserInvitationEmailDocument = gql`
+    mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
+  sendUserInvitationEmail(input: $input) {
+    ... on UserInvitation {
+      id
+      email_status
+    }
+    ... on ApiUpdateError {
+      message
+    }
+  }
+}
+    `;
+export type SendUserInvitationEmailMutationFn = Apollo.MutationFunction<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>;
+
+/**
+ * __useSendUserInvitationEmailMutation__
+ *
+ * To run a mutation, you first call `useSendUserInvitationEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendUserInvitationEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendUserInvitationEmailMutation, { data, loading, error }] = useSendUserInvitationEmailMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSendUserInvitationEmailMutation(baseOptions?: Apollo.MutationHookOptions<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>(SendUserInvitationEmailDocument, options);
+      }
+export type SendUserInvitationEmailMutationHookResult = ReturnType<typeof useSendUserInvitationEmailMutation>;
+export type SendUserInvitationEmailMutationResult = Apollo.MutationResult<SendUserInvitationEmailMutation>;
+export type SendUserInvitationEmailMutationOptions = Apollo.BaseMutationOptions<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>;
+export const UpdateUserOrganisationRoleDocument = gql`
+    mutation UpdateUserOrganisationRole($input: UpdateOrganisationUserInput!) {
+  updateOrganisationUser(input: $input) {
+    ... on OrganisationUser {
+      id
+      role
+    }
+  }
+}
+    `;
+export type UpdateUserOrganisationRoleMutationFn = Apollo.MutationFunction<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>;
+
+/**
+ * __useUpdateUserOrganisationRoleMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserOrganisationRoleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserOrganisationRoleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserOrganisationRoleMutation, { data, loading, error }] = useUpdateUserOrganisationRoleMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserOrganisationRoleMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>(UpdateUserOrganisationRoleDocument, options);
+      }
+export type UpdateUserOrganisationRoleMutationHookResult = ReturnType<typeof useUpdateUserOrganisationRoleMutation>;
+export type UpdateUserOrganisationRoleMutationResult = Apollo.MutationResult<UpdateUserOrganisationRoleMutation>;
+export type UpdateUserOrganisationRoleMutationOptions = Apollo.BaseMutationOptions<UpdateUserOrganisationRoleMutation, UpdateUserOrganisationRoleMutationVariables>;
+export const UpdateUserRolesForDistrictDocument = gql`
+    mutation UpdateUserRolesForDistrict($input: UpdateUserRolesForDistrictInput!) {
+  updateUserRolesForDistrict(input: $input) {
+    ... on DistrictUser {
+      id
+      roles
+    }
+  }
+}
+    `;
+export type UpdateUserRolesForDistrictMutationFn = Apollo.MutationFunction<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>;
+
+/**
+ * __useUpdateUserRolesForDistrictMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserRolesForDistrictMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserRolesForDistrictMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserRolesForDistrictMutation, { data, loading, error }] = useUpdateUserRolesForDistrictMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserRolesForDistrictMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>(UpdateUserRolesForDistrictDocument, options);
+      }
+export type UpdateUserRolesForDistrictMutationHookResult = ReturnType<typeof useUpdateUserRolesForDistrictMutation>;
+export type UpdateUserRolesForDistrictMutationResult = Apollo.MutationResult<UpdateUserRolesForDistrictMutation>;
+export type UpdateUserRolesForDistrictMutationOptions = Apollo.BaseMutationOptions<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>;
 export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier)[];
 export type ApiBatchPayloadFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiCreateErrorKeySpecifier = ('message' | 'errors' | ApiCreateErrorKeySpecifier)[];
+export type ApiCreateErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiCreateErrorKeySpecifier)[];
 export type ApiCreateErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type ApiDeleteErrorKeySpecifier = ('message' | 'errors' | ApiDeleteErrorKeySpecifier)[];
@@ -2855,7 +3412,7 @@ export type CatchmentDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type CatchmentDistrictViewKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'organisations_in_district' | 'residences' | 'disabled' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'reports' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictViewKeySpecifier)[];
+export type CatchmentDistrictViewKeySpecifier = ('id' | 'name' | 'code' | 'province_id' | 'province' | 'organisations_in_district' | 'residences' | 'disabled' | 'catchment_district_id' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'reports' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictViewKeySpecifier)[];
 export type CatchmentDistrictViewFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2865,6 +3422,7 @@ export type CatchmentDistrictViewFieldPolicy = {
 	organisations_in_district?: FieldPolicy<any> | FieldReadFunction<any>,
 	residences?: FieldPolicy<any> | FieldReadFunction<any>,
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_province_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_province?: FieldPolicy<any> | FieldReadFunction<any>,
 	water_treatment_plants?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2891,12 +3449,13 @@ export type CatchmentProvinceFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type CatchmentProvinceViewKeySpecifier = ('id' | 'code' | 'name' | 'disabled' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'country_id' | 'country' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceViewKeySpecifier)[];
+export type CatchmentProvinceViewKeySpecifier = ('id' | 'code' | 'name' | 'disabled' | 'catchment_province_id' | 'organisation_id' | 'organisation' | 'catchment_districts' | 'country_id' | 'country' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentProvinceViewKeySpecifier)[];
 export type CatchmentProvinceViewFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	code?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_province_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_districts?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3000,10 +3559,11 @@ export type DistrictUserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ErrorFieldKeySpecifier = ('field' | 'message' | ErrorFieldKeySpecifier)[];
+export type ErrorFieldKeySpecifier = ('field' | 'message' | 'value' | ErrorFieldKeySpecifier)[];
 export type ErrorFieldFieldPolicy = {
 	field?: FieldPolicy<any> | FieldReadFunction<any>,
-	message?: FieldPolicy<any> | FieldReadFunction<any>
+	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type IndicatorKeySpecifier = ('id' | 'indicator_number' | 'description' | 'category' | 'type' | 'contributing_organisation' | 'report_template_id' | 'report_template' | 'indicator_unit_id' | 'indicator_unit' | 'indicator_organisations' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | IndicatorKeySpecifier)[];
 export type IndicatorFieldPolicy = {
@@ -3066,7 +3626,7 @@ export type LoginSuccessFieldPolicy = {
 	accessToken?: FieldPolicy<any> | FieldReadFunction<any>,
 	id?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'resetPassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'setUserDefaultProject' | 'deleteOrganisationUser' | 'createDistrictUser' | 'setUserDefaultDistrict' | 'updateUserRolesForDistrict' | 'deleteDistrictUser' | 'createUserInvitation' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'resetPassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'setUserDefaultProject' | 'deleteOrganisationUser' | 'createDistrictUser' | 'setUserDefaultDistrict' | 'updateUserRolesForDistrict' | 'deleteDistrictUser' | 'createUserInvitation' | 'sendUserInvitationEmail' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
 	createCountry?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteCountry?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3103,6 +3663,7 @@ export type MutationFieldPolicy = {
 	updateUserRolesForDistrict?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteDistrictUser?: FieldPolicy<any> | FieldReadFunction<any>,
 	createUserInvitation?: FieldPolicy<any> | FieldReadFunction<any>,
+	sendUserInvitationEmail?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteUserInvitation?: FieldPolicy<any> | FieldReadFunction<any>,
 	createResidence?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateResidence?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3276,7 +3837,7 @@ export type OrganisationUserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type OrganisationUserViewKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'organisation_id' | 'organisation' | 'role' | 'user_organisations' | 'user_districts' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationUserViewKeySpecifier)[];
+export type OrganisationUserViewKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'organisation_id' | 'organisation' | 'organisation_user_id' | 'role' | 'user_organisations' | 'user_districts' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | OrganisationUserViewKeySpecifier)[];
 export type OrganisationUserViewFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	first_name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3286,6 +3847,7 @@ export type OrganisationUserViewFieldPolicy = {
 	master_support?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
+	organisation_user_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	role?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_organisations?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_districts?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3498,6 +4060,10 @@ export type SewerTreatmentPlantFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
+export type SubscriptionKeySpecifier = ('userInvitationUpdated' | SubscriptionKeySpecifier)[];
+export type SubscriptionFieldPolicy = {
+	userInvitationUpdated?: FieldPolicy<any> | FieldReadFunction<any>
+};
 export type UpdateSewerTreatmentPlantPayloadKeySpecifier = ('sewer_treatment_plant' | UpdateSewerTreatmentPlantPayloadKeySpecifier)[];
 export type UpdateSewerTreatmentPlantPayloadFieldPolicy = {
 	sewer_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
@@ -3534,16 +4100,18 @@ export type UserFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
+export type UserDistrictKeySpecifier = ('id' | 'name' | 'code' | 'user_id' | 'user' | 'catchment_district_id' | 'organisation_id' | 'organisation' | 'is_default_user_district' | 'district_user_id' | 'disabled' | 'user_district_roles' | 'province_id' | 'province' | 'service_areas' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserDistrictKeySpecifier)[];
 export type UserDistrictFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	code?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	user?: FieldPolicy<any> | FieldReadFunction<any>,
+	catchment_district_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation?: FieldPolicy<any> | FieldReadFunction<any>,
 	is_default_user_district?: FieldPolicy<any> | FieldReadFunction<any>,
+	district_user_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	disabled?: FieldPolicy<any> | FieldReadFunction<any>,
 	user_district_roles?: FieldPolicy<any> | FieldReadFunction<any>,
 	province_id?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3554,14 +4122,15 @@ export type UserDistrictFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | UserInvitationKeySpecifier)[];
+export type UserInvitationKeySpecifier = ('id' | 'ttl' | 'email' | 'organisation_id' | 'catchment_district_ids' | 'invitation_token' | 'email_status' | UserInvitationKeySpecifier)[];
 export type UserInvitationFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	ttl?: FieldPolicy<any> | FieldReadFunction<any>,
 	email?: FieldPolicy<any> | FieldReadFunction<any>,
 	organisation_id?: FieldPolicy<any> | FieldReadFunction<any>,
 	catchment_district_ids?: FieldPolicy<any> | FieldReadFunction<any>,
-	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>
+	invitation_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	email_status?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type UserOrganisationKeySpecifier = ('id' | 'name' | 'logo' | 'user_id' | 'user' | 'is_user_default_organisation' | 'user_default_district' | 'user_districts' | 'user_organisation_role' | 'country_id' | 'country' | 'catchment_provinces' | 'users' | 'organisation_report_templates' | 'organisation_indicators' | 'reports' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserOrganisationKeySpecifier)[];
 export type UserOrganisationFieldPolicy = {
@@ -3849,6 +4418,10 @@ export type StrictTypedTypePolicies = {
 	SewerTreatmentPlant?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | SewerTreatmentPlantKeySpecifier | (() => undefined | SewerTreatmentPlantKeySpecifier),
 		fields?: SewerTreatmentPlantFieldPolicy,
+	},
+	Subscription?: Omit<TypePolicy, "fields" | "keyFields"> & {
+		keyFields?: false | SubscriptionKeySpecifier | (() => undefined | SubscriptionKeySpecifier),
+		fields?: SubscriptionFieldPolicy,
 	},
 	UpdateSewerTreatmentPlantPayload?: Omit<TypePolicy, "fields" | "keyFields"> & {
 		keyFields?: false | UpdateSewerTreatmentPlantPayloadKeySpecifier | (() => undefined | UpdateSewerTreatmentPlantPayloadKeySpecifier),

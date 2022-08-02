@@ -1,0 +1,11 @@
+mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
+  sendUserInvitationEmail(input: $input) {
+    ... on UserInvitation {
+      id
+      email_status
+    }
+    ... on ApiUpdateError {
+      message
+    }
+  }
+}

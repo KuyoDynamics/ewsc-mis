@@ -8,6 +8,7 @@ query GetCurrentUser {
       first_name
       last_name
       email
+      disabled
       user_organisations {
         id
         name
@@ -23,15 +24,46 @@ query GetCurrentUser {
         name
         logo
         is_user_default_organisation
+        users {
+          id
+          first_name
+          last_name
+          email
+          disabled
+          master_support
+          organisation_id
+          organisation_user_id
+          role
+          hashed_confirmation_token
+          confirmed_at
+          hashed_password_reset_token
+          last_login
+          theme
+        }
         user_districts {
           id
           name
           code
           is_default_user_district
+          catchment_district_id
           province {
             id
             name
             code
+          }
+        }
+        catchment_provinces {
+          id
+          code
+          name
+          disabled
+          catchment_districts {
+            id
+            name
+            code
+            disabled
+            catchment_district_id
+            catchment_province_id
           }
         }
         country {

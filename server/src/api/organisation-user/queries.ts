@@ -7,6 +7,7 @@ import {
   OrganisationResult,
   OrganisationUser,
   OrganisationUserResult,
+  OrganisationUserView,
   QueryOrganisation_UserArgs,
   QueryOrganisation_UsersArgs,
   UserOrganisation,
@@ -24,6 +25,36 @@ async function getOrganisationUsers(
     })
     .users();
   return org_users as OrganisationUser[];
+}
+
+async function resolveOrganisationUsers(
+  organisation_id: string,
+  context: GraphQLContext
+): Promise<OrganisationUserView[]> {
+  const result = await context.prisma.organisation.findUnique({
+    where: {
+      id: organisation_id,
+    },
+    select: {
+      id: true,
+      users: {
+        select: {
+          role: true,
+          user: true,
+          id: true,
+        },
+      },
+    },
+  });
+
+  const org_users: OrganisationUserView[] = result?.users.map((org_user) => ({
+    ...org_user.user,
+    role: org_user.role,
+    organisation_user_id: org_user.id,
+    organisation_id: result?.id,
+  })) as OrganisationUserView[];
+
+  return org_users;
 }
 
 async function getOrganisationUser(
@@ -265,4 +296,5 @@ export {
   setUserDefaultOrganisation,
   getDefaultUserOrganisation,
   resolveUserDefaultOrganisation,
+  resolveOrganisationUsers,
 };

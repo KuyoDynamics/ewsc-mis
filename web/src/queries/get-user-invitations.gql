@@ -1,0 +1,13 @@
+query getUserInvitations($args: SearchUserInvitationsInput!) {
+  user_invitations(args: $args) {
+    ... on UserInvitation {
+      id
+      organisation_id
+      email
+      catchment_district_ids
+      invitation_token
+      ttl
+      email_status
+    }
+  }
+}

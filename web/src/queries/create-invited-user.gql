@@ -1,0 +1,25 @@
+mutation CreateInvitedUser($input: CreateInvitedUserInput!) {
+  createInvitedUser(input: $input) {
+    ... on User {
+      id
+      first_name
+      last_name
+      email
+      disabled
+      master_support
+      theme
+      created_at
+      created_by
+    }
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}

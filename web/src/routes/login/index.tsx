@@ -2,13 +2,17 @@ import React, { useEffect } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useReactiveVar } from '@apollo/client';
+import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
-import { isLoggedInVar } from 'cache';
-import FormInput from 'components/form-input/form-input';
-import { useLoginMutation } from '../../../graphql/generated';
+import { currentUserVar, isLoggedInVar } from 'cache';
+import FormInput from 'components/form-input-helpers/form-input';
+import {
+  useGetCurrentUserLazyQuery,
+  useLoginMutation,
+  User,
+} from '../../../graphql/generated';
 
 const schema = Yup.object({
   email: Yup.string()
@@ -28,6 +32,7 @@ type FormInputs = {
 
 function Login() {
   const location: any = useLocation();
+  const client = useApolloClient();
 
   const navigate = useNavigate();
 
@@ -43,15 +48,34 @@ function Login() {
 
   const [login, { loading: logginIn }] = useLoginMutation();
 
+  const [getCurrentUser, { data: currentUserResponse }] =
+    useGetCurrentUserLazyQuery();
+
+  const currentUser = React.useMemo(
+    () =>
+      currentUserResponse?.me.__typename === 'User'
+        ? currentUserResponse.me
+        : null,
+    [currentUserResponse]
+  );
+
   const isLoggedIn = useReactiveVar(isLoggedInVar);
 
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
+    currentUserVar(currentUser as User);
+  }, [currentUser]);
+
+  useEffect(() => {
     if (isLoggedIn) {
-      navigate(from, { replace: true });
+      getCurrentUser({
+        fetchPolicy: 'network-only',
+      }).then(() => {
+        navigate(from, { replace: true });
+      });
     }
-  }, [isLoggedIn, from, navigate]);
+  }, [isLoggedIn, from, navigate, getCurrentUser]);
 
   const onSubmit = async (values: any) => {
     login({
@@ -64,7 +88,7 @@ function Login() {
       },
       onCompleted: (result) => {
         if (result.login.__typename === 'LoginSuccess') {
-          setToken(result.login.accessToken);
+          setToken(result.login.accessToken, client);
         } else if (result.login.__typename === 'ApiLoginError') {
           result.login.errors?.forEach((err) =>
             setError(err.field as 'email' | 'password', {
@@ -101,6 +125,13 @@ function Login() {
               Sign in on to the MIS
             </Typography>
           </Box>
+          {from === '/signup' && (
+            <Box>
+              <Alert severity="success">
+                Your account was created successfully. Please sign-in!
+              </Alert>
+            </Box>
+          )}
           <FormInput
             control={control}
             name="email"

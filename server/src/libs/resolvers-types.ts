@@ -180,7 +180,9 @@ export type ApiBatchPayloadResult = ApiBatchPayload | ApiOperationError;
 export type ApiCreateError = ApiError & {
   __typename?: 'ApiCreateError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiDeleteError = ApiError & {
@@ -255,6 +257,7 @@ export type CatchmentDistrictUpdateInput = {
 
 export type CatchmentDistrictView = {
   __typename?: 'CatchmentDistrictView';
+  catchment_district_id: Scalars['String'];
   catchment_province?: Maybe<CatchmentProvinceView>;
   catchment_province_id: Scalars['String'];
   code: Scalars['String'];
@@ -300,6 +303,7 @@ export type CatchmentProvinceUpdateInput = {
 export type CatchmentProvinceView = {
   __typename?: 'CatchmentProvinceView';
   catchment_districts?: Maybe<Array<CatchmentDistrictView>>;
+  catchment_province_id: Scalars['String'];
   code: Scalars['String'];
   country?: Maybe<Country>;
   country_id: Scalars['String'];
@@ -419,9 +423,10 @@ export type CreateIndicatorUnitInput = {
 };
 
 export type CreateInvitedUserInput = {
-  catchment_districts: Array<CatchmentDistrictInput>;
-  organisation_id: Scalars['ID'];
-  user_details: CreateUserInput;
+  email: Scalars['String'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  password: Scalars['String'];
   user_invitation_id: Scalars['ID'];
 };
 
@@ -549,9 +554,8 @@ export type CreateUserInvitationCatchmentDistrictInput = {
 };
 
 export type CreateUserInvitationInput = {
-  catchment_districts: Array<CreateUserInvitationCatchmentDistrictInput>;
-  email: Scalars['EmailAddress'];
-  invited_by: Scalars['EmailAddress'];
+  catchment_districts?: InputMaybe<Array<CreateUserInvitationCatchmentDistrictInput>>;
+  email_addresses: Array<Scalars['EmailAddress']>;
   organisation_id: Scalars['ID'];
   organisation_role: OrganisationUserRoleType;
 };
@@ -823,10 +827,18 @@ export enum DistrictUserRoleType {
   User = 'USER'
 }
 
+export enum EmailStatus {
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED',
+  Sent = 'SENT'
+}
+
 export type ErrorField = {
   __typename?: 'ErrorField';
   field: Scalars['String'];
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type Indicator = {
@@ -969,7 +981,7 @@ export type Mutation = {
   createSewerNetwork: SewerNetworkResult;
   createSewerTreatmentPlant: SewerTreatmentPlantResult;
   createUser: UserResult;
-  createUserInvitation: UserInvitationResult;
+  createUserInvitation: Array<UserInvitationResult>;
   createWaterNetwork: WaterNetworkResult;
   createWaterProductionSite?: Maybe<CreateWaterProductionSitePayload>;
   createWaterStorageTank?: Maybe<CreateWaterStorageTankPayload>;
@@ -1009,6 +1021,7 @@ export type Mutation = {
   login: LoginResult;
   requestPasswordReset: PasswordResetRequestResult;
   resetPassword: PasswordResetResult;
+  sendUserInvitationEmail: UserInvitationResult;
   setUserDefaultDistrict: DistrictUserResult;
   setUserDefaultProject: OrganisationUserResult;
   updateCatchmentDistrict: CatchmentDistrictResult;
@@ -1399,6 +1412,11 @@ export type MutationResetPasswordArgs = {
 };
 
 
+export type MutationSendUserInvitationEmailArgs = {
+  input: SendInvitationEmailInput;
+};
+
+
 export type MutationSetUserDefaultDistrictArgs = {
   input: SetUserDefaultDistrictInput;
 };
@@ -1701,8 +1719,9 @@ export type OrganisationUserView = {
   master_support: Scalars['Boolean'];
   organisation?: Maybe<UserOrganisation>;
   organisation_id: Scalars['String'];
+  organisation_user_id: Scalars['String'];
   role: OrganisationUserRoleType;
-  theme?: Maybe<UserTheme>;
+  theme: UserTheme;
   user_districts?: Maybe<Array<UserDistrict>>;
   user_organisations?: Maybe<Array<UserOrganisation>>;
 };
@@ -2192,8 +2211,14 @@ export type ResidenceUpdateInput = {
 
 export type SearchUserInvitationsInput = {
   catchment_district_ids?: InputMaybe<Array<Scalars['ID']>>;
-  email?: InputMaybe<Scalars['EmailAddress']>;
-  organisation_id?: InputMaybe<Scalars['ID']>;
+  email_addresses?: InputMaybe<Array<Scalars['EmailAddress']>>;
+  organisation_id: Scalars['ID'];
+};
+
+export type SendInvitationEmailInput = {
+  email: Scalars['String'];
+  invitation_id: Scalars['String'];
+  organisation_name: Scalars['String'];
 };
 
 export type ServiceArea = {
@@ -2300,6 +2325,11 @@ export type SewerTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
   ponds: Scalars['Int'];
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  userInvitationUpdated: UserInvitation;
 };
 
 export type UpdateCatchmentDistrictInput = {
@@ -2476,10 +2506,12 @@ export type UserDisableInput = {
 
 export type UserDistrict = {
   __typename?: 'UserDistrict';
+  catchment_district_id: Scalars['ID'];
   code: Scalars['String'];
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
   disabled: Scalars['Boolean'];
+  district_user_id: Scalars['ID'];
   id: Scalars['ID'];
   is_default_user_district: Scalars['Boolean'];
   last_modified_at: Scalars['DateTime'];
@@ -2501,6 +2533,7 @@ export type UserInvitation = {
   __typename?: 'UserInvitation';
   catchment_district_ids?: Maybe<Array<Scalars['String']>>;
   email: Scalars['EmailAddress'];
+  email_status: EmailStatus;
   id: Scalars['ID'];
   invitation_token: Scalars['String'];
   organisation_id: Scalars['String'];
@@ -2849,6 +2882,7 @@ export type ResolversTypes = ResolversObject<{
   DistrictUserRoleType: DistrictUserRoleType;
   Duration: ResolverTypeWrapper<Scalars['Duration']>;
   EmailAddress: ResolverTypeWrapper<Scalars['EmailAddress']>;
+  EmailStatus: EmailStatus;
   ErrorField: ResolverTypeWrapper<ErrorField>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   GUID: ResolverTypeWrapper<Scalars['GUID']>;
@@ -2946,6 +2980,7 @@ export type ResolversTypes = ResolversObject<{
   RoutingNumber: ResolverTypeWrapper<Scalars['RoutingNumber']>;
   SafeInt: ResolverTypeWrapper<Scalars['SafeInt']>;
   SearchUserInvitationsInput: SearchUserInvitationsInput;
+  SendInvitationEmailInput: SendInvitationEmailInput;
   ServiceArea: ResolverTypeWrapper<Omit<ServiceArea, 'catchment_district' | 'residence'> & { catchment_district: ResolversTypes['CatchmentDistrictResult'], residence?: Maybe<ResolversTypes['ResidenceResult']> }>;
   ServiceAreaResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['ServiceArea'];
   ServiceAreaSewerConnection: ResolverTypeWrapper<Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversTypes['SewerNetworkResult']> }>;
@@ -2962,6 +2997,7 @@ export type ResolversTypes = ResolversObject<{
   SewerTreatmentPlantResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['SewerTreatmentPlant'];
   SewerTreatmentPlantUpdateInput: SewerTreatmentPlantUpdateInput;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Subscription: ResolverTypeWrapper<{}>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
   TimeZone: ResolverTypeWrapper<Scalars['TimeZone']>;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']>;
@@ -3240,6 +3276,7 @@ export type ResolversParentTypes = ResolversObject<{
   RoutingNumber: Scalars['RoutingNumber'];
   SafeInt: Scalars['SafeInt'];
   SearchUserInvitationsInput: SearchUserInvitationsInput;
+  SendInvitationEmailInput: SendInvitationEmailInput;
   ServiceArea: Omit<ServiceArea, 'catchment_district' | 'residence'> & { catchment_district: ResolversParentTypes['CatchmentDistrictResult'], residence?: Maybe<ResolversParentTypes['ResidenceResult']> };
   ServiceAreaResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ServiceArea'];
   ServiceAreaSewerConnection: Omit<ServiceAreaSewerConnection, 'service_area' | 'sewer_network'> & { service_area?: Maybe<ResolversParentTypes['ServiceAreaResult']>, sewer_network?: Maybe<ResolversParentTypes['SewerNetworkResult']> };
@@ -3256,6 +3293,7 @@ export type ResolversParentTypes = ResolversObject<{
   SewerTreatmentPlantResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['SewerTreatmentPlant'];
   SewerTreatmentPlantUpdateInput: SewerTreatmentPlantUpdateInput;
   String: Scalars['String'];
+  Subscription: {};
   Time: Scalars['Time'];
   TimeZone: Scalars['TimeZone'];
   Timestamp: Scalars['Timestamp'];
@@ -3332,7 +3370,9 @@ export type ApiBatchPayloadResultResolvers<ContextType = GraphQLContext, ParentT
 
 export type ApiCreateErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiCreateError'] = ResolversParentTypes['ApiCreateError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3409,6 +3449,7 @@ export type CatchmentDistrictResultResolvers<ContextType = GraphQLContext, Paren
 }>;
 
 export type CatchmentDistrictViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentDistrictView'] = ResolversParentTypes['CatchmentDistrictView']> = ResolversObject<{
+  catchment_district_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   catchment_province?: Resolver<Maybe<ResolversTypes['CatchmentProvinceView']>, ParentType, ContextType>;
   catchment_province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3452,6 +3493,7 @@ export type CatchmentProvinceResultResolvers<ContextType = GraphQLContext, Paren
 
 export type CatchmentProvinceViewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CatchmentProvinceView'] = ResolversParentTypes['CatchmentProvinceView']> = ResolversObject<{
   catchment_districts?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrictView']>>, ParentType, ContextType>;
+  catchment_province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType>;
   country_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3627,6 +3669,7 @@ export interface EmailAddressScalarConfig extends GraphQLScalarTypeConfig<Resolv
 export type ErrorFieldResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ErrorField'] = ResolversParentTypes['ErrorField']> = ResolversObject<{
   field?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3833,7 +3876,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createSewerNetwork?: Resolver<ResolversTypes['SewerNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateSewerNetworkArgs, 'input'>>;
   createSewerTreatmentPlant?: Resolver<ResolversTypes['SewerTreatmentPlantResult'], ParentType, ContextType, RequireFields<MutationCreateSewerTreatmentPlantArgs, 'input'>>;
   createUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
-  createUserInvitation?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
+  createUserInvitation?: Resolver<Array<ResolversTypes['UserInvitationResult']>, ParentType, ContextType, RequireFields<MutationCreateUserInvitationArgs, 'input'>>;
   createWaterNetwork?: Resolver<ResolversTypes['WaterNetworkResult'], ParentType, ContextType, RequireFields<MutationCreateWaterNetworkArgs, 'input'>>;
   createWaterProductionSite?: Resolver<Maybe<ResolversTypes['CreateWaterProductionSitePayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterProductionSiteArgs, 'input'>>;
   createWaterStorageTank?: Resolver<Maybe<ResolversTypes['CreateWaterStorageTankPayload']>, ParentType, ContextType, RequireFields<MutationCreateWaterStorageTankArgs, 'input'>>;
@@ -3873,6 +3916,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   login?: Resolver<ResolversTypes['LoginResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   requestPasswordReset?: Resolver<ResolversTypes['PasswordResetRequestResult'], ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
   resetPassword?: Resolver<ResolversTypes['PasswordResetResult'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'input'>>;
+  sendUserInvitationEmail?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationSendUserInvitationEmailArgs, 'input'>>;
   setUserDefaultDistrict?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultDistrictArgs, 'input'>>;
   setUserDefaultProject?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultProjectArgs, 'organisation_user_id'>>;
   updateCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;
@@ -4086,8 +4130,9 @@ export type OrganisationUserViewResolvers<ContextType = GraphQLContext, ParentTy
   master_support?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   organisation?: Resolver<Maybe<ResolversTypes['UserOrganisation']>, ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  organisation_user_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   role?: Resolver<ResolversTypes['OrganisationUserRoleType'], ParentType, ContextType>;
-  theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
+  theme?: Resolver<ResolversTypes['UserTheme'], ParentType, ContextType>;
   user_districts?: Resolver<Maybe<Array<ResolversTypes['UserDistrict']>>, ParentType, ContextType>;
   user_organisations?: Resolver<Maybe<Array<ResolversTypes['UserOrganisation']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -4381,6 +4426,10 @@ export type SewerTreatmentPlantResultResolvers<ContextType = GraphQLContext, Par
   __resolveType: TypeResolveFn<'ApiCreateError' | 'ApiDeleteError' | 'ApiNotFoundError' | 'ApiUpdateError' | 'SewerTreatmentPlant', ParentType, ContextType>;
 }>;
 
+export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
+  userInvitationUpdated?: SubscriptionResolver<ResolversTypes['UserInvitation'], "userInvitationUpdated", ParentType, ContextType>;
+}>;
+
 export interface TimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Time'], any> {
   name: 'Time';
 }
@@ -4455,10 +4504,12 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
 }>;
 
 export type UserDistrictResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserDistrict'] = ResolversParentTypes['UserDistrict']> = ResolversObject<{
+  catchment_district_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  district_user_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   is_default_user_district?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -4482,6 +4533,7 @@ export type UserDistrictResultResolvers<ContextType = GraphQLContext, ParentType
 export type UserInvitationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserInvitation'] = ResolversParentTypes['UserInvitation']> = ResolversObject<{
   catchment_district_ids?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['EmailAddress'], ParentType, ContextType>;
+  email_status?: Resolver<ResolversTypes['EmailStatus'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   invitation_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisation_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -4734,6 +4786,7 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   SewerNetworkResult?: SewerNetworkResultResolvers<ContextType>;
   SewerTreatmentPlant?: SewerTreatmentPlantResolvers<ContextType>;
   SewerTreatmentPlantResult?: SewerTreatmentPlantResultResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
   Time?: GraphQLScalarType;
   TimeZone?: GraphQLScalarType;
   Timestamp?: GraphQLScalarType;

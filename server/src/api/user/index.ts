@@ -5,20 +5,19 @@ import {
   createUser,
   deleteUser,
   disableUser,
-  getDefaultUserDistrict,
   getUser,
-  getUserDistricts,
   getUserOrganisations,
   getUsers,
   login,
   requestPasswordReset,
   resetPassword,
   updateUser,
-  getDefaultUserOrganisation,
   resolveCountry,
   resolveUserDefaultOrganisation,
   resolveUserDistricts,
   resolveProvince,
+  resolveOrganisationUsers,
+  resolveCatchmentProvinces,
 } from '../queries';
 
 const typeDefs = gql`
@@ -48,9 +47,11 @@ const typeDefs = gql`
     code: String!
     user_id: ID!
     user: User
+    catchment_district_id: ID!
     organisation_id: ID!
     organisation: UserOrganisation
     is_default_user_district: Boolean!
+    district_user_id: ID!
     disabled: Boolean!
     user_district_roles: [DistrictUserRoleType!]!
     province_id: String!
@@ -134,9 +135,10 @@ const typeDefs = gql`
 
   input CreateInvitedUserInput {
     user_invitation_id: ID!
-    organisation_id: ID!
-    catchment_districts: [CatchmentDistrictInput!]!
-    user_details: CreateUserInput!
+    first_name: String!
+    last_name: String!
+    email: String!
+    password: String!
   }
 
   input CatchmentDistrictInput {
@@ -228,6 +230,10 @@ const resolvers: Resolvers = {
       resolveCountry(parent.country_id, context),
     user_districts: (parent, _args, context) =>
       resolveUserDistricts(parent.user_id, parent.id, context),
+    users: (parent, _args, context) =>
+      resolveOrganisationUsers(parent.id, context),
+    catchment_provinces: (parent, _args, context) =>
+      resolveCatchmentProvinces(parent.id, context),
   },
   UserDistrict: {
     province: (parent, _args, context) =>

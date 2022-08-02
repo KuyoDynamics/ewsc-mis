@@ -16,9 +16,10 @@ import SettingsIcon from '@mui/icons-material/SettingsSharp';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, Divider, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
+import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { logout } from 'utils/session';
 import { UserCircle as UserCircleIcon } from 'icons';
-import { useGetCurrentUserQuery } from '../../../graphql/generated';
+import { currentUserVar } from 'cache';
 
 const Transition = forwardRef(
   (
@@ -31,6 +32,7 @@ const Transition = forwardRef(
 );
 
 function UserMenu() {
+  const client = useApolloClient();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleMouseOver = (event: MouseEvent<HTMLButtonElement>) => {
@@ -40,13 +42,7 @@ function UserMenu() {
     setAnchorEl(null);
   };
 
-  const { loading, data, error } = useGetCurrentUserQuery({
-    fetchPolicy: 'cache-first',
-  });
-
-  console.log('error', error);
-  console.log('data', data);
-  console.log('error', error);
+  const currentUser = useReactiveVar(currentUserVar);
 
   const navigate = useNavigate();
 
@@ -89,11 +85,7 @@ function UserMenu() {
           }}
           component="div"
         >
-          {data?.me.__typename === 'User' && !loading ? (
-            `Hi, ${data.me.first_name}`
-          ) : (
-            <h1>loading...</h1>
-          )}
+          {currentUser ? `Hi, ${currentUser.first_name}` : <h1>loading...</h1>}
         </Typography>
         <Divider />
         <MenuItem
@@ -106,7 +98,7 @@ function UserMenu() {
           </ListItemIcon>
           <ListItemText primary="Account Settings" />
         </MenuItem>
-        <MenuItem id="logout" onClick={() => logout()}>
+        <MenuItem id="logout" onClick={() => logout(client)}>
           <ListItemIcon>
             <ExitToAppIcon />
           </ListItemIcon>

@@ -1,0 +1,35 @@
+query GetDefaultOrganisationUsers {
+  me {
+    ... on User {
+      id
+      user_default_organisation {
+        id
+        users {
+          id
+          organisation_user_id
+          last_name
+          first_name
+          email
+          master_support
+          disabled
+          role
+          theme
+          user_districts {
+            id
+            code
+            name
+            disabled
+            is_default_user_district
+            district_user_id
+            catchment_district_id
+            user_district_roles
+            province {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}

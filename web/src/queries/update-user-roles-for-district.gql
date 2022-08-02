@@ -1,0 +1,8 @@
+mutation UpdateUserRolesForDistrict($input: UpdateUserRolesForDistrictInput!) {
+  updateUserRolesForDistrict(input: $input) {
+    ... on DistrictUser {
+      id
+      roles
+    }
+  }
+}

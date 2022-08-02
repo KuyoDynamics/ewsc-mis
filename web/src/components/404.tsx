@@ -12,7 +12,7 @@ function NotFound() {
         sx={{
           alignItems: 'center',
           display: 'flex',
-          flexGrow: 1,
+          flexGrow: 2,
           minHeight: '100%',
         }}
       >
