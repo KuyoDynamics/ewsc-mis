@@ -70,7 +70,6 @@ function UserPendingInvitationList() {
     );
   };
 
-  // TODO: figure out how to send email and org name
   const handleResend = async (selectedItems: readonly string[]) => {
     const operations = await Promise.allSettled(
       selectedItems.map((id) => {
@@ -86,7 +85,6 @@ function UserPendingInvitationList() {
         });
       })
     );
-    console.log('operations', operations);
   };
 
   return (

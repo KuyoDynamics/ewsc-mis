@@ -135,9 +135,10 @@ const typeDefs = gql`
 
   input CreateInvitedUserInput {
     user_invitation_id: ID!
-    organisation_id: ID!
-    catchment_districts: [CatchmentDistrictInput!]!
-    user_details: CreateUserInput!
+    first_name: String!
+    last_name: String!
+    email: String!
+    password: String!
   }
 
   input CatchmentDistrictInput {

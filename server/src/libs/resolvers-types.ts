@@ -423,9 +423,10 @@ export type CreateIndicatorUnitInput = {
 };
 
 export type CreateInvitedUserInput = {
-  catchment_districts: Array<CatchmentDistrictInput>;
-  organisation_id: Scalars['ID'];
-  user_details: CreateUserInput;
+  email: Scalars['String'];
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  password: Scalars['String'];
   user_invitation_id: Scalars['ID'];
 };
 

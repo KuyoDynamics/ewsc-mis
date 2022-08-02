@@ -7,12 +7,12 @@ import App from 'App';
 import NotFound from 'components/404';
 import PrivateRoute from 'components/authentication/private-route';
 import UserInvitations from 'routes/admin/user-invitations';
+import Signup from 'routes/signup';
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route index element={<App />} /> */}
         <Route path="/" element={<App />}>
           <Route
             index
@@ -40,6 +40,7 @@ function AppRouter() {
           />
           <Route path="*" element={<NotFound />} />
         </Route>
+        <Route path="/signup" element={<Signup />} />
         <Route path="login" element={<Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

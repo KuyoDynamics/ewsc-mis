@@ -424,9 +424,10 @@ export type CreateIndicatorUnitInput = {
 
 export type CreateInvitedUserInput = {
   user_invitation_id: Scalars['ID'];
-  organisation_id: Scalars['ID'];
-  catchment_districts: Array<CatchmentDistrictInput>;
-  user_details: CreateUserInput;
+  first_name: Scalars['String'];
+  last_name: Scalars['String'];
+  email: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type CreateOptionInput = {
@@ -2696,6 +2697,13 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type CreateInvitedUserMutationVariables = Exact<{
+  input: CreateInvitedUserInput;
+}>;
+
+
+export type CreateInvitedUserMutation = { __typename?: 'Mutation', createInvitedUser: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, theme?: UserTheme | null, created_at: any, created_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type CreateUserInvitationMutationVariables = Exact<{
   input: CreateUserInvitationInput;
 }>;
@@ -2768,6 +2776,59 @@ export type UpdateUserRolesForDistrictMutationVariables = Exact<{
 export type UpdateUserRolesForDistrictMutation = { __typename?: 'Mutation', updateUserRolesForDistrict: { __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType> } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 
+export const CreateInvitedUserDocument = gql`
+    mutation CreateInvitedUser($input: CreateInvitedUserInput!) {
+  createInvitedUser(input: $input) {
+    ... on User {
+      id
+      first_name
+      last_name
+      email
+      disabled
+      master_support
+      theme
+      created_at
+      created_by
+    }
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateInvitedUserMutationFn = Apollo.MutationFunction<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>;
+
+/**
+ * __useCreateInvitedUserMutation__
+ *
+ * To run a mutation, you first call `useCreateInvitedUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateInvitedUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createInvitedUserMutation, { data, loading, error }] = useCreateInvitedUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateInvitedUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>(CreateInvitedUserDocument, options);
+      }
+export type CreateInvitedUserMutationHookResult = ReturnType<typeof useCreateInvitedUserMutation>;
+export type CreateInvitedUserMutationResult = Apollo.MutationResult<CreateInvitedUserMutation>;
+export type CreateInvitedUserMutationOptions = Apollo.BaseMutationOptions<CreateInvitedUserMutation, CreateInvitedUserMutationVariables>;
 export const CreateUserInvitationDocument = gql`
     mutation CreateUserInvitation($input: CreateUserInvitationInput!) {
   createUserInvitation(input: $input) {

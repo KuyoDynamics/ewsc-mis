@@ -1,104 +1,115 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import { Box, Button, Container, Typography } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { setToken } from 'utils/session';
-import { currentUserVar, isLoggedInVar } from 'cache';
-import FormInput from 'components/form-input-helpers/form-input';
 import {
-  useGetCurrentUserLazyQuery,
-  useLoginMutation,
-  User,
-} from '../../../graphql/generated';
+  Box,
+  Button,
+  Container,
+  Typography,
+  Link as MUILink,
+  Alert,
+} from '@mui/material';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import FormInput from 'components/form-input-helpers/form-input';
+import { useCreateInvitedUserMutation } from '../../../graphql/generated';
 
 const schema = Yup.object({
   email: Yup.string()
     .email('Must be a valid email')
     .max(255)
     .required('Email is required'),
+  first_name: Yup.string().max(255).required('First name is required'),
+  last_name: Yup.string().max(255).required('Last name is required'),
   password: Yup.string()
     .max(255)
     .min(8, 'Password must be a minimum of 8 characters')
     .required('Password is required'),
+  confirmPassword: Yup.string()
+    .required('Please retype your password.')
+    .oneOf([Yup.ref('password')], 'Your passwords do not match.'),
+  user_invitation_id: Yup.string()
+    .uuid('No valid invitation found. This form is only for invited users')
+    .required('This form is only for invited users'),
 });
 
-type FormInputs = {
+interface FormInputs {
   email: string;
+  first_name: string;
+  last_name: string;
   password: string;
-};
+  confirmPassword: string;
+  user_invitation_id: string;
+}
 
 function UserSignUpForm() {
-  const location: any = useLocation();
-  const client = useApolloClient();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const invitationId = searchParams?.get('id') ?? '';
 
   const navigate = useNavigate();
+  const [signup, { loading: creatingAccount }] = useCreateInvitedUserMutation();
 
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, touchedFields },
+    formState: { isSubmitting, isValid, touchedFields, errors },
     setError,
+    register,
+    setValue,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
-    mode: 'onChange',
+    mode: 'all',
   });
 
-  const [signup, { loading: creatingAccount }] = useLoginMutation();
-
-  const [getCurrentUser, { data: currentUserResponse }] =
-    useGetCurrentUserLazyQuery();
-
-  const currentUser = React.useMemo(
-    () =>
-      currentUserResponse?.me.__typename === 'User'
-        ? currentUserResponse.me
-        : null,
-    [currentUserResponse]
-  );
-
-  const isLoggedIn = useReactiveVar(isLoggedInVar);
-
-  const from = location.state?.from?.pathname || '/';
-
-  useEffect(() => {
-    currentUserVar(currentUser as User);
-  }, [currentUser]);
-
-  // 1. Logout user
-  // 2. Redirect to /login
-  // 3. Prompt user to login with redirecting you to login msg
-  useEffect(() => {
-    if (isLoggedIn) {
-      getCurrentUser({
-        fetchPolicy: 'network-only',
-      }).then(() => {
-        navigate(from, { replace: true });
-      });
-    }
-  }, [isLoggedIn, from, navigate, getCurrentUser]);
-
-  const onSubmit = async (values: any) => {
+  const onSubmit = ({
+    user_invitation_id,
+    last_name,
+    first_name,
+    email,
+    password,
+  }: FormInputs) => {
     signup({
       fetchPolicy: 'network-only',
       variables: {
         input: {
-          email: values.email,
-          password: values.password,
+          user_invitation_id,
+          email,
+          first_name,
+          last_name,
+          password,
         },
       },
       onCompleted: (result) => {
-        if (result.login.__typename === 'LoginSuccess') {
-          setToken(result.login.accessToken, client);
-        } else if (result.login.__typename === 'ApiLoginError') {
-          result.login.errors?.forEach((err) =>
-            setError(err.field as 'email' | 'password', {
+        if (result.createInvitedUser.__typename === 'User') {
+          navigate('/login', { state: { from: '/signup' }, replace: true });
+        } else if (result.createInvitedUser.__typename === 'ApiCreateError') {
+          if (result.createInvitedUser.field) {
+            setError(
+              result.createInvitedUser.field as keyof FormInputs,
+
+              {
+                type: 'server',
+                message: result.createInvitedUser.message,
+              }
+            );
+          } else if (
+            !result.createInvitedUser.errors &&
+            !result.createInvitedUser.field
+          ) {
+            setError('unknown' as keyof FormInputs, {
               type: 'server',
-              message: err.message,
-            })
-          );
+              message: result.createInvitedUser.message,
+            });
+          } else {
+            result.createInvitedUser.errors?.forEach((err) =>
+              setError(err.field as keyof FormInputs, {
+                type: 'server',
+                message: err.message,
+              })
+            );
+          }
         }
       },
       onError: (err) => {
@@ -107,6 +118,12 @@ function UserSignUpForm() {
       },
     });
   };
+
+  useEffect(() => {
+    setValue('user_invitation_id', invitationId, {
+      shouldValidate: true,
+    });
+  }, [invitationId, setValue]);
 
   return (
     <Box
@@ -122,12 +139,31 @@ function UserSignUpForm() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ my: 3 }}>
             <Typography color="textPrimary" variant="h4">
-              Sign in
+              Create a new account
             </Typography>
             <Typography color="textSecondary" gutterBottom variant="body2">
-              Sign in on to the MIS
+              Use email to which the invitation was sent
             </Typography>
           </Box>
+          {(errors.user_invitation_id ||
+            errors['unknown' as keyof FormInputs]) && (
+            <Box>
+              <Alert severity="error">
+                {errors.user_invitation_id?.message ||
+                  errors['unknown' as keyof FormInputs]?.message}
+                . Please contact support or try again!
+              </Alert>
+            </Box>
+          )}
+          <FormInput
+            control={control}
+            name="email"
+            fullWidth
+            label="Email"
+            type="email"
+            margin="normal"
+            variant="outlined"
+          />
           <FormInput
             control={control}
             name="first_name"
@@ -146,38 +182,53 @@ function UserSignUpForm() {
           />
           <FormInput
             control={control}
-            name="unconfirmed_password"
+            name="password"
             fullWidth
             label="Password"
             margin="normal"
             type="password"
+            autoComplete="new-password"
+            inputProps={{
+              autoComplete: 'new-password',
+              autoSave: 'off',
+            }}
             variant="outlined"
           />
           <FormInput
             control={control}
-            name="password"
+            name="confirmPassword"
             fullWidth
             label="Confirm Password"
             margin="normal"
             type="password"
             variant="outlined"
           />
+          <input
+            id="user_invitation_id"
+            type="hidden"
+            required
+            {...register('user_invitation_id')}
+          />
           <Box sx={{ py: 2 }}>
             <Button
               color="primary"
-              disabled={
-                isSubmitting ||
-                (!isValid && (touchedFields.email || touchedFields.password)) ||
-                creatingAccount
-              }
+              disabled={isSubmitting || !isValid || creatingAccount}
               fullWidth
               size="large"
               type="submit"
               variant="contained"
             >
-              {creatingAccount ? 'signing you up...' : 'Sign Up'}
+              {creatingAccount ? 'Signing you up...' : 'Sign Up'}
             </Button>
           </Box>
+          <Typography color="textSecondary" variant="body2">
+            Have an account?{' '}
+            <Link to="/login">
+              <MUILink variant="subtitle2" underline="hover">
+                Sign In
+              </MUILink>
+            </Link>
+          </Typography>
         </form>
       </Container>
     </Box>

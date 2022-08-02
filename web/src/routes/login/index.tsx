@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
@@ -125,6 +125,13 @@ function Login() {
               Sign in on to the MIS
             </Typography>
           </Box>
+          {from === '/signup' && (
+            <Box>
+              <Alert severity="success">
+                Your account was created successfully. Please sign-in!
+              </Alert>
+            </Box>
+          )}
           <FormInput
             control={control}
             name="email"

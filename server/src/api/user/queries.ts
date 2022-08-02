@@ -21,6 +21,7 @@ import {
   MutationRequestPasswordResetArgs,
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
+  OrganisationUserRoleType,
   PasswordResetRequestResult,
   PasswordResetResult,
   QueryDefault_User_DistrictArgs,
@@ -213,7 +214,7 @@ async function createUser(
 }
 
 type InvitationPayloadType = {
-  emails: string[];
+  email: string;
   organisation_role: string;
   catchment_districts?: CatchmentDistrictInput[];
 } & JwtPayload;
@@ -223,21 +224,20 @@ async function createInvitedUser(
   context: GraphQLContext
 ): Promise<UserResult> {
   try {
-    const { email, first_name, last_name, password } = args.input.user_details;
-    const { catchment_districts, organisation_id } = args.input;
+    const { email, first_name, last_name, password, user_invitation_id } =
+      args.input;
 
     const user_invitation = await context.prisma.userInvitation.findUnique({
       where: {
-        id: args.input.user_invitation_id,
+        id: user_invitation_id,
       },
     });
 
     if (!user_invitation) {
       return {
         __typename: 'ApiCreateError',
-        message: `Failed to create User because we do not recognise the invitation or it expited.${catchment_districts.map(
-          (item) => item.catchment_district_id
-        )}`,
+        message:
+          'Failed to create User because we do not recognise the invitation or it expited',
       };
     }
 
@@ -245,12 +245,10 @@ async function createInvitedUser(
       user_invitation.invitation_token
     ) as InvitationPayloadType;
 
-    if (payload.emails.indexOf(email) === -1) {
+    if (payload.email !== email) {
       return {
         __typename: 'ApiCreateError',
-        message: `Failed to create User because we do not recognise the invitation or it expited.${catchment_districts.map(
-          (item) => item.catchment_district_id
-        )}`,
+        message: `Failed to create User because we do not recognise the invitation for this email:${email}`,
       };
     }
 
@@ -259,23 +257,28 @@ async function createInvitedUser(
         where: {
           AND: {
             id: {
-              in: catchment_districts.map((item) => item.catchment_district_id),
+              in: user_invitation.catchment_district_ids.map((id) => id),
             },
             disabled: true,
           },
         },
+        include: {
+          district: true,
+        },
       });
 
-    if (disabled_catchment_districts) {
+    console.log('disabled_catchment_districts', disabled_catchment_districts);
+
+    if (disabled_catchment_districts?.length > 0) {
       return {
         __typename: 'ApiCreateError',
-        message: `Failed to create User because the following catchment districts are disabled.${catchment_districts.map(
-          (item) => item.catchment_district_id
+        message: `Failed to create User because the following catchment districts are disabled.${disabled_catchment_districts.map(
+          (item) => item.district.name
         )}`,
       };
     }
 
-    const user_districts = catchment_districts.map((item) => ({
+    const user_districts = payload.catchment_districts?.map((item) => ({
       roles: prepareDistrictUserRolesForCreate(item.roles),
       catchment_district_id: item.catchment_district_id,
       created_by: context.user.email,
@@ -293,14 +296,15 @@ async function createInvitedUser(
         last_modified_by: context.user.email,
         user_organisations: {
           create: {
-            organisation_id,
+            organisation_id: user_invitation.organisation_id,
             is_default_organisation: true,
             // Also add the Organisation Role
+            role: payload.organisation_role as OrganisationUserRoleType,
             created_by: context.user.email,
             last_modified_by: context.user.email,
             district_users: {
               createMany: {
-                data: user_districts,
+                data: user_districts!,
                 skipDuplicates: true,
               },
             },
