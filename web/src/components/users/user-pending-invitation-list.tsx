@@ -45,7 +45,10 @@ const headCells: HeadCellType[] = [
 
 function UserPendingInvitationList() {
   const { rows } = useGetUserInvitations('network-only');
-  useOnUserInvitationUpdatedSubscription();
+
+  const organisationName = rows[0]?.organisation_name ?? '';
+
+  const { data: updatedInvite } = useOnUserInvitationUpdatedSubscription();
 
   const [deleteUserInvitation, { data, loading: deleting, error }] =
     useDeleteUserInvitationMutation();
@@ -74,8 +77,8 @@ function UserPendingInvitationList() {
         return sendUserInvitationEmail({
           variables: {
             input: {
-              email: '',
-              organisation_name: '',
+              email: rows.find((item) => item.id === id)?.email ?? '',
+              organisation_name: organisationName,
               invitation_id: id,
             },
           },
@@ -83,6 +86,7 @@ function UserPendingInvitationList() {
         });
       })
     );
+    console.log('operations', operations);
   };
 
   return (

@@ -6,6 +6,8 @@ import { useGetUserInvitationsQuery } from '../../../graphql/generated';
 const useGetUserInvitations = (fetchPolicy: FetchPolicy) => {
   const currentUser = useReactiveVar(currentUserVar);
 
+  const organisationName = currentUser.user_default_organisation?.name ?? '';
+
   const { data } = useGetUserInvitationsQuery({
     fetchPolicy,
     variables: {
@@ -16,7 +18,8 @@ const useGetUserInvitations = (fetchPolicy: FetchPolicy) => {
     // pollInterval: 500,
   });
 
-  const rows = getUserInvitations(data?.user_invitations ?? []) ?? [];
+  const rows =
+    getUserInvitations(data?.user_invitations ?? [], organisationName) ?? [];
 
   return {
     count: rows.length,

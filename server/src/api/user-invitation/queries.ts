@@ -4,12 +4,15 @@ import {
   EmailStatus,
   MutationCreateUserInvitationArgs,
   MutationDeleteUserInvitationArgs,
+  MutationSendUserInvitationEmailArgs,
   QueryUser_InvitationArgs,
   QueryUser_InvitationsArgs,
   UserInvitation,
   UserInvitationResult,
 } from '../../libs/resolvers-types';
 import { GraphQLContext, addDays, generateClientErrors } from '../../utils';
+import { AuthenticationError } from 'apollo-server-core';
+import { sendInvitation } from '../../mailer';
 
 async function createUserInvitation(
   args: MutationCreateUserInvitationArgs,
@@ -123,8 +126,6 @@ async function createUserInvitation(
       )
     );
 
-    console.log('user_invitations', user_invitations);
-
     return user_invitations.map((result, index) => {
       if (result.status === 'fulfilled') {
         return {
@@ -169,6 +170,42 @@ async function deleteUserInvitation(
       __typename: 'ApiDeleteError',
       message: `Failed to delete User Invitation with id ${args.input.id}.`,
       errors: generateClientErrors(error, 'id'),
+    };
+  }
+}
+
+async function sendUserInvitationEmail(
+  args: MutationSendUserInvitationEmailArgs,
+  context: GraphQLContext
+): Promise<UserInvitationResult> {
+  try {
+    const result = await context.prisma.userInvitation.update({
+      where: {
+        id: args.input.invitation_id,
+      },
+      data: {
+        email_status: EmailStatus.Pending,
+      },
+    });
+
+    if (!result) throw new AuthenticationError('Invalid user invitation.');
+
+    sendInvitation(
+      args.input.email,
+      args.input.invitation_id,
+      args.input.organisation_name,
+      context
+    );
+
+    return {
+      __typename: 'UserInvitation',
+      ...result,
+    } as UserInvitation;
+  } catch (error) {
+    return {
+      __typename: 'ApiUpdateError',
+      message: 'User Invitation Resend Failed.',
+      errors: generateClientErrors(error, 'email'),
     };
   }
 }
@@ -236,4 +273,5 @@ export {
   deleteUserInvitation,
   getUserInvitations,
   getUserInvitation,
+  sendUserInvitationEmail,
 };

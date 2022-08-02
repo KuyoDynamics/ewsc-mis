@@ -42,7 +42,7 @@ async function sendInvitation(
   context: GraphQLContext
 ) {
   try {
-    const url = `${process.env.HOST_URL}//signup?id=${invitation_id}`;
+    const url = `${process.env.HOST_URL}/signup?id=${invitation_id}`;
     await sendEmail(
       organisation_name,
       email,

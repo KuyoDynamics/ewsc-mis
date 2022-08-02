@@ -29,13 +29,17 @@ type TokenPayloadType = {
   catchment_districts?: CatchmentDistrictInput[];
 } & JwtPayload;
 
-function getUserInvitations(userInvitations: UserInvitation[]) {
+function getUserInvitations(
+  userInvitations: UserInvitation[],
+  organisationName: string
+) {
   const rows: IPendingUserInvitation[] = userInvitations.map((invite) => {
     const token: TokenPayloadType = jwtDecode(invite.invitation_token);
 
     return {
       id: token.jti!,
       email: token.email,
+      organisation_name: organisationName,
       organisation_role: token.organisation_role,
       organisation_id: token.sub!,
       catchment_districts: token.catchment_districts,

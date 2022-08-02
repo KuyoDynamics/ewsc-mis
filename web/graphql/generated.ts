@@ -983,7 +983,7 @@ export type Mutation = {
   updateUserRolesForDistrict: DistrictUserResult;
   deleteDistrictUser: DistrictUserResult;
   createUserInvitation: Array<UserInvitationResult>;
-  sendUserInvitationEmail?: Maybe<Scalars['Void']>;
+  sendUserInvitationEmail: UserInvitationResult;
   deleteUserInvitation: UserInvitationResult;
   createResidence: ResidenceResult;
   updateResidence: ResidenceResult;
@@ -2751,7 +2751,7 @@ export type SendUserInvitationEmailMutationVariables = Exact<{
 }>;
 
 
-export type SendUserInvitationEmailMutation = { __typename?: 'Mutation', sendUserInvitationEmail?: any | null };
+export type SendUserInvitationEmailMutation = { __typename?: 'Mutation', sendUserInvitationEmail: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string } | { __typename?: 'ApiDeleteError' } };
 
 export type UpdateUserOrganisationRoleMutationVariables = Exact<{
   input: UpdateOrganisationUserInput;
@@ -3179,7 +3179,15 @@ export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof us
 export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
 export const SendUserInvitationEmailDocument = gql`
     mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
-  sendUserInvitationEmail(input: $input)
+  sendUserInvitationEmail(input: $input) {
+    ... on UserInvitation {
+      id
+      email_status
+    }
+    ... on ApiUpdateError {
+      message
+    }
+  }
 }
     `;
 export type SendUserInvitationEmailMutationFn = Apollo.MutationFunction<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>;

@@ -105,7 +105,10 @@ function InvitationForm({ onClose }: InvitationFormProps) {
   });
 
   const userInvitations =
-    getUserInvitations(invitationData?.user_invitations ?? []) ?? [];
+    getUserInvitations(
+      invitationData?.user_invitations ?? [],
+      currentUser.user_default_organisation?.name ?? ''
+    ) ?? [];
 
   const invitedEmails = [
     ...new Set(userInvitations.map((invite) => invite.email)),

@@ -311,7 +311,6 @@ function getApiDeleteError<T>(
   id_value: string,
   error?: T
 ): ApiDeleteError {
-  console.log('Delete error', error);
   return {
     __typename: 'ApiDeleteError',
     message: `Failed to delete ${model_name} with id ${id_value}.`,

@@ -1020,7 +1020,7 @@ export type Mutation = {
   login: LoginResult;
   requestPasswordReset: PasswordResetRequestResult;
   resetPassword: PasswordResetResult;
-  sendUserInvitationEmail?: Maybe<Scalars['Void']>;
+  sendUserInvitationEmail: UserInvitationResult;
   setUserDefaultDistrict: DistrictUserResult;
   setUserDefaultProject: OrganisationUserResult;
   updateCatchmentDistrict: CatchmentDistrictResult;
@@ -3915,7 +3915,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   login?: Resolver<ResolversTypes['LoginResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   requestPasswordReset?: Resolver<ResolversTypes['PasswordResetRequestResult'], ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
   resetPassword?: Resolver<ResolversTypes['PasswordResetResult'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'input'>>;
-  sendUserInvitationEmail?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType, RequireFields<MutationSendUserInvitationEmailArgs, 'input'>>;
+  sendUserInvitationEmail?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationSendUserInvitationEmailArgs, 'input'>>;
   setUserDefaultDistrict?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultDistrictArgs, 'input'>>;
   setUserDefaultProject?: Resolver<ResolversTypes['OrganisationUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultProjectArgs, 'organisation_user_id'>>;
   updateCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationUpdateCatchmentDistrictArgs, 'input'>>;

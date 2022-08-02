@@ -1,3 +1,4 @@
+import { EmailStatus } from '@prisma/client';
 import { gql } from 'apollo-server-express';
 import { Resolvers } from '../../libs/resolvers-types';
 import { sendInvitation } from '../../mailer';
@@ -6,6 +7,7 @@ import {
   deleteUserInvitation,
   getUserInvitation,
   getUserInvitations,
+  sendUserInvitationEmail,
 } from './queries';
 
 const typeDefs = gql`
@@ -28,7 +30,9 @@ const typeDefs = gql`
     createUserInvitation(
       input: CreateUserInvitationInput!
     ): [UserInvitationResult!]!
-    sendUserInvitationEmail(input: SendInvitationEmailInput!): Void
+    sendUserInvitationEmail(
+      input: SendInvitationEmailInput!
+    ): UserInvitationResult!
     deleteUserInvitation(
       input: DeleteUserInvitationInput!
     ): UserInvitationResult!
@@ -91,14 +95,8 @@ const resolvers: Resolvers = {
       createUserInvitation(args, context),
     deleteUserInvitation: (_, args, context) =>
       deleteUserInvitation(args, context),
-    sendUserInvitationEmail: (_, args, context) => {
-      sendInvitation(
-        args.input.email,
-        args.input.invitation_id,
-        args.input.organisation_name,
-        context
-      );
-    },
+    sendUserInvitationEmail: (_, args, context) =>
+      sendUserInvitationEmail(args, context),
   },
   Subscription: {
     userInvitationUpdated: {
