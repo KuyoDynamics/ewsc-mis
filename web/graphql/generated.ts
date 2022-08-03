@@ -2742,6 +2742,13 @@ export type GetUserInvitationsQueryVariables = Exact<{
 
 export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', id: string, organisation_id: string, email: any, catchment_district_ids?: Array<string> | null, invitation_token: string, ttl: any, email_status: EmailStatus }> | null };
 
+export type GetUserQueryVariables = Exact<{
+  userId: Scalars['ID'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, email: string, first_name: string, last_name: string, disabled: boolean, last_login?: any | null, master_support: boolean, hashed_confirmation_token?: string | null, hashed_password_reset_token?: string | null, confirmed_at?: any | null, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, theme?: UserTheme | null } | { __typename?: 'ApiNotFoundError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
@@ -3165,6 +3172,65 @@ export function useGetUserInvitationsLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type GetUserInvitationsQueryHookResult = ReturnType<typeof useGetUserInvitationsQuery>;
 export type GetUserInvitationsLazyQueryHookResult = ReturnType<typeof useGetUserInvitationsLazyQuery>;
 export type GetUserInvitationsQueryResult = Apollo.QueryResult<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>;
+export const GetUserDocument = gql`
+    query getUser($userId: ID!) {
+  user(id: $userId) {
+    ... on User {
+      id
+      email
+      first_name
+      last_name
+      disabled
+      last_login
+      master_support
+      hashed_confirmation_token
+      hashed_password_reset_token
+      confirmed_at
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      theme
+    }
+    ... on ApiNotFoundError {
+      message
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserQuery__
+ *
+ * To run a query within a React component, call `useGetUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+      }
+export function useGetUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+        }
+export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
+export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
+export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {

@@ -1,25 +1,17 @@
-import React, {
-  useState,
-  forwardRef,
-  Ref,
-  ReactElement,
-  MouseEvent,
-} from 'react';
-import IconButton from '@mui/material/IconButton';
+import React, { forwardRef, Ref, ReactElement, useState } from 'react';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import SettingsIcon from '@mui/icons-material/SettingsSharp';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Divider, Slide } from '@mui/material';
+import { Divider, Slide } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { useApolloClient, useReactiveVar } from '@apollo/client';
-import { logout } from 'utils/session';
-import { UserCircle as UserCircleIcon } from 'icons';
+import { useReactiveVar } from '@apollo/client';
 import { currentUserVar } from 'cache';
+import { LockReset, Person, PersonOff } from '@mui/icons-material';
+import { User } from '../../../graphql/generated';
+import UserAccountDisableDialog from './user-account-disable-dialog';
 
 const Transition = forwardRef(
   (
@@ -31,35 +23,30 @@ const Transition = forwardRef(
   ) => <Slide direction="left" ref={ref} {...props} />
 );
 
-function UserMenu() {
-  const client = useApolloClient();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleMouseOver = (event: MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+interface IUserAccountMenuProps {
+  open: boolean;
+  handleClose: () => void;
+  anchorEl: null | HTMLElement;
+  user: User;
+}
+
+function UserAccountMenu({
+  open,
+  handleClose,
+  anchorEl,
+  user,
+}: IUserAccountMenuProps) {
+  const [showUserAccountDisableDialog, setShowUserAccountDisableDialog] =
+    useState(false);
 
   const currentUser = useReactiveVar(currentUserVar);
+
+  const isCurrentUser = currentUser.id === user.id;
 
   const navigate = useNavigate();
 
   return (
-    <div>
-      <Avatar
-        sx={{
-          height: 40,
-          width: 40,
-          ml: 1,
-        }}
-        src="/static/images/avatars/avatar_1.png"
-      >
-        <IconButton onMouseOver={handleMouseOver}>
-          <UserCircleIcon fontSize="small" />
-        </IconButton>
-      </Avatar>
+    <>
       <Menu
         id="user-menu-app-bar"
         anchorEl={anchorEl}
@@ -84,38 +71,53 @@ function UserMenu() {
             textAlign: 'center',
           }}
           component="div"
+          variant="subtitle1"
         >
-          {currentUser ? `Hi, ${currentUser.first_name}` : <h1>loading...</h1>}
+          Manage Account
         </Typography>
         <Divider />
         <MenuItem
-          id="account-settings"
-          href="/account"
+          id="change-password"
+          href="/change-password"
           onClick={() => {
             handleClose();
-            navigate('/account');
+            navigate('/change-password');
           }}
         >
           <ListItemIcon>
-            <SettingsIcon />
+            <LockReset />
           </ListItemIcon>
-          <ListItemText primary="Account Settings" />
+          <ListItemText
+            primary={
+              isCurrentUser
+                ? 'Change Password'
+                : `Request ${user.first_name} to change password`
+            }
+          />
         </MenuItem>
         <MenuItem
-          id="logout"
+          id="disable-account"
           onClick={() => {
             handleClose();
-            logout(client);
+            setShowUserAccountDisableDialog(true);
           }}
+          disabled={isCurrentUser}
         >
           <ListItemIcon>
-            <ExitToAppIcon />
+            {user.disabled ? <PersonOff /> : <Person />}
           </ListItemIcon>
-          <ListItemText primary="Logout" />
+          <ListItemText
+            primary={user?.disabled ? 'Enable Account' : 'Disable Account'}
+          />
         </MenuItem>
       </Menu>
-    </div>
+      <UserAccountDisableDialog
+        onClose={() => setShowUserAccountDisableDialog(false)}
+        user={user}
+        open={showUserAccountDisableDialog}
+      />
+    </>
   );
 }
 
-export default UserMenu;
+export default UserAccountMenu;
