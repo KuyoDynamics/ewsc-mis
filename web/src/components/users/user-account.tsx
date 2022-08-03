@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Avatar,
   Box,
   Button,
   Card,
@@ -7,8 +8,10 @@ import {
   CardHeader,
   Divider,
   Grid,
+  IconButton,
   TextField,
 } from '@mui/material';
+import { MoreVert as MoreVertIcon } from '@mui/icons-material';
 
 const states = [
   {
@@ -25,7 +28,7 @@ const states = [
   },
 ];
 
-function AccountProfileDetails(
+function UserAccount(
   props: React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,
     HTMLFormElement
@@ -51,7 +54,16 @@ function AccountProfileDetails(
     // eslint-disable-next-line react/jsx-props-no-spreading
     <form autoComplete="off" noValidate {...props}>
       <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
+        <CardHeader
+          subheader="chaiwa.berian@gmail.com"
+          title="Profile"
+          avatar={<Avatar aria-label="recipe">R</Avatar>}
+          action={
+            <IconButton aria-label="settings">
+              <MoreVertIcon />
+            </IconButton>
+          }
+        />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
@@ -149,4 +161,4 @@ function AccountProfileDetails(
   );
 }
 
-export default AccountProfileDetails;
+export default UserAccount;

@@ -8,6 +8,7 @@ import NotFound from 'components/404';
 import PrivateRoute from 'components/authentication/private-route';
 import UserInvitations from 'routes/admin/user-invitations';
 import Signup from 'routes/signup';
+import UserAccount from 'routes/account';
 
 function AppRouter() {
   return (
@@ -35,6 +36,14 @@ function AppRouter() {
             element={
               <PrivateRoute>
                 <UserInvitations />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <PrivateRoute>
+                <UserAccount />
               </PrivateRoute>
             }
           />

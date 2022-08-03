@@ -11,7 +11,7 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import { Bell as BellIcon } from 'icons';
 import theme from 'theme';
-import UserMenu from 'components/account/user-menu';
+import UserMenu from 'components/users/user-menu';
 
 const AppNavbarRoot = styled(AppBar)({
   backgroundColor: theme.palette.background.paper,

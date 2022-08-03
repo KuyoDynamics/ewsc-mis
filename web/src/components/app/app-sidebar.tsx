@@ -22,6 +22,7 @@ import {
   FireExtinguisher,
   Public as PublicIcon,
   Paid as PaidIcon,
+  ManageAccounts,
 } from '@mui/icons-material';
 
 import { useReactiveVar } from '@apollo/client';
@@ -67,6 +68,11 @@ const adminTasks = [
     href: '/admin',
     icon: <CogIcon fontSize="small" />,
     title: 'Admin',
+  },
+  {
+    href: '/account',
+    icon: <ManageAccounts fontSize="small" />,
+    title: 'Account',
   },
 ];
 

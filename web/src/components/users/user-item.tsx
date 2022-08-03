@@ -213,7 +213,9 @@ function UserItem({ align, row: user }: UserItemProps) {
   return (
     <>
       <TableCell align={align}>
-        <Link to="/user-details">{user.name}</Link>
+        <Link to="/account" state={{ id: user.id }}>
+          {user.name}
+        </Link>
       </TableCell>
 
       <TableCell align={align}>
