@@ -6,10 +6,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Fade,
   Typography,
 } from '@mui/material';
-import { useDisableUserMutation, User } from '../../../graphql/generated';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { useDisableUserMutation, User } from '../../../graphql/generated';
 
 interface IConfirmationDialogProps {
   open: boolean;
@@ -56,6 +57,9 @@ function UserAccountDisableDialog(props: IConfirmationDialogProps) {
       maxWidth="xs"
       open={open}
       keepMounted
+      transitionDuration={{
+        exit: 1000,
+      }}
     >
       <DialogTitle>{`Confirm Account ${
         user.disabled ? 'Enable' : 'Disable'
@@ -72,6 +76,7 @@ function UserAccountDisableDialog(props: IConfirmationDialogProps) {
           No
         </Button>
         {/* <Box sx={{ py: 2 }}> */}
+
         <LoadingButton
           onClick={handleOk}
           color="primary"

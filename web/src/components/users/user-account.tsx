@@ -15,6 +15,7 @@ import {
   MenuItem,
   Skeleton,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { Info, MoreVert as MoreVertIcon } from '@mui/icons-material';
@@ -106,9 +107,11 @@ function UserAccount() {
                 <div>
                   <Typography variant="subtitle1">
                     {user.email}{' '}
-                    <IconButton>
-                      <Info />
-                    </IconButton>
+                    <Tooltip title="User Info">
+                      <IconButton>
+                        <Info />
+                      </IconButton>
+                    </Tooltip>
                   </Typography>
                   <Typography variant="subtitle2" sx={{ fontStyle: 'italic' }}>
                     {user.disabled ? 'Disabled' : 'Active'}
@@ -170,41 +173,38 @@ function UserAccount() {
                 </>
               ) : (
                 <>
-                  {/* <Grid item md={6} xs={12}> */}
-                  <FormInput
-                    control={control}
-                    fullWidth
-                    label="First name"
-                    name="first_name"
-                    // value={user.first_name}
-                    variant="outlined"
-                  />
-                  {/* </Grid>
-                  <Grid item md={6} xs={12}> */}
-                  <FormInput
-                    control={control}
-                    fullWidth
-                    label="Last name"
-                    name="last_name"
-                    // value={user.last_name}
-                    variant="outlined"
-                  />
-                  {/* </Grid>
-                  <Grid item md={6} xs={12}> */}
-                  <FormSelect
-                    control={control}
-                    errors={errors}
-                    fullWidth
-                    label="Theme"
-                    name="theme"
-                    // value={user.theme}
-                    variant="outlined"
-                  >
-                    {USER_THEME_OPTIONS.map((option) => (
-                      <MenuItem value={option}>{option}</MenuItem>
-                    ))}
-                  </FormSelect>
-                  {/* </Grid> */}
+                  <Grid item md={6} xs={12}>
+                    <FormInput
+                      control={control}
+                      fullWidth
+                      label="First name"
+                      name="first_name"
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <FormInput
+                      control={control}
+                      fullWidth
+                      label="Last name"
+                      name="last_name"
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <FormSelect
+                      control={control}
+                      errors={errors}
+                      fullWidth
+                      label="Theme"
+                      name="theme"
+                      variant="outlined"
+                    >
+                      {USER_THEME_OPTIONS.map((option) => (
+                        <MenuItem value={option}>{option}</MenuItem>
+                      ))}
+                    </FormSelect>
+                  </Grid>
                 </>
               )}
             </Grid>
