@@ -16,6 +16,7 @@ import UserMenu from 'components/users/user-menu';
 const AppNavbarRoot = styled(AppBar)({
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows instanceof Array ? theme.shadows[3] : undefined,
+  elevation: 0,
 });
 
 type AppNavbarProps = {

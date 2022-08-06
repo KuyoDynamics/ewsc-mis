@@ -12,10 +12,11 @@ import {
 import { IconChevronRight } from '@tabler/icons';
 // import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 import Header from 'layout/main-layout/header';
-// import Sidebar from 'layout/main-layout/sidebar';
+import Sidebar from 'layout/main-layout/sidebar';
 import navigation from 'app-menu-items';
 import { drawerWidth } from 'theme/constants';
 import { MUIStyledCommonProps } from '@mui/system';
+import AppNavbar from 'layout/app-navbar';
 // import theme from 'theme'
 
 // assets
@@ -107,10 +108,10 @@ function MainLayout() {
       </AppBar>
 
       {/* drawer */}
-      {/* <Sidebar
+      <Sidebar
         drawerOpen={leftDrawerOpened}
         drawerToggle={handleLeftDrawerToggle}
-      /> */}
+      />
 
       {/* main content */}
       <Main theme={theme} open={leftDrawerOpened}>

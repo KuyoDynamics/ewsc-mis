@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import Loadable from 'components/loadable';
 import MainLayout from 'layout/main-layout';
 import PrivateRoute from 'components/authentication/private-route';
+import { RouteObject, RouteProps, RoutesProps } from 'react-router-dom';
 
 const DashboardDefault = Loadable(lazy(() => import('routes/dashboard')));
 
@@ -11,7 +12,7 @@ const UserInivitations = Loadable(
 );
 const NotFound = Loadable(lazy(() => import('components/404')));
 
-const MainRouter = {
+const MainRouter: RouteObject = {
   path: '/',
   element: (
     <PrivateRoute>
@@ -19,8 +20,9 @@ const MainRouter = {
     </PrivateRoute>
   ),
   children: [
+    { index: true, element: <DashboardDefault /> },
     {
-      path: '/',
+      path: '/dashboard',
       element: <DashboardDefault />,
     },
     {

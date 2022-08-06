@@ -4,10 +4,14 @@ import { ThemeOptions } from '@mui/material';
 declare module '@mui/material/styles/createTypography' {
   interface Typography {
     mainContent: TypographyStyleOptions | undefined;
+    subMenuCaption: TypographyStyleOptions | undefined;
+    menuCaption: TypographyStyleOptions | undefined;
   }
 
   interface TypographyOptions {
     mainContent: TypographyStyleOptions | undefined;
+    subMenuCaption: TypographyStyleOptions | undefined;
+    menuCaption: TypographyStyleOptions | undefined;
   }
 }
 
@@ -291,7 +295,20 @@ const theme = createTheme({
       marginRight: '20px',
       borderRadius: '12px',
     },
-
+    subMenuCaption: {
+      fontSize: '0.6875rem',
+      fontWeight: 500,
+      // color: theme.darkTextSecondary,
+      textTransform: 'capitalize',
+    },
+    menuCaption: {
+      fontSize: '0.875rem',
+      fontWeight: 500,
+      // color: theme.heading,
+      padding: '6px',
+      textTransform: 'capitalize',
+      marginTop: '10px',
+    },
     h1: {
       fontWeight: 700,
       fontSize: '3.5rem',

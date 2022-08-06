@@ -2,7 +2,7 @@ import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase } from '@mui/material';
 import { IconMenu2 } from '@tabler/icons';
-// import LogoSection from '../LogoSection';
+import LogoSection from 'layout/main-layout/logo-section';
 import ProfileSection from 'layout/main-layout/header/profile-section';
 // import NotificationSection from './NotificationSection';
 
@@ -24,12 +24,19 @@ function Header({ handleLeftDrawerToggle }: IHeaderProps) {
           },
         }}
       >
-        <Box
+        {/* Do not show the logo for now until when confident enough */}
+        {/* <Box
           component="span"
-          sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            // flexGrow: 1,
+            width: '130px',
+            height: '130px',
+            mt: '10px',
+          }}
         >
-          {/* <LogoSection /> */}
-        </Box>
+          <LogoSection />
+        </Box> */}
         <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
           <Avatar
             variant="rounded"
