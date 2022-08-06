@@ -70,6 +70,7 @@
     "@mui/x-data-grid": "^5.14.0",
     "@mui/x-data-grid-generator": "^5.14.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.7",
+    "@tabler/icons": "^1.78.1",
     "@types/color-hash": "^1.0.2",
     "@types/react-data-grid": "^4.0.8",
     "apollo3-cache-persist": "^0.14.1",

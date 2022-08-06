@@ -1,6 +1,16 @@
 import { createTheme } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material';
 
+declare module '@mui/material/styles/createTypography' {
+  interface Typography {
+    mainContent: TypographyStyleOptions | undefined;
+  }
+
+  interface TypographyOptions {
+    mainContent: TypographyStyleOptions | undefined;
+  }
+}
+
 const theme = createTheme({
   breakpoints: {
     values: {
@@ -162,6 +172,8 @@ const theme = createTheme({
       light: '#828DF8',
       dark: '#3832A0',
       contrastText: '#FFFFFF',
+      // 200: theme.colors?.primary200,
+      // 800: theme.colors?.primary800,
     },
     secondary: {
       main: '#10B981',
@@ -233,8 +245,8 @@ const theme = createTheme({
     button: {
       fontWeight: 600,
     },
-    fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+    fontFamily: `'Roboto', sans-serif`,
+    // '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
     body1: {
       fontSize: '1rem',
       fontWeight: 400,
@@ -265,8 +277,21 @@ const theme = createTheme({
     caption: {
       fontSize: '0.75rem',
       fontWeight: 400,
+      color: 'rgba(55, 65, 81, 0.48)',
+      textTransform: 'capitalize',
       lineHeight: 1.66,
     },
+    mainContent: {
+      // backgroundColor: theme.background,
+      width: '100%',
+      minHeight: 'calc(100vh - 88px)',
+      flexGrow: 1,
+      padding: '20px',
+      marginTop: '88px',
+      marginRight: '20px',
+      borderRadius: '12px',
+    },
+
     h1: {
       fontWeight: 700,
       fontSize: '3.5rem',

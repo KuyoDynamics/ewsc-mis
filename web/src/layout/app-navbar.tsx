@@ -49,7 +49,7 @@ function AppNavbar(props: AppNavbarProps) {
           sx={{
             display: {
               xs: 'inline-flex',
-              lg: 'none',
+              // lg: 'none', this only shows on smaller devices
             },
           }}
         >

@@ -16,8 +16,9 @@ import { createClient } from 'graphql-ws';
 import theme from 'theme';
 import { authLink, observeTokenForExternalChanges } from 'utils/session';
 import { cache } from 'cache';
-import AppRouter from 'app-router';
 import { getMainDefinition } from '@apollo/client/utilities';
+import App from 'App';
+import { BrowserRouter } from 'react-router-dom';
 
 const wsLink = new GraphQLWsLink(
   createClient({
@@ -66,7 +67,9 @@ root.render(
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <AppRouter />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </ThemeProvider>
     </LocalizationProvider>
   </ApolloProvider>

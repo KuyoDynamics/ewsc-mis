@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/system';
 import { Box } from '@mui/material';
-import AppNavbar from 'components/app/app-navbar';
-import AppSidebar from 'components/app/app-sidebar';
+// import AppNavbar from 'components/app/app-navbar';
+// import AppSidebar from 'components/app/app-sidebar';
 
 const AppLayoutRoot = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -25,6 +25,7 @@ function AppLayout(props: AppLayoutProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+      console.log('Chaiwa, what is event?', event);
       if (
         event &&
         event.type === 'keydown' &&
@@ -36,6 +37,8 @@ function AppLayout(props: AppLayoutProps) {
 
       setSidebarOpen(open);
     };
+
+  console.log('Chaiwa, what is isSidebarOpen?', isSidebarOpen);
 
   return (
     <>
@@ -52,8 +55,8 @@ function AppLayout(props: AppLayoutProps) {
         </Box> */}
         {children}
       </AppLayoutRoot>
-      <AppSidebar toggleDrawer={toggleDrawer} open={isSidebarOpen} />
-      <AppNavbar onSidebarOpen={toggleDrawer(true)} />
+      {/* <AppSidebar toggleDrawer={toggleDrawer} open={isSidebarOpen} /> */}
+      {/* <AppNavbar onSidebarOpen={toggleDrawer(true)} /> */}
     </>
   );
 }
