@@ -1,8 +1,3 @@
-import { useRoutes } from 'react-router-dom';
-import AppRouter from './router';
+import Router from 'routes/router';
 
-function AppRoutes() {
-  return useRoutes([AppRouter]);
-}
-
-export default AppRoutes;
+export default Router;
