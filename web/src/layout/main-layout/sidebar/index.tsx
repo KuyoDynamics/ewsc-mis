@@ -17,6 +17,8 @@ interface ISidebarProps {
 function Sidebar({ drawerOpen, drawerToggle }: ISidebarProps) {
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
+  console.log('mathUpMd', matchUpMd);
+  console.log("theme.breakpoints.up('md')", theme.breakpoints.up('md'));
 
   const drawer = (
     <>

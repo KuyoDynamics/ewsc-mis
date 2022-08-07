@@ -75,6 +75,7 @@ const Main = styled('main', {
 
 function MainLayout() {
   const theme = useTheme();
+  console.log('Chaiwa, show me Theme', theme);
   const [leftDrawerOpened, setLeftDrawerOpened] = useState(false);
   const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 

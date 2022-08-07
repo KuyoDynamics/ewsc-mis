@@ -97,7 +97,7 @@ function NavItem({ item, level }: INavItemProps) {
             //       ? 'h5'
             //       : 'body1'
             //   }
-            variant="body1"
+            variant="h5"
             color="inherit"
           >
             {item.title}
