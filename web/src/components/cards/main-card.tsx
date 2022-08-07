@@ -16,22 +16,22 @@ const headerSX = {
 
 type IMainCardProps = {
   border?: boolean;
-  boxShadow: boolean;
-  children: JSX.Element[];
+  boxShadow?: boolean;
+  children: React.ReactNode;
   content?: boolean;
   contentClass?: string;
   contentSX?: object;
   darkTitle?: boolean;
   secondary?: React.ReactNode;
-  shadow: string;
+  shadow?: string;
   sx?: object;
   title?: React.ReactNode;
-} & CardProps;
+};
 
 const MainCard = forwardRef(
   (
     {
-      border = true,
+      border = false,
       boxShadow,
       children,
       content = true,

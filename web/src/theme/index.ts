@@ -4,6 +4,13 @@ import { ColorPartial } from '@mui/material/styles/createPalette';
 
 declare module '@mui/material/styles/createPalette' {
   interface PaletteColor extends ColorPartial {}
+  interface Palette {
+    orange: {
+      light: string;
+      main: string;
+      dark: string;
+    };
+  }
 }
 declare module '@mui/material/styles/createTypography' {
   interface Typography {
@@ -216,6 +223,11 @@ const theme = createTheme({
       primary: '#121828',
       secondary: '#65748B',
       disabled: 'rgba(55, 65, 81, 0.48)',
+    },
+    orange: {
+      light: '#fbe9e7',
+      main: '#ffab91',
+      dark: '#d84315',
     },
   },
   shape: {

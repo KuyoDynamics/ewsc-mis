@@ -3,6 +3,7 @@ import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
 import UserItem from 'components/users/user-item';
 import UserInvitationForm from 'components/users/user-invitation-form';
 import UserInvitationButton from 'components/users/user-invitation-button';
+import UsersBarChartSkeleton from 'components/cards/skeletons/users-bar-chart';
 import { useGetDefaultOrganisationUsersQuery } from '../../../graphql/generated';
 
 function UserList() {
@@ -59,7 +60,7 @@ function UserList() {
 
   // const dummy: readonly string[] = [];
 
-  if (loading) return <p>loading organisation users...</p>;
+  if (loading) return <UsersBarChartSkeleton />;
   if (error) return <p>failed to load organisation users</p>;
 
   return (

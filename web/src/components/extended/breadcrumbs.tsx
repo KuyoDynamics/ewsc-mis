@@ -69,14 +69,7 @@ function Breadcrumbs({
         if (collapse.type && collapse.type === 'collapse') {
           getCollapse(collapse);
         } else if (collapse.type && collapse.type === 'item') {
-          // document.location.pathname === config.basename + collapse.url
-          console.log('in getCollapse Location', location);
-          console.log(
-            'in getCollapsedocument.location.pathname',
-            document.location.pathname
-          );
-          console.log('in getCollapse collapse.url', collapse.url);
-          if (document.location.pathname === collapse.url) {
+          if (location.pathname === collapse.url) {
             setMain(menu);
             setItem(collapse);
           }
