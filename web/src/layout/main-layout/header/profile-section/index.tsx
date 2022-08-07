@@ -1,5 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, forwardRef, Ref, ReactElement } from 'react';
+import React, {
+  useState,
+  forwardRef,
+  Ref,
+  ReactElement,
+  useEffect,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import {
@@ -125,10 +131,9 @@ function ProfileSection() {
         <Divider />
         <MenuItem
           id="account-settings"
-          href="/account"
           onClick={() => {
             handleClose();
-            navigate('/account');
+            navigate(`/admin/users/${currentUser?.id}`);
           }}
         >
           <ListItemIcon>

@@ -12,6 +12,7 @@ const UserInivitations = Loadable(
 );
 const NotFound = Loadable(lazy(() => import('components/404')));
 const UsersDashboard = Loadable(lazy(() => import('routes/users')));
+const UserAccount = Loadable(lazy(() => import('routes/users/user-account')));
 
 const MainRouter: RouteObject = {
   path: '/',
@@ -37,12 +38,12 @@ const MainRouter: RouteObject = {
         {
           path: 'users',
           element: <UsersDashboard />,
-          // children: [
-          //   {
-          //     path: ':id',
-          //     element: <p>Bang!</p>,
-          //   },
-          // ],
+          children: [
+            {
+              path: ':id',
+              element: <UserAccount />,
+            },
+          ],
         },
       ],
     },
