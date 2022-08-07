@@ -41,7 +41,7 @@ function UserAccountMenu({
 
   const currentUser = useReactiveVar(currentUserVar);
 
-  const isCurrentUser = currentUser.id === user.id;
+  const isCurrentUser = currentUser.id === user?.id;
 
   const navigate = useNavigate();
 
@@ -91,7 +91,7 @@ function UserAccountMenu({
             primary={
               isCurrentUser
                 ? 'Change Password'
-                : `Request ${user.first_name} to change password`
+                : `Request ${user?.first_name} to change password`
             }
           />
         </MenuItem>
@@ -104,7 +104,7 @@ function UserAccountMenu({
           disabled={isCurrentUser}
         >
           <ListItemIcon>
-            {user.disabled ? <PersonOff /> : <Person />}
+            {user?.disabled ? <PersonOff /> : <Person />}
           </ListItemIcon>
           <ListItemText
             primary={user?.disabled ? 'Enable Account' : 'Disable Account'}

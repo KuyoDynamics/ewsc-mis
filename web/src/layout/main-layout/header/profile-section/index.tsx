@@ -133,7 +133,7 @@ function ProfileSection() {
           id="account-settings"
           onClick={() => {
             handleClose();
-            navigate(`/admin/users/${currentUser?.id}`);
+            navigate(`/account/${currentUser?.id}`);
           }}
         >
           <ListItemIcon>

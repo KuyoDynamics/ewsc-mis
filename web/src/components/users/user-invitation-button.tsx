@@ -13,7 +13,7 @@ function UserInvitationButton({ onClick }: IUserInvitationButtonProps) {
 
   const { count } = useGetUserInvitations('network-only');
 
-  const handleNavigate = () => navigate('/invitations');
+  const handleNavigate = () => navigate('/admin/invitations');
 
   return (
     <>

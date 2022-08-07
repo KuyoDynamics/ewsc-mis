@@ -38,14 +38,16 @@ const MainRouter: RouteObject = {
         {
           path: 'users',
           element: <UsersDashboard />,
-          children: [
-            {
-              path: ':id',
-              element: <UserAccount />,
-            },
-          ],
+        },
+        {
+          path: 'users/:id',
+          element: <UserAccount />,
         },
       ],
+    },
+    {
+      path: 'account/:id',
+      element: <UserAccount />,
     },
     {
       path: '*',

@@ -32,9 +32,9 @@ function UserAccountDisableDialog(props: IConfirmationDialogProps) {
     toggleAccountStatus({
       variables: {
         input: {
-          id: user.id,
+          id: user?.id,
           update: {
-            disabled: !user.disabled,
+            disabled: !user?.disabled,
           },
         },
       },
@@ -61,13 +61,13 @@ function UserAccountDisableDialog(props: IConfirmationDialogProps) {
         exit: 1000,
       }}
     >
-      <DialogTitle>{`Confirm Account ${
-        user.disabled ? 'Enable' : 'Disable'
+      <DialogTitle variant="h4">{`Confirm Account ${
+        user?.disabled ? 'Enable' : 'Disable'
       }`}</DialogTitle>
       <DialogContent dividers>
         <Typography>
-          {`Are you sure you want to ${user.disabled ? 'enable' : 'disable'}`}{' '}
-          <span style={{ fontWeight: 'bold' }}>{user.first_name}</span>&apos;s
+          {`Are you sure you want to ${user?.disabled ? 'enable' : 'disable'}`}{' '}
+          <span style={{ fontWeight: 'bold' }}>{user?.first_name}</span>&apos;s
           account?
         </Typography>
       </DialogContent>
@@ -87,7 +87,7 @@ function UserAccountDisableDialog(props: IConfirmationDialogProps) {
           loadingPosition="end"
         >
           {loading
-            ? `${user.disabled ? 'enabling user...' : 'disabling user...'}`
+            ? `${user?.disabled ? 'enabling user...' : 'disabling user...'}`
             : 'Yes'}
         </LoadingButton>
         {/* </Box> */}
