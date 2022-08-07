@@ -11,6 +11,7 @@ const UserInivitations = Loadable(
   lazy(() => import('routes/admin/user-invitations'))
 );
 const NotFound = Loadable(lazy(() => import('components/404')));
+const UsersDashboard = Loadable(lazy(() => import('routes/users')));
 
 const MainRouter: RouteObject = {
   path: '/',
@@ -34,14 +35,14 @@ const MainRouter: RouteObject = {
           element: <UserInivitations />,
         },
         {
-          path: 'accounts',
-          element: <p>Hello</p>,
-          children: [
-            {
-              path: ':id',
-              element: <p>Bang!</p>,
-            },
-          ],
+          path: 'users',
+          element: <UsersDashboard />,
+          // children: [
+          //   {
+          //     path: ':id',
+          //     element: <p>Bang!</p>,
+          //   },
+          // ],
         },
       ],
     },

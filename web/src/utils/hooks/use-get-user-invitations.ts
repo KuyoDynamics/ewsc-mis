@@ -6,7 +6,7 @@ import { useGetUserInvitationsQuery } from '../../../graphql/generated';
 const useGetUserInvitations = (fetchPolicy: FetchPolicy) => {
   const currentUser = useReactiveVar(currentUserVar);
 
-  const organisationName = currentUser.user_default_organisation?.name ?? '';
+  const organisationName = currentUser?.user_default_organisation?.name ?? '';
 
   const { data } = useGetUserInvitationsQuery({
     fetchPolicy,

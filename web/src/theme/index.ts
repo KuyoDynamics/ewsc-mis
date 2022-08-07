@@ -1,13 +1,16 @@
 import { createTheme } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material';
+import { ColorPartial } from '@mui/material/styles/createPalette';
 
+declare module '@mui/material/styles/createPalette' {
+  interface PaletteColor extends ColorPartial {}
+}
 declare module '@mui/material/styles/createTypography' {
   interface Typography {
     mainContent: TypographyStyleOptions | undefined;
     subMenuCaption: TypographyStyleOptions | undefined;
     menuCaption: TypographyStyleOptions | undefined;
   }
-
   interface TypographyOptions {
     mainContent: TypographyStyleOptions | undefined;
     subMenuCaption: TypographyStyleOptions | undefined;
@@ -176,8 +179,8 @@ const theme = createTheme({
       light: '#828DF8',
       dark: '#3832A0',
       contrastText: '#FFFFFF',
-      // 200: theme.colors?.primary200,
-      // 800: theme.colors?.primary800,
+      200: '#90caf9',
+      800: '#1565c0',
     },
     secondary: {
       main: '#10B981',

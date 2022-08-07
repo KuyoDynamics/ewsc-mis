@@ -1,4 +1,3 @@
-// import React from 'react';
 import {
   ManageAccounts as ManageAccountsIcon,
   ContactMail as ContactEmailIcon,
@@ -17,7 +16,7 @@ const admin: IMenuItem = {
       title: 'Users',
       caption: 'User Accounts',
       type: 'item',
-      url: '/users',
+      url: '/admin/users',
       icon: ManageAccountsIcon,
     },
     {
@@ -25,7 +24,7 @@ const admin: IMenuItem = {
       title: 'Invitations',
       caption: 'User Invitations',
       type: 'item',
-      url: '/invitations',
+      url: '/admin/invitations',
       icon: ContactEmailIcon,
     },
     {
@@ -33,7 +32,7 @@ const admin: IMenuItem = {
       title: 'Organisation Settings',
       caption: 'Manage Organisation Settings',
       type: 'item',
-      url: '/organisation',
+      url: '/admin/organisation',
       icon: RoomPreferencesIcon,
     },
   ],

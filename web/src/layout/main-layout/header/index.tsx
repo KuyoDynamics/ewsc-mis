@@ -1,9 +1,11 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Avatar, Box, ButtonBase } from '@mui/material';
-import { IconMenu2 } from '@tabler/icons';
+import { IconMenu2, IconChevronRight } from '@tabler/icons';
 import LogoSection from 'layout/main-layout/logo-section';
 import ProfileSection from 'layout/main-layout/header/profile-section';
+import navigation from 'app-menu-items';
+import Breadcrumbs from 'components/extended/breadcrumbs';
 // import NotificationSection from './NotificationSection';
 
 interface IHeaderProps {
@@ -56,7 +58,17 @@ function Header({ handleLeftDrawerToggle }: IHeaderProps) {
           </Avatar>
         </ButtonBase>
       </Box>
-
+      {/* breadcrumb */}
+      <Breadcrumbs
+        separator={IconChevronRight}
+        navigation={navigation}
+        icon
+        title
+        rightAlign
+        maxItems={3}
+        card={false}
+        divider={false}
+      />
       {/* header search */}
       <Box sx={{ flexGrow: 1 }} />
       <Box sx={{ flexGrow: 1 }} />

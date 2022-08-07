@@ -11,7 +11,7 @@ export interface IMenuItem {
   icon?: any;
   url?: string;
   target?: boolean;
-  breadcrumbs?: false;
+  breadcrumbs?: boolean;
   disabled?: boolean;
   chip?: ChipProps;
   external?: boolean;
@@ -22,14 +22,16 @@ const dashboard: IMenuItem = {
   id: 'dashboard',
   title: 'Dashboard',
   type: 'group',
+  url: '/',
+  breadcrumbs: false,
   children: [
     {
       id: 'default',
-      title: 'Dashboard',
+      title: 'Default',
       type: 'item',
       url: '/dashboard',
       icon: icons.IconDashboard,
-      breadcrumbs: false,
+      breadcrumbs: true,
     },
   ],
 };

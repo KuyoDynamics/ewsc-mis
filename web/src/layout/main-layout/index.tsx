@@ -10,7 +10,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { IconChevronRight } from '@tabler/icons';
-// import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
+import Breadcrumbs from 'components/extended/breadcrumbs';
 import Header from 'layout/main-layout/header';
 import Sidebar from 'layout/main-layout/sidebar';
 import navigation from 'app-menu-items';
@@ -116,14 +116,6 @@ function MainLayout() {
 
       {/* main content */}
       <Main theme={theme} open={leftDrawerOpened}>
-        {/* breadcrumb */}
-        {/* <Breadcrumbs
-          separator={IconChevronRight}
-          navigation={navigation}
-          icon
-          title
-          rightAlign
-        /> */}
         <Outlet />
       </Main>
     </Box>
