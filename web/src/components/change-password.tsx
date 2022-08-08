@@ -11,6 +11,7 @@ import {
   CardContent,
   CardHeader,
   Divider,
+  FormHelperText,
   Grid,
   IconButton,
   Skeleton,
@@ -18,67 +19,77 @@ import {
   Typography,
 } from '@mui/material';
 import { Info } from '@mui/icons-material';
-import { useMatch, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useReactiveVar } from '@apollo/client';
+import { useApolloClient, useReactiveVar } from '@apollo/client';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { getNameInitials } from 'utils';
 import FormInput from 'components/form-input-helpers/form-input';
-import { currentUserVar } from 'cache';
+import { currentUserVar, isLoggedInVar } from 'cache';
 import {
+  useChangePasswordMutation,
   useGetUserLazyQuery,
   useUpdateUserMutation,
 } from '../../graphql/generated';
+import { logout } from 'utils/session';
 
 const schema = Yup.object({
-  password: Yup.string()
+  password: Yup.string().max(255).required('Password is required'),
+  new_password: Yup.string()
     .max(255)
-    .min(8, 'Password must be a minimum of 8 characters')
-    .required('Password is required'),
+    .min(8, 'New Password must be a minimum of 8 characters')
+    .required('New Password is required'),
   confirmPassword: Yup.string()
     .required('Please retype your password.')
-    .oneOf([Yup.ref('password')], 'Your passwords do not match.'),
-  //   password_reset_token: Yup.string()
-  //     .uuid('No valid invitation found. This form is only for invited users')
-  //     .required('This form is only for invited users'),
+    .oneOf([Yup.ref('new_password')], 'Your passwords do not match.'),
+  id: Yup.string()
+    .uuid('No valid user found.')
+    .required('You must be logged-in to use this form'),
 });
 
 interface FormInputs {
   password: string;
   confirmPassword: string;
-  current_password?: string;
-  password_reset_token?: string;
+  new_password: string;
+  id: string;
+  //   password_reset_token?: string;
 }
 
 type TokenPayloadType = {
   id: string;
 } & JwtPayload;
 
+function getPasswordResetUserId(token: string | null) {
+  if (token) {
+    const { id }: TokenPayloadType = jwtDecode(token);
+    return id;
+  }
+  return null;
+}
+
 function ChangePassword() {
+  const client = useApolloClient();
+
   const currentUser = useReactiveVar(currentUserVar);
 
   const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  // const [searchParams, setSearchParams] = useSearchParams();
 
-  const passwordResetToken = searchParams.get('token');
+  // const passwordResetToken = searchParams.get('id');
 
-  const { id: passwordResetUserId }: TokenPayloadType = jwtDecode(
-    passwordResetToken!
-  );
+  // const passwordResetUserId = getPasswordResetUserId(passwordResetToken);
 
-  const currentUserPasswordResetRoute = useMatch('/account/changePassword');
+  // const currentUserPasswordResetRoute = useMatch('/account/changePassword');
 
-  const userId = currentUserPasswordResetRoute
-    ? currentUser.id
-    : passwordResetUserId;
+  const userId = currentUser.id;
 
   const [getUser, { data, loading }] = useGetUserLazyQuery();
 
   const [
-    updateUser,
+    changePassword,
     { data: updatedUserResponse, loading: updatingUser, error: updateError },
-  ] = useUpdateUserMutation();
+  ] = useChangePasswordMutation();
 
   const user = useMemo(
     () => (data?.user.__typename === 'User' ? data.user : null),
@@ -87,11 +98,13 @@ function ChangePassword() {
 
   const updatedUser = useMemo(
     () =>
-      updatedUserResponse?.updateUser.__typename === 'User'
-        ? updatedUserResponse.updateUser
+      updatedUserResponse?.changePassword.__typename === 'User'
+        ? updatedUserResponse.changePassword
         : null,
     [updatedUserResponse]
   );
+
+  console.log('updatedUser', updatedUser);
 
   const {
     handleSubmit,
@@ -106,53 +119,68 @@ function ChangePassword() {
     mode: 'onChange',
   });
 
-  const onSubmit = ({ password, password_reset_token }: FormInputs) => {
+  const onSubmit = ({
+    // password_reset_token,
+    password,
+    confirmPassword,
+    new_password,
+    id,
+  }: FormInputs) => {
     console.log('password', password);
-    console.log('password_reset_token', password_reset_token);
-    // updateUser({
-    //   variables: {
-    //     input: {
-    //       id,
-    //       update: {
-    //         first_name,
-    //         last_name,
-    //         theme,
-    //       },
-    //     },
-    //   },
-    //   onCompleted: (result) => {
-    //     if (result.updateUser.__typename === 'User') {
-    //       // Do nothing for now
-    //     } else if (result.updateUser.__typename === 'ApiCreateError') {
-    //       if (result.updateUser.field) {
-    //         setError(
-    //           result.updateUser.field as keyof FormInputs,
+    console.log('user_id', id);
+    console.log('confirmPassword', confirmPassword);
+    console.log('new_password', new_password);
+    changePassword({
+      variables: {
+        input: {
+          user_id: id,
+          new_password,
+          password,
+        },
+      },
+      onCompleted: (result) => {
+        if (result.changePassword.__typename === 'User') {
+          logout(client);
+          navigate('/login', {
+            state: { from: '/account/changePassword' },
+            replace: true,
+          });
+        } else if (result.changePassword.__typename === 'ApiUpdateError') {
+          console.log('Chaiwa, ApiUpdateError', result.changePassword);
 
-    //           {
-    //             type: 'server',
-    //             message: result.updateUser.message,
-    //           }
-    //         );
-    //       } else if (!result.updateUser.errors && !result.updateUser.field) {
-    //         setError('unknown' as keyof FormInputs, {
-    //           type: 'server',
-    //           message: result.updateUser.message,
-    //         });
-    //       } else {
-    //         result.updateUser.errors?.forEach((err) =>
-    //           setError(err.field as keyof FormInputs, {
-    //             type: 'server',
-    //             message: err.message,
-    //           })
-    //         );
-    //       }
-    //     }
-    //   },
-    //   onError: (err) => {
-    //     // throw it and let it be handled by the Error Boundary
-    //     console.log('Chaiwa, something bad happened', err);
-    //   },
-    // });
+          if (result.changePassword.field) {
+            setError(
+              result.changePassword.field as keyof FormInputs,
+
+              {
+                type: 'server',
+                message: result.changePassword.message,
+              }
+            );
+          } else if (
+            !result.changePassword.errors &&
+            !result.changePassword.field
+          ) {
+            setError('unknown' as keyof FormInputs, {
+              type: 'server',
+              message: result.changePassword.message,
+            });
+          } else {
+            result.changePassword.errors?.forEach((err) => {
+              console.log('Each FieldError', err);
+              return setError(err.field as keyof FormInputs, {
+                type: 'server',
+                message: err.message,
+              });
+            });
+          }
+        }
+      },
+      onError: (err) => {
+        // throw it and let it be handled by the Error Boundary
+        console.log('Chaiwa, something bad happened', err);
+      },
+    });
   };
 
   const isLoading = loading || !user;
@@ -168,20 +196,19 @@ function ChangePassword() {
   }, [userId, getUser]);
 
   useEffect(() => {
-    if (passwordResetToken) {
-      setValue('password_reset_token', passwordResetToken, {
+    if (userId) {
+      setValue('id', userId, {
         shouldValidate: true,
       });
     }
-  }, [passwordResetToken, setValue]);
+  }, [userId, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {(errors.password_reset_token ||
-        errors['unknown' as keyof FormInputs]) && (
+      {(errors.id || errors['unknown' as keyof FormInputs]) && (
         <Box>
           <Alert severity="error">
-            {errors.password_reset_token?.message ||
+            {errors.id?.message ||
               errors['unknown' as keyof FormInputs]?.message}
             . Please contact support or try again!
           </Alert>
@@ -217,7 +244,7 @@ function ChangePassword() {
                 style={{ marginBottom: 6 }}
               />
             ) : (
-              <Typography variant="h3">Account Profile</Typography>
+              <Typography variant="h3">Change Your Account Password</Typography>
             )
           }
           avatar={
@@ -249,12 +276,17 @@ function ChangePassword() {
               </>
             ) : (
               <>
-                <Grid item md={6} xs={12}>
+                <Grid item md={12} xs={12}>
+                  {errors.password && (
+                    <FormHelperText>
+                      <Link to="/forgotPassword">Forgot password?</Link>
+                    </FormHelperText>
+                  )}
                   <FormInput
                     control={control}
                     fullWidth
                     label="Your Current Password"
-                    name="current_password"
+                    name="password"
                     type="password"
                     InputProps={{
                       autoComplete: 'new-password',
@@ -267,7 +299,7 @@ function ChangePassword() {
                     control={control}
                     fullWidth
                     label="New Password"
-                    name="password"
+                    name="new_password"
                     type="password"
                     InputProps={{
                       autoComplete: 'new-password',
@@ -288,12 +320,7 @@ function ChangePassword() {
                     variant="outlined"
                   />
                 </Grid>
-                <input
-                  id="password_reset_token"
-                  type="hidden"
-                  required
-                  {...register('password_reset_token')}
-                />
+                <input id="id" type="hidden" required {...register('id')} />
               </>
             )}
           </Grid>

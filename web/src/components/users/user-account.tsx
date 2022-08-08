@@ -61,7 +61,7 @@ function UserAccount() {
 
   const currentUserAccountRoute = useMatch('/account');
 
-  const userId = currentUserAccountRoute ? currentUser.id : params.id;
+  const userId = currentUserAccountRoute ? currentUser?.id : params?.id;
 
   const [getUser, { data, loading }] = useGetUserLazyQuery();
 

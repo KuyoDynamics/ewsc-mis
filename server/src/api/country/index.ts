@@ -70,6 +70,8 @@ const typeDefs = gql`
 
   type ApiUpdateError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 

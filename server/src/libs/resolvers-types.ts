@@ -222,7 +222,9 @@ export type ApiPasswordResetError = ApiError & {
 export type ApiUpdateError = ApiError & {
   __typename?: 'ApiUpdateError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type CatchmentDistrict = {
@@ -316,6 +318,12 @@ export type CatchmentProvinceView = {
   name: Scalars['String'];
   organisation?: Maybe<Organisation>;
   organisation_id: Scalars['String'];
+};
+
+export type ChangePasswordInput = {
+  new_password: Scalars['String'];
+  password: Scalars['String'];
+  user_id: Scalars['ID'];
 };
 
 export type Country = {
@@ -949,6 +957,7 @@ export type LoginSuccess = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changePassword: UserResult;
   createCatchmentDistrict: CatchmentDistrictResult;
   createCatchmentProvince: CatchmentProvinceResult;
   createCountry: CountryResult;
@@ -1049,6 +1058,11 @@ export type Mutation = {
   updateWaterProductionSite?: Maybe<UpdateWaterProductionSitePayload>;
   updateWaterStorageTank?: Maybe<UpdateWaterStorageTankPayload>;
   updateWaterTreatmentPlant: WaterTreatmentPlantResult;
+};
+
+
+export type MutationChangePasswordArgs = {
+  input: ChangePasswordInput;
 };
 
 
@@ -2784,6 +2798,7 @@ export type ResolversTypes = ResolversObject<{
   CatchmentProvinceResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['CatchmentProvince'];
   CatchmentProvinceUpdateInput: CatchmentProvinceUpdateInput;
   CatchmentProvinceView: ResolverTypeWrapper<CatchmentProvinceView>;
+  ChangePasswordInput: ChangePasswordInput;
   Country: ResolverTypeWrapper<Country>;
   CountryCode: ResolverTypeWrapper<Scalars['CountryCode']>;
   CountryResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Country'];
@@ -3088,6 +3103,7 @@ export type ResolversParentTypes = ResolversObject<{
   CatchmentProvinceResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['CatchmentProvince'];
   CatchmentProvinceUpdateInput: CatchmentProvinceUpdateInput;
   CatchmentProvinceView: CatchmentProvinceView;
+  ChangePasswordInput: ChangePasswordInput;
   Country: Country;
   CountryCode: Scalars['CountryCode'];
   CountryResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Country'];
@@ -3413,7 +3429,9 @@ export type ApiPasswordResetErrorResolvers<ContextType = GraphQLContext, ParentT
 
 export type ApiUpdateErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiUpdateError'] = ResolversParentTypes['ApiUpdateError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3844,6 +3862,7 @@ export interface MacScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes[
 }
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  changePassword?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'input'>>;
   createCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentDistrictArgs, 'input'>>;
   createCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentProvinceArgs, 'input'>>;
   createCountry?: Resolver<ResolversTypes['CountryResult'], ParentType, ContextType, RequireFields<MutationCreateCountryArgs, 'input'>>;

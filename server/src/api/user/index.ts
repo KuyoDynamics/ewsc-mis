@@ -18,6 +18,7 @@ import {
   resolveProvince,
   resolveOrganisationUsers,
   resolveCatchmentProvinces,
+  changePassword,
 } from '../queries';
 
 const typeDefs = gql`
@@ -108,6 +109,13 @@ const typeDefs = gql`
       input: PasswordResetRequestInput!
     ): PasswordResetRequestResult!
     resetPassword(input: PasswordResetInput!): PasswordResetResult!
+    changePassword(input: ChangePasswordInput!): UserResult!
+  }
+
+  input ChangePasswordInput {
+    user_id: ID!
+    new_password: String!
+    password: String!
   }
 
   input PasswordResetInput {
@@ -258,6 +266,7 @@ const resolvers: Resolvers = {
     requestPasswordReset: (_, args, context) =>
       requestPasswordReset(args, context),
     resetPassword: (_, args, context) => resetPassword(args, context),
+    changePassword: (_, args, context) => changePassword(args, context),
   },
 };
 

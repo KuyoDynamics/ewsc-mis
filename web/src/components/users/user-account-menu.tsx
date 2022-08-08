@@ -81,7 +81,7 @@ function UserAccountMenu({
           href="/change-password"
           onClick={() => {
             handleClose();
-            navigate('/account/changePassword');
+            navigate(`/requestPasswordReset/${user.id}`);
           }}
         >
           <ListItemIcon>

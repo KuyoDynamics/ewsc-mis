@@ -13,6 +13,9 @@ const UserInivitations = Loadable(
 const NotFound = Loadable(lazy(() => import('components/404')));
 const UsersDashboard = Loadable(lazy(() => import('routes/users')));
 const UserAccount = Loadable(lazy(() => import('routes/users/user-account')));
+const ChangePassword = Loadable(
+  lazy(() => import('routes/users/change-password'))
+);
 
 const MainRouter: RouteObject = {
   path: '/',
@@ -51,7 +54,7 @@ const MainRouter: RouteObject = {
     },
     {
       path: 'account/changePassword',
-      element: <UserAccount />,
+      element: <ChangePassword />,
     },
     {
       path: '*',

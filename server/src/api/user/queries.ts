@@ -13,6 +13,7 @@ import {
   DistrictResult,
   DistrictUser,
   LoginResult,
+  MutationChangePasswordArgs,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
   MutationDeleteUserArgs,
@@ -326,6 +327,64 @@ async function createInvitedUser(
   }
 }
 
+async function changePassword(
+  args: MutationChangePasswordArgs,
+  context: GraphQLContext
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.findUnique({
+      where: {
+        id: args.input.user_id,
+      },
+    });
+
+    if (user) {
+      // try {
+      if (!(await isValidPassword(args.input.password, user.password))) {
+        throw new AuthenticationError('Incorrect password.', {
+          field: 'password',
+        });
+      }
+      // } catch (error) {
+      //   console.log('Failed to update password.', error);
+      //   // Also send to Sentry
+      //   throw new AuthenticationError('Failed to update password.', {
+      //     field: 'password',
+      //   });
+      // }
+    }
+
+    const updatedUser = await context.prisma.user.update({
+      where: {
+        id: args.input.user_id,
+      },
+      data: {
+        password: await encryptPassword(args.input.new_password),
+        last_modified_by: context.user.email,
+      },
+    });
+
+    if (!updatedUser) {
+      return {
+        __typename: 'ApiUpdateError',
+        message: `Failed to update User Password because user does not exist.`,
+        field: 'id',
+      };
+    }
+
+    return {
+      __typename: 'User',
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: 'ApiUpdateError',
+      message: `Failed to update User Password with user id ${args.input.user_id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
+}
+
 async function updateUser(
   args: MutationUpdateUserArgs,
   context: GraphQLContext
@@ -569,4 +628,5 @@ export {
   resetPassword,
   getUserDistricts,
   getDefaultUserDistrict,
+  changePassword,
 };

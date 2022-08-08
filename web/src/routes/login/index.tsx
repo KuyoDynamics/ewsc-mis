@@ -39,7 +39,7 @@ function Login() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, touchedFields },
+    formState: { isSubmitting, isValid, touchedFields, isDirty },
     setError,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
@@ -61,7 +61,7 @@ function Login() {
 
   const isLoggedIn = useReactiveVar(isLoggedInVar);
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from || '/';
 
   useEffect(() => {
     currentUserVar(currentUser as User);
@@ -72,7 +72,11 @@ function Login() {
       getCurrentUser({
         fetchPolicy: 'network-only',
       }).then(() => {
-        navigate(from, { replace: true });
+        if (['/signup', '/account/changePassword'].indexOf(from) > -1) {
+          navigate('/', { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
       });
     }
   }, [isLoggedIn, from, navigate, getCurrentUser]);
@@ -125,13 +129,18 @@ function Login() {
               Sign in on to the MIS
             </Typography>
           </Box>
-          {from === '/signup' && (
-            <Box>
-              <Alert severity="success">
-                Your account was created successfully. Please sign-in!
-              </Alert>
-            </Box>
-          )}
+          {(from === '/signup' || from === '/account/changePassword') &&
+            !isDirty && (
+              <Box>
+                <Alert severity="success">
+                  Your $
+                  {from === '/signup'
+                    ? 'account was created'
+                    : 'password was changed'}{' '}
+                  successfully. Please sign-in!
+                </Alert>
+              </Box>
+            )}
           <FormInput
             control={control}
             name="email"
