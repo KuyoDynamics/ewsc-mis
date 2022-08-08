@@ -81,7 +81,7 @@ function UserAccountMenu({
           href="/change-password"
           onClick={() => {
             handleClose();
-            navigate('/change-password');
+            navigate('/account/changePassword');
           }}
         >
           <ListItemIcon>

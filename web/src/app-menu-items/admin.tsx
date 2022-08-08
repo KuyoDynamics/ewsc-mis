@@ -1,5 +1,5 @@
 import {
-  ManageAccounts as ManageAccountsIcon,
+  AdminPanelSettings as AdminPanelSettingsIcon,
   ContactMail as ContactEmailIcon,
   RoomPreferences as RoomPreferencesIcon,
 } from '@mui/icons-material';
@@ -7,7 +7,7 @@ import { IMenuItem } from './dashboard';
 
 const admin: IMenuItem = {
   id: 'admin',
-  title: 'Admin',
+  title: 'Admin Panel',
   caption: 'Manage Organisation',
   type: 'group',
   children: [
@@ -17,7 +17,7 @@ const admin: IMenuItem = {
       caption: 'User Accounts',
       type: 'item',
       url: '/admin/users',
-      icon: ManageAccountsIcon,
+      icon: AdminPanelSettingsIcon,
     },
     {
       id: 'invitations',

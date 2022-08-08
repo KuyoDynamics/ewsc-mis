@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -13,55 +13,65 @@ import {
   Divider,
   Grid,
   IconButton,
-  MenuItem,
   Skeleton,
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Info, MoreVert as MoreVertIcon } from '@mui/icons-material';
-import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { Info } from '@mui/icons-material';
+import { useMatch, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useReactiveVar } from '@apollo/client';
-import { getNameInitials, USER_THEME_OPTIONS } from 'utils';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { getNameInitials } from 'utils';
 import FormInput from 'components/form-input-helpers/form-input';
-import FormSelect from 'components/form-input-helpers/form-select';
-import UserAccountMenu from 'components/users/user-account-menu';
 import { currentUserVar } from 'cache';
 import {
   useGetUserLazyQuery,
-  UserTheme,
   useUpdateUserMutation,
-} from '../../../graphql/generated';
+} from '../../graphql/generated';
 
 const schema = Yup.object({
-  first_name: Yup.string().max(255).required('First name is required'),
-  last_name: Yup.string().max(255).required('Last name is required'),
-  id: Yup.string()
-    .uuid('Invalid user id detected.')
-    .required('User is required'),
+  password: Yup.string()
+    .max(255)
+    .min(8, 'Password must be a minimum of 8 characters')
+    .required('Password is required'),
+  confirmPassword: Yup.string()
+    .required('Please retype your password.')
+    .oneOf([Yup.ref('password')], 'Your passwords do not match.'),
+  //   password_reset_token: Yup.string()
+  //     .uuid('No valid invitation found. This form is only for invited users')
+  //     .required('This form is only for invited users'),
 });
 
 interface FormInputs {
-  first_name: string;
-  last_name: string;
-  theme: UserTheme;
-  id: string;
+  password: string;
+  confirmPassword: string;
+  current_password?: string;
+  password_reset_token?: string;
 }
 
-function UserAccount() {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+type TokenPayloadType = {
+  id: string;
+} & JwtPayload;
 
+function ChangePassword() {
   const currentUser = useReactiveVar(currentUserVar);
-
-  const open = Boolean(anchorEl);
 
   const navigate = useNavigate();
 
-  const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentUserAccountRoute = useMatch('/account');
+  const passwordResetToken = searchParams.get('token');
 
-  const userId = currentUserAccountRoute ? currentUser.id : params.id;
+  const { id: passwordResetUserId }: TokenPayloadType = jwtDecode(
+    passwordResetToken!
+  );
+
+  const currentUserPasswordResetRoute = useMatch('/account/changePassword');
+
+  const userId = currentUserPasswordResetRoute
+    ? currentUser.id
+    : passwordResetUserId;
 
   const [getUser, { data, loading }] = useGetUserLazyQuery();
 
@@ -83,8 +93,6 @@ function UserAccount() {
     [updatedUserResponse]
   );
 
-  const isCurrentUser = currentUser.id === user?.id;
-
   const {
     handleSubmit,
     control,
@@ -98,59 +106,53 @@ function UserAccount() {
     mode: 'onChange',
   });
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const onSubmit = ({ password, password_reset_token }: FormInputs) => {
+    console.log('password', password);
+    console.log('password_reset_token', password_reset_token);
+    // updateUser({
+    //   variables: {
+    //     input: {
+    //       id,
+    //       update: {
+    //         first_name,
+    //         last_name,
+    //         theme,
+    //       },
+    //     },
+    //   },
+    //   onCompleted: (result) => {
+    //     if (result.updateUser.__typename === 'User') {
+    //       // Do nothing for now
+    //     } else if (result.updateUser.__typename === 'ApiCreateError') {
+    //       if (result.updateUser.field) {
+    //         setError(
+    //           result.updateUser.field as keyof FormInputs,
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const onSubmit = ({ first_name, last_name, theme, id }: FormInputs) => {
-    updateUser({
-      variables: {
-        input: {
-          id,
-          update: {
-            first_name,
-            last_name,
-            theme,
-          },
-        },
-      },
-      onCompleted: (result) => {
-        if (result.updateUser.__typename === 'User') {
-          // Do nothing for now
-        } else if (result.updateUser.__typename === 'ApiCreateError') {
-          if (result.updateUser.field) {
-            setError(
-              result.updateUser.field as keyof FormInputs,
-
-              {
-                type: 'server',
-                message: result.updateUser.message,
-              }
-            );
-          } else if (!result.updateUser.errors && !result.updateUser.field) {
-            setError('unknown' as keyof FormInputs, {
-              type: 'server',
-              message: result.updateUser.message,
-            });
-          } else {
-            result.updateUser.errors?.forEach((err) =>
-              setError(err.field as keyof FormInputs, {
-                type: 'server',
-                message: err.message,
-              })
-            );
-          }
-        }
-      },
-      onError: (err) => {
-        // throw it and let it be handled by the Error Boundary
-        console.log('Chaiwa, something bad happened', err);
-      },
-    });
+    //           {
+    //             type: 'server',
+    //             message: result.updateUser.message,
+    //           }
+    //         );
+    //       } else if (!result.updateUser.errors && !result.updateUser.field) {
+    //         setError('unknown' as keyof FormInputs, {
+    //           type: 'server',
+    //           message: result.updateUser.message,
+    //         });
+    //       } else {
+    //         result.updateUser.errors?.forEach((err) =>
+    //           setError(err.field as keyof FormInputs, {
+    //             type: 'server',
+    //             message: err.message,
+    //           })
+    //         );
+    //       }
+    //     }
+    //   },
+    //   onError: (err) => {
+    //     // throw it and let it be handled by the Error Boundary
+    //     console.log('Chaiwa, something bad happened', err);
+    //   },
+    // });
   };
 
   const isLoading = loading || !user;
@@ -166,34 +168,20 @@ function UserAccount() {
   }, [userId, getUser]);
 
   useEffect(() => {
-    if (user) {
-      reset({
-        first_name: user.first_name,
-        last_name: user.last_name,
-        theme: user.theme as UserTheme,
-      });
-    }
-  }, [user, reset]);
-
-  useEffect(() => {
-    if (userId) {
-      setValue('id', userId, {
+    if (passwordResetToken) {
+      setValue('password_reset_token', passwordResetToken, {
         shouldValidate: true,
       });
     }
-  }, [userId, setValue]);
+  }, [passwordResetToken, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {updatedUser && isValid && Object.values(touchedFields).length === 0 && (
-        <Box>
-          <Alert severity="success">Changes saved successfully.</Alert>
-        </Box>
-      )}
-      {(errors.id || errors['unknown' as keyof FormInputs]) && (
+      {(errors.password_reset_token ||
+        errors['unknown' as keyof FormInputs]) && (
         <Box>
           <Alert severity="error">
-            {errors.id?.message ||
+            {errors.password_reset_token?.message ||
               errors['unknown' as keyof FormInputs]?.message}
             . Please contact support or try again!
           </Alert>
@@ -246,19 +234,6 @@ function UserAccount() {
               </Avatar>
             )
           }
-          action={
-            isLoading ? null : (
-              <IconButton aria-label="settings" onClick={handleClick}>
-                <MoreVertIcon />
-              </IconButton>
-            )
-          }
-        />
-        <UserAccountMenu
-          open={open}
-          handleClose={handleClose}
-          anchorEl={anchorEl}
-          user={user!}
         />
         <Divider />
         <CardContent>
@@ -277,48 +252,48 @@ function UserAccount() {
                 <Grid item md={6} xs={12}>
                   <FormInput
                     control={control}
-                    InputProps={{
-                      readOnly: !isCurrentUser,
-                      disabled: !isCurrentUser,
-                    }}
                     fullWidth
-                    label="First name"
-                    name="first_name"
+                    label="Your Current Password"
+                    name="current_password"
+                    type="password"
+                    InputProps={{
+                      autoComplete: 'new-password',
+                    }}
                     variant="outlined"
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <FormInput
                     control={control}
-                    InputProps={{
-                      readOnly: !isCurrentUser,
-                      disabled: !isCurrentUser,
-                    }}
                     fullWidth
-                    label="Last name"
-                    name="last_name"
+                    label="New Password"
+                    name="password"
+                    type="password"
+                    InputProps={{
+                      autoComplete: 'new-password',
+                    }}
                     variant="outlined"
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <FormSelect
+                  <FormInput
                     control={control}
-                    errors={errors}
-                    inputProps={{
-                      readOnly: !isCurrentUser,
-                      disabled: !isCurrentUser,
-                    }}
                     fullWidth
-                    label="Theme"
-                    name="theme"
+                    label="Confirm New Password"
+                    name="confirmPassword"
+                    type="password"
+                    InputProps={{
+                      autoComplete: 'new-password',
+                    }}
                     variant="outlined"
-                  >
-                    {USER_THEME_OPTIONS.map((option) => (
-                      <MenuItem value={option}>{option}</MenuItem>
-                    ))}
-                  </FormSelect>
+                  />
                 </Grid>
-                <input id="id" type="hidden" required {...register('id')} />
+                <input
+                  id="password_reset_token"
+                  type="hidden"
+                  required
+                  {...register('password_reset_token')}
+                />
               </>
             )}
           </Grid>
@@ -335,7 +310,7 @@ function UserAccount() {
           <Button
             variant="text"
             onClick={() => {
-              navigate(currentUserAccountRoute ? '/' : (-1 as any));
+              navigate('/');
             }}
           >
             Close
@@ -357,4 +332,4 @@ function UserAccount() {
   // eslint-disable-next-line react/jsx-props-no-spreading
 }
 
-export default UserAccount;
+export default ChangePassword;

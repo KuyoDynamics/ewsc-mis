@@ -1,8 +1,8 @@
 import React, { lazy } from 'react';
+import { RouteObject } from 'react-router-dom';
 import Loadable from 'components/loadable';
 import MainLayout from 'layout/main-layout';
 import PrivateRoute from 'components/authentication/private-route';
-import { RouteObject, RouteProps, RoutesProps } from 'react-router-dom';
 
 const DashboardDefault = Loadable(lazy(() => import('routes/dashboard')));
 
@@ -46,7 +46,11 @@ const MainRouter: RouteObject = {
       ],
     },
     {
-      path: 'account/:id',
+      path: 'account',
+      element: <UserAccount />,
+    },
+    {
+      path: 'account/changePassword',
       element: <UserAccount />,
     },
     {

@@ -1,11 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, {
-  useState,
-  forwardRef,
-  Ref,
-  ReactElement,
-  useEffect,
-} from 'react';
+import React, { useState, forwardRef, Ref, ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import {
@@ -19,8 +13,11 @@ import {
   Slide,
   Typography,
 } from '@mui/material';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import SettingsIcon from '@mui/icons-material/SettingsSharp';
+import {
+  ExitToApp as ExitToAppIcon,
+  ManageAccounts as ManageAccountsIcon,
+} from '@mui/icons-material';
+
 import { IconSettings } from '@tabler/icons';
 import { TransitionProps } from '@mui/material/transitions';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
@@ -133,11 +130,11 @@ function ProfileSection() {
           id="account-settings"
           onClick={() => {
             handleClose();
-            navigate(`/account/${currentUser?.id}`);
+            navigate('/account');
           }}
         >
           <ListItemIcon>
-            <SettingsIcon />
+            <ManageAccountsIcon />
           </ListItemIcon>
           <ListItemText primary="Account Settings" />
         </MenuItem>
