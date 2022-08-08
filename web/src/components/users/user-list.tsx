@@ -18,7 +18,7 @@ function UserList() {
         ? data.me.user_default_organisation?.users?.map((user) => ({
             id: user.id,
             organisation_user_id: user.organisation_user_id,
-            name: `${user.last_name} ${user.first_name} `,
+            name: `${user.first_name} ${user.last_name}`,
             role: user.role,
             disabled: user.disabled,
             user_districts: user.user_districts,

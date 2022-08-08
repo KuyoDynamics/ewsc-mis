@@ -2782,6 +2782,13 @@ export type UpdateUserRolesForDistrictMutationVariables = Exact<{
 
 export type UpdateUserRolesForDistrictMutation = { __typename?: 'Mutation', updateUserRolesForDistrict: { __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType> } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
+export type UpdateUserMutationVariables = Exact<{
+  input: UpdateUserInput;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, first_name: string, last_name: string, theme?: UserTheme | null, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 
 export const CreateInvitedUserDocument = gql`
     mutation CreateInvitedUser($input: CreateInvitedUserInput!) {
@@ -3415,6 +3422,56 @@ export function useUpdateUserRolesForDistrictMutation(baseOptions?: Apollo.Mutat
 export type UpdateUserRolesForDistrictMutationHookResult = ReturnType<typeof useUpdateUserRolesForDistrictMutation>;
 export type UpdateUserRolesForDistrictMutationResult = Apollo.MutationResult<UpdateUserRolesForDistrictMutation>;
 export type UpdateUserRolesForDistrictMutationOptions = Apollo.BaseMutationOptions<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    ... on User {
+      id
+      first_name
+      last_name
+      theme
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier)[];
 export type ApiBatchPayloadFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>

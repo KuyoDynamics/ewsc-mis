@@ -71,11 +71,8 @@ const Main = styled('main', {
   }),
 }));
 
-// ==============================|| MAIN LAYOUT ||============================== //
-
 function MainLayout() {
   const theme = useTheme();
-  console.log('Chaiwa, show me Theme', theme);
   const [leftDrawerOpened, setLeftDrawerOpened] = useState(false);
   const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'));
 

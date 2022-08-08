@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -14,36 +15,37 @@ import {
   IconButton,
   MenuItem,
   Skeleton,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import { Info, MoreVert as MoreVertIcon } from '@mui/icons-material';
-import {
-  useMatch,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useReactiveVar } from '@apollo/client';
 import { getNameInitials, USER_THEME_OPTIONS } from 'utils';
 import FormInput from 'components/form-input-helpers/form-input';
 import FormSelect from 'components/form-input-helpers/form-select';
 import UserAccountMenu from 'components/users/user-account-menu';
-import { useGetUserQuery, UserTheme } from '../../../graphql/generated';
-import { useReactiveVar } from '@apollo/client';
 import { currentUserVar } from 'cache';
+import {
+  useGetUserLazyQuery,
+  UserTheme,
+  useUpdateUserMutation,
+} from '../../../graphql/generated';
 
 const schema = Yup.object({
   first_name: Yup.string().max(255).required('First name is required'),
   last_name: Yup.string().max(255).required('Last name is required'),
-  //  theme
+  id: Yup.string()
+    .uuid('Invalid user id detected.')
+    .required('User is required'),
 });
 
 interface FormInputs {
   first_name: string;
   last_name: string;
   theme: UserTheme;
+  id: string;
 }
 
 function UserAccount() {
@@ -61,19 +63,24 @@ function UserAccount() {
 
   const userId = params.id;
 
-  console.log('searchParams', params);
-  console.log('userId', userId);
+  const [getUser, { data, loading }] = useGetUserLazyQuery();
 
-  const { data, loading } = useGetUserQuery({
-    variables: {
-      userId: userId!,
-    },
-    skip: !userId,
-  });
+  const [
+    updateUser,
+    { data: updatedUserResponse, loading: updatingUser, error: updateError },
+  ] = useUpdateUserMutation();
 
   const user = useMemo(
     () => (data?.user.__typename === 'User' ? data.user : null),
     [data]
+  );
+
+  const updatedUser = useMemo(
+    () =>
+      updatedUserResponse?.updateUser.__typename === 'User'
+        ? updatedUserResponse.updateUser
+        : null,
+    [updatedUserResponse]
   );
 
   const isCurrentUser = currentUser.id === user?.id;
@@ -81,12 +88,14 @@ function UserAccount() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, isDirty, touchedFields, errors },
+    formState: { isValid, isDirty, touchedFields, errors },
     reset,
+    register,
+    setValue,
+    setError,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
-    mode: 'all',
-    defaultValues: user as FormInputs,
+    mode: 'onChange',
   });
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -97,15 +106,99 @@ function UserAccount() {
     setAnchorEl(null);
   };
 
-  const onSubmit = ({ first_name, last_name, theme }: FormInputs) => {};
+  const onSubmit = ({ first_name, last_name, theme, id }: FormInputs) => {
+    updateUser({
+      variables: {
+        input: {
+          id,
+          update: {
+            first_name,
+            last_name,
+            theme,
+          },
+        },
+      },
+      onCompleted: (result) => {
+        if (result.updateUser.__typename === 'User') {
+          // Do nothing for now
+        } else if (result.updateUser.__typename === 'ApiCreateError') {
+          if (result.updateUser.field) {
+            setError(
+              result.updateUser.field as keyof FormInputs,
+
+              {
+                type: 'server',
+                message: result.updateUser.message,
+              }
+            );
+          } else if (!result.updateUser.errors && !result.updateUser.field) {
+            setError('unknown' as keyof FormInputs, {
+              type: 'server',
+              message: result.updateUser.message,
+            });
+          } else {
+            result.updateUser.errors?.forEach((err) =>
+              setError(err.field as keyof FormInputs, {
+                type: 'server',
+                message: err.message,
+              })
+            );
+          }
+        }
+      },
+      onError: (err) => {
+        // throw it and let it be handled by the Error Boundary
+        console.log('Chaiwa, something bad happened', err);
+      },
+    });
+  };
 
   const isLoading = loading || !user;
 
-  console.log('currentUser', currentUser);
-  console.log('isCurrentUser', isCurrentUser);
+  useEffect(() => {
+    if (userId) {
+      getUser({
+        variables: {
+          userId,
+        },
+      });
+    }
+  }, [userId, getUser]);
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        theme: user.theme as UserTheme,
+      });
+    }
+  }, [user, reset]);
+
+  useEffect(() => {
+    if (userId) {
+      setValue('id', userId, {
+        shouldValidate: true,
+      });
+    }
+  }, [userId, setValue]);
 
   return (
-    <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {updatedUser && isValid && Object.values(touchedFields).length === 0 && (
+        <Box>
+          <Alert severity="success">Changes saved successfully.</Alert>
+        </Box>
+      )}
+      {(errors.id || errors['unknown' as keyof FormInputs]) && (
+        <Box>
+          <Alert severity="error">
+            {errors.id?.message ||
+              errors['unknown' as keyof FormInputs]?.message}
+            . Please contact support or try again!
+          </Alert>
+        </Box>
+      )}
       <Card>
         <CardHeader
           subheader={
@@ -149,7 +242,7 @@ function UserAccount() {
               />
             ) : (
               <Avatar aria-label="recipe">
-                {getNameInitials(user?.first_name, user?.last_name)}
+                {getNameInitials(user.first_name, user.last_name)}
               </Avatar>
             )
           }
@@ -225,6 +318,7 @@ function UserAccount() {
                     ))}
                   </FormSelect>
                 </Grid>
+                <input id="id" type="hidden" required {...register('id')} />
               </>
             )}
           </Grid>

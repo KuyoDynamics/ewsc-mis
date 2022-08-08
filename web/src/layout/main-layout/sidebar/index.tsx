@@ -6,19 +6,15 @@ import { BrowserView, MobileView } from 'react-device-detect';
 import { drawerWidth } from 'theme/constants';
 import MenuList from 'layout/main-layout/sidebar/menu-list';
 import LogoSection from 'layout/main-layout/logo-section';
-// import Logo from '../../../../public/static/images/ewsc_logo.png';
 
 interface ISidebarProps {
   drawerOpen: boolean;
   drawerToggle: () => void;
-  //   window: object;
 }
 
 function Sidebar({ drawerOpen, drawerToggle }: ISidebarProps) {
   const theme = useTheme();
   const matchUpMd = useMediaQuery(theme.breakpoints.up('md'));
-  console.log('mathUpMd', matchUpMd);
-  console.log("theme.breakpoints.up('md')", theme.breakpoints.up('md'));
 
   const drawer = (
     <>

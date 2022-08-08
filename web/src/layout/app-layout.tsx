@@ -25,7 +25,6 @@ function AppLayout(props: AppLayoutProps) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
-      console.log('Chaiwa, what is event?', event);
       if (
         event &&
         event.type === 'keydown' &&
@@ -37,8 +36,6 @@ function AppLayout(props: AppLayoutProps) {
 
       setSidebarOpen(open);
     };
-
-  console.log('Chaiwa, what is isSidebarOpen?', isSidebarOpen);
 
   return (
     <>
