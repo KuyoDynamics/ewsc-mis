@@ -28,6 +28,7 @@ interface IUserAccountMenuProps {
   handleClose: () => void;
   anchorEl: null | HTMLElement;
   user: User;
+  handleOpenPasswordResetModal: () => void;
 }
 
 function UserAccountMenu({
@@ -35,6 +36,7 @@ function UserAccountMenu({
   handleClose,
   anchorEl,
   user,
+  handleOpenPasswordResetModal,
 }: IUserAccountMenuProps) {
   const [showUserAccountDisableDialog, setShowUserAccountDisableDialog] =
     useState(false);
@@ -81,7 +83,8 @@ function UserAccountMenu({
           href="/change-password"
           onClick={() => {
             handleClose();
-            navigate(`/requestPasswordReset/${user.id}`);
+            // navigate('/admin/requestPasswordReset/');
+            handleOpenPasswordResetModal();
           }}
         >
           <ListItemIcon>

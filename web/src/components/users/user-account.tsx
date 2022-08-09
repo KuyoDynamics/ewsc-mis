@@ -32,6 +32,7 @@ import {
   UserTheme,
   useUpdateUserMutation,
 } from '../../../graphql/generated';
+import RequestPasswordResetModal from './request-password-reset-modal';
 
 const schema = Yup.object({
   first_name: Yup.string().max(255).required('First name is required'),
@@ -50,10 +51,12 @@ interface FormInputs {
 
 function UserAccount() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [open, setOpen] = useState(Boolean(anchorEl));
+  const [openPasswordResetModal, setOpenPasswordResetModal] = useState(false);
 
   const currentUser = useReactiveVar(currentUserVar);
 
-  const open = Boolean(anchorEl);
+  // const open = Boolean(anchorEl);
 
   const navigate = useNavigate();
 
@@ -100,10 +103,20 @@ function UserAccount() {
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     setAnchorEl(event.currentTarget);
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    // setAnchorEl(null);
+    setOpen(false);
+  };
+
+  const handleOpenPasswordResetModal = () => {
+    setOpenPasswordResetModal(true);
+  };
+
+  const handleClosePasswordResetModal = () => {
+    setOpenPasswordResetModal(false);
   };
 
   const onSubmit = ({ first_name, last_name, theme, id }: FormInputs) => {
@@ -259,6 +272,14 @@ function UserAccount() {
           handleClose={handleClose}
           anchorEl={anchorEl}
           user={user!}
+          handleOpenPasswordResetModal={handleOpenPasswordResetModal}
+        />
+        <RequestPasswordResetModal
+          open={openPasswordResetModal}
+          handleClose={handleClosePasswordResetModal}
+          anchorEl={anchorEl}
+          email={user?.email!}
+          name={user?.first_name!}
         />
         <Divider />
         <CardContent>
