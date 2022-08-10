@@ -1,6 +1,8 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useContext, useMemo } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertColor } from '@mui/material/Alert';
+import Slide, { SlideProps } from '@mui/material/Slide';
 import { AppContext } from 'context/app-context';
 import { ActionTypes } from 'context/reducer';
 
@@ -10,6 +12,10 @@ export type ToastNotification = {
   id: string;
   open: boolean;
 };
+
+function SlideTransition(props: SlideProps) {
+  return <Slide {...props} direction="up" />;
+}
 
 export default function Toast() {
   const { state, dispatch } = useContext(AppContext);
@@ -44,9 +50,10 @@ export default function Toast() {
       onClose={handleClose}
       anchorOrigin={{
         vertical: 'bottom',
-        horizontal: 'left',
+        horizontal: 'center',
       }}
       open={firstNotification.open}
+      TransitionComponent={SlideTransition}
     >
       <MuiAlert
         onClose={handleClose}

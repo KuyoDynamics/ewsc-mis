@@ -13,6 +13,7 @@ import {
   useLoginMutation,
   User,
 } from '../../../graphql/generated';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const schema = Yup.object({
   email: Yup.string()
@@ -39,14 +40,20 @@ function Login() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, touchedFields, isDirty },
+    formState: { isSubmitting, isValid, touchedFields, isDirty, errors },
     setError,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
 
-  const [login, { loading: logginIn }] = useLoginMutation();
+  const [login, { loading, reset, error }] = useLoginMutation();
+
+  console.log('Error', error);
+
+  console.log('isDirty', isDirty);
+
+  console.log('errors', errors);
 
   const [getCurrentUser, { data: currentUserResponse }] =
     useGetCurrentUserLazyQuery();
@@ -82,31 +89,38 @@ function Login() {
   }, [isLoggedIn, from, navigate, getCurrentUser]);
 
   const onSubmit = async (values: any) => {
-    login({
-      fetchPolicy: 'network-only',
-      variables: {
-        input: {
-          email: values.email,
-          password: values.password,
+    try {
+      await login({
+        fetchPolicy: 'no-cache',
+        variables: {
+          input: {
+            email: values.email,
+            password: values.password,
+          },
         },
-      },
-      onCompleted: (result) => {
-        if (result.login.__typename === 'LoginSuccess') {
-          setToken(result.login.accessToken, client);
-        } else if (result.login.__typename === 'ApiLoginError') {
-          result.login.errors?.forEach((err) =>
-            setError(err.field as 'email' | 'password', {
-              type: 'server',
-              message: err.message,
-            })
-          );
-        }
-      },
-      onError: (err) => {
-        // throw it and let it be handled by the Error Boundary
-        console.log('Chaiwa, something bad happened', err);
-      },
-    });
+        onCompleted: (result) => {
+          if (result.login.__typename === 'LoginSuccess') {
+            setToken(result.login.accessToken, client);
+          } else if (result.login.__typename === 'ApiLoginError') {
+            result.login.errors?.forEach((err) =>
+              setError(err.field as 'email' | 'password', {
+                type: 'server',
+                message: err.message,
+              })
+            );
+          }
+        },
+        onError: (err) => {
+          // throw it and let it be handled by the Error Boundary
+          console.log('Chaiwa, something bad happened', err);
+        },
+      });
+    } catch (err) {
+      // Error Boundary
+      console.log('Chaiwa, Error', err);
+    } finally {
+      reset();
+    }
   };
 
   return (
@@ -121,6 +135,14 @@ function Login() {
     >
       <Container maxWidth="sm">
         <form onSubmit={handleSubmit(onSubmit)}>
+          {errors['unknown' as keyof FormInputs] && !isDirty && (
+            <Box>
+              <Alert severity="error">
+                {errors['unknown' as keyof FormInputs]?.message}. Please contact
+                support or try again!
+              </Alert>
+            </Box>
+          )}
           <Box sx={{ my: 3 }}>
             <Typography color="textPrimary" variant="h4">
               Sign in
@@ -160,20 +182,22 @@ function Login() {
             variant="outlined"
           />
           <Box sx={{ py: 2 }}>
-            <Button
+            <LoadingButton
               color="primary"
               disabled={
                 isSubmitting ||
                 (!isValid && (touchedFields.email || touchedFields.password)) ||
-                logginIn
+                loading
               }
-              fullWidth
               size="large"
-              type="submit"
               variant="contained"
+              type="submit"
+              fullWidth
+              loading={isSubmitting || loading}
+              loadingPosition="end"
             >
-              {logginIn ? 'signing you in...' : 'Sign In'}
-            </Button>
+              {loading ? 'signing you in...' : 'Sign In'}
+            </LoadingButton>
           </Box>
         </form>
       </Container>

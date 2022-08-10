@@ -1,6 +1,8 @@
 import { Organisation } from '@prisma/client';
 import {
   MutationCreateInvitedUserArgs,
+  MutationRequestPasswordResetArgs,
+  User,
   UserInvitationResult,
   UserResult,
 } from '../libs/resolvers-types';
@@ -101,6 +103,29 @@ const sendInvitationEmailMiddleware = {
       });
 
       return userInvitationResult;
+    },
+  },
+};
+
+const sendPasswordResetEmailMiddleware = {
+  Mutation: {
+    requestPasswordReset: async (
+      resolve: any,
+      parent: any,
+      args: MutationRequestPasswordResetArgs,
+      context: GraphQLContext,
+      info: any
+    ) => {
+      const userResult: UserResult = await resolve(parent, args, context, info);
+
+      const user = userResult.__typename === 'User' ? userResult : null;
+
+      if (user) {
+        // TODO: Create its own function
+        await sendInvitation(user.email, user.id, 'EWSC', context);
+      }
+
+      return userResult;
     },
   },
 };

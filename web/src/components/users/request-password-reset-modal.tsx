@@ -12,7 +12,6 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { AppContext } from 'context/app-context';
@@ -45,17 +44,9 @@ function RequestPasswordResetModal({
   const [requestPasswordReset, { data, loading, error: error }] =
     useRequestPasswordResetMutation();
 
-  const updatedUser = useMemo(
-    () =>
-      data?.requestPasswordReset.__typename === 'User'
-        ? data.requestPasswordReset
-        : null,
-    [data]
-  );
-
   const {
     handleSubmit,
-    formState: { isValid, errors },
+    formState: { errors },
     register,
     setError,
     setValue,
@@ -64,11 +55,7 @@ function RequestPasswordResetModal({
     mode: 'onChange',
   });
 
-  console.log('errors', errors);
-
   const onSubmit = ({ email: emailInput }: FormInputs) => {
-    console.log('email in onSubmit', emailInput);
-
     requestPasswordReset({
       variables: {
         input: {
@@ -77,7 +64,6 @@ function RequestPasswordResetModal({
       },
       onCompleted: (result) => {
         if (result.requestPasswordReset.__typename === 'User') {
-          console.log('Chaiwa, result with User', result);
           handleClose();
           dispatch({
             type: ActionTypes.ShowToast,
@@ -90,7 +76,6 @@ function RequestPasswordResetModal({
         } else if (
           result.requestPasswordReset.__typename === 'ApiUpdateError'
         ) {
-          console.log('Chaiwa, result with ApiUpdateError', result);
           if (result.requestPasswordReset.field) {
             setError(
               result.requestPasswordReset.field as keyof FormInputs,

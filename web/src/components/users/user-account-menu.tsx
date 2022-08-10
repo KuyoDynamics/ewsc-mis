@@ -83,8 +83,11 @@ function UserAccountMenu({
           href="/change-password"
           onClick={() => {
             handleClose();
-            // navigate('/admin/requestPasswordReset/');
-            handleOpenPasswordResetModal();
+            if (isCurrentUser) {
+              navigate('/account/changePassword');
+            } else {
+              handleOpenPasswordResetModal();
+            }
           }}
         >
           <ListItemIcon>
