@@ -105,9 +105,7 @@ const typeDefs = gql`
     disableUser(input: DisableUserInput!): UserResult!
     updateUser(input: UpdateUserInput!): UserResult!
     login(input: LoginInput!): LoginResult!
-    requestPasswordReset(
-      input: PasswordResetRequestInput!
-    ): PasswordResetRequestResult!
+    requestPasswordReset(input: PasswordResetRequestInput!): UserResult!
     resetPassword(input: PasswordResetInput!): PasswordResetResult!
     changePassword(input: ChangePasswordInput!): UserResult!
   }
@@ -218,10 +216,6 @@ const typeDefs = gql`
   union UserDistrictResult = UserDistrict | ApiNotFoundError
 
   union LoginResult = LoginSuccess | ApiLoginError
-
-  union PasswordResetRequestResult =
-      PasswordResetRequestPayload
-    | ApiPasswordResetError
 
   union PasswordResetResult = User | ApiPasswordResetError
 `;

@@ -23,7 +23,6 @@ import {
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
   OrganisationUserRoleType,
-  PasswordResetRequestResult,
   PasswordResetResult,
   QueryDefault_User_DistrictArgs,
   QueryUserArgs,
@@ -534,7 +533,7 @@ async function login(
 async function requestPasswordReset(
   args: MutationRequestPasswordResetArgs,
   context: GraphQLContext
-): Promise<PasswordResetRequestResult> {
+): Promise<UserResult> {
   let hashed_password_reset_token;
   try {
     const user = await context.prisma.user.findUnique({
@@ -548,9 +547,28 @@ async function requestPasswordReset(
 
     if (user.disabled) throw new AuthenticationError('Account is disabled.');
 
-    hashed_password_reset_token = uuidv4();
+    try {
+      hashed_password_reset_token = jwt.sign(
+        { email: user.email, id: uuidv4() },
+        process.env.JWT_SECRET!,
+        {
+          algorithm: 'HS256',
+          subject: user.email,
+          expiresIn: '1d',
+        }
+      );
+    } catch (error) {
+      console.log('Failed to generate password reset token.', error);
+      // Also send to Sentry
+      throw new AuthenticationError(
+        'Failed to generate password reset token.',
+        {
+          field: 'email',
+        }
+      );
+    }
 
-    await context.prisma.user.update({
+    const updatedUser = await context.prisma.user.update({
       where: {
         id: user.id,
       },
@@ -563,12 +581,12 @@ async function requestPasswordReset(
     // We can send email at this point like this, async. After we figure out sending emails, we will not return
     // Email.password_recovery_email(user, token) |> Mailer.deliver_later()
     return {
-      __typename: 'PasswordResetRequestPayload',
-      hashed_password_reset_token,
-    };
+      __typename: 'User',
+      ...updatedUser,
+    } as User;
   } catch (error) {
     return {
-      __typename: 'ApiPasswordResetError',
+      __typename: 'ApiUpdateError',
       message: 'Password Reset Request Failed.',
       errors: generateClientErrors(error, 'email,password'),
     };

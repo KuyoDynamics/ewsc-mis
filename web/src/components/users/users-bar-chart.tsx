@@ -87,7 +87,7 @@ function UsersBarChart() {
                   <Typography variant="subtitle2">Total Users</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography variant="h3">90</Typography>
+                  <Typography variant="h3">2</Typography>
                 </Grid>
               </Grid>
             </Grid>

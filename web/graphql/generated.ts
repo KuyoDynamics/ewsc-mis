@@ -981,7 +981,7 @@ export type Mutation = {
   disableUser: UserResult;
   updateUser: UserResult;
   login: LoginResult;
-  requestPasswordReset: PasswordResetRequestResult;
+  requestPasswordReset: UserResult;
   resetPassword: PasswordResetResult;
   changePassword: UserResult;
   createOrganisationUser: OrganisationUserResult;
@@ -1753,8 +1753,6 @@ export type PasswordResetRequestPayload = {
   __typename?: 'PasswordResetRequestPayload';
   hashed_password_reset_token: Scalars['String'];
 };
-
-export type PasswordResetRequestResult = PasswordResetRequestPayload | ApiPasswordResetError;
 
 export type PasswordResetResult = User | ApiPasswordResetError;
 
@@ -2782,6 +2780,13 @@ export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]
 
 export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
 
+export type RequestPasswordResetMutationVariables = Exact<{
+  input: PasswordResetRequestInput;
+}>;
+
+
+export type RequestPasswordResetMutation = { __typename?: 'Mutation', requestPasswordReset: { __typename?: 'User', id: string, email: string, hashed_password_reset_token?: string | null, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
 export type SendUserInvitationEmailMutationVariables = Exact<{
   input: SendInvitationEmailInput;
 }>;
@@ -3379,6 +3384,55 @@ export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.Subs
       }
 export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
 export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
+export const RequestPasswordResetDocument = gql`
+    mutation RequestPasswordReset($input: PasswordResetRequestInput!) {
+  requestPasswordReset(input: $input) {
+    ... on User {
+      id
+      email
+      hashed_password_reset_token
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type RequestPasswordResetMutationFn = Apollo.MutationFunction<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+
+/**
+ * __useRequestPasswordResetMutation__
+ *
+ * To run a mutation, you first call `useRequestPasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequestPasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requestPasswordResetMutation, { data, loading, error }] = useRequestPasswordResetMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRequestPasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>(RequestPasswordResetDocument, options);
+      }
+export type RequestPasswordResetMutationHookResult = ReturnType<typeof useRequestPasswordResetMutation>;
+export type RequestPasswordResetMutationResult = Apollo.MutationResult<RequestPasswordResetMutation>;
+export type RequestPasswordResetMutationOptions = Apollo.BaseMutationOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
 export const SendUserInvitationEmailDocument = gql`
     mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
   sendUserInvitationEmail(input: $input) {

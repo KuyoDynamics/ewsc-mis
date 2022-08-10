@@ -1028,7 +1028,7 @@ export type Mutation = {
   deleteWaterTreatmentPlants: ApiBatchPayloadResult;
   disableUser: UserResult;
   login: LoginResult;
-  requestPasswordReset: PasswordResetRequestResult;
+  requestPasswordReset: UserResult;
   resetPassword: PasswordResetResult;
   sendUserInvitationEmail: UserInvitationResult;
   setUserDefaultDistrict: DistrictUserResult;
@@ -1753,8 +1753,6 @@ export type PasswordResetRequestPayload = {
   __typename?: 'PasswordResetRequestPayload';
   hashed_password_reset_token: Scalars['String'];
 };
-
-export type PasswordResetRequestResult = ApiPasswordResetError | PasswordResetRequestPayload;
 
 export type PasswordResetResult = ApiPasswordResetError | User;
 
@@ -2968,7 +2966,6 @@ export type ResolversTypes = ResolversObject<{
   PasswordResetInput: PasswordResetInput;
   PasswordResetRequestInput: PasswordResetRequestInput;
   PasswordResetRequestPayload: ResolverTypeWrapper<PasswordResetRequestPayload>;
-  PasswordResetRequestResult: ResolversTypes['ApiPasswordResetError'] | ResolversTypes['PasswordResetRequestPayload'];
   PasswordResetResult: ResolversTypes['ApiPasswordResetError'] | ResolversTypes['User'];
   PhoneNumber: ResolverTypeWrapper<Scalars['PhoneNumber']>;
   Port: ResolverTypeWrapper<Scalars['Port']>;
@@ -3267,7 +3264,6 @@ export type ResolversParentTypes = ResolversObject<{
   PasswordResetInput: PasswordResetInput;
   PasswordResetRequestInput: PasswordResetRequestInput;
   PasswordResetRequestPayload: PasswordResetRequestPayload;
-  PasswordResetRequestResult: ResolversParentTypes['ApiPasswordResetError'] | ResolversParentTypes['PasswordResetRequestPayload'];
   PasswordResetResult: ResolversParentTypes['ApiPasswordResetError'] | ResolversParentTypes['User'];
   PhoneNumber: Scalars['PhoneNumber'];
   Port: Scalars['Port'];
@@ -3933,7 +3929,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteWaterTreatmentPlants?: Resolver<ResolversTypes['ApiBatchPayloadResult'], ParentType, ContextType, RequireFields<MutationDeleteWaterTreatmentPlantsArgs, 'filter'>>;
   disableUser?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationDisableUserArgs, 'input'>>;
   login?: Resolver<ResolversTypes['LoginResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
-  requestPasswordReset?: Resolver<ResolversTypes['PasswordResetRequestResult'], ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
+  requestPasswordReset?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationRequestPasswordResetArgs, 'input'>>;
   resetPassword?: Resolver<ResolversTypes['PasswordResetResult'], ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'input'>>;
   sendUserInvitationEmail?: Resolver<ResolversTypes['UserInvitationResult'], ParentType, ContextType, RequireFields<MutationSendUserInvitationEmailArgs, 'input'>>;
   setUserDefaultDistrict?: Resolver<ResolversTypes['DistrictUserResult'], ParentType, ContextType, RequireFields<MutationSetUserDefaultDistrictArgs, 'input'>>;
@@ -4160,10 +4156,6 @@ export type OrganisationUserViewResolvers<ContextType = GraphQLContext, ParentTy
 export type PasswordResetRequestPayloadResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PasswordResetRequestPayload'] = ResolversParentTypes['PasswordResetRequestPayload']> = ResolversObject<{
   hashed_password_reset_token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type PasswordResetRequestResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PasswordResetRequestResult'] = ResolversParentTypes['PasswordResetRequestResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'ApiPasswordResetError' | 'PasswordResetRequestPayload', ParentType, ContextType>;
 }>;
 
 export type PasswordResetResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PasswordResetResult'] = ResolversParentTypes['PasswordResetResult']> = ResolversObject<{
@@ -4775,7 +4767,6 @@ export type Resolvers<ContextType = GraphQLContext> = ResolversObject<{
   OrganisationUserResult?: OrganisationUserResultResolvers<ContextType>;
   OrganisationUserView?: OrganisationUserViewResolvers<ContextType>;
   PasswordResetRequestPayload?: PasswordResetRequestPayloadResolvers<ContextType>;
-  PasswordResetRequestResult?: PasswordResetRequestResultResolvers<ContextType>;
   PasswordResetResult?: PasswordResetResultResolvers<ContextType>;
   PhoneNumber?: GraphQLScalarType;
   Port?: GraphQLScalarType;

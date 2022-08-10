@@ -205,16 +205,16 @@ function ChangePassword() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {(errors.id || errors['unknown' as keyof FormInputs]) && (
-        <Box>
-          <Alert severity="error">
-            {errors.id?.message ||
-              errors['unknown' as keyof FormInputs]?.message}
-            . Please contact support or try again!
-          </Alert>
-        </Box>
-      )}
       <Card>
+        {(errors.id || errors['unknown' as keyof FormInputs]) && (
+          <Box>
+            <Alert severity="error">
+              {errors.id?.message ||
+                errors['unknown' as keyof FormInputs]?.message}
+              . Please contact support or try again!
+            </Alert>
+          </Box>
+        )}
         <CardHeader
           subheader={
             isLoading ? (

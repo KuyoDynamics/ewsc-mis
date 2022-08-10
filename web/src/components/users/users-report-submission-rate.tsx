@@ -97,7 +97,7 @@ function UsersReportSubmissionRate() {
                 >
                   <Grid item>
                     <Typography variant="subtitle1" color="inherit">
-                      Bajaj Finery
+                      Lundazi
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -108,7 +108,7 @@ function UsersReportSubmissionRate() {
                     >
                       <Grid item>
                         <Typography variant="subtitle1" color="inherit">
-                          $1839.00
+                          30
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -135,7 +135,7 @@ function UsersReportSubmissionRate() {
               </Grid>
               <Grid item>
                 <Typography variant="subtitle2" sx={{ color: 'success.dark' }}>
-                  10% Profit
+                  10% Ontime
                 </Typography>
               </Grid>
             </Grid>
@@ -149,7 +149,7 @@ function UsersReportSubmissionRate() {
                 >
                   <Grid item>
                     <Typography variant="subtitle1" color="inherit">
-                      TTML
+                      Chipata
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -160,7 +160,7 @@ function UsersReportSubmissionRate() {
                     >
                       <Grid item>
                         <Typography variant="subtitle1" color="inherit">
-                          $100.00
+                          20%
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -190,7 +190,7 @@ function UsersReportSubmissionRate() {
                   variant="subtitle2"
                   sx={{ color: theme.palette.orange.dark }}
                 >
-                  10% loss
+                  10% late
                 </Typography>
               </Grid>
             </Grid>
@@ -204,7 +204,7 @@ function UsersReportSubmissionRate() {
                 >
                   <Grid item>
                     <Typography variant="subtitle1" color="inherit">
-                      Reliance
+                      Chadiza
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -215,7 +215,7 @@ function UsersReportSubmissionRate() {
                     >
                       <Grid item>
                         <Typography variant="subtitle1" color="inherit">
-                          $200.00
+                          30
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -245,7 +245,7 @@ function UsersReportSubmissionRate() {
                   variant="subtitle2"
                   sx={{ color: theme.palette.success.dark }}
                 >
-                  10% Profit
+                  10% Ontime
                 </Typography>
               </Grid>
             </Grid>
@@ -259,7 +259,7 @@ function UsersReportSubmissionRate() {
                 >
                   <Grid item>
                     <Typography variant="subtitle1" color="inherit">
-                      TTML
+                      Katete
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -270,7 +270,7 @@ function UsersReportSubmissionRate() {
                     >
                       <Grid item>
                         <Typography variant="subtitle1" color="inherit">
-                          $189.00
+                          5
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -300,7 +300,7 @@ function UsersReportSubmissionRate() {
                   variant="subtitle2"
                   sx={{ color: theme.palette.orange.dark }}
                 >
-                  10% loss
+                  10% late
                 </Typography>
               </Grid>
             </Grid>
@@ -314,7 +314,7 @@ function UsersReportSubmissionRate() {
                 >
                   <Grid item>
                     <Typography variant="subtitle1" color="inherit">
-                      Stolon
+                      Petauke
                     </Typography>
                   </Grid>
                   <Grid item>
@@ -325,7 +325,7 @@ function UsersReportSubmissionRate() {
                     >
                       <Grid item>
                         <Typography variant="subtitle1" color="inherit">
-                          $189.00
+                          10
                         </Typography>
                       </Grid>
                       <Grid item>
@@ -355,7 +355,7 @@ function UsersReportSubmissionRate() {
                   variant="subtitle2"
                   sx={{ color: theme.palette.orange.dark }}
                 >
-                  10% loss
+                  10% late
                 </Typography>
               </Grid>
             </Grid>

@@ -1,26 +1,23 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useContext } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Alert,
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
-  Grid,
   Typography,
 } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import FormInput from 'components/form-input-helpers/form-input';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { AppContext } from 'context/app-context';
+import { ActionTypes } from 'context/reducer';
+import { useRequestPasswordResetMutation } from '../../../graphql/generated';
 
 const schema = Yup.object({
   email: Yup.string().email('Invalid email').required(),
@@ -33,7 +30,6 @@ interface FormInputs {
 interface RequestPasswordResetModalProps {
   open: boolean;
   handleClose: () => void;
-  anchorEl: null | HTMLElement;
   email: string;
   name: string;
 }
@@ -41,24 +37,27 @@ interface RequestPasswordResetModalProps {
 function RequestPasswordResetModal({
   open,
   handleClose,
-  anchorEl,
   email,
   name,
 }: RequestPasswordResetModalProps) {
-  // const [open, setOpen] = useState(true);
-  const navigate = useNavigate();
+  const { dispatch } = useContext(AppContext);
 
-  const location = useLocation();
+  const [requestPasswordReset, { data, loading, error: error }] =
+    useRequestPasswordResetMutation();
 
-  //   const [requestPasswordReset, { data, loading, error: error }] =
-  //     useChangePasswordMutation();
+  const updatedUser = useMemo(
+    () =>
+      data?.requestPasswordReset.__typename === 'User'
+        ? data.requestPasswordReset
+        : null,
+    [data]
+  );
 
   const {
     handleSubmit,
-    control,
-    formState: { isValid, isDirty, errors },
-    reset,
+    formState: { isValid, errors },
     register,
+    setError,
     setValue,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
@@ -68,59 +67,62 @@ function RequestPasswordResetModal({
   console.log('errors', errors);
 
   const onSubmit = ({ email: emailInput }: FormInputs) => {
-    // console.log('Chaiwa???');
     console.log('email in onSubmit', emailInput);
-    setTimeout(() => handleClose(), 500);
 
-    // requestPasswordReset({
-    //   variables: {
-    //     input: {
-    //       email,
-    //     },
-    //   },
-    //   onCompleted: (result) => {
-    //     if (result.changePassword.__typename === 'User') {
-    //       logout(client);
-    //       navigate('/login', {
-    //         state: { from: '/account/changePassword' },
-    //         replace: true,
-    //       });
-    //     } else if (result.changePassword.__typename === 'ApiUpdateError') {
-    //       console.log('Chaiwa, ApiUpdateError', result.changePassword);
+    requestPasswordReset({
+      variables: {
+        input: {
+          email: emailInput,
+        },
+      },
+      onCompleted: (result) => {
+        if (result.requestPasswordReset.__typename === 'User') {
+          console.log('Chaiwa, result with User', result);
+          handleClose();
+          dispatch({
+            type: ActionTypes.ShowToast,
+            payload: {
+              message: 'Password reset request sent!',
+              severity: 'success',
+              open: true,
+            },
+          });
+        } else if (
+          result.requestPasswordReset.__typename === 'ApiUpdateError'
+        ) {
+          console.log('Chaiwa, result with ApiUpdateError', result);
+          if (result.requestPasswordReset.field) {
+            setError(
+              result.requestPasswordReset.field as keyof FormInputs,
 
-    //       if (result.changePassword.field) {
-    //         setError(
-    //           result.changePassword.field as keyof FormInputs,
-
-    //           {
-    //             type: 'server',
-    //             message: result.changePassword.message,
-    //           }
-    //         );
-    //       } else if (
-    //         !result.changePassword.errors &&
-    //         !result.changePassword.field
-    //       ) {
-    //         setError('unknown' as keyof FormInputs, {
-    //           type: 'server',
-    //           message: result.changePassword.message,
-    //         });
-    //       } else {
-    //         result.changePassword.errors?.forEach((err) => {
-    //           console.log('Each FieldError', err);
-    //           return setError(err.field as keyof FormInputs, {
-    //             type: 'server',
-    //             message: err.message,
-    //           });
-    //         });
-    //       }
-    //     }
-    //   },
-    //   onError: (err) => {
-    //     // throw it and let it be handled by the Error Boundary
-    //     console.log('Chaiwa, something bad happened', err);
-    //   },
-    // });
+              {
+                type: 'server',
+                message: result.requestPasswordReset.message,
+              }
+            );
+          } else if (
+            !result.requestPasswordReset.errors &&
+            !result.requestPasswordReset.field
+          ) {
+            setError('unknown' as keyof FormInputs, {
+              type: 'server',
+              message: result.requestPasswordReset.message,
+            });
+          } else {
+            result.requestPasswordReset.errors?.forEach((err) => {
+              return setError(err.field as keyof FormInputs, {
+                type: 'server',
+                message: err.message,
+              });
+            });
+          }
+        }
+      },
+      onError: (err) => {
+        // throw it and let it be handled by the Error Boundary
+        console.log('Chaiwa, something bad happened', err);
+      },
+    });
   };
 
   useEffect(() => {
@@ -141,9 +143,18 @@ function RequestPasswordResetModal({
       open={open}
       keepMounted
       transitionDuration={{
-        exit: 1000,
+        exit: 300,
       }}
     >
+      {(errors.email || errors['unknown' as keyof FormInputs]) && (
+        <Box>
+          <Alert severity="error">
+            {errors.email?.message ||
+              errors['unknown' as keyof FormInputs]?.message}
+            . Please contact support or try again!
+          </Alert>
+        </Box>
+      )}
       <DialogTitle variant="h4">Confirm Request Password Reset</DialogTitle>
       <DialogContent dividers>
         <Typography variant="h5">
@@ -151,23 +162,18 @@ function RequestPasswordResetModal({
         </Typography>
       </DialogContent>
       <DialogActions>
-        <Button
-          autoFocus
-          onClick={() => handleClose()}
-          //   disabled={loading}
-        >
+        <Button autoFocus onClick={() => handleClose()} disabled={loading}>
           No
         </Button>
         <Box sx={{ py: 2 }}>
           <LoadingButton
             onClick={() => handleSubmit(onSubmit)()}
             color="primary"
-            // disabled={loading}
+            disabled={loading}
             size="small"
             variant="text"
-            // loading={loading}
+            loading={loading}
             loadingPosition="end"
-            // type="button"
           >
             Yes
           </LoadingButton>

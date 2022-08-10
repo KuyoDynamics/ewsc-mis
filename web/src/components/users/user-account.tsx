@@ -277,7 +277,6 @@ function UserAccount() {
         <RequestPasswordResetModal
           open={openPasswordResetModal}
           handleClose={handleClosePasswordResetModal}
-          anchorEl={anchorEl}
           email={user?.email!}
           name={user?.first_name!}
         />
