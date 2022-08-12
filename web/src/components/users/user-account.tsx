@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Alert,
+  AlertTitle,
   Avatar,
   Box,
   Button,
@@ -18,7 +19,14 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Info, MoreVert as MoreVertIcon } from '@mui/icons-material';
+import {
+  Check,
+  HourglassTop,
+  Info,
+  MoreVert as MoreVertIcon,
+  Error as ErrorIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useReactiveVar } from '@apollo/client';
@@ -28,11 +36,14 @@ import FormSelect from 'components/form-input-helpers/form-select';
 import UserAccountMenu from 'components/users/user-account-menu';
 import { currentUserVar } from 'cache';
 import {
+  EmailStatus,
   useGetUserLazyQuery,
+  useOnPasswordResetEmailSubscription,
   UserTheme,
   useUpdateUserMutation,
 } from '../../../graphql/generated';
 import RequestPasswordResetModal from './request-password-reset-modal';
+import CancelPasswordResetModal from './cancel-password-reset-modal';
 
 const schema = Yup.object({
   first_name: Yup.string().max(255).required('First name is required'),
@@ -49,14 +60,30 @@ interface FormInputs {
   id: string;
 }
 
+const renderEmailStatus = (status: EmailStatus | null) => {
+  console.log('EmailStatus in renderEmailStatus', status);
+  switch (status) {
+    case EmailStatus.Pending:
+    case null:
+      return <HourglassTop />;
+    case EmailStatus.Sent:
+      return <Check />;
+    case EmailStatus.Failed:
+    case EmailStatus.Rejected:
+      return <ErrorIcon color="error" />;
+    default:
+      return status;
+  }
+};
+
 function UserAccount() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(Boolean(anchorEl));
   const [openPasswordResetModal, setOpenPasswordResetModal] = useState(false);
+  const [openCancelPasswordResetModal, setOpenCancelPasswordResetModal] =
+    useState(false);
 
   const currentUser = useReactiveVar(currentUserVar);
-
-  // const open = Boolean(anchorEl);
 
   const navigate = useNavigate();
 
@@ -68,10 +95,10 @@ function UserAccount() {
 
   const [getUser, { data, loading }] = useGetUserLazyQuery();
 
-  const [
-    updateUser,
-    { data: updatedUserResponse, loading: updatingUser, error: updateError },
-  ] = useUpdateUserMutation();
+  const [updateUser, { data: updatedUserResponse }] = useUpdateUserMutation();
+
+  const { data: userEmailStatusSubscription } =
+    useOnPasswordResetEmailSubscription();
 
   const user = useMemo(
     () => (data?.user.__typename === 'User' ? data.user : null),
@@ -86,7 +113,7 @@ function UserAccount() {
     [updatedUserResponse]
   );
 
-  const isCurrentUser = currentUser.id === user?.id;
+  const isCurrentUser = currentUser?.id === user?.id;
 
   const {
     handleSubmit,
@@ -107,7 +134,6 @@ function UserAccount() {
   };
 
   const handleClose = () => {
-    // setAnchorEl(null);
     setOpen(false);
   };
 
@@ -117,6 +143,14 @@ function UserAccount() {
 
   const handleClosePasswordResetModal = () => {
     setOpenPasswordResetModal(false);
+  };
+
+  const handleOpenCancelPasswordResetModal = () => {
+    setOpenCancelPasswordResetModal(true);
+  };
+
+  const handleCloseCancelPasswordResetModal = () => {
+    setOpenCancelPasswordResetModal(false);
   };
 
   const onSubmit = ({ first_name, last_name, theme, id }: FormInputs) => {
@@ -171,6 +205,7 @@ function UserAccount() {
   useEffect(() => {
     if (userId) {
       getUser({
+        fetchPolicy: 'no-cache',
         variables: {
           userId,
         },
@@ -213,6 +248,35 @@ function UserAccount() {
         </Box>
       )}
       <Card>
+        {user?.hashed_password_reset_token && (
+          <Box>
+            <Tooltip title="Passsword Reset Email Status">
+              <Alert
+                severity="info"
+                icon={renderEmailStatus(user?.password_reset_email_status!)}
+                action={
+                  <Tooltip title="Cancel Password Reset Request">
+                    <IconButton
+                      aria-label="cancel password reset"
+                      color="inherit"
+                      size="small"
+                      onClick={handleOpenCancelPasswordResetModal}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  </Tooltip>
+                }
+              >
+                <AlertTitle>
+                  {user?.password_reset_email_status === EmailStatus.Pending ||
+                  !user?.password_reset_email_status
+                    ? 'Pending email status update...'
+                    : user?.password_reset_email_status}
+                </AlertTitle>
+              </Alert>
+            </Tooltip>
+          </Box>
+        )}
         <CardHeader
           subheader={
             isLoading ? (
@@ -279,6 +343,11 @@ function UserAccount() {
           handleClose={handleClosePasswordResetModal}
           email={user?.email!}
           name={user?.first_name!}
+        />
+        <CancelPasswordResetModal
+          open={openCancelPasswordResetModal}
+          handleClose={handleCloseCancelPasswordResetModal}
+          userId={user?.id!}
         />
         <Divider />
         <CardContent>

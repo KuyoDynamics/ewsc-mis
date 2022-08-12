@@ -4,6 +4,9 @@ import Loadable from 'components/loadable';
 const Login = Loadable(lazy(() => import('routes/login')));
 const Signup = Loadable(lazy(() => import('routes/signup')));
 const NotFound = Loadable(lazy(() => import('components/404')));
+const ResetPassword = Loadable(
+  lazy(() => import('routes/users/reset-password'))
+);
 
 const AuthRouter = [
   {
@@ -13,6 +16,10 @@ const AuthRouter = [
   {
     path: '/signup',
     element: <Signup />,
+  },
+  {
+    path: 'resetPassword',
+    element: <ResetPassword />,
   },
   {
     path: '*',

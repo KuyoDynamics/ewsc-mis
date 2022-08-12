@@ -7,6 +7,7 @@ import { permissions as permissionsMiddleware } from '../../permissions';
 import {
   deleteUserInvitationMiddleware,
   sendInvitationEmailMiddleware,
+  sendPasswordResetEmailMiddleware,
 } from '../../middleware';
 
 const schema = applyMiddleware(
@@ -16,7 +17,8 @@ const schema = applyMiddleware(
   }),
   permissionsMiddleware,
   deleteUserInvitationMiddleware,
-  sendInvitationEmailMiddleware
+  sendInvitationEmailMiddleware,
+  sendPasswordResetEmailMiddleware
 );
 
 export { schema };

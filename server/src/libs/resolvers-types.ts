@@ -227,6 +227,10 @@ export type ApiUpdateError = ApiError & {
   value?: Maybe<Scalars['String']>;
 };
 
+export type CancelPasswordResetRequestInput = {
+  user_id: Scalars['ID'];
+};
+
 export type CatchmentDistrict = {
   __typename?: 'CatchmentDistrict';
   catchment_province?: Maybe<CatchmentProvinceResult>;
@@ -957,6 +961,7 @@ export type LoginSuccess = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  cancelRequestPasswordReset: UserResult;
   changePassword: UserResult;
   createCatchmentDistrict: CatchmentDistrictResult;
   createCatchmentProvince: CatchmentProvinceResult;
@@ -1058,6 +1063,11 @@ export type Mutation = {
   updateWaterProductionSite?: Maybe<UpdateWaterProductionSitePayload>;
   updateWaterStorageTank?: Maybe<UpdateWaterStorageTankPayload>;
   updateWaterTreatmentPlant: WaterTreatmentPlantResult;
+};
+
+
+export type MutationCancelRequestPasswordResetArgs = {
+  input: CancelPasswordResetRequestInput;
 };
 
 
@@ -2341,6 +2351,7 @@ export type SewerTreatmentPlantUpdateInput = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  passwordRequestEmailCompleted?: Maybe<User>;
   userInvitationUpdated: UserInvitation;
 };
 
@@ -2507,6 +2518,7 @@ export type User = {
   last_modified_by: Scalars['String'];
   last_name: Scalars['String'];
   master_support: Scalars['Boolean'];
+  password_reset_email_status?: Maybe<EmailStatus>;
   theme?: Maybe<UserTheme>;
   user_default_organisation?: Maybe<UserOrganisation>;
   user_organisations?: Maybe<Array<UserOrganisation>>;
@@ -2787,6 +2799,7 @@ export type ResolversTypes = ResolversObject<{
   BigInt: ResolverTypeWrapper<Scalars['BigInt']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Byte: ResolverTypeWrapper<Scalars['Byte']>;
+  CancelPasswordResetRequestInput: CancelPasswordResetRequestInput;
   CatchmentDistrict: ResolverTypeWrapper<Omit<CatchmentDistrict, 'catchment_province' | 'district'> & { catchment_province?: Maybe<ResolversTypes['CatchmentProvinceResult']>, district?: Maybe<ResolversTypes['DistrictResult']> }>;
   CatchmentDistrictInput: CatchmentDistrictInput;
   CatchmentDistrictResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['CatchmentDistrict'];
@@ -3091,6 +3104,7 @@ export type ResolversParentTypes = ResolversObject<{
   BigInt: Scalars['BigInt'];
   Boolean: Scalars['Boolean'];
   Byte: Scalars['Byte'];
+  CancelPasswordResetRequestInput: CancelPasswordResetRequestInput;
   CatchmentDistrict: Omit<CatchmentDistrict, 'catchment_province' | 'district'> & { catchment_province?: Maybe<ResolversParentTypes['CatchmentProvinceResult']>, district?: Maybe<ResolversParentTypes['DistrictResult']> };
   CatchmentDistrictInput: CatchmentDistrictInput;
   CatchmentDistrictResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['CatchmentDistrict'];
@@ -3858,6 +3872,7 @@ export interface MacScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes[
 }
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  cancelRequestPasswordReset?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationCancelRequestPasswordResetArgs, 'input'>>;
   changePassword?: Resolver<ResolversTypes['UserResult'], ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'input'>>;
   createCatchmentDistrict?: Resolver<ResolversTypes['CatchmentDistrictResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentDistrictArgs, 'input'>>;
   createCatchmentProvince?: Resolver<ResolversTypes['CatchmentProvinceResult'], ParentType, ContextType, RequireFields<MutationCreateCatchmentProvinceArgs, 'input'>>;
@@ -4438,6 +4453,7 @@ export type SewerTreatmentPlantResultResolvers<ContextType = GraphQLContext, Par
 }>;
 
 export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
+  passwordRequestEmailCompleted?: SubscriptionResolver<Maybe<ResolversTypes['User']>, "passwordRequestEmailCompleted", ParentType, ContextType>;
   userInvitationUpdated?: SubscriptionResolver<ResolversTypes['UserInvitation'], "userInvitationUpdated", ParentType, ContextType>;
 }>;
 
@@ -4508,6 +4524,7 @@ export type UserResolvers<ContextType = GraphQLContext, ParentType extends Resol
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   last_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   master_support?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  password_reset_email_status?: Resolver<Maybe<ResolversTypes['EmailStatus']>, ParentType, ContextType>;
   theme?: Resolver<Maybe<ResolversTypes['UserTheme']>, ParentType, ContextType>;
   user_default_organisation?: Resolver<Maybe<ResolversTypes['UserOrganisation']>, ParentType, ContextType>;
   user_organisations?: Resolver<Maybe<Array<ResolversTypes['UserOrganisation']>>, ParentType, ContextType>;

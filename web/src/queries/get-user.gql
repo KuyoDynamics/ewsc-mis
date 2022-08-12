@@ -10,6 +10,7 @@ query getUser($userId: ID!) {
       master_support
       hashed_confirmation_token
       hashed_password_reset_token
+      password_reset_email_status
       confirmed_at
       created_at
       created_by

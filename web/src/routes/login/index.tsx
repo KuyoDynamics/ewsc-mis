@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { Alert, Box, Button, Container, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
 import { currentUserVar, isLoggedInVar } from 'cache';
@@ -13,7 +14,6 @@ import {
   useLoginMutation,
   User,
 } from '../../../graphql/generated';
-import LoadingButton from '@mui/lab/LoadingButton';
 
 const schema = Yup.object({
   email: Yup.string()
@@ -49,12 +49,6 @@ function Login() {
 
   const [login, { loading, reset, error }] = useLoginMutation();
 
-  console.log('Error', error);
-
-  console.log('isDirty', isDirty);
-
-  console.log('errors', errors);
-
   const [getCurrentUser, { data: currentUserResponse }] =
     useGetCurrentUserLazyQuery();
 
@@ -79,7 +73,11 @@ function Login() {
       getCurrentUser({
         fetchPolicy: 'network-only',
       }).then(() => {
-        if (['/signup', '/account/changePassword'].indexOf(from) > -1) {
+        if (
+          ['/signup', '/account/changePassword', '/resetPassword'].indexOf(
+            from
+          ) > -1
+        ) {
           navigate('/', { replace: true });
         } else {
           navigate(from, { replace: true });
@@ -151,7 +149,9 @@ function Login() {
               Sign in on to the MIS
             </Typography>
           </Box>
-          {(from === '/signup' || from === '/account/changePassword') &&
+          {(from === '/signup' ||
+            from === '/account/changePassword' ||
+            from === '/resetPassword') &&
             !isDirty && (
               <Box>
                 <Alert severity="success">

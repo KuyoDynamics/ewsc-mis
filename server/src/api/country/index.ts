@@ -47,6 +47,8 @@ const typeDefs = gql`
 
   type ApiOperationError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 
@@ -58,6 +60,8 @@ const typeDefs = gql`
 
   type ApiNotFoundError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 
@@ -77,16 +81,22 @@ const typeDefs = gql`
 
   type ApiDeleteError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 
   type ApiLoginError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 
   type ApiPasswordResetError implements ApiError {
     message: String!
+    field: String
+    value: String
     errors: [ErrorField!]
   }
 

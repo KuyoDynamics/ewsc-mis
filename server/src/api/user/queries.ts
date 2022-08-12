@@ -13,6 +13,7 @@ import {
   DistrictResult,
   DistrictUser,
   LoginResult,
+  MutationCancelRequestPasswordResetArgs,
   MutationChangePasswordArgs,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
@@ -593,6 +594,35 @@ async function requestPasswordReset(
   }
 }
 
+async function cancelRequestPasswordReset(
+  args: MutationCancelRequestPasswordResetArgs,
+  context: GraphQLContext
+): Promise<UserResult> {
+  try {
+    const updatedUser = await context.prisma.user.update({
+      where: {
+        id: args.input.user_id,
+      },
+      data: {
+        hashed_password_reset_token: null,
+        password_reset_email_status: null,
+        last_modified_by: context.user.email,
+      },
+    });
+
+    return {
+      __typename: 'User',
+      ...updatedUser,
+    } as User;
+  } catch (error) {
+    return {
+      __typename: 'ApiUpdateError',
+      message: 'Cancel Password Reset Request Failed.',
+      errors: generateClientErrors(error, 'id'),
+    };
+  }
+}
+
 async function resetPassword(
   args: MutationResetPasswordArgs,
   context: GraphQLContext
@@ -614,7 +644,8 @@ async function resetPassword(
       },
       data: {
         password: await encryptPassword(args.input.password),
-        hashed_password_reset_token: '',
+        hashed_password_reset_token: null,
+        password_reset_email_status: null,
         last_modified_by: user.email,
       },
     });
@@ -647,4 +678,5 @@ export {
   getUserDistricts,
   getDefaultUserDistrict,
   changePassword,
+  cancelRequestPasswordReset,
 };

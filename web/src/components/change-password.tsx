@@ -19,19 +19,17 @@ import {
   Typography,
 } from '@mui/material';
 import { Info } from '@mui/icons-material';
-import { Link, useMatch, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
-import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { getNameInitials } from 'utils';
 import FormInput from 'components/form-input-helpers/form-input';
-import { currentUserVar, isLoggedInVar } from 'cache';
+import { currentUserVar } from 'cache';
+import { logout } from 'utils/session';
 import {
   useChangePasswordMutation,
   useGetUserLazyQuery,
-  useUpdateUserMutation,
 } from '../../graphql/generated';
-import { logout } from 'utils/session';
 
 const schema = Yup.object({
   password: Yup.string().max(255).required('Password is required'),
@@ -52,19 +50,6 @@ interface FormInputs {
   confirmPassword: string;
   new_password: string;
   id: string;
-  //   password_reset_token?: string;
-}
-
-type TokenPayloadType = {
-  id: string;
-} & JwtPayload;
-
-function getPasswordResetUserId(token: string | null) {
-  if (token) {
-    const { id }: TokenPayloadType = jwtDecode(token);
-    return id;
-  }
-  return null;
 }
 
 function ChangePassword() {
@@ -74,42 +59,21 @@ function ChangePassword() {
 
   const navigate = useNavigate();
 
-  // const [searchParams, setSearchParams] = useSearchParams();
-
-  // const passwordResetToken = searchParams.get('id');
-
-  // const passwordResetUserId = getPasswordResetUserId(passwordResetToken);
-
-  // const currentUserPasswordResetRoute = useMatch('/account/changePassword');
-
   const userId = currentUser.id;
 
   const [getUser, { data, loading }] = useGetUserLazyQuery();
 
-  const [
-    changePassword,
-    { data: updatedUserResponse, loading: updatingUser, error: updateError },
-  ] = useChangePasswordMutation();
+  const [changePassword] = useChangePasswordMutation();
 
   const user = useMemo(
     () => (data?.user.__typename === 'User' ? data.user : null),
     [data]
   );
 
-  const updatedUser = useMemo(
-    () =>
-      updatedUserResponse?.changePassword.__typename === 'User'
-        ? updatedUserResponse.changePassword
-        : null,
-    [updatedUserResponse]
-  );
-
-  console.log('updatedUser', updatedUser);
-
   const {
     handleSubmit,
     control,
-    formState: { isValid, isDirty, touchedFields, errors },
+    formState: { isValid, isDirty, errors },
     reset,
     register,
     setValue,
@@ -119,17 +83,7 @@ function ChangePassword() {
     mode: 'onChange',
   });
 
-  const onSubmit = ({
-    // password_reset_token,
-    password,
-    confirmPassword,
-    new_password,
-    id,
-  }: FormInputs) => {
-    console.log('password', password);
-    console.log('user_id', id);
-    console.log('confirmPassword', confirmPassword);
-    console.log('new_password', new_password);
+  const onSubmit = ({ password, new_password, id }: FormInputs) => {
     changePassword({
       variables: {
         input: {
@@ -146,8 +100,6 @@ function ChangePassword() {
             replace: true,
           });
         } else if (result.changePassword.__typename === 'ApiUpdateError') {
-          console.log('Chaiwa, ApiUpdateError', result.changePassword);
-
           if (result.changePassword.field) {
             setError(
               result.changePassword.field as keyof FormInputs,
@@ -167,7 +119,6 @@ function ChangePassword() {
             });
           } else {
             result.changePassword.errors?.forEach((err) => {
-              console.log('Each FieldError', err);
               return setError(err.field as keyof FormInputs, {
                 type: 'server',
                 message: err.message,
