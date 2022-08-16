@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useReactiveVar } from '@apollo/client';
 import { getNameInitials, USER_THEME_OPTIONS } from 'utils';
 import FormInput from 'components/form-input-helpers/form-input';
@@ -38,7 +39,6 @@ import { currentUserVar } from 'cache';
 import {
   EmailStatus,
   useGetUserLazyQuery,
-  useOnPasswordResetEmailSubscription,
   UserTheme,
   useUpdateUserMutation,
 } from '../../../graphql/generated';
@@ -61,7 +61,6 @@ interface FormInputs {
 }
 
 const renderEmailStatus = (status: EmailStatus | null) => {
-  console.log('EmailStatus in renderEmailStatus', status);
   switch (status) {
     case EmailStatus.Pending:
     case null:
@@ -96,9 +95,6 @@ function UserAccount() {
   const [getUser, { data, loading }] = useGetUserLazyQuery();
 
   const [updateUser, { data: updatedUserResponse }] = useUpdateUserMutation();
-
-  const { data: userEmailStatusSubscription } =
-    useOnPasswordResetEmailSubscription();
 
   const user = useMemo(
     () => (data?.user.__typename === 'User' ? data.user : null),
@@ -205,7 +201,7 @@ function UserAccount() {
   useEffect(() => {
     if (userId) {
       getUser({
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'network-only',
         variables: {
           userId,
         },
@@ -233,48 +229,46 @@ function UserAccount() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      {updatedUser && isValid && Object.values(touchedFields).length === 0 && (
-        <Box>
-          <Alert severity="success">Changes saved successfully.</Alert>
-        </Box>
-      )}
-      {(errors.id || errors['unknown' as keyof FormInputs]) && (
-        <Box>
-          <Alert severity="error">
-            {errors.id?.message ||
-              errors['unknown' as keyof FormInputs]?.message}
-            . Please contact support or try again!
-          </Alert>
-        </Box>
-      )}
       <Card>
+        {updatedUser && isValid && Object.values(touchedFields).length === 0 && (
+          <Box>
+            <Alert severity="success">Changes saved successfully.</Alert>
+          </Box>
+        )}
+        {(errors.id || errors['unknown' as keyof FormInputs]) && (
+          <Box>
+            <Alert severity="error">
+              {errors.id?.message ||
+                errors['unknown' as keyof FormInputs]?.message}
+              . Please contact support or try again!
+            </Alert>
+          </Box>
+        )}
         {user?.hashed_password_reset_token && (
           <Box>
-            <Tooltip title="Passsword Reset Email Status">
-              <Alert
-                severity="info"
-                icon={renderEmailStatus(user?.password_reset_email_status!)}
-                action={
-                  <Tooltip title="Cancel Password Reset Request">
-                    <IconButton
-                      aria-label="cancel password reset"
-                      color="inherit"
-                      size="small"
-                      onClick={handleOpenCancelPasswordResetModal}
-                    >
-                      <CloseIcon fontSize="inherit" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              >
-                <AlertTitle>
-                  {user?.password_reset_email_status === EmailStatus.Pending ||
-                  !user?.password_reset_email_status
-                    ? 'Pending email status update...'
-                    : user?.password_reset_email_status}
-                </AlertTitle>
-              </Alert>
-            </Tooltip>
+            <Alert
+              severity="info"
+              icon={renderEmailStatus(user?.password_reset_email_status!)}
+              action={
+                <Tooltip title="Cancel Password Reset Request">
+                  <IconButton
+                    aria-label="cancel password reset"
+                    color="inherit"
+                    size="small"
+                    onClick={handleOpenCancelPasswordResetModal}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+              }
+            >
+              <AlertTitle>
+                {user?.password_reset_email_status === EmailStatus.Pending ||
+                !user?.password_reset_email_status
+                  ? 'Waiting for password reset email status...'
+                  : `Password reset email status: ${user?.password_reset_email_status}. Wait for user action or cancel this request.`}
+              </AlertTitle>
+            </Alert>
           </Box>
         )}
         <CardHeader
@@ -432,13 +426,17 @@ function UserAccount() {
           <Button variant="text" disabled={!isDirty} onClick={() => reset()}>
             Reset
           </Button>
-          <Button
-            type="submit"
+          <LoadingButton
+            onClick={() => handleSubmit(onSubmit)()}
+            color="primary"
+            disabled={(isValid && !isDirty) || !isValid || loading}
+            size="small"
             variant="text"
-            disabled={(isValid && !isDirty) || !isValid}
+            loading={loading}
+            loadingPosition="end"
           >
             Save
-          </Button>
+          </LoadingButton>
         </Box>
       </Card>
     </form>

@@ -23,16 +23,17 @@ const schema = Yup.object({
   password: Yup.string().max(255).required('Password is required'),
   confirmPassword: Yup.string()
     .required('Please retype your password.')
-    .oneOf([Yup.ref('new_password')], 'Your passwords do not match.'),
-  id: Yup.string()
-    .uuid('No valid user found.')
-    .required('You must be logged-in to use this form'),
+    .oneOf([Yup.ref('password')], 'Your passwords do not match.'),
+  hashed_password_reset_token: Yup.string().required(
+    'A valid token is required'
+  ),
 });
 
 interface FormInputs {
   password: string;
   confirmPassword: string;
   hashed_password_reset_token: string;
+  email?: string;
 }
 
 type TokenPayloadType = {
@@ -72,6 +73,8 @@ function ResetPassword() {
     mode: 'onChange',
   });
 
+  console.log('Errors', errors);
+
   const onSubmit = ({
     password,
     confirmPassword,
@@ -88,6 +91,7 @@ function ResetPassword() {
         },
       },
       onCompleted: (result) => {
+        console.log('Password Reset Result', result);
         if (result.resetPassword.__typename === 'User') {
           navigate('/login', {
             state: { from: '/resetPassword' },
@@ -142,10 +146,12 @@ function ResetPassword() {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         {(errors.hashed_password_reset_token ||
+          errors.email ||
           errors['unknown' as keyof FormInputs]) && (
           <Box>
             <Alert severity="error">
               {errors.hashed_password_reset_token?.message ||
+                errors.email?.message ||
                 errors['unknown' as keyof FormInputs]?.message}
               . Please contact support or try again!
             </Alert>

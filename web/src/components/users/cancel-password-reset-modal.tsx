@@ -14,7 +14,10 @@ import {
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useCancelRequestPasswordResetMutation } from '../../../graphql/generated';
+import {
+  GetUserDocument,
+  useCancelRequestPasswordResetMutation,
+} from '../../../graphql/generated';
 
 const schema = Yup.object({
   userId: Yup.string().uuid('Invalid user id').required(),
@@ -35,7 +38,7 @@ function CancelPasswordResetModal({
   handleClose,
   userId,
 }: RequestPasswordResetModalProps) {
-  const [cancelPasswordReset, { data, loading, error: error }] =
+  const [cancelPasswordReset, { loading }] =
     useCancelRequestPasswordResetMutation();
 
   const {
@@ -56,6 +59,15 @@ function CancelPasswordResetModal({
           user_id: userIdInput,
         },
       },
+      refetchQueries: [
+        {
+          query: GetUserDocument,
+          variables: {
+            userId,
+          },
+        },
+      ],
+      awaitRefetchQueries: true,
       onCompleted: (result) => {
         if (result.cancelRequestPasswordReset.__typename === 'User') {
           handleClose();

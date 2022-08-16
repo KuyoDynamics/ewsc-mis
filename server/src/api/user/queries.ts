@@ -31,6 +31,7 @@ import {
   UserOrganisation,
   UserResult,
 } from '../../libs/resolvers-types';
+import { EmailStatus } from '@prisma/client';
 
 async function getUsers(context: GraphQLContext): Promise<User[]> {
   const result = await context.prisma.user.findMany({});
@@ -575,6 +576,7 @@ async function requestPasswordReset(
       },
       data: {
         hashed_password_reset_token,
+        password_reset_email_status: EmailStatus.PENDING,
         last_modified_by: user.email,
       },
     });

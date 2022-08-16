@@ -43,7 +43,7 @@ function UserAccountMenu({
 
   const currentUser = useReactiveVar(currentUserVar);
 
-  const isCurrentUser = currentUser.id === user?.id;
+  const isCurrentUser = currentUser?.id === user?.id;
 
   const navigate = useNavigate();
 
