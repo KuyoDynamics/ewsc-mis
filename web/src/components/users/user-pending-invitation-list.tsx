@@ -1,8 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DataTable, { HeadCellType } from 'components/data-table';
 import UserPendingInvitationItem from 'components/users/user-pending-invitation-item';
 import useGetUserInvitations from 'utils/hooks/use-get-user-invitations';
+import { Box, Slide } from '@mui/material';
 import {
   GetUserInvitationsDocument,
   useDeleteUserInvitationMutation,
@@ -45,7 +46,6 @@ const headCells: HeadCellType[] = [
 
 function UserPendingInvitationList() {
   const { rows } = useGetUserInvitations('network-only');
-
   const organisationName = rows[0]?.organisation_name ?? '';
 
   const { data: updatedInvite } = useOnUserInvitationUpdatedSubscription();

@@ -43,7 +43,7 @@ function NotFound() {
                 }}
               />
             </Box>
-            <Link to="/" replace>
+            <Link to={-1 as any} replace>
               <Button
                 component="a"
                 startIcon={<ArrowBackIcon fontSize="small" />}

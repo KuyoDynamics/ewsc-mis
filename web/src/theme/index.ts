@@ -1,5 +1,29 @@
 import { createTheme } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material';
+import { ColorPartial } from '@mui/material/styles/createPalette';
+
+declare module '@mui/material/styles/createPalette' {
+  interface PaletteColor extends ColorPartial {}
+  interface Palette {
+    orange: {
+      light: string;
+      main: string;
+      dark: string;
+    };
+  }
+}
+declare module '@mui/material/styles/createTypography' {
+  interface Typography {
+    mainContent: TypographyStyleOptions | undefined;
+    subMenuCaption: TypographyStyleOptions | undefined;
+    menuCaption: TypographyStyleOptions | undefined;
+  }
+  interface TypographyOptions {
+    mainContent: TypographyStyleOptions | undefined;
+    subMenuCaption: TypographyStyleOptions | undefined;
+    menuCaption: TypographyStyleOptions | undefined;
+  }
+}
 
 const theme = createTheme({
   breakpoints: {
@@ -162,6 +186,8 @@ const theme = createTheme({
       light: '#828DF8',
       dark: '#3832A0',
       contrastText: '#FFFFFF',
+      200: '#90caf9',
+      800: '#1565c0',
     },
     secondary: {
       main: '#10B981',
@@ -198,6 +224,11 @@ const theme = createTheme({
       secondary: '#65748B',
       disabled: 'rgba(55, 65, 81, 0.48)',
     },
+    orange: {
+      light: '#fbe9e7',
+      main: '#ffab91',
+      dark: '#d84315',
+    },
   },
   shape: {
     borderRadius: 8,
@@ -230,72 +261,129 @@ const theme = createTheme({
     '0px 25px 50px rgba(100, 116, 139, 0.25)',
   ],
   typography: {
-    button: {
+    fontFamily: "'Roboto', sans-serif",
+    h6: {
+      fontWeight: 500,
+      color: '#212121',
+      fontSize: '0.75rem',
+    },
+    h5: {
+      fontSize: '0.875rem',
+      color: '#212121',
+      fontWeight: 500,
+    },
+    h4: {
+      fontSize: '1rem',
+      color: '#212121',
       fontWeight: 600,
     },
-    fontFamily:
-      '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
-    body1: {
-      fontSize: '1rem',
-      fontWeight: 400,
-      lineHeight: 1.5,
+    h3: {
+      fontSize: '1.25rem',
+      color: '#212121',
+      fontWeight: 600,
     },
-    body2: {
-      fontSize: '0.875rem',
-      fontWeight: 400,
-      lineHeight: 1.57,
+    h2: {
+      fontSize: '1.5rem',
+      color: '#212121',
+      fontWeight: 700,
+    },
+    h1: {
+      fontSize: '2.125rem',
+      color: '#212121',
+      fontWeight: 700,
     },
     subtitle1: {
-      fontSize: '1rem',
-      fontWeight: 500,
-      lineHeight: 1.75,
-    },
-    subtitle2: {
       fontSize: '0.875rem',
       fontWeight: 500,
-      lineHeight: 1.57,
+      color: '#212121',
     },
-    overline: {
+    subtitle2: {
       fontSize: '0.75rem',
-      fontWeight: 600,
-      letterSpacing: '0.5px',
-      lineHeight: 2.5,
-      textTransform: 'uppercase',
+      fontWeight: 400,
+      color: '#8492c4',
     },
     caption: {
       fontSize: '0.75rem',
+      color: '#8492c4',
       fontWeight: 400,
-      lineHeight: 1.66,
     },
-    h1: {
-      fontWeight: 700,
-      fontSize: '3.5rem',
-      lineHeight: 1.375,
+    body1: {
+      fontSize: '0.875rem',
+      fontWeight: 400,
+      lineHeight: '1.334em',
     },
-    h2: {
-      fontWeight: 700,
-      fontSize: '3rem',
-      lineHeight: 1.375,
+    body2: {
+      letterSpacing: '0em',
+      fontWeight: 400,
+      lineHeight: '1.5em',
+      color: '#bdc8f0',
     },
-    h3: {
-      fontWeight: 700,
-      fontSize: '2.25rem',
-      lineHeight: 1.375,
+    button: {
+      textTransform: 'capitalize',
     },
-    h4: {
-      fontWeight: 700,
-      fontSize: '2rem',
-      lineHeight: 1.375,
+    customInput: {
+      marginTop: 1,
+      marginBottom: 1,
+      '& > label': {
+        top: 23,
+        left: 0,
+        color: '#9e9e9e',
+        '&[data-shrink="false"]': {
+          top: 5,
+        },
+      },
+      '& > div > input': {
+        padding: '30.5px 14px 11.5px !important',
+      },
+      '& legend': {
+        display: 'none',
+      },
+      '& fieldset': {
+        top: 0,
+      },
     },
-    h5: {
-      fontWeight: 600,
+    mainContent: {
+      backgroundColor: '#e3f2fd',
+      width: '100%',
+      minHeight: 'calc(100vh - 88px)',
+      flexGrow: 1,
+      padding: '20px',
+      marginTop: '88px',
+      marginRight: '20px',
+      borderRadius: '12px',
+    },
+    menuCaption: {
+      fontSize: '0.875rem',
+      fontWeight: 500,
+      color: '#212121',
+      padding: '6px',
+      textTransform: 'capitalize',
+      marginTop: '10px',
+    },
+    subMenuCaption: {
+      fontSize: '0.6875rem',
+      fontWeight: 500,
+      color: '#9e9e9e',
+      textTransform: 'capitalize',
+    },
+    commonAvatar: {
+      cursor: 'pointer',
+      borderRadius: '8px',
+    },
+    smallAvatar: {
+      width: '22px',
+      height: '22px',
+      fontSize: '1rem',
+    },
+    mediumAvatar: {
+      width: '34px',
+      height: '34px',
+      fontSize: '1.2rem',
+    },
+    largeAvatar: {
+      width: '44px',
+      height: '44px',
       fontSize: '1.5rem',
-      lineHeight: 1.375,
-    },
-    h6: {
-      fontWeight: 600,
-      fontSize: '1.125rem',
-      lineHeight: 1.375,
     },
   },
 } as ThemeOptions);

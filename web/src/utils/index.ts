@@ -6,6 +6,7 @@ import {
   OrganisationUserRoleType,
   User,
   UserInvitation,
+  UserTheme,
 } from '../../graphql/generated';
 
 const getEnumKeys = <T>(
@@ -22,6 +23,8 @@ const USER_DISTRICT_ROLE_OPTIONS: string[] =
 const USER_ORGANISATION_ROLE_OPTIONS: string[] = Object.values(
   OrganisationUserRoleType
 );
+
+const USER_THEME_OPTIONS: string[] = Object.values(UserTheme);
 
 type TokenPayloadType = {
   email: string;
@@ -51,6 +54,10 @@ function getUserInvitations(
   return rows;
 }
 
+function getNameInitials(firstName: string, lastName: string) {
+  return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+}
+
 function getCatchmentDistricts(currentUser: User) {
   return currentUser.user_default_organisation?.catchment_provinces?.flatMap(
     (cp) => cp.catchment_districts?.filter((district) => !district.disabled)
@@ -75,4 +82,6 @@ export {
   isExpired,
   USER_DISTRICT_ROLE_OPTIONS,
   USER_ORGANISATION_ROLE_OPTIONS,
+  USER_THEME_OPTIONS,
+  getNameInitials,
 };

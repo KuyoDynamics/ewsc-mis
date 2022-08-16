@@ -188,6 +188,8 @@ export type ApiCreateError = ApiError & {
 export type ApiDeleteError = ApiError & {
   __typename?: 'ApiDeleteError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
@@ -198,31 +200,45 @@ export type ApiError = {
 export type ApiLoginError = ApiError & {
   __typename?: 'ApiLoginError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
 export type ApiNotFoundError = ApiError & {
   __typename?: 'ApiNotFoundError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
 export type ApiOperationError = ApiError & {
   __typename?: 'ApiOperationError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
 export type ApiPasswordResetError = ApiError & {
   __typename?: 'ApiPasswordResetError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
 };
 
 export type ApiUpdateError = ApiError & {
   __typename?: 'ApiUpdateError';
   message: Scalars['String'];
+  field?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<ErrorField>>;
+};
+
+export type CancelPasswordResetRequestInput = {
+  user_id: Scalars['ID'];
 };
 
 export type CatchmentDistrict = {
@@ -316,6 +332,12 @@ export type CatchmentProvinceView = {
   created_by?: Maybe<Scalars['String']>;
   last_modified_at?: Maybe<Scalars['DateTime']>;
   last_modified_by?: Maybe<Scalars['String']>;
+};
+
+export type ChangePasswordInput = {
+  user_id: Scalars['ID'];
+  new_password: Scalars['String'];
+  password: Scalars['String'];
 };
 
 export type Country = {
@@ -973,8 +995,10 @@ export type Mutation = {
   disableUser: UserResult;
   updateUser: UserResult;
   login: LoginResult;
-  requestPasswordReset: PasswordResetRequestResult;
+  requestPasswordReset: UserResult;
+  cancelRequestPasswordReset: UserResult;
   resetPassword: PasswordResetResult;
+  changePassword: UserResult;
   createOrganisationUser: OrganisationUserResult;
   updateOrganisationUser: OrganisationUserResult;
   setUserDefaultProject: OrganisationUserResult;
@@ -1177,8 +1201,18 @@ export type MutationRequestPasswordResetArgs = {
 };
 
 
+export type MutationCancelRequestPasswordResetArgs = {
+  input: CancelPasswordResetRequestInput;
+};
+
+
 export type MutationResetPasswordArgs = {
   input: PasswordResetInput;
+};
+
+
+export type MutationChangePasswordArgs = {
+  input: ChangePasswordInput;
 };
 
 
@@ -1739,8 +1773,6 @@ export type PasswordResetRequestPayload = {
   __typename?: 'PasswordResetRequestPayload';
   hashed_password_reset_token: Scalars['String'];
 };
-
-export type PasswordResetRequestResult = PasswordResetRequestPayload | ApiPasswordResetError;
 
 export type PasswordResetResult = User | ApiPasswordResetError;
 
@@ -2335,6 +2367,7 @@ export type SewerTreatmentPlantUpdateInput = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  passwordRequestEmailCompleted?: Maybe<User>;
   userInvitationUpdated: UserInvitation;
 };
 
@@ -2498,6 +2531,7 @@ export type User = {
   hashed_confirmation_token?: Maybe<Scalars['String']>;
   confirmed_at?: Maybe<Scalars['DateTime']>;
   hashed_password_reset_token?: Maybe<Scalars['String']>;
+  password_reset_email_status?: Maybe<EmailStatus>;
   last_login?: Maybe<Scalars['DateTime']>;
   theme?: Maybe<UserTheme>;
   created_at: Scalars['DateTime'];
@@ -2697,6 +2731,20 @@ export type WaterTreatmentPlantUpdateInput = {
   gps?: InputMaybe<Scalars['String']>;
 };
 
+export type CancelRequestPasswordResetMutationVariables = Exact<{
+  input: CancelPasswordResetRequestInput;
+}>;
+
+
+export type CancelRequestPasswordResetMutation = { __typename?: 'Mutation', cancelRequestPasswordReset: { __typename?: 'User', id: string, hashed_password_reset_token?: string | null, password_reset_email_status?: EmailStatus | null, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename?: 'ApiDeleteError' } };
+
+export type ChangePasswordMutationVariables = Exact<{
+  input: ChangePasswordInput;
+}>;
+
+
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'User', id: string, email: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename?: 'ApiDeleteError' } };
+
 export type CreateInvitedUserMutationVariables = Exact<{
   input: CreateInvitedUserInput;
 }>;
@@ -2742,6 +2790,13 @@ export type GetUserInvitationsQueryVariables = Exact<{
 
 export type GetUserInvitationsQuery = { __typename?: 'Query', user_invitations?: Array<{ __typename?: 'UserInvitation', id: string, organisation_id: string, email: any, catchment_district_ids?: Array<string> | null, invitation_token: string, ttl: any, email_status: EmailStatus }> | null };
 
+export type GetUserQueryVariables = Exact<{
+  userId: Scalars['ID'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, email: string, first_name: string, last_name: string, disabled: boolean, last_login?: any | null, master_support: boolean, hashed_confirmation_token?: string | null, hashed_password_reset_token?: string | null, password_reset_email_status?: EmailStatus | null, confirmed_at?: any | null, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, theme?: UserTheme | null } | { __typename?: 'ApiNotFoundError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
@@ -2749,10 +2804,29 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginSuccess', accessToken: any, id: string } | { __typename?: 'ApiLoginError', message: string, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string }> | null } };
 
+export type OnPasswordResetEmailSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OnPasswordResetEmailSubscription = { __typename?: 'Subscription', passwordRequestEmailCompleted?: { __typename?: 'User', id: string, email: string, hashed_password_reset_token?: string | null, password_reset_email_status?: EmailStatus | null, last_modified_at: any, last_modified_by: string } | null };
+
 export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]: never; }>;
 
 
 export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
+
+export type RequestPasswordResetMutationVariables = Exact<{
+  input: PasswordResetRequestInput;
+}>;
+
+
+export type RequestPasswordResetMutation = { __typename?: 'Mutation', requestPasswordReset: { __typename?: 'User', id: string, email: string, hashed_password_reset_token?: string | null, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
+export type ResetPasswordMutationVariables = Exact<{
+  input: PasswordResetInput;
+}>;
+
+
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'User', id: string, hashed_password_reset_token?: string | null, password_reset_email_status?: EmailStatus | null, email: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiPasswordResetError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
 
 export type SendUserInvitationEmailMutationVariables = Exact<{
   input: SendInvitationEmailInput;
@@ -2775,7 +2849,110 @@ export type UpdateUserRolesForDistrictMutationVariables = Exact<{
 
 export type UpdateUserRolesForDistrictMutation = { __typename?: 'Mutation', updateUserRolesForDistrict: { __typename?: 'DistrictUser', id: string, roles: Array<DistrictUserRoleType> } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
+export type UpdateUserMutationVariables = Exact<{
+  input: UpdateUserInput;
+}>;
 
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, first_name: string, last_name: string, theme?: UserTheme | null, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+
+export const CancelRequestPasswordResetDocument = gql`
+    mutation CancelRequestPasswordReset($input: CancelPasswordResetRequestInput!) {
+  cancelRequestPasswordReset(input: $input) {
+    ... on User {
+      id
+      hashed_password_reset_token
+      password_reset_email_status
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        value
+        message
+      }
+    }
+  }
+}
+    `;
+export type CancelRequestPasswordResetMutationFn = Apollo.MutationFunction<CancelRequestPasswordResetMutation, CancelRequestPasswordResetMutationVariables>;
+
+/**
+ * __useCancelRequestPasswordResetMutation__
+ *
+ * To run a mutation, you first call `useCancelRequestPasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelRequestPasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelRequestPasswordResetMutation, { data, loading, error }] = useCancelRequestPasswordResetMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCancelRequestPasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<CancelRequestPasswordResetMutation, CancelRequestPasswordResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CancelRequestPasswordResetMutation, CancelRequestPasswordResetMutationVariables>(CancelRequestPasswordResetDocument, options);
+      }
+export type CancelRequestPasswordResetMutationHookResult = ReturnType<typeof useCancelRequestPasswordResetMutation>;
+export type CancelRequestPasswordResetMutationResult = Apollo.MutationResult<CancelRequestPasswordResetMutation>;
+export type CancelRequestPasswordResetMutationOptions = Apollo.BaseMutationOptions<CancelRequestPasswordResetMutation, CancelRequestPasswordResetMutationVariables>;
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($input: ChangePasswordInput!) {
+  changePassword(input: $input) {
+    ... on User {
+      id
+      email
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      errors {
+        field
+        value
+        message
+      }
+    }
+  }
+}
+    `;
+export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
+
+/**
+ * __useChangePasswordMutation__
+ *
+ * To run a mutation, you first call `useChangePasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangePasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changePasswordMutation, { data, loading, error }] = useChangePasswordMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, options);
+      }
+export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
+export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
+export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const CreateInvitedUserDocument = gql`
     mutation CreateInvitedUser($input: CreateInvitedUserInput!) {
   createInvitedUser(input: $input) {
@@ -3165,6 +3342,66 @@ export function useGetUserInvitationsLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type GetUserInvitationsQueryHookResult = ReturnType<typeof useGetUserInvitationsQuery>;
 export type GetUserInvitationsLazyQueryHookResult = ReturnType<typeof useGetUserInvitationsLazyQuery>;
 export type GetUserInvitationsQueryResult = Apollo.QueryResult<GetUserInvitationsQuery, GetUserInvitationsQueryVariables>;
+export const GetUserDocument = gql`
+    query getUser($userId: ID!) {
+  user(id: $userId) {
+    ... on User {
+      id
+      email
+      first_name
+      last_name
+      disabled
+      last_login
+      master_support
+      hashed_confirmation_token
+      hashed_password_reset_token
+      password_reset_email_status
+      confirmed_at
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      theme
+    }
+    ... on ApiNotFoundError {
+      message
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserQuery__
+ *
+ * To run a query within a React component, call `useGetUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserQuery(baseOptions: Apollo.QueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+      }
+export function useGetUserLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserQuery, GetUserQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserQuery, GetUserQueryVariables>(GetUserDocument, options);
+        }
+export type GetUserQueryHookResult = ReturnType<typeof useGetUserQuery>;
+export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
+export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -3208,6 +3445,40 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const OnPasswordResetEmailDocument = gql`
+    subscription OnPasswordResetEmail {
+  passwordRequestEmailCompleted {
+    id
+    email
+    hashed_password_reset_token
+    password_reset_email_status
+    last_modified_at
+    last_modified_by
+  }
+}
+    `;
+
+/**
+ * __useOnPasswordResetEmailSubscription__
+ *
+ * To run a query within a React component, call `useOnPasswordResetEmailSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useOnPasswordResetEmailSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOnPasswordResetEmailSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOnPasswordResetEmailSubscription(baseOptions?: Apollo.SubscriptionHookOptions<OnPasswordResetEmailSubscription, OnPasswordResetEmailSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<OnPasswordResetEmailSubscription, OnPasswordResetEmailSubscriptionVariables>(OnPasswordResetEmailDocument, options);
+      }
+export type OnPasswordResetEmailSubscriptionHookResult = ReturnType<typeof useOnPasswordResetEmailSubscription>;
+export type OnPasswordResetEmailSubscriptionResult = Apollo.SubscriptionResult<OnPasswordResetEmailSubscription>;
 export const OnUserInvitationUpdatedDocument = gql`
     subscription OnUserInvitationUpdated {
   userInvitationUpdated {
@@ -3238,6 +3509,105 @@ export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.Subs
       }
 export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
 export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
+export const RequestPasswordResetDocument = gql`
+    mutation RequestPasswordReset($input: PasswordResetRequestInput!) {
+  requestPasswordReset(input: $input) {
+    ... on User {
+      id
+      email
+      hashed_password_reset_token
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type RequestPasswordResetMutationFn = Apollo.MutationFunction<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+
+/**
+ * __useRequestPasswordResetMutation__
+ *
+ * To run a mutation, you first call `useRequestPasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequestPasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requestPasswordResetMutation, { data, loading, error }] = useRequestPasswordResetMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRequestPasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>(RequestPasswordResetDocument, options);
+      }
+export type RequestPasswordResetMutationHookResult = ReturnType<typeof useRequestPasswordResetMutation>;
+export type RequestPasswordResetMutationResult = Apollo.MutationResult<RequestPasswordResetMutation>;
+export type RequestPasswordResetMutationOptions = Apollo.BaseMutationOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+export const ResetPasswordDocument = gql`
+    mutation ResetPassword($input: PasswordResetInput!) {
+  resetPassword(input: $input) {
+    ... on User {
+      id
+      hashed_password_reset_token
+      password_reset_email_status
+      email
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiPasswordResetError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type ResetPasswordMutationFn = Apollo.MutationFunction<ResetPasswordMutation, ResetPasswordMutationVariables>;
+
+/**
+ * __useResetPasswordMutation__
+ *
+ * To run a mutation, you first call `useResetPasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResetPasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resetPasswordMutation, { data, loading, error }] = useResetPasswordMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useResetPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ResetPasswordMutation, ResetPasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, options);
+      }
+export type ResetPasswordMutationHookResult = ReturnType<typeof useResetPasswordMutation>;
+export type ResetPasswordMutationResult = Apollo.MutationResult<ResetPasswordMutation>;
+export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>;
 export const SendUserInvitationEmailDocument = gql`
     mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
   sendUserInvitationEmail(input: $input) {
@@ -3349,6 +3719,56 @@ export function useUpdateUserRolesForDistrictMutation(baseOptions?: Apollo.Mutat
 export type UpdateUserRolesForDistrictMutationHookResult = ReturnType<typeof useUpdateUserRolesForDistrictMutation>;
 export type UpdateUserRolesForDistrictMutationResult = Apollo.MutationResult<UpdateUserRolesForDistrictMutation>;
 export type UpdateUserRolesForDistrictMutationOptions = Apollo.BaseMutationOptions<UpdateUserRolesForDistrictMutation, UpdateUserRolesForDistrictMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($input: UpdateUserInput!) {
+  updateUser(input: $input) {
+    ... on User {
+      id
+      first_name
+      last_name
+      theme
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export type ApiBatchPayloadKeySpecifier = ('count' | ApiBatchPayloadKeySpecifier)[];
 export type ApiBatchPayloadFieldPolicy = {
 	count?: FieldPolicy<any> | FieldReadFunction<any>
@@ -3360,38 +3780,50 @@ export type ApiCreateErrorFieldPolicy = {
 	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiDeleteErrorKeySpecifier = ('message' | 'errors' | ApiDeleteErrorKeySpecifier)[];
+export type ApiDeleteErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiDeleteErrorKeySpecifier)[];
 export type ApiDeleteErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type ApiErrorKeySpecifier = ('message' | ApiErrorKeySpecifier)[];
 export type ApiErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiLoginErrorKeySpecifier = ('message' | 'errors' | ApiLoginErrorKeySpecifier)[];
+export type ApiLoginErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiLoginErrorKeySpecifier)[];
 export type ApiLoginErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiNotFoundErrorKeySpecifier = ('message' | 'errors' | ApiNotFoundErrorKeySpecifier)[];
+export type ApiNotFoundErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiNotFoundErrorKeySpecifier)[];
 export type ApiNotFoundErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiOperationErrorKeySpecifier = ('message' | 'errors' | ApiOperationErrorKeySpecifier)[];
+export type ApiOperationErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiOperationErrorKeySpecifier)[];
 export type ApiOperationErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiPasswordResetErrorKeySpecifier = ('message' | 'errors' | ApiPasswordResetErrorKeySpecifier)[];
+export type ApiPasswordResetErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiPasswordResetErrorKeySpecifier)[];
 export type ApiPasswordResetErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type ApiUpdateErrorKeySpecifier = ('message' | 'errors' | ApiUpdateErrorKeySpecifier)[];
+export type ApiUpdateErrorKeySpecifier = ('message' | 'field' | 'value' | 'errors' | ApiUpdateErrorKeySpecifier)[];
 export type ApiUpdateErrorFieldPolicy = {
 	message?: FieldPolicy<any> | FieldReadFunction<any>,
+	field?: FieldPolicy<any> | FieldReadFunction<any>,
+	value?: FieldPolicy<any> | FieldReadFunction<any>,
 	errors?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type CatchmentDistrictKeySpecifier = ('id' | 'disabled' | 'district_id' | 'district' | 'catchment_province_id' | 'catchment_province' | 'water_treatment_plants' | 'service_areas' | 'sewer_treatment_plants' | 'reports' | 'district_users' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | CatchmentDistrictKeySpecifier)[];
@@ -3626,7 +4058,7 @@ export type LoginSuccessFieldPolicy = {
 	accessToken?: FieldPolicy<any> | FieldReadFunction<any>,
 	id?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'resetPassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'setUserDefaultProject' | 'deleteOrganisationUser' | 'createDistrictUser' | 'setUserDefaultDistrict' | 'updateUserRolesForDistrict' | 'deleteDistrictUser' | 'createUserInvitation' | 'sendUserInvitationEmail' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
+export type MutationKeySpecifier = ('createCountry' | 'deleteCountry' | 'updateCountry' | 'createProvince' | 'deleteProvince' | 'updateProvince' | 'createDistrict' | 'updateDistrict' | 'deleteDistrict' | 'createOrganisation' | 'updateOrganisation' | 'deleteOrganisation' | 'createCatchmentProvince' | 'updateCatchmentProvince' | 'deleteCatchmentProvince' | 'createCatchmentDistrict' | 'updateCatchmentDistrict' | 'deleteCatchmentDistrict' | 'createUser' | 'createInvitedUser' | 'deleteUser' | 'disableUser' | 'updateUser' | 'login' | 'requestPasswordReset' | 'cancelRequestPasswordReset' | 'resetPassword' | 'changePassword' | 'createOrganisationUser' | 'updateOrganisationUser' | 'setUserDefaultProject' | 'deleteOrganisationUser' | 'createDistrictUser' | 'setUserDefaultDistrict' | 'updateUserRolesForDistrict' | 'deleteDistrictUser' | 'createUserInvitation' | 'sendUserInvitationEmail' | 'deleteUserInvitation' | 'createResidence' | 'updateResidence' | 'deleteResidence' | 'createServiceArea' | 'deleteServiceArea' | 'createWaterTreatmentPlant' | 'updateWaterTreatmentPlant' | 'deleteWaterTreatmentPlants' | 'createWaterStorageTank' | 'updateWaterStorageTank' | 'deleteWaterStorageTank' | 'createWaterProductionSite' | 'updateWaterProductionSite' | 'deleteWaterProductionSite' | 'createWaterNetwork' | 'updateWaterNetwork' | 'deleteWaterNetwork' | 'createServiceAreaWaterConnection' | 'updateServiceAreaWaterConnection' | 'deleteServiceAreaWaterConnection' | 'createSewerTreatmentPlant' | 'updateSewerTreatmentPlant' | 'deleteSewerTreatmentPlants' | 'createSewerNetwork' | 'updateSewerNetwork' | 'deleteSewerNetwork' | 'createServiceAreaSewerConnection' | 'updateServiceAreaSewerConnection' | 'deleteServiceAreaSewerConnection' | 'createDisaggregateOption' | 'createDisaggregateOptions' | 'deleteDisaggregateOption' | 'createDisaggregate' | 'createDisaggregateWithOptions' | 'updateDisaggregate' | 'deleteDisaggregate' | 'createIndicatorUnit' | 'updateIndicatorUnit' | 'deleteIndicatorUnit' | 'createIndicator' | 'updateIndicator' | 'deleteIndicator' | 'createReport' | 'updateReport' | 'deleteReport' | 'createOrganisationReportTemplate' | 'createOrganisationReportTemplates' | 'deleteOrganisationReportTemplate' | 'createReportTemplate' | 'updateReportTemplate' | 'deleteReportTemplate' | 'createOrganisationIndicator' | 'createOrganisationIndicators' | 'deleteOrganisationIndicator' | 'createIndicatorDisaggregate' | 'createIndicatorDisaggregates' | 'deleteIndicatorDisaggregate' | 'createOption' | 'updateOption' | 'deleteOption' | 'createIndicatorDisaggregateReport' | 'updateIndicatorDisaggregateReport' | 'deleteIndicatorDisaggregateReport' | MutationKeySpecifier)[];
 export type MutationFieldPolicy = {
 	createCountry?: FieldPolicy<any> | FieldReadFunction<any>,
 	deleteCountry?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -3653,7 +4085,9 @@ export type MutationFieldPolicy = {
 	updateUser?: FieldPolicy<any> | FieldReadFunction<any>,
 	login?: FieldPolicy<any> | FieldReadFunction<any>,
 	requestPasswordReset?: FieldPolicy<any> | FieldReadFunction<any>,
+	cancelRequestPasswordReset?: FieldPolicy<any> | FieldReadFunction<any>,
 	resetPassword?: FieldPolicy<any> | FieldReadFunction<any>,
+	changePassword?: FieldPolicy<any> | FieldReadFunction<any>,
 	createOrganisationUser?: FieldPolicy<any> | FieldReadFunction<any>,
 	updateOrganisationUser?: FieldPolicy<any> | FieldReadFunction<any>,
 	setUserDefaultProject?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4060,8 +4494,9 @@ export type SewerTreatmentPlantFieldPolicy = {
 	last_modified_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_modified_by?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type SubscriptionKeySpecifier = ('userInvitationUpdated' | SubscriptionKeySpecifier)[];
+export type SubscriptionKeySpecifier = ('passwordRequestEmailCompleted' | 'userInvitationUpdated' | SubscriptionKeySpecifier)[];
 export type SubscriptionFieldPolicy = {
+	passwordRequestEmailCompleted?: FieldPolicy<any> | FieldReadFunction<any>,
 	userInvitationUpdated?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type UpdateSewerTreatmentPlantPayloadKeySpecifier = ('sewer_treatment_plant' | UpdateSewerTreatmentPlantPayloadKeySpecifier)[];
@@ -4080,7 +4515,7 @@ export type UpdateWaterTreatmentPlantPayloadKeySpecifier = ('water_treatment_pla
 export type UpdateWaterTreatmentPlantPayloadFieldPolicy = {
 	water_treatment_plant?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type UserKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'user_organisations' | 'user_default_organisation' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserKeySpecifier)[];
+export type UserKeySpecifier = ('id' | 'first_name' | 'last_name' | 'email' | 'disabled' | 'master_support' | 'user_organisations' | 'user_default_organisation' | 'hashed_confirmation_token' | 'confirmed_at' | 'hashed_password_reset_token' | 'password_reset_email_status' | 'last_login' | 'theme' | 'created_at' | 'created_by' | 'last_modified_at' | 'last_modified_by' | UserKeySpecifier)[];
 export type UserFieldPolicy = {
 	id?: FieldPolicy<any> | FieldReadFunction<any>,
 	first_name?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -4093,6 +4528,7 @@ export type UserFieldPolicy = {
 	hashed_confirmation_token?: FieldPolicy<any> | FieldReadFunction<any>,
 	confirmed_at?: FieldPolicy<any> | FieldReadFunction<any>,
 	hashed_password_reset_token?: FieldPolicy<any> | FieldReadFunction<any>,
+	password_reset_email_status?: FieldPolicy<any> | FieldReadFunction<any>,
 	last_login?: FieldPolicy<any> | FieldReadFunction<any>,
 	theme?: FieldPolicy<any> | FieldReadFunction<any>,
 	created_at?: FieldPolicy<any> | FieldReadFunction<any>,

@@ -1,13 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import { Alert, Box, Button, Container, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Link as MUILink,
+  Button,
+  Container,
+  Typography,
+} from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
 import { currentUserVar, isLoggedInVar } from 'cache';
 import FormInput from 'components/form-input-helpers/form-input';
+import RequestPasswordResetModal from 'components/users/request-password-reset-modal';
 import {
   useGetCurrentUserLazyQuery,
   useLoginMutation,
@@ -31,6 +40,7 @@ type FormInputs = {
 };
 
 function Login() {
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
   const location: any = useLocation();
   const client = useApolloClient();
 
@@ -39,14 +49,14 @@ function Login() {
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, touchedFields },
+    formState: { isSubmitting, isValid, touchedFields, isDirty, errors },
     setError,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
 
-  const [login, { loading: logginIn }] = useLoginMutation();
+  const [login, { loading, reset, error }] = useLoginMutation();
 
   const [getCurrentUser, { data: currentUserResponse }] =
     useGetCurrentUserLazyQuery();
@@ -61,7 +71,7 @@ function Login() {
 
   const isLoggedIn = useReactiveVar(isLoggedInVar);
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from || '/';
 
   useEffect(() => {
     currentUserVar(currentUser as User);
@@ -72,37 +82,52 @@ function Login() {
       getCurrentUser({
         fetchPolicy: 'network-only',
       }).then(() => {
-        navigate(from, { replace: true });
+        if (
+          ['/signup', '/account/changePassword', '/resetPassword'].indexOf(
+            from
+          ) > -1
+        ) {
+          navigate('/', { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
       });
     }
   }, [isLoggedIn, from, navigate, getCurrentUser]);
 
   const onSubmit = async (values: any) => {
-    login({
-      fetchPolicy: 'network-only',
-      variables: {
-        input: {
-          email: values.email,
-          password: values.password,
+    try {
+      await login({
+        fetchPolicy: 'no-cache',
+        variables: {
+          input: {
+            email: values.email,
+            password: values.password,
+          },
         },
-      },
-      onCompleted: (result) => {
-        if (result.login.__typename === 'LoginSuccess') {
-          setToken(result.login.accessToken, client);
-        } else if (result.login.__typename === 'ApiLoginError') {
-          result.login.errors?.forEach((err) =>
-            setError(err.field as 'email' | 'password', {
-              type: 'server',
-              message: err.message,
-            })
-          );
-        }
-      },
-      onError: (err) => {
-        // throw it and let it be handled by the Error Boundary
-        console.log('Chaiwa, something bad happened', err);
-      },
-    });
+        onCompleted: (result) => {
+          if (result.login.__typename === 'LoginSuccess') {
+            setToken(result.login.accessToken, client);
+          } else if (result.login.__typename === 'ApiLoginError') {
+            result.login.errors?.forEach((err) =>
+              setError(err.field as 'email' | 'password', {
+                type: 'server',
+                message: err.message,
+              })
+            );
+          }
+        },
+        onError: (err) => {
+          // throw it and let it be handled by the Error Boundary
+          console.log('Chaiwa, something bad happened', err);
+        },
+      });
+    } catch (err) {
+      // Error Boundary
+      console.log('Chaiwa, Error', err);
+    } finally {
+      reset();
+    }
   };
 
   return (
@@ -117,6 +142,14 @@ function Login() {
     >
       <Container maxWidth="sm">
         <form onSubmit={handleSubmit(onSubmit)}>
+          {errors['unknown' as keyof FormInputs] && !isDirty && (
+            <Box>
+              <Alert severity="error">
+                {errors['unknown' as keyof FormInputs]?.message}. Please contact
+                support or try again!
+              </Alert>
+            </Box>
+          )}
           <Box sx={{ my: 3 }}>
             <Typography color="textPrimary" variant="h4">
               Sign in
@@ -125,13 +158,20 @@ function Login() {
               Sign in on to the MIS
             </Typography>
           </Box>
-          {from === '/signup' && (
-            <Box>
-              <Alert severity="success">
-                Your account was created successfully. Please sign-in!
-              </Alert>
-            </Box>
-          )}
+          {(from === '/signup' ||
+            from === '/account/changePassword' ||
+            from === '/resetPassword') &&
+            !isDirty && (
+              <Box>
+                <Alert severity="success">
+                  Your $
+                  {from === '/signup'
+                    ? 'account was created'
+                    : 'password was changed'}{' '}
+                  successfully. Please sign-in!
+                </Alert>
+              </Box>
+            )}
           <FormInput
             control={control}
             name="email"
@@ -150,22 +190,36 @@ function Login() {
             type="password"
             variant="outlined"
           />
+          <MUILink
+            onClick={() => setShowPasswordResetModal(true)}
+            style={{
+              cursor: 'pointer',
+            }}
+          >
+            Forgot password?
+          </MUILink>
           <Box sx={{ py: 2 }}>
-            <Button
+            <LoadingButton
               color="primary"
               disabled={
                 isSubmitting ||
                 (!isValid && (touchedFields.email || touchedFields.password)) ||
-                logginIn
+                loading
               }
-              fullWidth
               size="large"
-              type="submit"
               variant="contained"
+              type="submit"
+              fullWidth
+              loading={isSubmitting || loading}
+              loadingPosition="end"
             >
-              {logginIn ? 'signing you in...' : 'Sign In'}
-            </Button>
+              {loading ? 'signing you in...' : 'Sign In'}
+            </LoadingButton>
           </Box>
+          <RequestPasswordResetModal
+            open={showPasswordResetModal}
+            handleClose={() => setShowPasswordResetModal(false)}
+          />
         </form>
       </Container>
     </Box>

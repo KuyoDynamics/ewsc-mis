@@ -239,7 +239,7 @@ function generateClientErrors<T>(error: T, field_name?: string): ErrorField[] {
   } else if (error instanceof AuthenticationError) {
     errorFields = [
       {
-        field: field_name || 'unknown',
+        field: error.extensions.field || field_name || 'unknown',
         message: error.message,
       },
     ];

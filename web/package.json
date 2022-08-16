@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --mode development --config webpack.config.ts",
+    "build": "node --loader ts-node/esm node_modules/.bin/webpack-cli build",
     "deploy": "webpack --mode production --config webpack.config.ts",
     "dev": "node --loader ts-node/esm node_modules/.bin/webpack-cli serve --open",
     "gen": "graphql-codegen",
@@ -25,6 +25,7 @@
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
+    "@types/uuid": "^8.3.4",
     "@types/webpack": "^5.28.0",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
@@ -70,6 +71,7 @@
     "@mui/x-data-grid": "^5.14.0",
     "@mui/x-data-grid-generator": "^5.14.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.7",
+    "@tabler/icons": "^1.78.1",
     "@types/color-hash": "^1.0.2",
     "@types/react-data-grid": "^4.0.8",
     "apollo3-cache-persist": "^0.14.1",
@@ -82,11 +84,14 @@
     "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^4.2.0",
+    "react-device-detect": "^2.2.2",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
     "react-hook-form": "^7.33.0",
+    "react-perfect-scrollbar": "^1.5.8",
     "react-router-dom": "^6.3.0",
     "react-select": "^5.4.0",
+    "uuid": "^8.3.2",
     "yup": "^0.32.11"
   }
 }

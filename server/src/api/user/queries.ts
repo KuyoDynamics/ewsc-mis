@@ -13,6 +13,8 @@ import {
   DistrictResult,
   DistrictUser,
   LoginResult,
+  MutationCancelRequestPasswordResetArgs,
+  MutationChangePasswordArgs,
   MutationCreateInvitedUserArgs,
   MutationCreateUserArgs,
   MutationDeleteUserArgs,
@@ -22,7 +24,6 @@ import {
   MutationResetPasswordArgs,
   MutationUpdateUserArgs,
   OrganisationUserRoleType,
-  PasswordResetRequestResult,
   PasswordResetResult,
   QueryDefault_User_DistrictArgs,
   QueryUserArgs,
@@ -30,6 +31,7 @@ import {
   UserOrganisation,
   UserResult,
 } from '../../libs/resolvers-types';
+import { EmailStatus } from '@prisma/client';
 
 async function getUsers(context: GraphQLContext): Promise<User[]> {
   const result = await context.prisma.user.findMany({});
@@ -326,6 +328,64 @@ async function createInvitedUser(
   }
 }
 
+async function changePassword(
+  args: MutationChangePasswordArgs,
+  context: GraphQLContext
+): Promise<UserResult> {
+  try {
+    const user = await context.prisma.user.findUnique({
+      where: {
+        id: args.input.user_id,
+      },
+    });
+
+    if (user) {
+      // try {
+      if (!(await isValidPassword(args.input.password, user.password))) {
+        throw new AuthenticationError('Incorrect password.', {
+          field: 'password',
+        });
+      }
+      // } catch (error) {
+      //   console.log('Failed to update password.', error);
+      //   // Also send to Sentry
+      //   throw new AuthenticationError('Failed to update password.', {
+      //     field: 'password',
+      //   });
+      // }
+    }
+
+    const updatedUser = await context.prisma.user.update({
+      where: {
+        id: args.input.user_id,
+      },
+      data: {
+        password: await encryptPassword(args.input.new_password),
+        last_modified_by: context.user.email,
+      },
+    });
+
+    if (!updatedUser) {
+      return {
+        __typename: 'ApiUpdateError',
+        message: `Failed to update User Password because user does not exist.`,
+        field: 'id',
+      };
+    }
+
+    return {
+      __typename: 'User',
+      ...user,
+    } as UserResult;
+  } catch (error) {
+    return {
+      __typename: 'ApiUpdateError',
+      message: `Failed to update User Password with user id ${args.input.user_id}.`,
+      errors: generateClientErrors(error),
+    };
+  }
+}
+
 async function updateUser(
   args: MutationUpdateUserArgs,
   context: GraphQLContext
@@ -475,7 +535,7 @@ async function login(
 async function requestPasswordReset(
   args: MutationRequestPasswordResetArgs,
   context: GraphQLContext
-): Promise<PasswordResetRequestResult> {
+): Promise<UserResult> {
   let hashed_password_reset_token;
   try {
     const user = await context.prisma.user.findUnique({
@@ -485,18 +545,43 @@ async function requestPasswordReset(
     });
 
     if (!user)
-      throw new AuthenticationError('Account with this email does not exit.');
+      throw new AuthenticationError('Account with this email does not exist.', {
+        field: 'email',
+      });
 
-    if (user.disabled) throw new AuthenticationError('Account is disabled.');
+    if (user.disabled)
+      throw new AuthenticationError('Account is disabled.', {
+        field: 'email',
+      });
 
-    hashed_password_reset_token = uuidv4();
+    try {
+      hashed_password_reset_token = jwt.sign(
+        { email: user.email, id: uuidv4() },
+        process.env.JWT_SECRET!,
+        {
+          algorithm: 'HS256',
+          subject: user.email,
+          expiresIn: '1d',
+        }
+      );
+    } catch (error) {
+      console.log('Failed to generate password reset token.', error);
+      // Also send to Sentry
+      throw new AuthenticationError(
+        'Failed to generate password reset token.',
+        {
+          field: 'email',
+        }
+      );
+    }
 
-    await context.prisma.user.update({
+    const updatedUser = await context.prisma.user.update({
       where: {
         id: user.id,
       },
       data: {
         hashed_password_reset_token,
+        password_reset_email_status: EmailStatus.PENDING,
         last_modified_by: user.email,
       },
     });
@@ -504,14 +589,43 @@ async function requestPasswordReset(
     // We can send email at this point like this, async. After we figure out sending emails, we will not return
     // Email.password_recovery_email(user, token) |> Mailer.deliver_later()
     return {
-      __typename: 'PasswordResetRequestPayload',
-      hashed_password_reset_token,
-    };
+      __typename: 'User',
+      ...updatedUser,
+    } as User;
   } catch (error) {
     return {
-      __typename: 'ApiPasswordResetError',
+      __typename: 'ApiUpdateError',
       message: 'Password Reset Request Failed.',
-      errors: generateClientErrors(error, 'email,password'),
+      errors: generateClientErrors(error, 'email'),
+    };
+  }
+}
+
+async function cancelRequestPasswordReset(
+  args: MutationCancelRequestPasswordResetArgs,
+  context: GraphQLContext
+): Promise<UserResult> {
+  try {
+    const updatedUser = await context.prisma.user.update({
+      where: {
+        id: args.input.user_id,
+      },
+      data: {
+        hashed_password_reset_token: null,
+        password_reset_email_status: null,
+        last_modified_by: context.user.email,
+      },
+    });
+
+    return {
+      __typename: 'User',
+      ...updatedUser,
+    } as User;
+  } catch (error) {
+    return {
+      __typename: 'ApiUpdateError',
+      message: 'Cancel Password Reset Request Failed.',
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -537,7 +651,8 @@ async function resetPassword(
       },
       data: {
         password: await encryptPassword(args.input.password),
-        hashed_password_reset_token: '',
+        hashed_password_reset_token: null,
+        password_reset_email_status: null,
         last_modified_by: user.email,
       },
     });
@@ -569,4 +684,6 @@ export {
   resetPassword,
   getUserDistricts,
   getDefaultUserDistrict,
+  changePassword,
+  cancelRequestPasswordReset,
 };

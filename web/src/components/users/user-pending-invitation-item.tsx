@@ -63,7 +63,7 @@ function UserPendingInvitationItem({
         return <Check />;
       case EmailStatus.Failed:
       case EmailStatus.Rejected:
-        return <Error />;
+        return <Error color="error" />;
       default:
         return status;
     }

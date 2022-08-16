@@ -3,6 +3,7 @@ import DataTable, { HeadCellType, TableDataType } from 'components/data-table';
 import UserItem from 'components/users/user-item';
 import UserInvitationForm from 'components/users/user-invitation-form';
 import UserInvitationButton from 'components/users/user-invitation-button';
+import UsersBarChartSkeleton from 'components/cards/skeletons/users-bar-chart';
 import { useGetDefaultOrganisationUsersQuery } from '../../../graphql/generated';
 
 function UserList() {
@@ -17,10 +18,11 @@ function UserList() {
         ? data.me.user_default_organisation?.users?.map((user) => ({
             id: user.id,
             organisation_user_id: user.organisation_user_id,
-            name: `${user.last_name} ${user.first_name} `,
+            name: `${user.first_name} ${user.last_name}`,
             role: user.role,
             disabled: user.disabled,
             user_districts: user.user_districts,
+            email: user.email,
           }))
         : null,
     [data]
@@ -33,6 +35,12 @@ function UserList() {
       numeric: false,
       disablePadding: true,
       label: 'Name',
+    },
+    {
+      id: 'email',
+      numeric: false,
+      disablePadding: true,
+      label: 'Email',
     },
     {
       id: 'role',
@@ -59,7 +67,7 @@ function UserList() {
 
   // const dummy: readonly string[] = [];
 
-  if (loading) return <p>loading organisation users...</p>;
+  if (loading) return <UsersBarChartSkeleton />;
   if (error) return <p>failed to load organisation users</p>;
 
   return (

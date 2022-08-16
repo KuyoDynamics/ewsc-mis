@@ -18,6 +18,8 @@ import {
   resolveProvince,
   resolveOrganisationUsers,
   resolveCatchmentProvinces,
+  changePassword,
+  cancelRequestPasswordReset,
 } from '../queries';
 
 const typeDefs = gql`
@@ -33,6 +35,7 @@ const typeDefs = gql`
     hashed_confirmation_token: String
     confirmed_at: DateTime
     hashed_password_reset_token: String
+    password_reset_email_status: EmailStatus
     last_login: DateTime
     theme: UserTheme
     created_at: DateTime!
@@ -104,10 +107,26 @@ const typeDefs = gql`
     disableUser(input: DisableUserInput!): UserResult!
     updateUser(input: UpdateUserInput!): UserResult!
     login(input: LoginInput!): LoginResult!
-    requestPasswordReset(
-      input: PasswordResetRequestInput!
-    ): PasswordResetRequestResult!
+    requestPasswordReset(input: PasswordResetRequestInput!): UserResult!
+    cancelRequestPasswordReset(
+      input: CancelPasswordResetRequestInput!
+    ): UserResult!
     resetPassword(input: PasswordResetInput!): PasswordResetResult!
+    changePassword(input: ChangePasswordInput!): UserResult!
+  }
+
+  extend type Subscription {
+    passwordRequestEmailCompleted: User
+  }
+
+  input CancelPasswordResetRequestInput {
+    user_id: ID!
+  }
+
+  input ChangePasswordInput {
+    user_id: ID!
+    new_password: String!
+    password: String!
   }
 
   input PasswordResetInput {
@@ -211,10 +230,6 @@ const typeDefs = gql`
 
   union LoginResult = LoginSuccess | ApiLoginError
 
-  union PasswordResetRequestResult =
-      PasswordResetRequestPayload
-    | ApiPasswordResetError
-
   union PasswordResetResult = User | ApiPasswordResetError
 `;
 
@@ -258,6 +273,22 @@ const resolvers: Resolvers = {
     requestPasswordReset: (_, args, context) =>
       requestPasswordReset(args, context),
     resetPassword: (_, args, context) => resetPassword(args, context),
+    changePassword: (_, args, context) => changePassword(args, context),
+    cancelRequestPasswordReset: (_, args, context) =>
+      cancelRequestPasswordReset(args, context),
+  },
+  Subscription: {
+    passwordRequestEmailCompleted: {
+      // Also apply withFilter to only subscribe to organisation user password updates
+      //@ts-ignore
+      subscribe: (_parent, _args, context) => {
+        return context.pubSub.asyncIterator([
+          'PASSWORD_REQUEST_EMAIL_FAILED',
+          'PASSWORD_REQUEST_EMAIL_SENT',
+          'PASSWORD_REQUEST_EMAIL_REJECTED',
+        ]);
+      },
+    },
   },
 };
 

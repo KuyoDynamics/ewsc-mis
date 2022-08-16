@@ -165,6 +165,7 @@ model User {
   theme                       UserTheme          @default(LIGHT)
   disabled                    Boolean            @default(false)
   master_support              Boolean            @default(false)
+  password_reset_email_status EmailStatus?
   // Relation Fields
   user_organisations          OrganisationUser[]
 

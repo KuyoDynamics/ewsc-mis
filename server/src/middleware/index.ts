@@ -1,11 +1,13 @@
-import { Organisation } from '@prisma/client';
+import { EmailStatus, Organisation } from '@prisma/client';
 import {
   MutationCreateInvitedUserArgs,
+  MutationRequestPasswordResetArgs,
+  User,
   UserInvitationResult,
   UserResult,
 } from '../libs/resolvers-types';
 import { GraphQLContext } from '../utils';
-import { sendInvitation } from '../mailer';
+import { sendEmail, sendInvitation } from '../mailer';
 
 const deleteUserInvitationMiddleware = {
   Mutation: {
@@ -105,4 +107,86 @@ const sendInvitationEmailMiddleware = {
   },
 };
 
-export { deleteUserInvitationMiddleware, sendInvitationEmailMiddleware };
+const sendPasswordResetEmailMiddleware = {
+  Mutation: {
+    requestPasswordReset: async (
+      resolve: any,
+      parent: any,
+      args: MutationRequestPasswordResetArgs,
+      context: GraphQLContext,
+      info: any
+    ) => {
+      const userResult: UserResult = await resolve(parent, args, context, info);
+
+      const user = userResult.__typename === 'User' ? userResult : null;
+
+      if (user) {
+        if (userResult?.__typename === 'User') {
+          try {
+            console.log('Chaiwa, was this called?');
+            const url = `${process.env.HOST_URL}/resetPassword?token=${user.hashed_password_reset_token}`;
+            await sendEmail(
+              user.user_default_organisation?.name!,
+              user.email,
+              'Request to reset your password',
+              `<p>To reset your password for your ${user.user_default_organisation?.name} MIS Account, please click on the link below. If clicking does not work, copy the url and paste in the broswer:</p> <br/> <a href=${url}>${url}<a/>`,
+              async (err, information) => {
+                const emailStatus: EmailStatus = err
+                  ? EmailStatus.FAILED
+                  : information?.accepted?.indexOf(user.email) > -1
+                  ? EmailStatus.SENT
+                  : EmailStatus.REJECTED;
+                console.log('Chaiwa, EmailStatus', emailStatus);
+                try {
+                  const result = await context.prisma.user.update({
+                    where: {
+                      email: user.email,
+                    },
+                    data: {
+                      password_reset_email_status: emailStatus,
+                      last_modified_by: context.user.email,
+                    },
+                  });
+
+                  context.pubSub.publish(
+                    `PASSWORD_REQUEST_EMAIL_${emailStatus}`,
+                    {
+                      passwordRequestEmailCompleted: result,
+                    }
+                  );
+                } catch (error) {
+                  console.log(
+                    'Error during email sending. Failed to update hashed_password_reset_token:',
+                    error
+                  );
+                  context.pubSub.publish(
+                    `PASSWORD_REQUEST_EMAIL_${emailStatus}`,
+                    {
+                      passwordRequestEmailCompleted: null,
+                    }
+                  );
+                }
+              }
+            );
+          } catch (error) {
+            console.log(
+              'Error occured before sending email to user for password reset request',
+              error
+            );
+            context.pubSub.publish('PASSWORD_REQUEST_EMAIL_FAILED', {
+              passwordRequestEmailCompleted: null,
+            });
+          }
+        }
+      }
+
+      return userResult;
+    },
+  },
+};
+
+export {
+  deleteUserInvitationMiddleware,
+  sendInvitationEmailMiddleware,
+  sendPasswordResetEmailMiddleware,
+};

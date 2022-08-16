@@ -302,7 +302,7 @@ function UserInvitationForm({ open, onClose }: IUserInvitationFormProps) {
       }}
     >
       <DialogTitle id="user-inivation-dialog-title">
-        <Typography color="textPrimary" variant="h6">
+        <Typography color="textPrimary" variant="h4">
           New User Invitation Form
         </Typography>
         <Typography color="textSecondary" gutterBottom variant="body2">

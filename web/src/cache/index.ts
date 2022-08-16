@@ -31,7 +31,7 @@ function isTokenExpired(): boolean {
 
 const tokenExpired = isTokenExpired();
 
-const isLoggedInVar: ReactiveVar<boolean> = makeVar(tokenExpired);
+const isLoggedInVar: ReactiveVar<boolean> = makeVar(!tokenExpired);
 
 const currentUserVar: ReactiveVar<User> = makeVar(null as unknown as User);
 

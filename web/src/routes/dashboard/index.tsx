@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Container, Grid, Skeleton } from '@mui/material';
+import Logo from '../../../public/static/images/ewsc_logo.png';
 
 function Dashboard() {
   return (
