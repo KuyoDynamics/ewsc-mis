@@ -73,16 +73,11 @@ function ResetPassword() {
     mode: 'onChange',
   });
 
-  console.log('Errors', errors);
-
   const onSubmit = ({
     password,
     confirmPassword,
     hashed_password_reset_token,
   }: FormInputs) => {
-    console.log('password', password);
-    console.log('user_id', hashed_password_reset_token);
-    console.log('confirmPassword', confirmPassword);
     resetPassword({
       variables: {
         input: {

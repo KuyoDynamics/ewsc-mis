@@ -71,8 +71,9 @@ function RequestPasswordResetModal({
           dispatch({
             type: ActionTypes.ShowToast,
             payload: {
-              message:
-                'Password reset request sent! Check your email to reset your password.',
+              message: `Password reset request sent! ${
+                !email ? 'Check your email to reset your password.' : ''
+              }`,
               severity: 'success',
               open: true,
             },
