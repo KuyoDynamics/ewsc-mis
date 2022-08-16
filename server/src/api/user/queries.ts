@@ -545,9 +545,14 @@ async function requestPasswordReset(
     });
 
     if (!user)
-      throw new AuthenticationError('Account with this email does not exit.');
+      throw new AuthenticationError('Account with this email does not exist.', {
+        field: 'email',
+      });
 
-    if (user.disabled) throw new AuthenticationError('Account is disabled.');
+    if (user.disabled)
+      throw new AuthenticationError('Account is disabled.', {
+        field: 'email',
+      });
 
     try {
       hashed_password_reset_token = jwt.sign(
@@ -591,7 +596,7 @@ async function requestPasswordReset(
     return {
       __typename: 'ApiUpdateError',
       message: 'Password Reset Request Failed.',
-      errors: generateClientErrors(error, 'email,password'),
+      errors: generateClientErrors(error, 'email'),
     };
   }
 }

@@ -1,14 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import { Alert, Box, Button, Container, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Link as MUILink,
+  Button,
+  Container,
+  Typography,
+} from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useApolloClient, useReactiveVar } from '@apollo/client';
 import { setToken } from 'utils/session';
 import { currentUserVar, isLoggedInVar } from 'cache';
 import FormInput from 'components/form-input-helpers/form-input';
+import RequestPasswordResetModal from 'components/users/request-password-reset-modal';
 import {
   useGetCurrentUserLazyQuery,
   useLoginMutation,
@@ -32,6 +40,7 @@ type FormInputs = {
 };
 
 function Login() {
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
   const location: any = useLocation();
   const client = useApolloClient();
 
@@ -181,6 +190,14 @@ function Login() {
             type="password"
             variant="outlined"
           />
+          <MUILink
+            onClick={() => setShowPasswordResetModal(true)}
+            style={{
+              cursor: 'pointer',
+            }}
+          >
+            Forgot password?
+          </MUILink>
           <Box sx={{ py: 2 }}>
             <LoadingButton
               color="primary"
@@ -199,6 +216,10 @@ function Login() {
               {loading ? 'signing you in...' : 'Sign In'}
             </LoadingButton>
           </Box>
+          <RequestPasswordResetModal
+            open={showPasswordResetModal}
+            handleClose={() => setShowPasswordResetModal(false)}
+          />
         </form>
       </Container>
     </Box>

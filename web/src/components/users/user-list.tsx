@@ -22,6 +22,7 @@ function UserList() {
             role: user.role,
             disabled: user.disabled,
             user_districts: user.user_districts,
+            email: user.email,
           }))
         : null,
     [data]
@@ -34,6 +35,12 @@ function UserList() {
       numeric: false,
       disablePadding: true,
       label: 'Name',
+    },
+    {
+      id: 'email',
+      numeric: false,
+      disablePadding: true,
+      label: 'Email',
     },
     {
       id: 'role',

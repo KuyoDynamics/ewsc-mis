@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useMemo, useContext } from 'react';
 import * as Yup from 'yup';
@@ -17,6 +18,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { AppContext } from 'context/app-context';
 import { ActionTypes } from 'context/reducer';
 import { useRequestPasswordResetMutation } from '../../../graphql/generated';
+import FormInput from 'components/form-input-helpers/form-input';
 
 const schema = Yup.object({
   email: Yup.string().email('Invalid email').required(),
@@ -29,8 +31,8 @@ interface FormInputs {
 interface RequestPasswordResetModalProps {
   open: boolean;
   handleClose: () => void;
-  email: string;
-  name: string;
+  email?: string;
+  name?: string;
 }
 
 function RequestPasswordResetModal({
@@ -49,6 +51,7 @@ function RequestPasswordResetModal({
     formState: { errors },
     register,
     setError,
+    control,
     setValue,
   } = useForm<FormInputs>({
     resolver: yupResolver(schema),
@@ -68,7 +71,8 @@ function RequestPasswordResetModal({
           dispatch({
             type: ActionTypes.ShowToast,
             payload: {
-              message: 'Password reset request sent!',
+              message:
+                'Password reset request sent! Check your email to reset your password.',
               severity: 'success',
               open: true,
             },
@@ -111,8 +115,10 @@ function RequestPasswordResetModal({
   };
 
   useEffect(() => {
-    register('email');
-  }, [register]);
+    if (email) {
+      register('email');
+    }
+  }, [register, email]);
 
   useEffect(() => {
     if (email) {
@@ -140,15 +146,29 @@ function RequestPasswordResetModal({
           </Alert>
         </Box>
       )}
-      <DialogTitle variant="h4">Confirm Request Password Reset</DialogTitle>
+      <DialogTitle variant="h4">
+        {email ? 'Confirm Request Password Reset' : 'Request Password Reset'}
+      </DialogTitle>
       <DialogContent dividers>
-        <Typography variant="h5">
-          Are you sure you want to ask {name} to reset password?
-        </Typography>
+        {email && name && (
+          <Typography variant="h5">
+            Are you sure you want to ask {name} to reset password?
+          </Typography>
+        )}
+
+        {!email && (
+          <FormInput
+            control={control}
+            fullWidth
+            label="Your Email Address"
+            name="email"
+            variant="outlined"
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={() => handleClose()} disabled={loading}>
-          No
+          {email ? 'No' : 'Cancel'}
         </Button>
         <Box sx={{ py: 2 }}>
           <LoadingButton
@@ -160,7 +180,7 @@ function RequestPasswordResetModal({
             loading={loading}
             loadingPosition="end"
           >
-            Yes
+            {email ? 'Yes' : 'Save'}
           </LoadingButton>
         </Box>
       </DialogActions>

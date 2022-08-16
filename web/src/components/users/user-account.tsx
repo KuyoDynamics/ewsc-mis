@@ -31,7 +31,7 @@ import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useReactiveVar } from '@apollo/client';
-import { getNameInitials, USER_THEME_OPTIONS } from 'utils';
+import { getNameInitials, isExpired, USER_THEME_OPTIONS } from 'utils';
 import FormInput from 'components/form-input-helpers/form-input';
 import FormSelect from 'components/form-input-helpers/form-select';
 import UserAccountMenu from 'components/users/user-account-menu';
@@ -44,6 +44,7 @@ import {
 } from '../../../graphql/generated';
 import RequestPasswordResetModal from './request-password-reset-modal';
 import CancelPasswordResetModal from './cancel-password-reset-modal';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 
 const schema = Yup.object({
   first_name: Yup.string().max(255).required('First name is required'),
@@ -100,6 +101,12 @@ function UserAccount() {
     () => (data?.user.__typename === 'User' ? data.user : null),
     [data]
   );
+
+  const decodedToken: JwtPayload | null = user?.hashed_password_reset_token
+    ? jwtDecode(user?.hashed_password_reset_token)
+    : null;
+
+  const isTokenExpired = decodedToken ? isExpired(decodedToken.exp!) : false;
 
   const updatedUser = useMemo(
     () =>
@@ -244,33 +251,35 @@ function UserAccount() {
             </Alert>
           </Box>
         )}
-        {user?.hashed_password_reset_token && (
-          <Box>
-            <Alert
-              severity="info"
-              icon={renderEmailStatus(user?.password_reset_email_status!)}
-              action={
-                <Tooltip title="Cancel Password Reset Request">
-                  <IconButton
-                    aria-label="cancel password reset"
-                    color="inherit"
-                    size="small"
-                    onClick={handleOpenCancelPasswordResetModal}
-                  >
-                    <CloseIcon fontSize="inherit" />
-                  </IconButton>
-                </Tooltip>
-              }
-            >
-              <AlertTitle>
-                {user?.password_reset_email_status === EmailStatus.Pending ||
-                !user?.password_reset_email_status
-                  ? 'Waiting for password reset email status...'
-                  : `Password reset email status: ${user?.password_reset_email_status}. Wait for user action or cancel this request.`}
-              </AlertTitle>
-            </Alert>
-          </Box>
-        )}
+        {user?.hashed_password_reset_token &&
+          !isCurrentUser &&
+          !isTokenExpired && (
+            <Box>
+              <Alert
+                severity="info"
+                icon={renderEmailStatus(user?.password_reset_email_status!)}
+                action={
+                  <Tooltip title="Cancel Password Reset Request">
+                    <IconButton
+                      aria-label="cancel password reset"
+                      color="inherit"
+                      size="small"
+                      onClick={handleOpenCancelPasswordResetModal}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  </Tooltip>
+                }
+              >
+                <AlertTitle>
+                  {user?.password_reset_email_status === EmailStatus.Pending ||
+                  !user?.password_reset_email_status
+                    ? 'Waiting for password reset email status...'
+                    : `Password reset email status: ${user?.password_reset_email_status}. Wait for user action or cancel this request.`}
+                </AlertTitle>
+              </Alert>
+            </Box>
+          )}
         <CardHeader
           subheader={
             isLoading ? (

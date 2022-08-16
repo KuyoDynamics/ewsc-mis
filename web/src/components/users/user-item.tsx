@@ -43,6 +43,7 @@ export type UserItemType = {
   role: OrganisationUserRoleType;
   disabled: boolean;
   user_districts: UserDistrict[];
+  email: string;
   // [key: string]: any;
 };
 
@@ -214,6 +215,10 @@ function UserItem({ align, row: user }: UserItemProps) {
     <>
       <TableCell align={align}>
         <Link to={`/admin/users/${user.id}`}>{user.name}</Link>
+      </TableCell>
+
+      <TableCell align={align}>
+        <Link to={`/admin/users/${user.id}`}>{user.email}</Link>
       </TableCell>
 
       <TableCell align={align}>
