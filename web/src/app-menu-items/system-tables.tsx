@@ -17,7 +17,7 @@ const admin: IMenuItem = {
       title: 'Countries',
       caption: 'System Countries',
       type: 'item',
-      url: '/countries',
+      url: '/system/countries',
       icon: ManageAccountsIcon,
     },
     {
@@ -25,7 +25,7 @@ const admin: IMenuItem = {
       title: 'Provinces',
       caption: 'System Provinces',
       type: 'item',
-      url: '/provinces',
+      url: '/system/provinces',
       icon: ContactEmailIcon,
     },
     {
@@ -33,7 +33,7 @@ const admin: IMenuItem = {
       title: 'Districts',
       caption: 'System Districts',
       type: 'item',
-      url: '/districts',
+      url: '/system/districts',
       icon: RoomPreferencesIcon,
     },
     {
@@ -41,7 +41,7 @@ const admin: IMenuItem = {
       title: 'Residential Areas',
       caption: 'System Residential Areas',
       type: 'item',
-      url: '/residences',
+      url: '/system/residences',
       icon: RoomPreferencesIcon,
     },
   ],

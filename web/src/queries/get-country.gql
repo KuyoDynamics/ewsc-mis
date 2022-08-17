@@ -1,0 +1,20 @@
+query GetCountry($countryId: ID!) {
+  country(id: $countryId) {
+    ... on Country {
+      name
+      code
+      created_by
+      created_at
+    }
+    ... on ApiNotFoundError {
+      message
+      field
+      value
+      errors {
+        field
+        value
+        message
+      }
+    }
+  }
+}
