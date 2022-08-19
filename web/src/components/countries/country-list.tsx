@@ -4,10 +4,14 @@
 import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
+import {
+  Edit as EditIcon,
+  DeleteOutline as DeleteIcon,
+  Save as SaveIcon,
+  Close as CancelIcon,
+  EditLocationOutlined,
+} from '@mui/icons-material';
+
 import {
   DataGrid,
   GridActionsCellItem,
@@ -44,6 +48,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { utils, writeFile } from 'xlsx';
 import { useForm } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
@@ -57,8 +62,6 @@ import {
   useGetCountriesQuery,
   useUpdateCountryMutation,
 } from '../../../graphql/generated';
-import { EditLocationOutlined, MoreHoriz } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
