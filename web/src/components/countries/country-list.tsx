@@ -21,12 +21,14 @@ import {
   gridFilteredSortedRowIdsSelector,
   GridFooter,
   GridFooterContainer,
+  GridRenderCellParams,
   GridRowId,
   GridRowModes,
   GridRowModesModel,
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridValueFormatterParams,
   gridVisibleColumnFieldsSelector,
   MuiEvent,
   useGridApiContext,
@@ -34,6 +36,7 @@ import {
 import {
   Alert,
   Box,
+  Button,
   Collapse,
   Fab,
   MenuItem,
@@ -48,11 +51,14 @@ import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
 import CountryForm from './country-form';
 import {
+  Country,
   GetCountriesDocument,
   useDeleteCountryMutation,
   useGetCountriesQuery,
   useUpdateCountryMutation,
 } from '../../../graphql/generated';
+import { EditLocationOutlined, MoreHoriz } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
@@ -129,7 +135,15 @@ function ExcelExportMenuItem(props: GridExportMenuItemProps<{}>) {
       onClick={() => {
         const { json } = getJson(apiRef);
 
-        saveExcelFile('countries', 'countries', 'xlsx', json);
+        saveExcelFile(
+          'countries',
+          'countries',
+          'xlsx',
+          json.map((item) => ({
+            ...item,
+            provinces: item.provinces.length,
+          }))
+        );
 
         hideMenu?.();
       }}
@@ -208,6 +222,8 @@ const schema = Yup.object({
 const initialRowModesModel: GridRowModesModel = {};
 
 function CountryList() {
+  const navigate = useNavigate();
+
   const [openAlert, setOpenAlert] = useState(false);
 
   const [openCreateCountryModal, setOpenCreateCountryModal] = useState(false);
@@ -406,6 +422,33 @@ function CountryList() {
       },
     },
     {
+      field: 'provinces',
+      headerName: 'provinces',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      renderCell: (params: GridRenderCellParams) => {
+        const { provinces, id } = params.row as Country;
+        return (
+          <Button
+            variant="text"
+            size="small"
+            endIcon={<EditLocationOutlined />}
+            onClick={() => navigate(`/system/provinces/${id}`)}
+          >
+            {provinces && provinces.length === 1
+              ? provinces[0].name
+              : `${provinces?.length} provinces`}
+          </Button>
+        );
+      },
+      valueFormatter: (params: GridValueFormatterParams) => {
+        return params.value.length;
+      },
+    },
+    {
       field: 'id',
       headerName: 'ID',
       type: 'string',
@@ -536,6 +579,7 @@ function CountryList() {
           rowsPerPageOptions={[5, 10]}
           columns={columns}
           editMode="row"
+          disableSelectionOnClick
           rowModesModel={rowModesModel}
           onRowEditStart={handleRowEditStart}
           onRowEditStop={handleRowEditStop}
