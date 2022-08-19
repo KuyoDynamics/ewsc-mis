@@ -16,6 +16,8 @@ const UserAccount = Loadable(lazy(() => import('routes/users/user-account')));
 const ChangePassword = Loadable(
   lazy(() => import('routes/users/change-password'))
 );
+const SystemDashboard = Loadable(lazy(() => import('routes/system')));
+const Countries = Loadable(lazy(() => import('routes/system/countries')));
 
 const MainRouter: RouteObject = {
   path: '/',
@@ -45,6 +47,16 @@ const MainRouter: RouteObject = {
         {
           path: 'users/:id',
           element: <UserAccount />,
+        },
+      ],
+    },
+    {
+      path: 'system',
+      element: <SystemDashboard />,
+      children: [
+        {
+          path: 'countries',
+          element: <Countries />,
         },
       ],
     },

@@ -2745,6 +2745,13 @@ export type ChangePasswordMutationVariables = Exact<{
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'User', id: string, email: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename?: 'ApiDeleteError' } };
 
+export type CreateCountryMutationVariables = Exact<{
+  input: CreateCountryInput;
+}>;
+
+
+export type CreateCountryMutation = { __typename?: 'Mutation', createCountry: { __typename?: 'Country', code: string, created_at: any, created_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
 export type CreateInvitedUserMutationVariables = Exact<{
   input: CreateInvitedUserInput;
 }>;
@@ -2759,6 +2766,13 @@ export type CreateUserInvitationMutationVariables = Exact<{
 
 export type CreateUserInvitationMutation = { __typename?: 'Mutation', createUserInvitation: Array<{ __typename?: 'UserInvitation', id: string, catchment_district_ids?: Array<string> | null, email: any, invitation_token: string, organisation_id: string, ttl: any } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, field?: string | null, value?: string | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' }> };
 
+export type DeleteCountryMutationVariables = Exact<{
+  input: DeleteCountryInput;
+}>;
+
+
+export type DeleteCountryMutation = { __typename?: 'Mutation', deleteCountry: { __typename?: 'Country', id: string, name: string, code: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
 export type DeleteUserInvitationMutationVariables = Exact<{
   input: DeleteUserInvitationInput;
 }>;
@@ -2772,6 +2786,18 @@ export type DisableUserMutationVariables = Exact<{
 
 
 export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __typename?: 'User', id: string, disabled: boolean } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetCountriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCountriesQuery = { __typename?: 'Query', countries?: Array<{ __typename?: 'Country', name: string, id: string, code: string, flag?: any | null, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, provinces?: Array<{ __typename?: 'Province', name: string, code: string, id: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, districts?: Array<{ __typename?: 'District', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string }> | null }> | null }> | null };
+
+export type GetCountryQueryVariables = Exact<{
+  countryId: Scalars['ID'];
+}>;
+
+
+export type GetCountryQuery = { __typename?: 'Query', country: { __typename?: 'Country', name: string, code: string, created_by: string, created_at: any } | { __typename?: 'ApiNotFoundError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2834,6 +2860,13 @@ export type SendUserInvitationEmailMutationVariables = Exact<{
 
 
 export type SendUserInvitationEmailMutation = { __typename?: 'Mutation', sendUserInvitationEmail: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string } | { __typename?: 'ApiDeleteError' } };
+
+export type UpdateCountryMutationVariables = Exact<{
+  input: UpdateCountryInput;
+}>;
+
+
+export type UpdateCountryMutation = { __typename?: 'Mutation', updateCountry: { __typename?: 'Country', id: string, code: string, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
 
 export type UpdateUserOrganisationRoleMutationVariables = Exact<{
   input: UpdateOrganisationUserInput;
@@ -2953,6 +2986,53 @@ export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptio
 export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const CreateCountryDocument = gql`
+    mutation CreateCountry($input: CreateCountryInput!) {
+  createCountry(input: $input) {
+    ... on Country {
+      code
+      created_at
+      created_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateCountryMutationFn = Apollo.MutationFunction<CreateCountryMutation, CreateCountryMutationVariables>;
+
+/**
+ * __useCreateCountryMutation__
+ *
+ * To run a mutation, you first call `useCreateCountryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCountryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCountryMutation, { data, loading, error }] = useCreateCountryMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateCountryMutation(baseOptions?: Apollo.MutationHookOptions<CreateCountryMutation, CreateCountryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCountryMutation, CreateCountryMutationVariables>(CreateCountryDocument, options);
+      }
+export type CreateCountryMutationHookResult = ReturnType<typeof useCreateCountryMutation>;
+export type CreateCountryMutationResult = Apollo.MutationResult<CreateCountryMutation>;
+export type CreateCountryMutationOptions = Apollo.BaseMutationOptions<CreateCountryMutation, CreateCountryMutationVariables>;
 export const CreateInvitedUserDocument = gql`
     mutation CreateInvitedUser($input: CreateInvitedUserInput!) {
   createInvitedUser(input: $input) {
@@ -3051,6 +3131,55 @@ export function useCreateUserInvitationMutation(baseOptions?: Apollo.MutationHoo
 export type CreateUserInvitationMutationHookResult = ReturnType<typeof useCreateUserInvitationMutation>;
 export type CreateUserInvitationMutationResult = Apollo.MutationResult<CreateUserInvitationMutation>;
 export type CreateUserInvitationMutationOptions = Apollo.BaseMutationOptions<CreateUserInvitationMutation, CreateUserInvitationMutationVariables>;
+export const DeleteCountryDocument = gql`
+    mutation DeleteCountry($input: DeleteCountryInput!) {
+  deleteCountry(input: $input) {
+    ... on Country {
+      id
+      name
+      code
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteCountryMutationFn = Apollo.MutationFunction<DeleteCountryMutation, DeleteCountryMutationVariables>;
+
+/**
+ * __useDeleteCountryMutation__
+ *
+ * To run a mutation, you first call `useDeleteCountryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteCountryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteCountryMutation, { data, loading, error }] = useDeleteCountryMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteCountryMutation(baseOptions?: Apollo.MutationHookOptions<DeleteCountryMutation, DeleteCountryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteCountryMutation, DeleteCountryMutationVariables>(DeleteCountryDocument, options);
+      }
+export type DeleteCountryMutationHookResult = ReturnType<typeof useDeleteCountryMutation>;
+export type DeleteCountryMutationResult = Apollo.MutationResult<DeleteCountryMutation>;
+export type DeleteCountryMutationOptions = Apollo.BaseMutationOptions<DeleteCountryMutation, DeleteCountryMutationVariables>;
 export const DeleteUserInvitationDocument = gql`
     mutation DeleteUserInvitation($input: DeleteUserInvitationInput!) {
   deleteUserInvitation(input: $input) {
@@ -3129,6 +3258,115 @@ export function useDisableUserMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DisableUserMutationHookResult = ReturnType<typeof useDisableUserMutation>;
 export type DisableUserMutationResult = Apollo.MutationResult<DisableUserMutation>;
 export type DisableUserMutationOptions = Apollo.BaseMutationOptions<DisableUserMutation, DisableUserMutationVariables>;
+export const GetCountriesDocument = gql`
+    query GetCountries {
+  countries {
+    name
+    id
+    code
+    flag
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    provinces {
+      name
+      code
+      id
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      districts {
+        id
+        code
+        name
+        created_at
+        created_by
+        last_modified_at
+        last_modified_by
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCountriesQuery__
+ *
+ * To run a query within a React component, call `useGetCountriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCountriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCountriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetCountriesQuery(baseOptions?: Apollo.QueryHookOptions<GetCountriesQuery, GetCountriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCountriesQuery, GetCountriesQueryVariables>(GetCountriesDocument, options);
+      }
+export function useGetCountriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCountriesQuery, GetCountriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCountriesQuery, GetCountriesQueryVariables>(GetCountriesDocument, options);
+        }
+export type GetCountriesQueryHookResult = ReturnType<typeof useGetCountriesQuery>;
+export type GetCountriesLazyQueryHookResult = ReturnType<typeof useGetCountriesLazyQuery>;
+export type GetCountriesQueryResult = Apollo.QueryResult<GetCountriesQuery, GetCountriesQueryVariables>;
+export const GetCountryDocument = gql`
+    query GetCountry($countryId: ID!) {
+  country(id: $countryId) {
+    ... on Country {
+      name
+      code
+      created_by
+      created_at
+    }
+    ... on ApiNotFoundError {
+      message
+      field
+      value
+      errors {
+        field
+        value
+        message
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCountryQuery__
+ *
+ * To run a query within a React component, call `useGetCountryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCountryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCountryQuery({
+ *   variables: {
+ *      countryId: // value for 'countryId'
+ *   },
+ * });
+ */
+export function useGetCountryQuery(baseOptions: Apollo.QueryHookOptions<GetCountryQuery, GetCountryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCountryQuery, GetCountryQueryVariables>(GetCountryDocument, options);
+      }
+export function useGetCountryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCountryQuery, GetCountryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCountryQuery, GetCountryQueryVariables>(GetCountryDocument, options);
+        }
+export type GetCountryQueryHookResult = ReturnType<typeof useGetCountryQuery>;
+export type GetCountryLazyQueryHookResult = ReturnType<typeof useGetCountryLazyQuery>;
+export type GetCountryQueryResult = Apollo.QueryResult<GetCountryQuery, GetCountryQueryVariables>;
 export const GetCurrentUserDocument = gql`
     query GetCurrentUser {
   me {
@@ -3647,6 +3885,55 @@ export function useSendUserInvitationEmailMutation(baseOptions?: Apollo.Mutation
 export type SendUserInvitationEmailMutationHookResult = ReturnType<typeof useSendUserInvitationEmailMutation>;
 export type SendUserInvitationEmailMutationResult = Apollo.MutationResult<SendUserInvitationEmailMutation>;
 export type SendUserInvitationEmailMutationOptions = Apollo.BaseMutationOptions<SendUserInvitationEmailMutation, SendUserInvitationEmailMutationVariables>;
+export const UpdateCountryDocument = gql`
+    mutation UpdateCountry($input: UpdateCountryInput!) {
+  updateCountry(input: $input) {
+    ... on Country {
+      id
+      code
+      name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateCountryMutationFn = Apollo.MutationFunction<UpdateCountryMutation, UpdateCountryMutationVariables>;
+
+/**
+ * __useUpdateCountryMutation__
+ *
+ * To run a mutation, you first call `useUpdateCountryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCountryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCountryMutation, { data, loading, error }] = useUpdateCountryMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateCountryMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCountryMutation, UpdateCountryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCountryMutation, UpdateCountryMutationVariables>(UpdateCountryDocument, options);
+      }
+export type UpdateCountryMutationHookResult = ReturnType<typeof useUpdateCountryMutation>;
+export type UpdateCountryMutationResult = Apollo.MutationResult<UpdateCountryMutation>;
+export type UpdateCountryMutationOptions = Apollo.BaseMutationOptions<UpdateCountryMutation, UpdateCountryMutationVariables>;
 export const UpdateUserOrganisationRoleDocument = gql`
     mutation UpdateUserOrganisationRole($input: UpdateOrganisationUserInput!) {
   updateOrganisationUser(input: $input) {

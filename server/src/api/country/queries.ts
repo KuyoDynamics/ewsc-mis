@@ -59,7 +59,7 @@ async function createCountry(
   try {
     const country = await context.prisma.country.create({
       data: {
-        code: args.input.code,
+        code: args.input.code.toUpperCase(),
         name: args.input.name,
         flag: args.input.flag,
         created_by: context.user.email,
@@ -114,7 +114,7 @@ async function updateCountry(
         id: args.input.id,
       },
       data: {
-        code: args.input.update.code || undefined,
+        code: args.input.update.code?.toUpperCase() || undefined,
         name: args.input.update.name || undefined,
         last_modified_by: args.input.update ? context.user.email : undefined,
       },

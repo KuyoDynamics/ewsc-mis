@@ -1,0 +1,19 @@
+mutation CreateCountry($input: CreateCountryInput!) {
+  createCountry(input: $input) {
+    ... on Country {
+      code
+      created_at
+      created_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
