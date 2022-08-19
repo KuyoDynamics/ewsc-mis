@@ -106,10 +106,6 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
     });
   };
 
-  // useEffect(() => {
-  //   reset({ code: undefined, name: undefined });
-  // }, [reset]);
-
   return (
     <Dialog
       open={open}
@@ -154,6 +150,9 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
             label="Name"
             margin="normal"
             variant="outlined"
+            inputProps={{
+              autoCapitalize: 'on',
+            }}
           />
           <Box sx={{ py: 2 }}>
             <LoadingButton
