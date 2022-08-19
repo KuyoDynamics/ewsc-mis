@@ -40,9 +40,6 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
   const [createCountry, { data, loading, error }] = useCreateCountryMutation({
     refetchQueries: [GetCountriesDocument],
   });
-  console.log('data', data);
-  console.log('loading', loading);
-  console.log('error', error);
   const {
     handleSubmit,
     control,
@@ -51,10 +48,8 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
     reset,
   } = useForm<CreateCountryInput>({
     resolver: yupResolver(schema),
-    mode: 'all',
+    mode: 'onChange',
   });
-
-  console.log('errors', errors);
 
   const submitting = isSubmitting || loading;
 
@@ -69,7 +64,6 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
       },
       onCompleted: (result) => {
         if (result.createCountry.__typename === 'Country') {
-          //   navigate('/login', { state: { from: '/signup' }, replace: true });
           onClose();
         } else if (result.createCountry.__typename === 'ApiCreateError') {
           if (result.createCountry.field) {
@@ -134,17 +128,6 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormInput
             control={control}
-            name="code"
-            fullWidth
-            label="Code"
-            margin="normal"
-            variant="outlined"
-            inputProps={{
-              style: { textTransform: 'uppercase' },
-            }}
-          />
-          <FormInput
-            control={control}
             name="name"
             fullWidth
             label="Name"
@@ -152,6 +135,17 @@ function CountryForm({ open, onClose }: ICountryFormProps) {
             variant="outlined"
             inputProps={{
               autoCapitalize: 'on',
+            }}
+          />
+          <FormInput
+            control={control}
+            name="code"
+            fullWidth
+            label="Code"
+            margin="normal"
+            variant="outlined"
+            inputProps={{
+              style: { textTransform: 'uppercase' },
             }}
           />
           <Box sx={{ py: 2 }}>

@@ -8,12 +8,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
-import { Download as MoreVertIcon } from '@mui/icons-material';
 import {
   DataGrid,
   GridActionsCellItem,
+  GridApi,
+  gridColumnDefinitionsSelector,
   GridColumns,
+  GridCsvExportMenuItem,
+  GridCsvExportOptions,
   GridEventListener,
+  GridExportMenuItemProps,
+  gridFilteredSortedRowIdsSelector,
   GridFooter,
   GridFooterContainer,
   GridRowId,
@@ -21,18 +26,22 @@ import {
   GridRowModesModel,
   GridRowParams,
   GridToolbarContainer,
+  GridToolbarExportContainer,
+  gridVisibleColumnFieldsSelector,
   MuiEvent,
+  useGridApiContext,
 } from '@mui/x-data-grid';
 import {
   Alert,
   Box,
   Collapse,
   Fab,
-  IconButton,
+  MenuItem,
   TableFooterProps,
   Tooltip,
   Typography,
 } from '@mui/material';
+import { utils, writeFile } from 'xlsx';
 import { useForm } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
 import FormInput from 'components/form-input-helpers/form-input';
@@ -58,13 +67,110 @@ export interface CustomToolbarProps {
   title: string;
 }
 
+const getJson = (apiRef: React.MutableRefObject<GridApi>) => {
+  const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
+
+  const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
+
+  const disableExportCols = gridColumnDefinitionsSelector(apiRef)
+    .filter((col) => col.disableExport)
+    .map((col) => col.field);
+
+  const exportableVisibleColumnsField = visibleColumnsField.filter(
+    (field) => disableExportCols.indexOf(field) === -1
+  );
+
+  const data = filteredSortedRowIds.map((id) => {
+    const row: Record<string, any> = {};
+    exportableVisibleColumnsField.forEach((field) => {
+      row[field] = apiRef.current.getCellParams(id, field).value;
+    });
+    return row;
+  });
+
+  return { jsonString: JSON.stringify(data, null, 2), json: data };
+};
+
+const exportBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  });
+};
+
+function saveExcelFile(
+  fileName: string,
+  worksheetName: string,
+  ext: string,
+  rows: Record<string, any>[]
+): void {
+  const wb = utils.book_new();
+
+  const worksheet = utils.json_to_sheet(rows);
+
+  utils.book_append_sheet(wb, worksheet, worksheetName);
+
+  writeFile(wb, `${fileName}.${ext}`);
+}
+
+function ExcelExportMenuItem(props: GridExportMenuItemProps<{}>) {
+  const apiRef = useGridApiContext();
+
+  const { hideMenu } = props;
+
+  return (
+    <MenuItem
+      onClick={() => {
+        const { json } = getJson(apiRef);
+
+        saveExcelFile('countries', 'countries', 'xlsx', json);
+
+        hideMenu?.();
+      }}
+    >
+      Download as Excel(xlsx)
+    </MenuItem>
+  );
+}
+
+function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
+  const apiRef = useGridApiContext();
+
+  const { hideMenu } = props;
+  return (
+    <MenuItem
+      onClick={() => {
+        const { jsonString } = getJson(apiRef);
+        const blob = new Blob([jsonString], {
+          type: 'text/json',
+        });
+        exportBlob(blob, 'countries.json');
+
+        hideMenu?.();
+      }}
+    >
+      Download as JSON
+    </MenuItem>
+  );
+}
+
+const csvOptions: GridCsvExportOptions = { delimiter: ';' };
+
 function CustomToolbar({ title }: CustomToolbarProps) {
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Typography variant="h3">{title}</Typography>
-      <IconButton aria-label="options menu">
-        <MoreVertIcon />
-      </IconButton>
+      <GridToolbarExportContainer>
+        <ExcelExportMenuItem />
+        <GridCsvExportMenuItem options={csvOptions} />
+        <JsonExportMenuItem />
+      </GridToolbarExportContainer>
     </GridToolbarContainer>
   );
 }
@@ -119,8 +225,6 @@ function CountryList() {
       refetchQueries: [GetCountriesDocument],
     });
 
-  console.log('update response', updatedCountryResponse);
-
   const [deleteCountry, { data: deleteCountryResponse, loading: deleting }] =
     useDeleteCountryMutation({
       refetchQueries: [GetCountriesDocument],
@@ -133,13 +237,13 @@ function CountryList() {
   const rows = data?.countries ?? [];
 
   const {
-    formState: { isDirty, isValid },
+    formState: { isDirty, isValid, errors },
     setValue,
     register,
     control,
     setError,
     handleSubmit,
-    reset,
+    reset: resetForm,
   } = useForm<ICountryFormInputs>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -353,6 +457,8 @@ function CountryList() {
       headerName: 'Actions',
       width: 100,
       cellClassName: 'actions',
+      disableExport: true,
+      disableColumnMenu: true,
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         if (isInEditMode) {
@@ -395,8 +501,8 @@ function CountryList() {
   ];
 
   useEffect(() => {
-    reset(selectedRow!);
-  }, [selectedRow, reset]);
+    resetForm(selectedRow!);
+  }, [selectedRow, resetForm]);
 
   return (
     <MainCard>
@@ -413,6 +519,14 @@ function CountryList() {
               .Please contact support or try again!
             </Alert>
           </Collapse>
+        </Box>
+      )}
+      {errors['unknown' as keyof ICountryFormInputs] && (
+        <Box>
+          <Alert severity="error">
+            {errors['unknown' as keyof ICountryFormInputs]?.message}. Please
+            contact support or try again!
+          </Alert>
         </Box>
       )}
       <Box sx={{ height: 400, width: '100%' }}>
