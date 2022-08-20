@@ -1782,7 +1782,7 @@ export type Province = {
   code: Scalars['String'];
   name: Scalars['String'];
   country_id: Scalars['String'];
-  country?: Maybe<CountryResult>;
+  country?: Maybe<Country>;
   districts?: Maybe<Array<District>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2840,6 +2840,20 @@ export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]
 
 export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
 
+export type CreateProvinceMutationVariables = Exact<{
+  input: CreateProvinceInput;
+}>;
+
+
+export type CreateProvinceMutation = { __typename?: 'Mutation', createProvince: { __typename?: 'Province', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetProvincesQueryVariables = Exact<{
+  countryId: Scalars['ID'];
+}>;
+
+
+export type GetProvincesQuery = { __typename?: 'Query', provinces?: Array<{ __typename?: 'Province', id: string, name: string, code: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, country_id: string, country?: { __typename?: 'Country', id: string, name: string, code: string } | null, districts?: Array<{ __typename?: 'District', id: string, code: string, name: string }> | null }> | null };
+
 export type RequestPasswordResetMutationVariables = Exact<{
   input: PasswordResetRequestInput;
 }>;
@@ -3747,6 +3761,109 @@ export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.Subs
       }
 export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
 export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
+export const CreateProvinceDocument = gql`
+    mutation CreateProvince($input: CreateProvinceInput!) {
+  createProvince(input: $input) {
+    ... on Province {
+      id
+      code
+      name
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateProvinceMutationFn = Apollo.MutationFunction<CreateProvinceMutation, CreateProvinceMutationVariables>;
+
+/**
+ * __useCreateProvinceMutation__
+ *
+ * To run a mutation, you first call `useCreateProvinceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProvinceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProvinceMutation, { data, loading, error }] = useCreateProvinceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateProvinceMutation(baseOptions?: Apollo.MutationHookOptions<CreateProvinceMutation, CreateProvinceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateProvinceMutation, CreateProvinceMutationVariables>(CreateProvinceDocument, options);
+      }
+export type CreateProvinceMutationHookResult = ReturnType<typeof useCreateProvinceMutation>;
+export type CreateProvinceMutationResult = Apollo.MutationResult<CreateProvinceMutation>;
+export type CreateProvinceMutationOptions = Apollo.BaseMutationOptions<CreateProvinceMutation, CreateProvinceMutationVariables>;
+export const GetProvincesDocument = gql`
+    query GetProvinces($countryId: ID!) {
+  provinces(country_id: $countryId) {
+    id
+    name
+    code
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    country_id
+    country {
+      id
+      name
+      code
+    }
+    districts {
+      id
+      code
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetProvincesQuery__
+ *
+ * To run a query within a React component, call `useGetProvincesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProvincesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProvincesQuery({
+ *   variables: {
+ *      countryId: // value for 'countryId'
+ *   },
+ * });
+ */
+export function useGetProvincesQuery(baseOptions: Apollo.QueryHookOptions<GetProvincesQuery, GetProvincesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProvincesQuery, GetProvincesQueryVariables>(GetProvincesDocument, options);
+      }
+export function useGetProvincesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProvincesQuery, GetProvincesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProvincesQuery, GetProvincesQueryVariables>(GetProvincesDocument, options);
+        }
+export type GetProvincesQueryHookResult = ReturnType<typeof useGetProvincesQuery>;
+export type GetProvincesLazyQueryHookResult = ReturnType<typeof useGetProvincesLazyQuery>;
+export type GetProvincesQueryResult = Apollo.QueryResult<GetProvincesQuery, GetProvincesQueryVariables>;
 export const RequestPasswordResetDocument = gql`
     mutation RequestPasswordReset($input: PasswordResetRequestInput!) {
   requestPasswordReset(input: $input) {
