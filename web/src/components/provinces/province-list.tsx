@@ -1,7 +1,7 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -33,6 +33,7 @@ import {
   GridToolbarContainer,
   GridToolbarExportContainer,
   GridValueFormatterParams,
+  GridValueGetterParams,
   gridVisibleColumnFieldsSelector,
   MuiEvent,
   useGridApiContext,
@@ -44,6 +45,8 @@ import {
   Collapse,
   Fab,
   MenuItem,
+  Select,
+  SelectChangeEvent,
   TableFooterProps,
   Tooltip,
   Typography,
@@ -54,14 +57,18 @@ import { useForm } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
 import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
+import FormSelect from 'components/form-input-helpers/form-select';
 import ProvinceForm from './province-form';
 import {
   Province,
-  GetCountriesDocument,
+  GetProvincesDocument,
   useDeleteProvinceMutation,
-  useGetCountriesQuery,
+  useGetProvincesQuery,
   useUpdateProvinceMutation,
+  useGetCountriesQuery,
+  District,
 } from '../../../graphql/generated';
+import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
@@ -71,10 +78,6 @@ export interface EditToolbarProps {
 type CustomFooterProps = {
   onClick: () => void;
 } & TableFooterProps;
-
-export interface CustomToolbarProps {
-  title: string;
-}
 
 const getJson = (apiRef: React.MutableRefObject<GridApi>) => {
   const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
@@ -138,15 +141,7 @@ function ExcelExportMenuItem(props: GridExportMenuItemProps<{}>) {
       onClick={() => {
         const { json } = getJson(apiRef);
 
-        saveExcelFile(
-          'countries',
-          'countries',
-          'xlsx',
-          json.map((item) => ({
-            ...item,
-            provinces: item.provinces.length,
-          }))
-        );
+        saveExcelFile('provinces', 'provinces', 'xlsx', json);
 
         hideMenu?.();
       }}
@@ -167,7 +162,7 @@ function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
         const blob = new Blob([jsonString], {
           type: 'text/json',
         });
-        exportBlob(blob, 'countries.json');
+        exportBlob(blob, 'provinces.json');
 
         hideMenu?.();
       }}
@@ -179,10 +174,42 @@ function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
 
 const csvOptions: GridCsvExportOptions = { delimiter: ';' };
 
-function CustomToolbar({ title }: CustomToolbarProps) {
+export interface CustomToolbarProps {
+  title: string;
+  handleChange: () => void;
+  selectedCountryId: string;
+}
+
+function CustomToolbar({
+  title,
+  handleChange,
+  selectedCountryId,
+}: CustomToolbarProps) {
+  const { data } = useGetCountriesQuery();
+
+  const countries = useMemo(
+    () => data?.countries?.map((c) => ({ name: c.name, id: c.id })),
+    [data]
+  );
+
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-      <Typography variant="h3">{title}</Typography>
+      <Box>
+        <Typography variant="h3">{title}</Typography>
+        <Select
+          value={selectedCountryId}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+          name="theme"
+          variant="outlined"
+        >
+          {countries &&
+            countries.map((country) => (
+              <MenuItem value={country.id}>{country.name}</MenuItem>
+            ))}
+        </Select>
+      </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem />
         <GridCsvExportMenuItem options={csvOptions} />
@@ -200,7 +227,7 @@ function CustomFooter({ onClick, ...props }: CustomFooterProps) {
         <Fab
           size="small"
           color="primary"
-          aria-label="invite user"
+          aria-label="add province"
           sx={{ mr: '20px', ml: '20px' }}
           onClick={onClick}
         >
@@ -227,6 +254,10 @@ const initialRowModesModel: GridRowModesModel = {};
 function ProvinceList() {
   const navigate = useNavigate();
 
+  const { country_id: countryId } = useGetDefaultOrganisation();
+
+  const [selectedCountryId, setSelectedCountryId] = useState(countryId);
+
   const [openAlert, setOpenAlert] = useState(false);
 
   const [openCreateProvinceModal, setOpenCreateProvinceModal] = useState(false);
@@ -235,25 +266,28 @@ function ProvinceList() {
     null
   );
 
-  const { data, loading } = useGetCountriesQuery({
+  const { data, loading } = useGetProvincesQuery({
     fetchPolicy: 'network-only',
+    variables: {
+      countryId: selectedCountryId,
+    },
   });
 
   const [updateProvince, { data: updatedProvinceResponse, loading: updating }] =
     useUpdateProvinceMutation({
-      refetchQueries: [GetCountriesDocument],
+      refetchQueries: [GetProvincesDocument],
     });
 
   const [deleteProvince, { data: deleteProvinceResponse, loading: deleting }] =
     useDeleteProvinceMutation({
-      refetchQueries: [GetCountriesDocument],
+      refetchQueries: [GetProvincesDocument],
     });
 
   const deleteErrors =
     deleteProvinceResponse?.deleteProvince.__typename === 'ApiDeleteError'
       ? deleteProvinceResponse.deleteProvince
       : null;
-  const rows = data?.countries ?? [];
+  const rows = data?.provinces ?? [];
 
   const {
     formState: { isDirty, isValid, errors },
@@ -317,6 +351,10 @@ function ProvinceList() {
         console.log('Chaiwa, something bad happened', err);
       },
     });
+  };
+
+  const handleCountrySelectionChange = (event: SelectChangeEvent) => {
+    setSelectedCountryId(event.target.value);
   };
 
   const handleClose = () => {
@@ -425,30 +463,32 @@ function ProvinceList() {
       },
     },
     {
-      field: 'provinces',
-      headerName: 'provinces',
-      type: 'string',
+      field: 'districts',
+      headerName: 'districts',
+      type: 'number',
       width: 180,
       editable: false,
       flex: 1,
       resizable: true,
+      headerAlign: 'left',
+      align: 'left',
       renderCell: (params: GridRenderCellParams) => {
-        const { provinces, id } = params.row as Province;
+        const { districts, id } = params.row as Province;
         return (
           <Button
             variant="text"
             size="small"
             endIcon={<EditLocationOutlined />}
-            onClick={() => navigate(`/system/provinces/${id}`)}
+            onClick={() => navigate(`/system/districts/${id}`)}
           >
-            {provinces && provinces.length === 1
-              ? provinces[0].name
-              : `${provinces?.length} provinces`}
+            {districts && districts.length === 1
+              ? districts[0].name
+              : `${districts?.length} districts`}
           </Button>
         );
       },
-      valueFormatter: (params: GridValueFormatterParams) => {
-        return params.value.length;
+      valueGetter: (params: GridValueGetterParams) => {
+        return (params.value as District[]).length;
       },
     },
     {
@@ -592,7 +632,11 @@ function ProvinceList() {
           }}
           componentsProps={{
             footer: { onClick: () => setOpenCreateProvinceModal(true) },
-            toolbar: { title: 'Countries' },
+            toolbar: {
+              title: 'Provinces',
+              handleChange: handleCountrySelectionChange,
+              selectedCountryId,
+            },
           }}
           loading={loading || deleting}
           experimentalFeatures={{ newEditingApi: true }}
