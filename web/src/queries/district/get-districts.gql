@@ -1,0 +1,12 @@
+query GetDistricts($provinceId: ID!) {
+  districts(province_id: $provinceId) {
+    id
+    code
+    name
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    province_id
+  }
+}
