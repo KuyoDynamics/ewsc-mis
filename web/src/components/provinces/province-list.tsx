@@ -263,7 +263,7 @@ function ProvinceList() {
   const { state } = useLocation();
 
   const [selectedCountryId, setSelectedCountryId] = useState(
-    (state as { countryId: string }).countryId || countryId
+    (state as { countryId: string })?.countryId || countryId
   );
 
   const [openAlert, setOpenAlert] = useState(false);
