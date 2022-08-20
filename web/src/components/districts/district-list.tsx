@@ -45,6 +45,7 @@ import {
   Button,
   Collapse,
   Fab,
+  FormControl,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -208,36 +209,52 @@ function CustomToolbar({
     [provinceData]
   );
 
+  useEffect(() => {
+    if (provinces?.length === 0) {
+      handleProvinceSelectionChange();
+    }
+  }, [provinces, handleProvinceSelectionChange]);
+
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Box>
         <Typography variant="h3">{title}</Typography>
-        <Select
-          value={selectedCountryId}
-          onChange={handleCountrySelectionChange}
-          fullWidth
-          size="small"
-          name="theme"
-          variant="outlined"
-        >
-          {countries &&
-            countries.map((country) => (
-              <MenuItem value={country.id}>{country.name}</MenuItem>
-            ))}
-        </Select>
-        <Select
-          value={selectedProvinceId}
-          onChange={handleProvinceSelectionChange}
-          fullWidth
-          size="small"
-          name="theme"
-          variant="outlined"
-        >
-          {provinces &&
-            provinces.map((province) => (
-              <MenuItem value={province.id}>{province.name}</MenuItem>
-            ))}
-        </Select>
+        <FormControl>
+          <Select
+            value={selectedCountryId}
+            onChange={handleCountrySelectionChange}
+            displayEmpty
+            size="small"
+            name="country_id"
+            variant="outlined"
+          >
+            {countries &&
+              countries.map((country) => (
+                <MenuItem value={country.id}>{country.name}</MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <Select
+            value={selectedProvinceId}
+            onChange={handleProvinceSelectionChange}
+            // fullWidth
+            displayEmpty
+            size="small"
+            name="province_id"
+            // variant="outlined"
+          >
+            {provinces?.length! <= 0 && (
+              <MenuItem disabled value="">
+                <em>empty</em>
+              </MenuItem>
+            )}
+            {provinces &&
+              provinces.map((province) => (
+                <MenuItem value={province.id}>{province.name}</MenuItem>
+              ))}
+          </Select>
+        </FormControl>
       </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem />
@@ -337,7 +354,6 @@ function DistrictList() {
   // TODO: Fix the cascading for when country changes, should show empty list
   const rows = DistrictData?.districts ?? [];
 
-  console.log('Districts', rows);
   const {
     formState: { isDirty, isValid, errors },
     setValue,
@@ -407,7 +423,7 @@ function DistrictList() {
   };
 
   const handleProvinceSelectionChange = (event: SelectChangeEvent) => {
-    setSelectedProvinceId(event.target.value);
+    setSelectedProvinceId(event?.target?.value);
   };
 
   const handleClose = () => {
@@ -541,8 +557,6 @@ function DistrictList() {
         );
       },
       valueGetter: (params: GridValueGetterParams) => {
-        console.log('params.value in valueGetter', params.value);
-
         return (params.value as Residence[])?.length;
       },
     },

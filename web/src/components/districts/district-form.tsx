@@ -28,7 +28,7 @@ import {
 } from '../../../graphql/generated';
 
 const schema = Yup.object({
-  code: Yup.string().required().min(5).max(5).uppercase(),
+  code: Yup.string().required().min(8).max(8).uppercase(),
   name: Yup.string().required().min(4).max(255),
   province_id: Yup.string().uuid().required(),
 });
