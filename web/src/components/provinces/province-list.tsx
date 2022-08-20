@@ -52,7 +52,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { utils, writeFile } from 'xlsx';
 import { useForm } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
@@ -260,7 +260,11 @@ function ProvinceList() {
 
   const { country_id: countryId } = useGetDefaultOrganisation();
 
-  const [selectedCountryId, setSelectedCountryId] = useState(countryId);
+  const { state } = useLocation();
+
+  const [selectedCountryId, setSelectedCountryId] = useState(
+    (state as { countryId: string }).countryId || countryId
+  );
 
   const [openAlert, setOpenAlert] = useState(false);
 

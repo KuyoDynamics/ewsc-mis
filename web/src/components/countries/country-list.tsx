@@ -439,7 +439,9 @@ function CountryList() {
             variant="text"
             size="small"
             endIcon={<EditLocationOutlined />}
-            onClick={() => navigate(`/system/provinces/${id}`)}
+            onClick={() =>
+              navigate('/system/provinces', { state: { countryId: id } })
+            }
           >
             {provinces && provinces.length === 1
               ? provinces[0].name
