@@ -292,7 +292,7 @@ interface IDistrictFormInputs {
 
 const schema = Yup.object({
   name: Yup.string().required().min(4).max(255),
-  code: Yup.string().required().min(5).max(5),
+  code: Yup.string().required().min(8).max(8),
 });
 
 const initialRowModesModel: GridRowModesModel = {};
