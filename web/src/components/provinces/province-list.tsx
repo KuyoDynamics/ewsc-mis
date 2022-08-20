@@ -254,6 +254,8 @@ const initialRowModesModel: GridRowModesModel = {};
 function ProvinceList() {
   const navigate = useNavigate();
 
+  const [pageSize, setPageSize] = React.useState<number>(5);
+
   const renderId = uuidv4();
 
   const { country_id: countryId } = useGetDefaultOrganisation();
@@ -620,7 +622,8 @@ function ProvinceList() {
       <Box sx={{ height: 400, width: '100%' }}>
         <DataGrid
           rows={rows}
-          pageSize={5}
+          pageSize={pageSize}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           rowsPerPageOptions={[5, 10]}
           columns={columns}
           editMode="row"
