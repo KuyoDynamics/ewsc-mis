@@ -487,7 +487,14 @@ function ProvinceList() {
             variant="text"
             size="small"
             endIcon={<EditLocationOutlined />}
-            onClick={() => navigate(`/system/districts/${id}`)}
+            onClick={() =>
+              navigate('/system/districts', {
+                state: {
+                  countryId: selectedCountryId,
+                  provinceId: id,
+                },
+              })
+            }
           >
             {districts && districts.length === 1
               ? districts[0].name

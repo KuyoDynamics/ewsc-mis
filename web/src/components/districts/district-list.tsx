@@ -59,15 +59,16 @@ import AddIcon from '@mui/icons-material/Add';
 import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
 import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
-import ProvinceForm from './province-form';
+import DistrictForm from './district-form';
 import {
-  Province,
-  GetProvincesDocument,
-  useDeleteProvinceMutation,
-  useGetProvincesQuery,
-  useUpdateProvinceMutation,
+  GetDistrictsDocument,
+  useDeleteDistrictMutation,
+  useGetDistrictsQuery,
+  useUpdateDistrictMutation,
   useGetCountriesQuery,
   District,
+  useGetProvincesQuery,
+  Residence,
 } from '../../../graphql/generated';
 
 export interface EditToolbarProps {
@@ -141,7 +142,7 @@ function ExcelExportMenuItem(props: GridExportMenuItemProps<{}>) {
       onClick={() => {
         const { json } = getJson(apiRef);
 
-        saveExcelFile('provinces', 'provinces', 'xlsx', json);
+        saveExcelFile('districts', 'districts', 'xlsx', json);
 
         hideMenu?.();
       }}
@@ -162,7 +163,7 @@ function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
         const blob = new Blob([jsonString], {
           type: 'text/json',
         });
-        exportBlob(blob, 'provinces.json');
+        exportBlob(blob, 'districts.json');
 
         hideMenu?.();
       }}
@@ -176,14 +177,18 @@ const csvOptions: GridCsvExportOptions = { delimiter: ';' };
 
 export interface CustomToolbarProps {
   title: string;
-  handleChange: () => void;
+  handleCountrySelectionChange: () => void;
+  handleProvinceSelectionChange: () => void;
   selectedCountryId: string;
+  selectedProvinceId: string;
 }
 
 function CustomToolbar({
   title,
-  handleChange,
+  handleCountrySelectionChange,
+  handleProvinceSelectionChange,
   selectedCountryId,
+  selectedProvinceId,
 }: CustomToolbarProps) {
   const { data } = useGetCountriesQuery();
 
@@ -192,13 +197,24 @@ function CustomToolbar({
     [data]
   );
 
+  const { data: provinceData } = useGetProvincesQuery({
+    variables: {
+      countryId: selectedCountryId,
+    },
+  });
+
+  const provinces = useMemo(
+    () => provinceData?.provinces?.map((p) => ({ name: p.name, id: p.id })),
+    [provinceData]
+  );
+
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Box>
         <Typography variant="h3">{title}</Typography>
         <Select
           value={selectedCountryId}
-          onChange={handleChange}
+          onChange={handleCountrySelectionChange}
           fullWidth
           size="small"
           name="theme"
@@ -207,6 +223,19 @@ function CustomToolbar({
           {countries &&
             countries.map((country) => (
               <MenuItem value={country.id}>{country.name}</MenuItem>
+            ))}
+        </Select>
+        <Select
+          value={selectedProvinceId}
+          onChange={handleProvinceSelectionChange}
+          fullWidth
+          size="small"
+          name="theme"
+          variant="outlined"
+        >
+          {provinces &&
+            provinces.map((province) => (
+              <MenuItem value={province.id}>{province.name}</MenuItem>
             ))}
         </Select>
       </Box>
@@ -223,7 +252,7 @@ function CustomFooter({ onClick, ...props }: CustomFooterProps) {
   return (
     <GridFooterContainer>
       <GridFooter {...props} />
-      <Tooltip title="Add Province">
+      <Tooltip title="Add District">
         <Fab
           size="small"
           color="primary"
@@ -238,7 +267,7 @@ function CustomFooter({ onClick, ...props }: CustomFooterProps) {
   );
 }
 
-interface IProvinceFormInputs {
+interface IDistrictFormInputs {
   name: string;
   code: string;
   id: string;
@@ -251,7 +280,12 @@ const schema = Yup.object({
 
 const initialRowModesModel: GridRowModesModel = {};
 
-function ProvinceList() {
+type LocationStateType = {
+  countryId: string;
+  provinceId: string;
+};
+
+function DistrictList() {
   const navigate = useNavigate();
 
   const [pageSize, setPageSize] = React.useState<number>(5);
@@ -263,40 +297,47 @@ function ProvinceList() {
   const { state } = useLocation();
 
   const [selectedCountryId, setSelectedCountryId] = useState(
-    (state as { countryId: string })?.countryId || countryId
+    (state as LocationStateType)?.countryId || countryId
+  );
+
+  const [selectedProvinceId, setSelectedProvinceId] = useState(
+    (state as LocationStateType)?.provinceId
   );
 
   const [openAlert, setOpenAlert] = useState(false);
 
-  const [openCreateProvinceModal, setOpenCreateProvinceModal] = useState(false);
+  const [openCreateDistrictModal, setOpenCreateDistrictModal] = useState(false);
 
-  const [selectedRow, setSelectedRow] = useState<IProvinceFormInputs | null>(
+  const [selectedRow, setSelectedRow] = useState<IDistrictFormInputs | null>(
     null
   );
 
-  const { data, loading } = useGetProvincesQuery({
+  const { data: DistrictData, loading } = useGetDistrictsQuery({
     fetchPolicy: 'network-only',
     variables: {
-      countryId: selectedCountryId,
+      provinceId: selectedProvinceId,
     },
   });
 
-  const [updateProvince, { data: updatedProvinceResponse, loading: updating }] =
-    useUpdateProvinceMutation({
-      refetchQueries: [GetProvincesDocument],
+  const [updateDistrict, { data: updatedDistrictResponse, loading: updating }] =
+    useUpdateDistrictMutation({
+      refetchQueries: [GetDistrictsDocument],
     });
 
-  const [deleteProvince, { data: deleteProvinceResponse, loading: deleting }] =
-    useDeleteProvinceMutation({
-      refetchQueries: [GetProvincesDocument],
+  const [deleteDistrict, { data: deleteDistrictResponse, loading: deleting }] =
+    useDeleteDistrictMutation({
+      refetchQueries: [GetDistrictsDocument],
     });
 
   const deleteErrors =
-    deleteProvinceResponse?.deleteProvince.__typename === 'ApiDeleteError'
-      ? deleteProvinceResponse.deleteProvince
+    deleteDistrictResponse?.deleteDistrict.__typename === 'ApiDeleteError'
+      ? deleteDistrictResponse.deleteDistrict
       : null;
-  const rows = data?.provinces ?? [];
 
+  // TODO: Fix the cascading for when country changes, should show empty list
+  const rows = DistrictData?.districts ?? [];
+
+  console.log('Districts', rows);
   const {
     formState: { isDirty, isValid, errors },
     setValue,
@@ -305,7 +346,7 @@ function ProvinceList() {
     setError,
     handleSubmit,
     reset: resetForm,
-  } = useForm<IProvinceFormInputs>({
+  } = useForm<IDistrictFormInputs>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
@@ -313,8 +354,8 @@ function ProvinceList() {
   const [rowModesModel, setRowModesModel] =
     React.useState<GridRowModesModel>(initialRowModesModel);
 
-  const onSubmit = async ({ code, name, id }: IProvinceFormInputs) => {
-    updateProvince({
+  const onSubmit = async ({ code, name, id }: IDistrictFormInputs) => {
+    updateDistrict({
       variables: {
         input: {
           id,
@@ -325,28 +366,28 @@ function ProvinceList() {
         },
       },
       onCompleted: (result) => {
-        if (result.updateProvince.__typename === 'Province') {
+        if (result.updateDistrict.__typename === 'District') {
           setRowModesModel({
             ...rowModesModel,
             [id]: { mode: GridRowModes.View },
           });
-        } else if (result.updateProvince.__typename === 'ApiUpdateError') {
-          if (result.updateProvince.field) {
-            setError(result.updateProvince.field as keyof IProvinceFormInputs, {
+        } else if (result.updateDistrict.__typename === 'ApiUpdateError') {
+          if (result.updateDistrict.field) {
+            setError(result.updateDistrict.field as keyof IDistrictFormInputs, {
               type: 'server',
-              message: result.updateProvince.message,
+              message: result.updateDistrict.message,
             });
           } else if (
-            !result.updateProvince.errors &&
-            !result.updateProvince.field
+            !result.updateDistrict.errors &&
+            !result.updateDistrict.field
           ) {
-            setError('unknown' as keyof IProvinceFormInputs, {
+            setError('unknown' as keyof IDistrictFormInputs, {
               type: 'server',
-              message: result.updateProvince.message,
+              message: result.updateDistrict.message,
             });
           } else {
-            result.updateProvince.errors?.forEach((err) =>
-              setError(err.field as keyof IProvinceFormInputs, {
+            result.updateDistrict.errors?.forEach((err) =>
+              setError(err.field as keyof IDistrictFormInputs, {
                 type: 'server',
                 message: err.message,
               })
@@ -363,6 +404,10 @@ function ProvinceList() {
 
   const handleCountrySelectionChange = (event: SelectChangeEvent) => {
     setSelectedCountryId(event.target.value);
+  };
+
+  const handleProvinceSelectionChange = (event: SelectChangeEvent) => {
+    setSelectedProvinceId(event.target.value);
   };
 
   const handleClose = () => {
@@ -383,14 +428,14 @@ function ProvinceList() {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    deleteProvince({
+    deleteDistrict({
       variables: {
         input: {
           id: id as string,
         },
       },
       onCompleted: (result) => {
-        if (result.deleteProvince.__typename === 'ApiDeleteError') {
+        if (result.deleteDistrict.__typename === 'ApiDeleteError') {
           setOpenAlert(true);
         }
       },
@@ -421,7 +466,7 @@ function ProvinceList() {
   const columns: GridColumns = [
     {
       field: 'name',
-      headerName: 'Province Name',
+      headerName: 'District Name',
       type: 'string',
       width: 180,
       editable: true,
@@ -447,7 +492,7 @@ function ProvinceList() {
     },
     {
       field: 'code',
-      headerName: 'Province Code',
+      headerName: 'District Code',
       type: 'string',
       width: 180,
       editable: true,
@@ -471,8 +516,8 @@ function ProvinceList() {
       },
     },
     {
-      field: 'districts',
-      headerName: 'districts',
+      field: 'residences',
+      headerName: 'Residential Areas',
       type: 'number',
       width: 180,
       editable: false,
@@ -481,22 +526,24 @@ function ProvinceList() {
       headerAlign: 'left',
       align: 'left',
       renderCell: (params: GridRenderCellParams) => {
-        const { districts, id } = params.row as Province;
+        const { residences, id } = params.row as District;
         return (
           <Button
             variant="text"
             size="small"
             endIcon={<EditLocationOutlined />}
-            onClick={() => navigate(`/system/districts/${id}`)}
+            onClick={() => navigate(`/system/residences/${id}`)}
           >
-            {districts && districts.length === 1
-              ? districts[0].name
-              : `${districts?.length} districts`}
+            {residences && residences.length === 1
+              ? residences[0].name
+              : `${residences?.length} residential areas`}
           </Button>
         );
       },
       valueGetter: (params: GridValueGetterParams) => {
-        return (params.value as District[]).length;
+        console.log('params.value in valueGetter', params.value);
+
+        return (params.value as Residence[])?.length;
       },
     },
     {
@@ -615,10 +662,10 @@ function ProvinceList() {
           </Collapse>
         </Box>
       )}
-      {errors['unknown' as keyof IProvinceFormInputs] && (
+      {errors['unknown' as keyof IDistrictFormInputs] && (
         <Box>
           <Alert severity="error">
-            {errors['unknown' as keyof IProvinceFormInputs]?.message}. Please
+            {errors['unknown' as keyof IDistrictFormInputs]?.message}. Please
             contact support or try again!
           </Alert>
         </Box>
@@ -640,11 +687,13 @@ function ProvinceList() {
             Toolbar: CustomToolbar,
           }}
           componentsProps={{
-            footer: { onClick: () => setOpenCreateProvinceModal(true) },
+            footer: { onClick: () => setOpenCreateDistrictModal(true) },
             toolbar: {
-              title: 'Provinces',
-              handleChange: handleCountrySelectionChange,
+              title: 'Districts',
+              handleCountrySelectionChange,
+              handleProvinceSelectionChange,
               selectedCountryId,
+              selectedProvinceId,
             },
           }}
           loading={loading || deleting}
@@ -666,15 +715,16 @@ function ProvinceList() {
           }}
         />
       </Box>
-      <ProvinceForm
+      <DistrictForm
         key={renderId}
-        open={openCreateProvinceModal}
-        onClose={() => setOpenCreateProvinceModal(false)}
+        open={openCreateDistrictModal}
+        onClose={() => setOpenCreateDistrictModal(false)}
         selectedCountryId={selectedCountryId}
+        selectedProvinceId={selectedProvinceId}
       />
       <input id="id" type="hidden" required {...register('id')} />
     </MainCard>
   );
 }
 
-export default ProvinceList;
+export default DistrictList;

@@ -2806,7 +2806,7 @@ export type GetDistrictsQueryVariables = Exact<{
 }>;
 
 
-export type GetDistrictsQuery = { __typename?: 'Query', districts?: Array<{ __typename?: 'District', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, province_id: string }> | null };
+export type GetDistrictsQuery = { __typename?: 'Query', districts?: Array<{ __typename?: 'District', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, province_id: string, residences?: Array<{ __typename?: 'Residence', id: string, name: string, cost_classification: ResidenceClassification }> | null }> | null };
 
 export type UpdateDistrictMutationVariables = Exact<{
   input: UpdateDistrictInput;
@@ -3425,6 +3425,11 @@ export const GetDistrictsDocument = gql`
     last_modified_at
     last_modified_by
     province_id
+    residences {
+      id
+      name
+      cost_classification
+    }
   }
 }
     `;
