@@ -1782,7 +1782,7 @@ export type Province = {
   code: Scalars['String'];
   name: Scalars['String'];
   country_id: Scalars['String'];
-  country?: Maybe<CountryResult>;
+  country?: Maybe<Country>;
   districts?: Maybe<Array<District>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2802,7 +2802,7 @@ export type GetCountryQuery = { __typename?: 'Query', country: { __typename?: 'C
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, users?: Array<{ __typename?: 'OrganisationUserView', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, organisation_id: string, organisation_user_id: string, role: OrganisationUserRoleType, hashed_confirmation_token?: string | null, confirmed_at?: any | null, hashed_password_reset_token?: string | null, last_login?: any | null, theme: UserTheme }> | null, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, catchment_district_id: string, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, catchment_provinces?: Array<{ __typename?: 'CatchmentProvinceView', id: string, code: string, name: string, disabled: boolean, catchment_districts?: Array<{ __typename?: 'CatchmentDistrictView', id: string, name: string, code: string, disabled: boolean, catchment_district_id: string, catchment_province_id: string }> | null }> | null, country?: { __typename?: 'Country', code: string, name: string, flag?: any | null } | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetCurrentUserQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, first_name: string, last_name: string, email: string, disabled: boolean, user_organisations?: Array<{ __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country?: { __typename?: 'Country', id: string, name: string } | null }> | null, user_default_organisation?: { __typename?: 'UserOrganisation', id: string, name: string, logo?: any | null, is_user_default_organisation: boolean, country_id: string, country?: { __typename?: 'Country', code: string, id: string, name: string, flag?: any | null } | null, users?: Array<{ __typename?: 'OrganisationUserView', id: string, first_name: string, last_name: string, email: string, disabled: boolean, master_support: boolean, organisation_id: string, organisation_user_id: string, role: OrganisationUserRoleType, hashed_confirmation_token?: string | null, confirmed_at?: any | null, hashed_password_reset_token?: string | null, last_login?: any | null, theme: UserTheme }> | null, user_districts?: Array<{ __typename?: 'UserDistrict', id: string, name: string, code: string, is_default_user_district: boolean, catchment_district_id: string, province?: { __typename?: 'Province', id: string, name: string, code: string } | null }> | null, catchment_provinces?: Array<{ __typename?: 'CatchmentProvinceView', id: string, code: string, name: string, disabled: boolean, catchment_districts?: Array<{ __typename?: 'CatchmentDistrictView', id: string, name: string, code: string, disabled: boolean, catchment_district_id: string, catchment_province_id: string }> | null }> | null } | null } | { __typename?: 'ApiNotFoundError', message: string } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type GetDefaultOrganisationUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2839,6 +2839,34 @@ export type OnUserInvitationUpdatedSubscriptionVariables = Exact<{ [key: string]
 
 
 export type OnUserInvitationUpdatedSubscription = { __typename?: 'Subscription', userInvitationUpdated: { __typename?: 'UserInvitation', id: string, email_status: EmailStatus } };
+
+export type CreateProvinceMutationVariables = Exact<{
+  input: CreateProvinceInput;
+}>;
+
+
+export type CreateProvinceMutation = { __typename?: 'Mutation', createProvince: { __typename?: 'Province', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type DeleteProvinceMutationVariables = Exact<{
+  input: DeleteProvinceInput;
+}>;
+
+
+export type DeleteProvinceMutation = { __typename?: 'Mutation', deleteProvince: { __typename?: 'Province', id: string, code: string, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type GetProvincesQueryVariables = Exact<{
+  countryId: Scalars['ID'];
+}>;
+
+
+export type GetProvincesQuery = { __typename?: 'Query', provinces?: Array<{ __typename?: 'Province', id: string, name: string, code: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, country_id: string, country?: { __typename?: 'Country', id: string, name: string, code: string } | null, districts?: Array<{ __typename?: 'District', id: string, code: string, name: string }> | null }> | null };
+
+export type UpdateProvinceMutationVariables = Exact<{
+  input: UpdateProvinceInput;
+}>;
+
+
+export type UpdateProvinceMutation = { __typename?: 'Mutation', updateProvince: { __typename?: 'Province', id: string, code: string, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
 
 export type RequestPasswordResetMutationVariables = Exact<{
   input: PasswordResetRequestInput;
@@ -3394,6 +3422,12 @@ export const GetCurrentUserDocument = gql`
         name
         logo
         is_user_default_organisation
+        country_id
+        country {
+          code
+          id
+          name
+        }
         users {
           id
           first_name
@@ -3747,6 +3781,207 @@ export function useOnUserInvitationUpdatedSubscription(baseOptions?: Apollo.Subs
       }
 export type OnUserInvitationUpdatedSubscriptionHookResult = ReturnType<typeof useOnUserInvitationUpdatedSubscription>;
 export type OnUserInvitationUpdatedSubscriptionResult = Apollo.SubscriptionResult<OnUserInvitationUpdatedSubscription>;
+export const CreateProvinceDocument = gql`
+    mutation CreateProvince($input: CreateProvinceInput!) {
+  createProvince(input: $input) {
+    ... on Province {
+      id
+      code
+      name
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateProvinceMutationFn = Apollo.MutationFunction<CreateProvinceMutation, CreateProvinceMutationVariables>;
+
+/**
+ * __useCreateProvinceMutation__
+ *
+ * To run a mutation, you first call `useCreateProvinceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProvinceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProvinceMutation, { data, loading, error }] = useCreateProvinceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateProvinceMutation(baseOptions?: Apollo.MutationHookOptions<CreateProvinceMutation, CreateProvinceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateProvinceMutation, CreateProvinceMutationVariables>(CreateProvinceDocument, options);
+      }
+export type CreateProvinceMutationHookResult = ReturnType<typeof useCreateProvinceMutation>;
+export type CreateProvinceMutationResult = Apollo.MutationResult<CreateProvinceMutation>;
+export type CreateProvinceMutationOptions = Apollo.BaseMutationOptions<CreateProvinceMutation, CreateProvinceMutationVariables>;
+export const DeleteProvinceDocument = gql`
+    mutation DeleteProvince($input: DeleteProvinceInput!) {
+  deleteProvince(input: $input) {
+    ... on Province {
+      id
+      code
+      name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteProvinceMutationFn = Apollo.MutationFunction<DeleteProvinceMutation, DeleteProvinceMutationVariables>;
+
+/**
+ * __useDeleteProvinceMutation__
+ *
+ * To run a mutation, you first call `useDeleteProvinceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteProvinceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteProvinceMutation, { data, loading, error }] = useDeleteProvinceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteProvinceMutation(baseOptions?: Apollo.MutationHookOptions<DeleteProvinceMutation, DeleteProvinceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteProvinceMutation, DeleteProvinceMutationVariables>(DeleteProvinceDocument, options);
+      }
+export type DeleteProvinceMutationHookResult = ReturnType<typeof useDeleteProvinceMutation>;
+export type DeleteProvinceMutationResult = Apollo.MutationResult<DeleteProvinceMutation>;
+export type DeleteProvinceMutationOptions = Apollo.BaseMutationOptions<DeleteProvinceMutation, DeleteProvinceMutationVariables>;
+export const GetProvincesDocument = gql`
+    query GetProvinces($countryId: ID!) {
+  provinces(country_id: $countryId) {
+    id
+    name
+    code
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    country_id
+    country {
+      id
+      name
+      code
+    }
+    districts {
+      id
+      code
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetProvincesQuery__
+ *
+ * To run a query within a React component, call `useGetProvincesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetProvincesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetProvincesQuery({
+ *   variables: {
+ *      countryId: // value for 'countryId'
+ *   },
+ * });
+ */
+export function useGetProvincesQuery(baseOptions: Apollo.QueryHookOptions<GetProvincesQuery, GetProvincesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetProvincesQuery, GetProvincesQueryVariables>(GetProvincesDocument, options);
+      }
+export function useGetProvincesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetProvincesQuery, GetProvincesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetProvincesQuery, GetProvincesQueryVariables>(GetProvincesDocument, options);
+        }
+export type GetProvincesQueryHookResult = ReturnType<typeof useGetProvincesQuery>;
+export type GetProvincesLazyQueryHookResult = ReturnType<typeof useGetProvincesLazyQuery>;
+export type GetProvincesQueryResult = Apollo.QueryResult<GetProvincesQuery, GetProvincesQueryVariables>;
+export const UpdateProvinceDocument = gql`
+    mutation UpdateProvince($input: UpdateProvinceInput!) {
+  updateProvince(input: $input) {
+    ... on Province {
+      id
+      code
+      name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateProvinceMutationFn = Apollo.MutationFunction<UpdateProvinceMutation, UpdateProvinceMutationVariables>;
+
+/**
+ * __useUpdateProvinceMutation__
+ *
+ * To run a mutation, you first call `useUpdateProvinceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProvinceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProvinceMutation, { data, loading, error }] = useUpdateProvinceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateProvinceMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProvinceMutation, UpdateProvinceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateProvinceMutation, UpdateProvinceMutationVariables>(UpdateProvinceDocument, options);
+      }
+export type UpdateProvinceMutationHookResult = ReturnType<typeof useUpdateProvinceMutation>;
+export type UpdateProvinceMutationResult = Apollo.MutationResult<UpdateProvinceMutation>;
+export type UpdateProvinceMutationOptions = Apollo.BaseMutationOptions<UpdateProvinceMutation, UpdateProvinceMutationVariables>;
 export const RequestPasswordResetDocument = gql`
     mutation RequestPasswordReset($input: PasswordResetRequestInput!) {
   requestPasswordReset(input: $input) {

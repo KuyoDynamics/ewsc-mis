@@ -188,7 +188,9 @@ export type ApiCreateError = ApiError & {
 export type ApiDeleteError = ApiError & {
   __typename?: 'ApiDeleteError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiError = {
@@ -198,25 +200,33 @@ export type ApiError = {
 export type ApiLoginError = ApiError & {
   __typename?: 'ApiLoginError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiNotFoundError = ApiError & {
   __typename?: 'ApiNotFoundError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiOperationError = ApiError & {
   __typename?: 'ApiOperationError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiPasswordResetError = ApiError & {
   __typename?: 'ApiPasswordResetError';
   errors?: Maybe<Array<ErrorField>>;
+  field?: Maybe<Scalars['String']>;
   message: Scalars['String'];
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ApiUpdateError = ApiError & {
@@ -1769,7 +1779,7 @@ export type PasswordResetResult = ApiPasswordResetError | User;
 export type Province = {
   __typename?: 'Province';
   code: Scalars['String'];
-  country?: Maybe<CountryResult>;
+  country?: Maybe<Country>;
   country_id: Scalars['String'];
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2985,7 +2995,7 @@ export type ResolversTypes = ResolversObject<{
   PositiveFloat: ResolverTypeWrapper<Scalars['PositiveFloat']>;
   PositiveInt: ResolverTypeWrapper<Scalars['PositiveInt']>;
   PostalCode: ResolverTypeWrapper<Scalars['PostalCode']>;
-  Province: ResolverTypeWrapper<Omit<Province, 'country'> & { country?: Maybe<ResolversTypes['CountryResult']> }>;
+  Province: ResolverTypeWrapper<Province>;
   ProvinceResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Province'];
   ProvinceUpdateInput: ProvinceUpdateInput;
   Query: ResolverTypeWrapper<{}>;
@@ -3284,7 +3294,7 @@ export type ResolversParentTypes = ResolversObject<{
   PositiveFloat: Scalars['PositiveFloat'];
   PositiveInt: Scalars['PositiveInt'];
   PostalCode: Scalars['PostalCode'];
-  Province: Omit<Province, 'country'> & { country?: Maybe<ResolversParentTypes['CountryResult']> };
+  Province: Province;
   ProvinceResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Province'];
   ProvinceUpdateInput: ProvinceUpdateInput;
   Query: {};
@@ -3404,7 +3414,9 @@ export type ApiCreateErrorResolvers<ContextType = GraphQLContext, ParentType ext
 
 export type ApiDeleteErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiDeleteError'] = ResolversParentTypes['ApiDeleteError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -3415,25 +3427,33 @@ export type ApiErrorResolvers<ContextType = GraphQLContext, ParentType extends R
 
 export type ApiLoginErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiLoginError'] = ResolversParentTypes['ApiLoginError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type ApiNotFoundErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiNotFoundError'] = ResolversParentTypes['ApiNotFoundError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type ApiOperationErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiOperationError'] = ResolversParentTypes['ApiOperationError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type ApiPasswordResetErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ApiPasswordResetError'] = ResolversParentTypes['ApiPasswordResetError']> = ResolversObject<{
   errors?: Resolver<Maybe<Array<ResolversTypes['ErrorField']>>, ParentType, ContextType>;
+  field?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -4199,7 +4219,7 @@ export interface PostalCodeScalarConfig extends GraphQLScalarTypeConfig<Resolver
 
 export type ProvinceResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Province'] = ResolversParentTypes['Province']> = ResolversObject<{
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  country?: Resolver<Maybe<ResolversTypes['CountryResult']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['Country']>, ParentType, ContextType>;
   country_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

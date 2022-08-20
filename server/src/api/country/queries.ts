@@ -10,6 +10,7 @@ import {
 async function getCountries(context: GraphQLContext): Promise<Country[]> {
   return context.prisma.country.findMany({});
 }
+
 async function getCountry(
   id: string,
   context: GraphQLContext

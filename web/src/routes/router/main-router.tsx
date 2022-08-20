@@ -18,6 +18,7 @@ const ChangePassword = Loadable(
 );
 const SystemDashboard = Loadable(lazy(() => import('routes/system')));
 const Countries = Loadable(lazy(() => import('routes/system/countries')));
+const Provinces = Loadable(lazy(() => import('routes/system/provinces')));
 
 const MainRouter: RouteObject = {
   path: '/',
@@ -57,6 +58,10 @@ const MainRouter: RouteObject = {
         {
           path: 'countries',
           element: <Countries />,
+        },
+        {
+          path: 'provinces',
+          element: <Provinces />,
         },
       ],
     },
