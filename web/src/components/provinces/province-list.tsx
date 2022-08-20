@@ -245,8 +245,8 @@ interface IProvinceFormInputs {
 }
 
 const schema = Yup.object({
-  code: Yup.string().required().min(2).max(3),
   name: Yup.string().required().min(4).max(255),
+  code: Yup.string().required().min(5).max(5),
 });
 
 const initialRowModesModel: GridRowModesModel = {};
