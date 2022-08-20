@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useMemo } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  MenuItem,
   PaperProps,
   Typography,
 } from '@mui/material';
@@ -15,15 +16,17 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useForm } from 'react-hook-form';
 import DraggablePaper from 'components/draggable-paper';
 import FormInput from 'components/form-input-helpers/form-input';
+import FormSelect from 'components/form-input-helpers/form-select';
 import {
   CreateProvinceInput,
   GetProvincesDocument,
   useCreateProvinceMutation,
+  useGetCountriesQuery,
 } from '../../../graphql/generated';
 
 const schema = Yup.object({
-  code: Yup.string().required(),
-  name: Yup.string().required(),
+  code: Yup.string().required().min(5).max(5).uppercase(),
+  name: Yup.string().required().min(4).max(255),
   country_id: Yup.string().uuid().required(),
 });
 
@@ -31,33 +34,43 @@ function DraggableProvinceForm(props: PaperProps) {
   // eslint-disable-next-line react/jsx-props-no-spreading
   return <DraggablePaper {...props} handle="#new-country-dialog-title" />;
 }
-
 interface IProvinceFormProps {
   open: boolean;
   onClose: () => void;
+  selectedCountryId: string;
 }
 
-function ProvinceForm({ open, onClose }: IProvinceFormProps) {
-  const [createProvince, { loading }] = useCreateProvinceMutation({
+function ProvinceForm({
+  open,
+  onClose,
+  selectedCountryId,
+}: IProvinceFormProps) {
+  const [createProvince, { loading: creating }] = useCreateProvinceMutation({
     refetchQueries: [GetProvincesDocument],
   });
+
+  const { data } = useGetCountriesQuery();
+
+  const countries = useMemo(
+    () => data?.countries?.map((c) => ({ name: c.name, id: c.id })),
+    [data]
+  );
+
   const {
     handleSubmit,
     control,
-    formState: { isSubmitting, isValid, errors },
+    formState: { isValid, isSubmitting, errors, isDirty },
     setError,
   } = useForm<CreateProvinceInput>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
 
-  const submitting = isSubmitting || loading;
-
   const onSubmit = async ({ code, name, country_id }: CreateProvinceInput) => {
     createProvince({
       variables: {
         input: {
-          code,
+          code: code.toUpperCase(),
           name,
           country_id,
         },
@@ -124,42 +137,58 @@ function ProvinceForm({ open, onClose }: IProvinceFormProps) {
         </Typography>
       </DialogTitle>
       <DialogContent>
-        {/* Refactor this into its own component so it can re-render */}
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+          <FormSelect
+            control={control}
+            name="country_id"
+            errors={errors}
+            defaultValue={selectedCountryId}
+            fullWidth
+            size="small"
+            margin="dense"
+            variant="outlined"
+          >
+            {countries &&
+              countries.map((country) => (
+                <MenuItem value={country.id}>{country.name}</MenuItem>
+              ))}
+          </FormSelect>
           <FormInput
             control={control}
             name="name"
             fullWidth
-            label="Name"
+            label="Province Name"
             margin="normal"
             variant="outlined"
             inputProps={{
               autoCapitalize: 'on',
+              autoComplete: 'off',
             }}
           />
           <FormInput
             control={control}
             name="code"
             fullWidth
-            label="Code"
+            label="Province Code"
             margin="normal"
             variant="outlined"
             inputProps={{
               style: { textTransform: 'uppercase' },
+              autoComplete: 'off',
             }}
           />
           <Box sx={{ py: 2 }}>
             <LoadingButton
               color="primary"
-              disabled={submitting || !isValid}
+              disabled={isSubmitting || !isValid || creating}
               fullWidth
               size="large"
               type="submit"
               variant="contained"
-              loading={submitting}
+              loading={isSubmitting || creating}
               loadingPosition="end"
             >
-              {submitting ? 'Saving...' : 'Create'}
+              {isSubmitting || creating ? 'Saving...' : 'Create'}
             </LoadingButton>
           </Box>
         </form>

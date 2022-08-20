@@ -38,6 +38,7 @@ import {
   MuiEvent,
   useGridApiContext,
 } from '@mui/x-data-grid';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Alert,
   Box,
@@ -57,7 +58,7 @@ import { useForm } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
 import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
-import FormSelect from 'components/form-input-helpers/form-select';
+import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
 import ProvinceForm from './province-form';
 import {
   Province,
@@ -68,7 +69,6 @@ import {
   useGetCountriesQuery,
   District,
 } from '../../../graphql/generated';
-import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
@@ -253,6 +253,8 @@ const initialRowModesModel: GridRowModesModel = {};
 
 function ProvinceList() {
   const navigate = useNavigate();
+
+  const renderId = uuidv4();
 
   const { country_id: countryId } = useGetDefaultOrganisation();
 
@@ -658,8 +660,10 @@ function ProvinceList() {
         />
       </Box>
       <ProvinceForm
+        key={renderId}
         open={openCreateProvinceModal}
         onClose={() => setOpenCreateProvinceModal(false)}
+        selectedCountryId={selectedCountryId}
       />
       <input id="id" type="hidden" required {...register('id')} />
     </MainCard>
