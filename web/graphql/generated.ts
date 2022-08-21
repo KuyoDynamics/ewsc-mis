@@ -2787,6 +2787,34 @@ export type DisableUserMutationVariables = Exact<{
 
 export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __typename?: 'User', id: string, disabled: boolean } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
+export type CreateDistrictMutationVariables = Exact<{
+  input: CreateDistrictInput;
+}>;
+
+
+export type CreateDistrictMutation = { __typename?: 'Mutation', createDistrict: { __typename?: 'District', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type DeleteDistrictMutationVariables = Exact<{
+  input: DeleteDistrictInput;
+}>;
+
+
+export type DeleteDistrictMutation = { __typename?: 'Mutation', deleteDistrict: { __typename?: 'District', id: string, code: string, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type GetDistrictsQueryVariables = Exact<{
+  provinceId: Scalars['ID'];
+}>;
+
+
+export type GetDistrictsQuery = { __typename?: 'Query', districts?: Array<{ __typename?: 'District', id: string, code: string, name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, province_id: string, residences?: Array<{ __typename?: 'Residence', id: string, name: string, cost_classification: ResidenceClassification }> | null }> | null };
+
+export type UpdateDistrictMutationVariables = Exact<{
+  input: UpdateDistrictInput;
+}>;
+
+
+export type UpdateDistrictMutation = { __typename?: 'Mutation', updateDistrict: { __typename?: 'District', id: string, code: string, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
 export type GetCountriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3286,6 +3314,202 @@ export function useDisableUserMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DisableUserMutationHookResult = ReturnType<typeof useDisableUserMutation>;
 export type DisableUserMutationResult = Apollo.MutationResult<DisableUserMutation>;
 export type DisableUserMutationOptions = Apollo.BaseMutationOptions<DisableUserMutation, DisableUserMutationVariables>;
+export const CreateDistrictDocument = gql`
+    mutation CreateDistrict($input: CreateDistrictInput!) {
+  createDistrict(input: $input) {
+    ... on District {
+      id
+      code
+      name
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateDistrictMutationFn = Apollo.MutationFunction<CreateDistrictMutation, CreateDistrictMutationVariables>;
+
+/**
+ * __useCreateDistrictMutation__
+ *
+ * To run a mutation, you first call `useCreateDistrictMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDistrictMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDistrictMutation, { data, loading, error }] = useCreateDistrictMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDistrictMutation(baseOptions?: Apollo.MutationHookOptions<CreateDistrictMutation, CreateDistrictMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDistrictMutation, CreateDistrictMutationVariables>(CreateDistrictDocument, options);
+      }
+export type CreateDistrictMutationHookResult = ReturnType<typeof useCreateDistrictMutation>;
+export type CreateDistrictMutationResult = Apollo.MutationResult<CreateDistrictMutation>;
+export type CreateDistrictMutationOptions = Apollo.BaseMutationOptions<CreateDistrictMutation, CreateDistrictMutationVariables>;
+export const DeleteDistrictDocument = gql`
+    mutation DeleteDistrict($input: DeleteDistrictInput!) {
+  deleteDistrict(input: $input) {
+    ... on District {
+      id
+      code
+      name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteDistrictMutationFn = Apollo.MutationFunction<DeleteDistrictMutation, DeleteDistrictMutationVariables>;
+
+/**
+ * __useDeleteDistrictMutation__
+ *
+ * To run a mutation, you first call `useDeleteDistrictMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDistrictMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteDistrictMutation, { data, loading, error }] = useDeleteDistrictMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteDistrictMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDistrictMutation, DeleteDistrictMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteDistrictMutation, DeleteDistrictMutationVariables>(DeleteDistrictDocument, options);
+      }
+export type DeleteDistrictMutationHookResult = ReturnType<typeof useDeleteDistrictMutation>;
+export type DeleteDistrictMutationResult = Apollo.MutationResult<DeleteDistrictMutation>;
+export type DeleteDistrictMutationOptions = Apollo.BaseMutationOptions<DeleteDistrictMutation, DeleteDistrictMutationVariables>;
+export const GetDistrictsDocument = gql`
+    query GetDistricts($provinceId: ID!) {
+  districts(province_id: $provinceId) {
+    id
+    code
+    name
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    province_id
+    residences {
+      id
+      name
+      cost_classification
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDistrictsQuery__
+ *
+ * To run a query within a React component, call `useGetDistrictsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDistrictsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDistrictsQuery({
+ *   variables: {
+ *      provinceId: // value for 'provinceId'
+ *   },
+ * });
+ */
+export function useGetDistrictsQuery(baseOptions: Apollo.QueryHookOptions<GetDistrictsQuery, GetDistrictsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDistrictsQuery, GetDistrictsQueryVariables>(GetDistrictsDocument, options);
+      }
+export function useGetDistrictsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDistrictsQuery, GetDistrictsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDistrictsQuery, GetDistrictsQueryVariables>(GetDistrictsDocument, options);
+        }
+export type GetDistrictsQueryHookResult = ReturnType<typeof useGetDistrictsQuery>;
+export type GetDistrictsLazyQueryHookResult = ReturnType<typeof useGetDistrictsLazyQuery>;
+export type GetDistrictsQueryResult = Apollo.QueryResult<GetDistrictsQuery, GetDistrictsQueryVariables>;
+export const UpdateDistrictDocument = gql`
+    mutation UpdateDistrict($input: UpdateDistrictInput!) {
+  updateDistrict(input: $input) {
+    ... on District {
+      id
+      code
+      name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateDistrictMutationFn = Apollo.MutationFunction<UpdateDistrictMutation, UpdateDistrictMutationVariables>;
+
+/**
+ * __useUpdateDistrictMutation__
+ *
+ * To run a mutation, you first call `useUpdateDistrictMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDistrictMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDistrictMutation, { data, loading, error }] = useUpdateDistrictMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateDistrictMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDistrictMutation, UpdateDistrictMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDistrictMutation, UpdateDistrictMutationVariables>(UpdateDistrictDocument, options);
+      }
+export type UpdateDistrictMutationHookResult = ReturnType<typeof useUpdateDistrictMutation>;
+export type UpdateDistrictMutationResult = Apollo.MutationResult<UpdateDistrictMutation>;
+export type UpdateDistrictMutationOptions = Apollo.BaseMutationOptions<UpdateDistrictMutation, UpdateDistrictMutationVariables>;
 export const GetCountriesDocument = gql`
     query GetCountries {
   countries {

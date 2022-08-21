@@ -32,12 +32,10 @@ function FormSelect({
       name={name}
       defaultValue={defaultValue}
       render={({ field, fieldState: { isTouched, error } }) => {
-        // console.log('field', field);
         return (
           <FormControl fullWidth={fullWidth}>
             <InputLabel id={id}>{label}</InputLabel>
             <Select
-              // defaultValue={defaultValue}
               labelId={id}
               label={label}
               error={Boolean(isTouched && error)}
