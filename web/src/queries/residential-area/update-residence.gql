@@ -1,0 +1,22 @@
+mutation UpdateResidence($input: UpdateResidenceInput!) {
+  updateResidence(input: $input) {
+    ... on Residence {
+      id
+      name
+      cost_classification
+      last_modified_by
+      last_modified_at
+    }
+
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ import {
   CatchmentDistrictInput,
   DistrictUserRoleType,
   OrganisationUserRoleType,
+  ResidenceClassification,
   User,
   UserInvitation,
   UserTheme,
@@ -19,6 +20,10 @@ const getEnumKeys = <T>(
 
 const USER_DISTRICT_ROLE_OPTIONS: string[] =
   Object.values(DistrictUserRoleType);
+
+const COST_CLASSIFICATION_OPTIONS: string[] = Object.values(
+  ResidenceClassification
+);
 
 const USER_ORGANISATION_ROLE_OPTIONS: string[] = Object.values(
   OrganisationUserRoleType
@@ -83,5 +88,6 @@ export {
   USER_DISTRICT_ROLE_OPTIONS,
   USER_ORGANISATION_ROLE_OPTIONS,
   USER_THEME_OPTIONS,
+  COST_CLASSIFICATION_OPTIONS,
   getNameInitials,
 };

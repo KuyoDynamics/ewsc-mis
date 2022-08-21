@@ -1,0 +1,20 @@
+mutation DeleteResidence($input: DeleteResidenceInput!) {
+  deleteResidence(input: $input) {
+    ... on Residence {
+      id
+      last_modified_by
+      last_modified_by
+    }
+
+    ... on ApiDeleteError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
