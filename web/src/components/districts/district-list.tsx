@@ -32,7 +32,6 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
-  GridValueFormatterParams,
   GridValueGetterParams,
   gridVisibleColumnFieldsSelector,
   MuiEvent,
@@ -71,6 +70,7 @@ import {
   useGetProvincesQuery,
   Residence,
 } from '../../../graphql/generated';
+import useGetDefaultProvince from 'utils/hooks/use-get-default-province';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
@@ -311,6 +311,8 @@ function DistrictList() {
 
   const { country_id: countryId } = useGetDefaultOrganisation();
 
+  const { id: defaultProvinceId } = useGetDefaultProvince();
+
   const { state } = useLocation();
 
   const [selectedCountryId, setSelectedCountryId] = useState(
@@ -318,7 +320,7 @@ function DistrictList() {
   );
 
   const [selectedProvinceId, setSelectedProvinceId] = useState(
-    (state as LocationStateType)?.provinceId
+    (state as LocationStateType)?.provinceId || defaultProvinceId
   );
 
   const [openAlert, setOpenAlert] = useState(false);
