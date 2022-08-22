@@ -2787,6 +2787,39 @@ export type DisableUserMutationVariables = Exact<{
 
 export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __typename?: 'User', id: string, disabled: boolean } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
+export type CreateOptionMutationVariables = Exact<{
+  input: CreateOptionInput;
+}>;
+
+
+export type CreateOptionMutation = { __typename?: 'Mutation', createOption: { __typename?: 'Option', id: string, option_name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type DeleteOptionMutationVariables = Exact<{
+  input: DeleteOptionInput;
+}>;
+
+
+export type DeleteOptionMutation = { __typename?: 'Mutation', deleteOption: { __typename?: 'Option', id: string, option_name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type GetOptionQueryVariables = Exact<{
+  optionId: Scalars['ID'];
+}>;
+
+
+export type GetOptionQuery = { __typename?: 'Query', option: { __typename?: 'Option', id: string, option_name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetOptionsQuery = { __typename?: 'Query', options?: Array<{ __typename?: 'Option', id: string, option_name: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_options?: Array<{ __typename?: 'DisaggregateOption', id: string }> | null }> | null };
+
+export type UpdateOptionMutationVariables = Exact<{
+  input: UpdateOptionInput;
+}>;
+
+
+export type UpdateOptionMutation = { __typename?: 'Mutation', updateOption: { __typename?: 'Option', id: string, option_name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
 export type CreateDistrictMutationVariables = Exact<{
   input: CreateDistrictInput;
 }>;
@@ -3349,6 +3382,246 @@ export function useDisableUserMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DisableUserMutationHookResult = ReturnType<typeof useDisableUserMutation>;
 export type DisableUserMutationResult = Apollo.MutationResult<DisableUserMutation>;
 export type DisableUserMutationOptions = Apollo.BaseMutationOptions<DisableUserMutation, DisableUserMutationVariables>;
+export const CreateOptionDocument = gql`
+    mutation CreateOption($input: CreateOptionInput!) {
+  createOption(input: $input) {
+    ... on Option {
+      id
+      option_name
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateOptionMutationFn = Apollo.MutationFunction<CreateOptionMutation, CreateOptionMutationVariables>;
+
+/**
+ * __useCreateOptionMutation__
+ *
+ * To run a mutation, you first call `useCreateOptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateOptionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createOptionMutation, { data, loading, error }] = useCreateOptionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateOptionMutation(baseOptions?: Apollo.MutationHookOptions<CreateOptionMutation, CreateOptionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateOptionMutation, CreateOptionMutationVariables>(CreateOptionDocument, options);
+      }
+export type CreateOptionMutationHookResult = ReturnType<typeof useCreateOptionMutation>;
+export type CreateOptionMutationResult = Apollo.MutationResult<CreateOptionMutation>;
+export type CreateOptionMutationOptions = Apollo.BaseMutationOptions<CreateOptionMutation, CreateOptionMutationVariables>;
+export const DeleteOptionDocument = gql`
+    mutation DeleteOption($input: DeleteOptionInput!) {
+  deleteOption(input: $input) {
+    ... on Option {
+      id
+      option_name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteOptionMutationFn = Apollo.MutationFunction<DeleteOptionMutation, DeleteOptionMutationVariables>;
+
+/**
+ * __useDeleteOptionMutation__
+ *
+ * To run a mutation, you first call `useDeleteOptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteOptionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteOptionMutation, { data, loading, error }] = useDeleteOptionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteOptionMutation(baseOptions?: Apollo.MutationHookOptions<DeleteOptionMutation, DeleteOptionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteOptionMutation, DeleteOptionMutationVariables>(DeleteOptionDocument, options);
+      }
+export type DeleteOptionMutationHookResult = ReturnType<typeof useDeleteOptionMutation>;
+export type DeleteOptionMutationResult = Apollo.MutationResult<DeleteOptionMutation>;
+export type DeleteOptionMutationOptions = Apollo.BaseMutationOptions<DeleteOptionMutation, DeleteOptionMutationVariables>;
+export const GetOptionDocument = gql`
+    query GetOption($optionId: ID!) {
+  option(id: $optionId) {
+    ... on Option {
+      id
+      option_name
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiNotFoundError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetOptionQuery__
+ *
+ * To run a query within a React component, call `useGetOptionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOptionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOptionQuery({
+ *   variables: {
+ *      optionId: // value for 'optionId'
+ *   },
+ * });
+ */
+export function useGetOptionQuery(baseOptions: Apollo.QueryHookOptions<GetOptionQuery, GetOptionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOptionQuery, GetOptionQueryVariables>(GetOptionDocument, options);
+      }
+export function useGetOptionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOptionQuery, GetOptionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOptionQuery, GetOptionQueryVariables>(GetOptionDocument, options);
+        }
+export type GetOptionQueryHookResult = ReturnType<typeof useGetOptionQuery>;
+export type GetOptionLazyQueryHookResult = ReturnType<typeof useGetOptionLazyQuery>;
+export type GetOptionQueryResult = Apollo.QueryResult<GetOptionQuery, GetOptionQueryVariables>;
+export const GetOptionsDocument = gql`
+    query GetOptions {
+  options {
+    id
+    option_name
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    disaggregate_options {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetOptionsQuery__
+ *
+ * To run a query within a React component, call `useGetOptionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOptionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOptionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetOptionsQuery(baseOptions?: Apollo.QueryHookOptions<GetOptionsQuery, GetOptionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetOptionsQuery, GetOptionsQueryVariables>(GetOptionsDocument, options);
+      }
+export function useGetOptionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetOptionsQuery, GetOptionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetOptionsQuery, GetOptionsQueryVariables>(GetOptionsDocument, options);
+        }
+export type GetOptionsQueryHookResult = ReturnType<typeof useGetOptionsQuery>;
+export type GetOptionsLazyQueryHookResult = ReturnType<typeof useGetOptionsLazyQuery>;
+export type GetOptionsQueryResult = Apollo.QueryResult<GetOptionsQuery, GetOptionsQueryVariables>;
+export const UpdateOptionDocument = gql`
+    mutation UpdateOption($input: UpdateOptionInput!) {
+  updateOption(input: $input) {
+    ... on Option {
+      id
+      option_name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateOptionMutationFn = Apollo.MutationFunction<UpdateOptionMutation, UpdateOptionMutationVariables>;
+
+/**
+ * __useUpdateOptionMutation__
+ *
+ * To run a mutation, you first call `useUpdateOptionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateOptionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateOptionMutation, { data, loading, error }] = useUpdateOptionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateOptionMutation(baseOptions?: Apollo.MutationHookOptions<UpdateOptionMutation, UpdateOptionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateOptionMutation, UpdateOptionMutationVariables>(UpdateOptionDocument, options);
+      }
+export type UpdateOptionMutationHookResult = ReturnType<typeof useUpdateOptionMutation>;
+export type UpdateOptionMutationResult = Apollo.MutationResult<UpdateOptionMutation>;
+export type UpdateOptionMutationOptions = Apollo.BaseMutationOptions<UpdateOptionMutation, UpdateOptionMutationVariables>;
 export const CreateDistrictDocument = gql`
     mutation CreateDistrict($input: CreateDistrictInput!) {
   createDistrict(input: $input) {
