@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createDistrict,
   deleteDistrict,
@@ -8,8 +8,9 @@ import {
   getOrganisationsInDistrict,
   getProvince,
   getResidences,
+  resolveProvince,
   updateDistrict,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type District {
@@ -17,7 +18,7 @@ const typeDefs = gql`
     name: String!
     code: String!
     province_id: String!
-    province: ProvinceResult
+    province: Province
     organisations_in_district: [CatchmentDistrict!]
     residences: [Residence!]
     created_at: DateTime!
@@ -78,7 +79,7 @@ const resolvers: Resolvers = {
   },
   District: {
     province: (parent, _args, context) =>
-      getProvince(parent.province_id, context),
+      resolveProvince(parent.province_id, context),
     residences: (parent, _args, context) =>
       getResidences({ district_id: parent.id }, context),
     organisations_in_district: (parent, _args, context) =>

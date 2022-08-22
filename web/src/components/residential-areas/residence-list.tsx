@@ -1,7 +1,7 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -9,23 +9,15 @@ import {
   DeleteOutline as DeleteIcon,
   Save as SaveIcon,
   Close as CancelIcon,
-  EditLocationOutlined,
 } from '@mui/icons-material';
 
 import {
   DataGrid,
   GridActionsCellItem,
-  GridApi,
-  gridColumnDefinitionsSelector,
   GridColumns,
   GridCsvExportMenuItem,
   GridCsvExportOptions,
   GridEventListener,
-  GridExportMenuItemProps,
-  gridFilteredSortedRowIdsSelector,
-  GridFooter,
-  GridFooterContainer,
-  GridRenderCellParams,
   GridRowId,
   GridRowModes,
   GridRowModesModel,
@@ -33,266 +25,145 @@ import {
   GridToolbarContainer,
   GridToolbarExportContainer,
   GridValueGetterParams,
-  gridVisibleColumnFieldsSelector,
   MuiEvent,
-  useGridApiContext,
 } from '@mui/x-data-grid';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Alert,
   Box,
-  Button,
   Collapse,
-  Fab,
   FormControl,
   MenuItem,
   Select,
   SelectChangeEvent,
-  TableFooterProps,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { utils, writeFile } from 'xlsx';
 import { useForm } from 'react-hook-form';
-import AddIcon from '@mui/icons-material/Add';
+import CustomFooterWithFab from 'components/data-grid-helpers/customer-footer-with-fab';
 import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
 import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
-import DistrictForm from './district-form';
-import {
-  GetDistrictsDocument,
-  useDeleteDistrictMutation,
-  useGetDistrictsQuery,
-  useUpdateDistrictMutation,
-  useGetCountriesQuery,
-  District,
-  useGetProvincesQuery,
-  Residence,
-} from '../../../graphql/generated';
 import useGetDefaultProvince from 'utils/hooks/use-get-default-province';
+import FormSelect from 'components/form-input-helpers/form-select';
+import { COST_CLASSIFICATION_OPTIONS, ILocationFilterState } from 'utils';
+import useGetDefaultDistrict from 'utils/hooks/use-get-default-district';
+import ExcelExportMenuItem from 'components/data-grid-helpers/excel-export-menu-item';
+import JsonExportMenuItem from 'components/data-grid-helpers/json-export-menu-item';
+import ResidenceForm from './residence-form';
+import {
+  GetResidencesDocument,
+  useDeleteResidenceMutation,
+  useGetResidencesQuery,
+  useUpdateResidenceMutation,
+  useGetCountriesQuery,
+  Residence,
+  ResidenceClassification,
+  District,
+} from '../../../graphql/generated';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
   setRowModesModel: (newModel: any) => void;
 }
 
-type CustomFooterProps = {
-  onClick: () => void;
-} & TableFooterProps;
-
-const getJson = (apiRef: React.MutableRefObject<GridApi>) => {
-  const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
-
-  const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
-
-  const disableExportCols = gridColumnDefinitionsSelector(apiRef)
-    .filter((col) => col.disableExport)
-    .map((col) => col.field);
-
-  const exportableVisibleColumnsField = visibleColumnsField.filter(
-    (field) => disableExportCols.indexOf(field) === -1
-  );
-
-  const data = filteredSortedRowIds.map((id) => {
-    const row: Record<string, any> = {};
-    exportableVisibleColumnsField.forEach((field) => {
-      row[field] = apiRef.current.getCellParams(id, field).value;
-    });
-    return row;
-  });
-
-  return { jsonString: JSON.stringify(data, null, 2), json: data };
+const csvOptions: GridCsvExportOptions = {
+  delimiter: ';',
+  fileName: 'residential areas',
 };
-
-const exportBlob = (blob: Blob, filename: string) => {
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  });
-};
-
-function saveExcelFile(
-  fileName: string,
-  worksheetName: string,
-  ext: string,
-  rows: Record<string, any>[]
-): void {
-  const wb = utils.book_new();
-
-  const worksheet = utils.json_to_sheet(rows);
-
-  utils.book_append_sheet(wb, worksheet, worksheetName);
-
-  writeFile(wb, `${fileName}.${ext}`);
+export interface ICustomToolbarDataProps {
+  name: string;
+  id: string;
 }
-
-function ExcelExportMenuItem(props: GridExportMenuItemProps<{}>) {
-  const apiRef = useGridApiContext();
-
-  const { hideMenu } = props;
-
-  return (
-    <MenuItem
-      onClick={() => {
-        const { json } = getJson(apiRef);
-
-        saveExcelFile('districts', 'districts', 'xlsx', json);
-
-        hideMenu?.();
-      }}
-    >
-      Download as Excel(xlsx)
-    </MenuItem>
-  );
-}
-
-function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
-  const apiRef = useGridApiContext();
-
-  const { hideMenu } = props;
-  return (
-    <MenuItem
-      onClick={() => {
-        const { jsonString } = getJson(apiRef);
-        const blob = new Blob([jsonString], {
-          type: 'text/json',
-        });
-        exportBlob(blob, 'districts.json');
-
-        hideMenu?.();
-      }}
-    >
-      Download as JSON
-    </MenuItem>
-  );
-}
-
-const csvOptions: GridCsvExportOptions = { delimiter: ';' };
-
 export interface CustomToolbarProps {
   title: string;
   handleCountrySelectionChange: () => void;
   handleProvinceSelectionChange: () => void;
-  selectedCountryId: string;
-  selectedProvinceId: string;
+  handleDistrictSelectionChange: () => void;
+  countryId: string;
+  provinceId: string;
+  districtId: string;
+  provinceOptions: JSX.Element[];
+  countryOptions: JSX.Element[];
+  districtOptions: JSX.Element[];
 }
 
 function CustomToolbar({
   title,
   handleCountrySelectionChange,
   handleProvinceSelectionChange,
-  selectedCountryId,
-  selectedProvinceId,
+  handleDistrictSelectionChange,
+  countryId,
+  provinceId,
+  districtId,
+  provinceOptions,
+  countryOptions,
+  districtOptions,
 }: CustomToolbarProps) {
-  const { data } = useGetCountriesQuery();
-
-  const countries = useMemo(
-    () => data?.countries?.map((c) => ({ name: c.name, id: c.id })),
-    [data]
-  );
-
-  const { data: provinceData } = useGetProvincesQuery({
-    variables: {
-      countryId: selectedCountryId,
-    },
-  });
-
-  const provinces = useMemo(
-    () => provinceData?.provinces?.map((p) => ({ name: p.name, id: p.id })),
-    [provinceData]
-  );
-
-  useEffect(() => {
-    if (provinces?.length === 0) {
-      handleProvinceSelectionChange();
-    }
-  }, [provinces, handleProvinceSelectionChange]);
-
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Box>
         <Typography variant="h3">{title}</Typography>
         <FormControl>
           <Select
-            value={selectedCountryId}
+            value={countryId}
             onChange={handleCountrySelectionChange}
             displayEmpty
             size="small"
             name="country_id"
             variant="outlined"
           >
-            {countries &&
-              countries.map((country) => (
-                <MenuItem value={country.id}>{country.name}</MenuItem>
-              ))}
+            {countryOptions}
           </Select>
         </FormControl>
         <FormControl>
           <Select
-            value={selectedProvinceId}
+            value={provinceId}
             onChange={handleProvinceSelectionChange}
-            // fullWidth
             displayEmpty
             size="small"
             name="province_id"
-            // variant="outlined"
           >
-            {provinces?.length! <= 0 && (
-              <MenuItem disabled value="">
-                <em>empty</em>
-              </MenuItem>
-            )}
-            {provinces &&
-              provinces.map((province) => (
-                <MenuItem value={province.id}>{province.name}</MenuItem>
-              ))}
+            {provinceOptions}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <Select
+            value={districtId}
+            onChange={handleDistrictSelectionChange}
+            displayEmpty
+            size="small"
+            name="district_id"
+          >
+            {districtOptions}
           </Select>
         </FormControl>
       </Box>
       <GridToolbarExportContainer>
-        <ExcelExportMenuItem />
+        <ExcelExportMenuItem
+          fileName="residential areas"
+          worksheetName="residential areas"
+          ext="xlsx"
+        />
         <GridCsvExportMenuItem options={csvOptions} />
-        <JsonExportMenuItem />
+        <JsonExportMenuItem fileName="residential areas" />
       </GridToolbarExportContainer>
     </GridToolbarContainer>
   );
 }
 
-function CustomFooter({ onClick, ...props }: CustomFooterProps) {
-  return (
-    <GridFooterContainer>
-      <GridFooter {...props} />
-      <Tooltip title="Add District">
-        <Fab
-          size="small"
-          color="primary"
-          aria-label="add province"
-          sx={{ mr: '20px', ml: '20px' }}
-          onClick={onClick}
-        >
-          <AddIcon />
-        </Fab>
-      </Tooltip>
-    </GridFooterContainer>
-  );
-}
-
-interface IDistrictFormInputs {
-  name: string;
-  code: string;
+interface IResidenceFormInputs {
+  name?: string;
+  cost_classification?: ResidenceClassification;
   id: string;
 }
 
 const schema = Yup.object({
+  cost_classification: Yup.mixed<ResidenceClassification>()
+    .oneOf(COST_CLASSIFICATION_OPTIONS as ResidenceClassification[])
+    .required(),
   name: Yup.string().required().min(4).max(255),
-  code: Yup.string().required().min(8).max(8),
+  id: Yup.string().uuid().required(),
 });
 
 const initialRowModesModel: GridRowModesModel = {};
@@ -300,61 +171,81 @@ const initialRowModesModel: GridRowModesModel = {};
 type LocationStateType = {
   countryId: string;
   provinceId: string;
+  districtId: string;
 };
 
-function DistrictList() {
+function ResidenceList() {
   const navigate = useNavigate();
 
   const [pageSize, setPageSize] = React.useState<number>(5);
 
   const renderId = uuidv4();
 
-  const { country_id: countryId } = useGetDefaultOrganisation();
+  const { country_id: defaultCountryId } = useGetDefaultOrganisation();
+
+  const { id: defaultDistrictId } = useGetDefaultDistrict();
 
   const { id: defaultProvinceId } = useGetDefaultProvince();
 
   const { state } = useLocation();
 
-  const [selectedCountryId, setSelectedCountryId] = useState(
-    (state as LocationStateType)?.countryId || countryId
-  );
+  const { data: countryData } = useGetCountriesQuery();
 
-  const [selectedProvinceId, setSelectedProvinceId] = useState(
-    (state as LocationStateType)?.provinceId || defaultProvinceId
-  );
+  const [{ countryId, provinceId, districtId }, setFilter] =
+    useState<ILocationFilterState>({
+      countryId: (state as LocationStateType)?.countryId || defaultCountryId,
+      provinceId: (state as LocationStateType)?.provinceId || defaultProvinceId,
+      districtId: (state as LocationStateType)?.districtId || defaultDistrictId,
+      organisationId: '',
+      residenceId: '',
+    });
+
+  const countryOptions = countryData?.countries?.map((c) => (
+    <MenuItem value={c.id}>{c.name}</MenuItem>
+  ));
+
+  const provinceOptions = countryData?.countries
+    ?.find((item) => item.id === countryId)
+    ?.provinces?.map((p) => <MenuItem value={p.id}>{p.name}</MenuItem>);
+
+  const districtOptions = countryData?.countries
+    ?.find((item) => item.id === countryId)
+    ?.provinces?.find((p) => p.id === provinceId)
+    ?.districts?.map((d) => <MenuItem value={d.id}>{d.name}</MenuItem>);
 
   const [openAlert, setOpenAlert] = useState(false);
 
-  const [openCreateDistrictModal, setOpenCreateDistrictModal] = useState(false);
+  const [openCreateResidenceModal, setOpenCreateResidenceModal] =
+    useState(false);
 
-  const [selectedRow, setSelectedRow] = useState<IDistrictFormInputs | null>(
+  const [selectedRow, setSelectedRow] = useState<IResidenceFormInputs | null>(
     null
   );
 
-  const { data: DistrictData, loading } = useGetDistrictsQuery({
+  const { data: residenceData, loading } = useGetResidencesQuery({
     fetchPolicy: 'network-only',
     variables: {
-      provinceId: selectedProvinceId,
+      districtId,
     },
   });
 
-  const [updateDistrict, { data: updatedDistrictResponse, loading: updating }] =
-    useUpdateDistrictMutation({
-      refetchQueries: [GetDistrictsDocument],
-    });
+  const rows = residenceData?.residences ?? [];
 
-  const [deleteDistrict, { data: deleteDistrictResponse, loading: deleting }] =
-    useDeleteDistrictMutation({
-      refetchQueries: [GetDistrictsDocument],
-    });
+  const [updateResidence, { loading: updating }] = useUpdateResidenceMutation({
+    refetchQueries: [GetResidencesDocument],
+  });
+
+  const [
+    deleteResidence,
+    { data: deleteResidenceResponse, loading: deleting },
+  ] = useDeleteResidenceMutation({
+    refetchQueries: [GetResidencesDocument],
+  });
 
   const deleteErrors =
-    deleteDistrictResponse?.deleteDistrict.__typename === 'ApiDeleteError'
-      ? deleteDistrictResponse.deleteDistrict
+    deleteResidenceResponse?.deleteResidence.__typename === 'ApiDeleteError'
+      ? deleteResidenceResponse.deleteResidence
       : null;
-
-  // TODO: Fix the cascading for when country changes, should show empty list
-  const rows = DistrictData?.districts ?? [];
 
   const {
     formState: { isDirty, isValid, errors },
@@ -364,7 +255,7 @@ function DistrictList() {
     setError,
     handleSubmit,
     reset: resetForm,
-  } = useForm<IDistrictFormInputs>({
+  } = useForm<IResidenceFormInputs>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
@@ -372,40 +263,47 @@ function DistrictList() {
   const [rowModesModel, setRowModesModel] =
     React.useState<GridRowModesModel>(initialRowModesModel);
 
-  const onSubmit = async ({ code, name, id }: IDistrictFormInputs) => {
-    updateDistrict({
+  const onSubmit = async ({
+    cost_classification,
+    name,
+    id,
+  }: IResidenceFormInputs) => {
+    updateResidence({
       variables: {
         input: {
           id,
           update: {
-            code,
+            cost_classification,
             name,
           },
         },
       },
       onCompleted: (result) => {
-        if (result.updateDistrict.__typename === 'District') {
+        if (result.updateResidence.__typename === 'Residence') {
           setRowModesModel({
             ...rowModesModel,
             [id]: { mode: GridRowModes.View },
           });
-        } else if (result.updateDistrict.__typename === 'ApiUpdateError') {
-          if (result.updateDistrict.field) {
-            setError(result.updateDistrict.field as keyof IDistrictFormInputs, {
-              type: 'server',
-              message: result.updateDistrict.message,
-            });
+        } else if (result.updateResidence.__typename === 'ApiUpdateError') {
+          if (result.updateResidence.field) {
+            setError(
+              result.updateResidence.field as keyof IResidenceFormInputs,
+              {
+                type: 'server',
+                message: result.updateResidence.message,
+              }
+            );
           } else if (
-            !result.updateDistrict.errors &&
-            !result.updateDistrict.field
+            !result.updateResidence.errors &&
+            !result.updateResidence.field
           ) {
-            setError('unknown' as keyof IDistrictFormInputs, {
+            setError('unknown' as keyof IResidenceFormInputs, {
               type: 'server',
-              message: result.updateDistrict.message,
+              message: result.updateResidence.message,
             });
           } else {
-            result.updateDistrict.errors?.forEach((err) =>
-              setError(err.field as keyof IDistrictFormInputs, {
+            result.updateResidence.errors?.forEach((err) =>
+              setError(err.field as keyof IResidenceFormInputs, {
                 type: 'server',
                 message: err.message,
               })
@@ -421,11 +319,27 @@ function DistrictList() {
   };
 
   const handleCountrySelectionChange = (event: SelectChangeEvent) => {
-    setSelectedCountryId(event.target.value);
+    setFilter((prevData) => ({
+      ...prevData,
+      provinceId: '',
+      districtId: '',
+      countryId: event.target.value,
+    }));
   };
 
   const handleProvinceSelectionChange = (event: SelectChangeEvent) => {
-    setSelectedProvinceId(event?.target?.value);
+    setFilter((prevData) => ({
+      ...prevData,
+      districtId: '',
+      provinceId: event.target.value,
+    }));
+  };
+
+  const handleDistrictSelectionChange = (event: SelectChangeEvent) => {
+    setFilter((prevData) => ({
+      ...prevData,
+      districtId: event.target.value,
+    }));
   };
 
   const handleClose = () => {
@@ -436,7 +350,13 @@ function DistrictList() {
     const item = rows.find((row) => row.id === id);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setSelectedRow(() =>
-      item ? { id: item.id, code: item.code, name: item.name } : null
+      item
+        ? {
+            id: item.id,
+            cost_classification: item.cost_classification,
+            name: item.name,
+          }
+        : null
     );
   };
 
@@ -446,14 +366,14 @@ function DistrictList() {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    deleteDistrict({
+    deleteResidence({
       variables: {
         input: {
           id: id as string,
         },
       },
       onCompleted: (result) => {
-        if (result.deleteDistrict.__typename === 'ApiDeleteError') {
+        if (result.deleteResidence.__typename === 'ApiDeleteError') {
           setOpenAlert(true);
         }
       },
@@ -483,8 +403,77 @@ function DistrictList() {
 
   const columns: GridColumns = [
     {
+      field: 'country',
+      headerName: 'Country',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      valueGetter: (params: GridValueGetterParams) => {
+        return (params.row as Residence)?.district?.province?.country?.name;
+      },
+    },
+    {
+      field: 'country_id',
+      headerName: 'Country ID',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      valueGetter: (params: GridValueGetterParams) => {
+        return (params.row as Residence)?.district?.province?.country?.id;
+      },
+    },
+    {
+      field: 'province',
+      headerName: 'Province',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      valueGetter: (params: GridValueGetterParams) => {
+        return (params.row as Residence)?.district?.province?.name;
+      },
+    },
+    {
+      field: 'province_id',
+      headerName: 'Province ID',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      valueGetter: (params: GridValueGetterParams) => {
+        return (params.row as Residence)?.district?.province?.id;
+      },
+    },
+    {
+      field: 'district',
+      headerName: 'District',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      valueGetter: (params: GridValueGetterParams) => {
+        return (params.value as District)?.name;
+      },
+    },
+    {
+      field: 'district_id',
+      headerName: 'District ID',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+    },
+    {
       field: 'name',
-      headerName: 'District Name',
+      headerName: 'Residence Name',
       type: 'string',
       width: 180,
       editable: true,
@@ -509,8 +498,17 @@ function DistrictList() {
       },
     },
     {
-      field: 'code',
-      headerName: 'District Code',
+      field: 'id',
+      headerName: 'Residence ID',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+    },
+    {
+      field: 'cost_classification',
+      headerName: 'Cost Classification',
       type: 'string',
       width: 180,
       editable: true,
@@ -518,68 +516,23 @@ function DistrictList() {
       resizable: true,
       renderEditCell: () => {
         return (
-          <FormInput
+          <FormSelect
             control={control}
-            name="code"
+            name="cost_classification"
+            errors={errors}
             fullWidth
-            label="Code"
-            margin="none"
             size="small"
+            margin="dense"
             variant="outlined"
-            inputProps={{
-              style: { textTransform: 'uppercase' },
-            }}
-          />
-        );
-      },
-    },
-    {
-      field: 'residences',
-      headerName: 'Residential Areas',
-      type: 'number',
-      width: 180,
-      editable: false,
-      flex: 1,
-      resizable: true,
-      headerAlign: 'left',
-      align: 'left',
-      renderCell: (params: GridRenderCellParams) => {
-        const { residences, id } = params.row as District;
-        return (
-          <Button
-            variant="text"
-            size="small"
-            endIcon={<EditLocationOutlined />}
-            onClick={() =>
-              navigate('/system/residences', {
-                state: {
-                  countryId: selectedCountryId,
-                  provinceId: selectedProvinceId,
-                  districtId: id,
-                },
-              })
-            }
           >
-            {residences && residences.length === 1
-              ? residences[0].name
-              : `${residences?.length} residential areas`}
-          </Button>
+            {COST_CLASSIFICATION_OPTIONS &&
+              COST_CLASSIFICATION_OPTIONS.map((c) => (
+                <MenuItem value={c}>{c}</MenuItem>
+              ))}
+          </FormSelect>
         );
       },
-      valueGetter: (params: GridValueGetterParams) => {
-        return (params.value as Residence[])?.length;
-      },
     },
-    {
-      field: 'id',
-      headerName: 'ID',
-      type: 'string',
-      width: 180,
-      editable: false,
-      flex: 1,
-      resizable: true,
-    },
-
     {
       field: 'created_at',
       headerName: 'Created At',
@@ -686,10 +639,10 @@ function DistrictList() {
           </Collapse>
         </Box>
       )}
-      {errors['unknown' as keyof IDistrictFormInputs] && (
+      {errors['unknown' as keyof IResidenceFormInputs] && (
         <Box>
           <Alert severity="error">
-            {errors['unknown' as keyof IDistrictFormInputs]?.message}. Please
+            {errors['unknown' as keyof IResidenceFormInputs]?.message}. Please
             contact support or try again!
           </Alert>
         </Box>
@@ -707,17 +660,25 @@ function DistrictList() {
           onRowEditStart={handleRowEditStart}
           onRowEditStop={handleRowEditStop}
           components={{
-            Footer: CustomFooter,
+            Footer: CustomFooterWithFab,
             Toolbar: CustomToolbar,
           }}
           componentsProps={{
-            footer: { onClick: () => setOpenCreateDistrictModal(true) },
+            footer: {
+              onClick: () => setOpenCreateResidenceModal(true),
+              title: 'Add Residence',
+            },
             toolbar: {
-              title: 'Districts',
+              title: 'Residences',
               handleCountrySelectionChange,
               handleProvinceSelectionChange,
-              selectedCountryId,
-              selectedProvinceId,
+              handleDistrictSelectionChange,
+              countryId,
+              provinceId,
+              districtId,
+              provinceOptions,
+              countryOptions,
+              districtOptions,
             },
           }}
           loading={loading || deleting}
@@ -731,6 +692,9 @@ function DistrictList() {
                 last_modified_at: false,
                 last_modified_by: false,
                 id: false,
+                district_id: false,
+                country_id: false,
+                province_id: false,
               },
             },
           }}
@@ -739,16 +703,17 @@ function DistrictList() {
           }}
         />
       </Box>
-      <DistrictForm
+      <ResidenceForm
         key={renderId}
-        open={openCreateDistrictModal}
-        onClose={() => setOpenCreateDistrictModal(false)}
-        selectedCountryId={selectedCountryId}
-        selectedProvinceId={selectedProvinceId}
+        open={openCreateResidenceModal}
+        onClose={() => setOpenCreateResidenceModal(false)}
+        selectedCountryId={countryId}
+        selectedProvinceId={provinceId}
+        selectedDistrictId={districtId}
       />
       <input id="id" type="hidden" required {...register('id')} />
     </MainCard>
   );
 }
 
-export default DistrictList;
+export default ResidenceList;

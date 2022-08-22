@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createResidence,
   deleteResidence,
@@ -7,8 +7,8 @@ import {
   getResidences,
   updateResidence,
   getResidenceServiceAreas,
-  getDistrict,
-} from "../queries";
+  resolveDistrict,
+} from '../queries';
 
 const typeDefs = gql`
   type Residence {
@@ -16,7 +16,7 @@ const typeDefs = gql`
     name: String!
     cost_classification: ResidenceClassification!
     district_id: String!
-    district: DistrictResult
+    district: District
     service_areas: [ServiceArea!]
     created_at: DateTime!
     created_by: String!
@@ -84,7 +84,7 @@ const resolvers: Resolvers = {
   },
   Residence: {
     district: (parent, _args, context) =>
-      getDistrict(parent.district_id, context),
+      resolveDistrict(parent.district_id, context),
     service_areas: (parent, _args, context) =>
       getResidenceServiceAreas(parent.id, context),
   },

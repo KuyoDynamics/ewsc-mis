@@ -21,7 +21,7 @@ export default function Toast() {
   const { state, dispatch } = useContext(AppContext);
 
   const firstNotification = useMemo(
-    () => Object.values(state.notifications)[0] || {},
+    () => Object.values(state.notifications)[0] || ({} as ToastNotification),
     [state.notifications]
   );
 

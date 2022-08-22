@@ -19,41 +19,49 @@ import { useForm } from 'react-hook-form';
 import DraggablePaper from 'components/draggable-paper';
 import FormInput from 'components/form-input-helpers/form-input';
 import FormSelect from 'components/form-input-helpers/form-select';
+import { COST_CLASSIFICATION_OPTIONS } from 'utils';
 import {
-  CreateDistrictInput,
-  GetDistrictsDocument,
-  useCreateDistrictMutation,
+  CreateResidenceInput,
+  GetResidencesDocument,
+  ResidenceClassification,
+  useCreateResidenceMutation,
   useGetCountriesQuery,
+  useGetDistrictsQuery,
   useGetProvincesQuery,
 } from '../../../graphql/generated';
 
 const schema = Yup.object({
-  code: Yup.string().required().min(8).max(8).uppercase(),
+  cost_classification: Yup.mixed<ResidenceClassification>()
+    .oneOf(COST_CLASSIFICATION_OPTIONS as ResidenceClassification[])
+    .required(),
   name: Yup.string().required().min(4).max(255),
-  province_id: Yup.string().uuid().required(),
+  district_id: Yup.string().uuid().required(),
 });
 
-function DraggableDistrictForm(props: PaperProps) {
+function DraggableResidenceForm(props: PaperProps) {
   // eslint-disable-next-line react/jsx-props-no-spreading
   return <DraggablePaper {...props} handle="#new-country-dialog-title" />;
 }
-interface IDistrictFormProps {
+interface IResidenceFormProps {
   open: boolean;
   onClose: () => void;
   selectedCountryId: string;
   selectedProvinceId: string;
+  selectedDistrictId: string;
 }
 
-function DistrictForm({
+function ResidenceForm({
   open,
   onClose,
   selectedCountryId,
   selectedProvinceId,
-}: IDistrictFormProps) {
+  selectedDistrictId,
+}: IResidenceFormProps) {
   const [countryId, setCountryId] = useState(selectedCountryId);
+  const [provinceId, setProvinceId] = useState(selectedProvinceId);
 
-  const [createDistrict, { loading: creating }] = useCreateDistrictMutation({
-    refetchQueries: [GetDistrictsDocument],
+  const [createResidence, { loading: creating }] = useCreateResidenceMutation({
+    refetchQueries: [GetResidencesDocument],
   });
 
   const { data: countryData } = useGetCountriesQuery();
@@ -74,8 +82,23 @@ function DistrictForm({
     [provinceData]
   );
 
+  const { data: DistrictData } = useGetDistrictsQuery({
+    variables: {
+      provinceId,
+    },
+  });
+
+  const districts = useMemo(
+    () => DistrictData?.districts?.map((d) => ({ name: d.name, id: d.id })),
+    [DistrictData]
+  );
+
   const handleCountrySelectionChange = (event: SelectChangeEvent) => {
     setCountryId(event.target.value);
+  };
+
+  const handleProvinceSelectionChange = (event: SelectChangeEvent) => {
+    setProvinceId(event.target.value);
   };
 
   const {
@@ -83,44 +106,48 @@ function DistrictForm({
     control,
     formState: { isValid, isSubmitting, errors, isDirty },
     setError,
-  } = useForm<CreateDistrictInput>({
+  } = useForm<CreateResidenceInput>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
 
-  const onSubmit = async ({ code, name, province_id }: CreateDistrictInput) => {
-    createDistrict({
+  const onSubmit = async ({
+    cost_classification,
+    name,
+    district_id,
+  }: CreateResidenceInput) => {
+    createResidence({
       variables: {
         input: {
-          code: code.toUpperCase(),
+          cost_classification,
           name,
-          province_id,
+          district_id,
         },
       },
       onCompleted: (result) => {
-        if (result.createDistrict.__typename === 'District') {
+        if (result.createResidence.__typename === 'Residence') {
           onClose();
-        } else if (result.createDistrict.__typename === 'ApiCreateError') {
-          if (result.createDistrict.field) {
+        } else if (result.createResidence.__typename === 'ApiCreateError') {
+          if (result.createResidence.field) {
             setError(
-              result.createDistrict.field as keyof CreateDistrictInput,
+              result.createResidence.field as keyof CreateResidenceInput,
 
               {
                 type: 'server',
-                message: result.createDistrict.message,
+                message: result.createResidence.message,
               }
             );
           } else if (
-            !result.createDistrict.errors &&
-            !result.createDistrict.field
+            !result.createResidence.errors &&
+            !result.createResidence.field
           ) {
-            setError('unknown' as keyof CreateDistrictInput, {
+            setError('unknown' as keyof CreateResidenceInput, {
               type: 'server',
-              message: result.createDistrict.message,
+              message: result.createResidence.message,
             });
           } else {
-            result.createDistrict.errors?.forEach((err) =>
-              setError(err.field as keyof CreateDistrictInput, {
+            result.createResidence.errors?.forEach((err) =>
+              setError(err.field as keyof CreateResidenceInput, {
                 type: 'server',
                 message: err.message,
               })
@@ -139,8 +166,8 @@ function DistrictForm({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperComponent={DraggableDistrictForm}
-      aria-label="new District form dialog"
+      PaperComponent={DraggableResidenceForm}
+      aria-label="new Residence form dialog"
       sx={{
         '& .MuiDialog-container': {
           '& .MuiPaper-root': {
@@ -152,10 +179,10 @@ function DistrictForm({
     >
       <DialogTitle id="user-inivation-dialog-title">
         <Typography color="textPrimary" variant="h4">
-          New District Form
+          New Residential Area Form
         </Typography>
         <Typography color="textSecondary" gutterBottom variant="body2">
-          Add new District to the system
+          Add new Residential Area to the system
         </Typography>
       </DialogTitle>
       <DialogContent>
@@ -174,26 +201,40 @@ function DistrictForm({
                 <MenuItem value={country.id}>{country.name}</MenuItem>
               ))}
           </Select>
+          <Select
+            name="province_id"
+            value={provinceId}
+            fullWidth
+            size="small"
+            margin="dense"
+            variant="outlined"
+            onChange={handleProvinceSelectionChange}
+          >
+            {provinces &&
+              provinces.map((province) => (
+                <MenuItem value={province.id}>{province.name}</MenuItem>
+              ))}
+          </Select>
           <FormSelect
             control={control}
-            name="province_id"
+            name="district_id"
             errors={errors}
-            defaultValue={selectedProvinceId}
+            defaultValue={selectedDistrictId}
             fullWidth
             size="small"
             margin="dense"
             variant="outlined"
           >
-            {provinces &&
-              provinces.map((province) => (
-                <MenuItem value={province.id}>{province.name}</MenuItem>
+            {districts &&
+              districts.map((district) => (
+                <MenuItem value={district.id}>{district.name}</MenuItem>
               ))}
           </FormSelect>
           <FormInput
             control={control}
             name="name"
             fullWidth
-            label="District Name"
+            label="Residence Name"
             margin="normal"
             variant="outlined"
             inputProps={{
@@ -201,18 +242,20 @@ function DistrictForm({
               autoComplete: 'off',
             }}
           />
-          <FormInput
+          <FormSelect
             control={control}
-            name="code"
+            name="cost_classification"
+            errors={errors}
             fullWidth
-            label="District Code"
-            margin="normal"
+            size="small"
+            margin="dense"
             variant="outlined"
-            inputProps={{
-              style: { textTransform: 'uppercase' },
-              autoComplete: 'off',
-            }}
-          />
+          >
+            {COST_CLASSIFICATION_OPTIONS &&
+              COST_CLASSIFICATION_OPTIONS.map((c) => (
+                <MenuItem value={c}>{c}</MenuItem>
+              ))}
+          </FormSelect>
           <Box sx={{ py: 2 }}>
             <LoadingButton
               color="primary"
@@ -233,4 +276,4 @@ function DistrictForm({
   );
 }
 
-export default DistrictForm;
+export default ResidenceForm;

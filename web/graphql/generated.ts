@@ -809,7 +809,7 @@ export type District = {
   name: Scalars['String'];
   code: Scalars['String'];
   province_id: Scalars['String'];
-  province?: Maybe<ProvinceResult>;
+  province?: Maybe<Province>;
   organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
   residences?: Maybe<Array<Residence>>;
   created_at: Scalars['DateTime'];
@@ -2223,7 +2223,7 @@ export type Residence = {
   name: Scalars['String'];
   cost_classification: ResidenceClassification;
   district_id: Scalars['String'];
-  district?: Maybe<DistrictResult>;
+  district?: Maybe<District>;
   service_areas?: Maybe<Array<ServiceArea>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2909,6 +2909,41 @@ export type ResetPasswordMutationVariables = Exact<{
 
 
 export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'User', id: string, hashed_password_reset_token?: string | null, password_reset_email_status?: EmailStatus | null, email: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiPasswordResetError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type CreateResidenceMutationVariables = Exact<{
+  input: CreateResidenceInput;
+}>;
+
+
+export type CreateResidenceMutation = { __typename?: 'Mutation', createResidence: { __typename?: 'Residence', id: string, name: string, cost_classification: ResidenceClassification, district_id: string, last_modified_at: any, last_modified_by: string, created_at: any, created_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type DeleteResidenceMutationVariables = Exact<{
+  input: DeleteResidenceInput;
+}>;
+
+
+export type DeleteResidenceMutation = { __typename?: 'Mutation', deleteResidence: { __typename?: 'Residence', id: string, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type GetResidenceQueryVariables = Exact<{
+  residenceId: Scalars['ID'];
+}>;
+
+
+export type GetResidenceQuery = { __typename?: 'Query', residence: { __typename?: 'Residence', id: string, cost_classification: ResidenceClassification, name: string, district_id: string, last_modified_at: any, last_modified_by: string, created_at: any, created_by: string, service_areas?: Array<{ __typename?: 'ServiceArea', id: string, residence_id: string, catchment_district_id: string }> | null } | { __typename?: 'ApiNotFoundError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetResidencesQueryVariables = Exact<{
+  districtId: Scalars['ID'];
+}>;
+
+
+export type GetResidencesQuery = { __typename?: 'Query', residences?: Array<{ __typename?: 'Residence', id: string, cost_classification: ResidenceClassification, name: string, district_id: string, last_modified_at: any, last_modified_by: string, created_at: any, created_by: string, district?: { __typename?: 'District', id: string, code: string, name: string, province?: { __typename?: 'Province', id: string, code: string, name: string, country?: { __typename?: 'Country', id: string, code: string, name: string } | null } | null } | null, service_areas?: Array<{ __typename?: 'ServiceArea', id: string, residence_id: string, catchment_district_id: string }> | null }> | null };
+
+export type UpdateResidenceMutationVariables = Exact<{
+  input: UpdateResidenceInput;
+}>;
+
+
+export type UpdateResidenceMutation = { __typename?: 'Mutation', updateResidence: { __typename?: 'Residence', id: string, name: string, cost_classification: ResidenceClassification, last_modified_by: string, last_modified_at: any } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
 
 export type SendUserInvitationEmailMutationVariables = Exact<{
   input: SendInvitationEmailInput;
@@ -4305,6 +4340,275 @@ export function useResetPasswordMutation(baseOptions?: Apollo.MutationHookOption
 export type ResetPasswordMutationHookResult = ReturnType<typeof useResetPasswordMutation>;
 export type ResetPasswordMutationResult = Apollo.MutationResult<ResetPasswordMutation>;
 export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>;
+export const CreateResidenceDocument = gql`
+    mutation CreateResidence($input: CreateResidenceInput!) {
+  createResidence(input: $input) {
+    ... on Residence {
+      id
+      name
+      cost_classification
+      district_id
+      last_modified_at
+      last_modified_by
+      created_at
+      created_by
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateResidenceMutationFn = Apollo.MutationFunction<CreateResidenceMutation, CreateResidenceMutationVariables>;
+
+/**
+ * __useCreateResidenceMutation__
+ *
+ * To run a mutation, you first call `useCreateResidenceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateResidenceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createResidenceMutation, { data, loading, error }] = useCreateResidenceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateResidenceMutation(baseOptions?: Apollo.MutationHookOptions<CreateResidenceMutation, CreateResidenceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateResidenceMutation, CreateResidenceMutationVariables>(CreateResidenceDocument, options);
+      }
+export type CreateResidenceMutationHookResult = ReturnType<typeof useCreateResidenceMutation>;
+export type CreateResidenceMutationResult = Apollo.MutationResult<CreateResidenceMutation>;
+export type CreateResidenceMutationOptions = Apollo.BaseMutationOptions<CreateResidenceMutation, CreateResidenceMutationVariables>;
+export const DeleteResidenceDocument = gql`
+    mutation DeleteResidence($input: DeleteResidenceInput!) {
+  deleteResidence(input: $input) {
+    ... on Residence {
+      id
+      last_modified_by
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteResidenceMutationFn = Apollo.MutationFunction<DeleteResidenceMutation, DeleteResidenceMutationVariables>;
+
+/**
+ * __useDeleteResidenceMutation__
+ *
+ * To run a mutation, you first call `useDeleteResidenceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteResidenceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteResidenceMutation, { data, loading, error }] = useDeleteResidenceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteResidenceMutation(baseOptions?: Apollo.MutationHookOptions<DeleteResidenceMutation, DeleteResidenceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteResidenceMutation, DeleteResidenceMutationVariables>(DeleteResidenceDocument, options);
+      }
+export type DeleteResidenceMutationHookResult = ReturnType<typeof useDeleteResidenceMutation>;
+export type DeleteResidenceMutationResult = Apollo.MutationResult<DeleteResidenceMutation>;
+export type DeleteResidenceMutationOptions = Apollo.BaseMutationOptions<DeleteResidenceMutation, DeleteResidenceMutationVariables>;
+export const GetResidenceDocument = gql`
+    query GetResidence($residenceId: ID!) {
+  residence(id: $residenceId) {
+    ... on Residence {
+      id
+      cost_classification
+      name
+      district_id
+      last_modified_at
+      last_modified_by
+      created_at
+      created_by
+      service_areas {
+        id
+        residence_id
+        catchment_district_id
+      }
+    }
+    ... on ApiNotFoundError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetResidenceQuery__
+ *
+ * To run a query within a React component, call `useGetResidenceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetResidenceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetResidenceQuery({
+ *   variables: {
+ *      residenceId: // value for 'residenceId'
+ *   },
+ * });
+ */
+export function useGetResidenceQuery(baseOptions: Apollo.QueryHookOptions<GetResidenceQuery, GetResidenceQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetResidenceQuery, GetResidenceQueryVariables>(GetResidenceDocument, options);
+      }
+export function useGetResidenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidenceQuery, GetResidenceQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetResidenceQuery, GetResidenceQueryVariables>(GetResidenceDocument, options);
+        }
+export type GetResidenceQueryHookResult = ReturnType<typeof useGetResidenceQuery>;
+export type GetResidenceLazyQueryHookResult = ReturnType<typeof useGetResidenceLazyQuery>;
+export type GetResidenceQueryResult = Apollo.QueryResult<GetResidenceQuery, GetResidenceQueryVariables>;
+export const GetResidencesDocument = gql`
+    query GetResidences($districtId: ID!) {
+  residences(district_id: $districtId) {
+    id
+    cost_classification
+    name
+    district_id
+    district {
+      id
+      code
+      name
+      province {
+        id
+        code
+        name
+        country {
+          id
+          code
+          name
+        }
+      }
+    }
+    last_modified_at
+    last_modified_by
+    created_at
+    created_by
+    service_areas {
+      id
+      residence_id
+      catchment_district_id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetResidencesQuery__
+ *
+ * To run a query within a React component, call `useGetResidencesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetResidencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetResidencesQuery({
+ *   variables: {
+ *      districtId: // value for 'districtId'
+ *   },
+ * });
+ */
+export function useGetResidencesQuery(baseOptions: Apollo.QueryHookOptions<GetResidencesQuery, GetResidencesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetResidencesQuery, GetResidencesQueryVariables>(GetResidencesDocument, options);
+      }
+export function useGetResidencesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetResidencesQuery, GetResidencesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetResidencesQuery, GetResidencesQueryVariables>(GetResidencesDocument, options);
+        }
+export type GetResidencesQueryHookResult = ReturnType<typeof useGetResidencesQuery>;
+export type GetResidencesLazyQueryHookResult = ReturnType<typeof useGetResidencesLazyQuery>;
+export type GetResidencesQueryResult = Apollo.QueryResult<GetResidencesQuery, GetResidencesQueryVariables>;
+export const UpdateResidenceDocument = gql`
+    mutation UpdateResidence($input: UpdateResidenceInput!) {
+  updateResidence(input: $input) {
+    ... on Residence {
+      id
+      name
+      cost_classification
+      last_modified_by
+      last_modified_at
+    }
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateResidenceMutationFn = Apollo.MutationFunction<UpdateResidenceMutation, UpdateResidenceMutationVariables>;
+
+/**
+ * __useUpdateResidenceMutation__
+ *
+ * To run a mutation, you first call `useUpdateResidenceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateResidenceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateResidenceMutation, { data, loading, error }] = useUpdateResidenceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateResidenceMutation(baseOptions?: Apollo.MutationHookOptions<UpdateResidenceMutation, UpdateResidenceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateResidenceMutation, UpdateResidenceMutationVariables>(UpdateResidenceDocument, options);
+      }
+export type UpdateResidenceMutationHookResult = ReturnType<typeof useUpdateResidenceMutation>;
+export type UpdateResidenceMutationResult = Apollo.MutationResult<UpdateResidenceMutation>;
+export type UpdateResidenceMutationOptions = Apollo.BaseMutationOptions<UpdateResidenceMutation, UpdateResidenceMutationVariables>;
 export const SendUserInvitationEmailDocument = gql`
     mutation SendUserInvitationEmail($input: SendInvitationEmailInput!) {
   sendUserInvitationEmail(input: $input) {

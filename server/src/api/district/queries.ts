@@ -1,11 +1,23 @@
-import { generateClientErrors, GraphQLContext } from "../../utils";
+import { generateClientErrors, GraphQLContext } from '../../utils';
 import {
   CatchmentDistrict,
   District,
   DistrictResult,
   MutationCreateDistrictArgs,
   MutationUpdateDistrictArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
+
+async function resolveDistrict(
+  id: string,
+  context: GraphQLContext
+): Promise<District | null> {
+  const district = await context.prisma.district.findUnique({
+    where: {
+      id,
+    },
+  });
+  return district;
+}
 
 async function getDistrict(
   id: string,
@@ -20,18 +32,18 @@ async function getDistrict(
 
     if (!district) {
       return {
-        __typename: "ApiNotFoundError",
+        __typename: 'ApiNotFoundError',
         message: `The District with the id ${id} does not exist.`,
       };
     }
 
     return {
-      __typename: "District",
+      __typename: 'District',
       ...district,
     };
   } catch (error) {
     return {
-      __typename: "ApiNotFoundError",
+      __typename: 'ApiNotFoundError',
       message: `Failed to find District with the id ${id}.`,
       errors: generateClientErrors(error),
     };
@@ -82,12 +94,12 @@ async function createDistrict(
     });
 
     return {
-      __typename: "District",
+      __typename: 'District',
       ...district,
     };
   } catch (error) {
     return {
-      __typename: "ApiCreateError",
+      __typename: 'ApiCreateError',
       message: `Failed to create District.`,
       errors: generateClientErrors(error),
     };
@@ -111,14 +123,14 @@ async function updateDistrict(
     });
 
     return {
-      __typename: "District",
+      __typename: 'District',
       ...district,
     };
   } catch (error) {
     return {
-      __typename: "ApiUpdateError",
+      __typename: 'ApiUpdateError',
       message: `Failed to update District with id ${args.input.id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -135,14 +147,14 @@ async function deleteDistrict(
     });
 
     return {
-      __typename: "District",
+      __typename: 'District',
       ...district,
     };
   } catch (error) {
     return {
-      __typename: "ApiDeleteError",
+      __typename: 'ApiDeleteError',
       message: `Failed to delete District with id ${id}.`,
-      errors: generateClientErrors(error, "id"),
+      errors: generateClientErrors(error, 'id'),
     };
   }
 }
@@ -154,4 +166,5 @@ export {
   createDistrict,
   updateDistrict,
   deleteDistrict,
+  resolveDistrict,
 };
