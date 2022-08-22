@@ -14,7 +14,7 @@
     "noImplicitAny": true,
     "lib": ["ES6", "DOM"],
     "noImplicitThis": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "forceConsistentCasingInFileNames": true,
     "allowJs": false,
     "esModuleInterop": true,

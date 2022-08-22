@@ -1,5 +1,12 @@
+import {
+  GridApi,
+  gridColumnDefinitionsSelector,
+  gridFilteredSortedRowIdsSelector,
+  gridVisibleColumnFieldsSelector,
+} from '@mui/x-data-grid';
 import { IPendingUserInvitation } from 'components/users/user-pending-invitation-item';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { utils, writeFile } from 'xlsx';
 import {
   CatchmentDistrictInput,
   DistrictUserRoleType,
@@ -79,7 +86,71 @@ function isExpired(dateInMilliSeconds: number): boolean {
   return dateInMilliSeconds < Math.round(new Date().getTime() / 1000);
 }
 
+type ILocationFilterState = {
+  countryId: string;
+  provinceId: string;
+  districtId: string;
+  residenceId: string;
+  organisationId: string;
+};
+
+const exportBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  });
+};
+
+function saveExcelFile(
+  fileName: string,
+  worksheetName: string,
+  ext: string,
+  rows: Record<string, any>[]
+): void {
+  const wb = utils.book_new();
+
+  const worksheet = utils.json_to_sheet(rows);
+
+  utils.book_append_sheet(wb, worksheet, worksheetName);
+
+  writeFile(wb, `${fileName}.${ext}`);
+}
+
+const getJson = (apiRef: React.MutableRefObject<GridApi>) => {
+  const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
+
+  const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
+
+  const disableExportCols = gridColumnDefinitionsSelector(apiRef)
+    .filter((col) => col.disableExport)
+    .map((col) => col.field);
+
+  const exportableVisibleColumnsField = visibleColumnsField.filter(
+    (field) => disableExportCols.indexOf(field) === -1
+  );
+
+  const data = filteredSortedRowIds.map((id) => {
+    const row: Record<string, any> = {};
+    exportableVisibleColumnsField.forEach((field) => {
+      row[field] = apiRef.current.getCellParams(id, field).value;
+    });
+    return row;
+  });
+
+  return { jsonString: JSON.stringify(data, null, 2), json: data };
+};
+
 export {
+  getJson,
+  saveExcelFile,
+  exportBlob,
+  ILocationFilterState,
   getEnumKeys,
   getUserInvitations,
   getCatchmentDistricts,

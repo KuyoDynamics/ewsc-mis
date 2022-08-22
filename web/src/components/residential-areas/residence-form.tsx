@@ -242,18 +242,20 @@ function ResidenceForm({
               autoComplete: 'off',
             }}
           />
-          <FormInput
+          <FormSelect
             control={control}
-            name="code"
+            name="cost_classification"
+            errors={errors}
             fullWidth
-            label="Residence Code"
-            margin="normal"
+            size="small"
+            margin="dense"
             variant="outlined"
-            inputProps={{
-              style: { textTransform: 'uppercase' },
-              autoComplete: 'off',
-            }}
-          />
+          >
+            {COST_CLASSIFICATION_OPTIONS &&
+              COST_CLASSIFICATION_OPTIONS.map((c) => (
+                <MenuItem value={c}>{c}</MenuItem>
+              ))}
+          </FormSelect>
           <Box sx={{ py: 2 }}>
             <LoadingButton
               color="primary"

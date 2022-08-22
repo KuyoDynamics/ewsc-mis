@@ -809,7 +809,7 @@ export type District = {
   name: Scalars['String'];
   code: Scalars['String'];
   province_id: Scalars['String'];
-  province?: Maybe<ProvinceResult>;
+  province?: Maybe<Province>;
   organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
   residences?: Maybe<Array<Residence>>;
   created_at: Scalars['DateTime'];
@@ -2223,7 +2223,7 @@ export type Residence = {
   name: Scalars['String'];
   cost_classification: ResidenceClassification;
   district_id: Scalars['String'];
-  district?: Maybe<DistrictResult>;
+  district?: Maybe<District>;
   service_areas?: Maybe<Array<ServiceArea>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2936,7 +2936,7 @@ export type GetResidencesQueryVariables = Exact<{
 }>;
 
 
-export type GetResidencesQuery = { __typename?: 'Query', residences?: Array<{ __typename?: 'Residence', id: string, cost_classification: ResidenceClassification, name: string, district_id: string, last_modified_at: any, last_modified_by: string, created_at: any, created_by: string, service_areas?: Array<{ __typename?: 'ServiceArea', id: string, residence_id: string, catchment_district_id: string }> | null }> | null };
+export type GetResidencesQuery = { __typename?: 'Query', residences?: Array<{ __typename?: 'Residence', id: string, cost_classification: ResidenceClassification, name: string, district_id: string, last_modified_at: any, last_modified_by: string, created_at: any, created_by: string, district?: { __typename?: 'District', id: string, code: string, name: string, province?: { __typename?: 'Province', id: string, code: string, name: string, country?: { __typename?: 'Country', id: string, code: string, name: string } | null } | null } | null, service_areas?: Array<{ __typename?: 'ServiceArea', id: string, residence_id: string, catchment_district_id: string }> | null }> | null };
 
 export type UpdateResidenceMutationVariables = Exact<{
   input: UpdateResidenceInput;
@@ -4505,6 +4505,21 @@ export const GetResidencesDocument = gql`
     cost_classification
     name
     district_id
+    district {
+      id
+      code
+      name
+      province {
+        id
+        code
+        name
+        country {
+          id
+          code
+          name
+        }
+      }
+    }
     last_modified_at
     last_modified_by
     created_at

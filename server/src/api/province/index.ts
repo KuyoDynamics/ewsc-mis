@@ -77,7 +77,8 @@ const resolvers: Resolvers = {
   },
   Province: {
     districts: (parent, _args, context) => getDistricts(parent.id, context),
-    country: (parent, _args, context) => resolveCountry(parent.id, context),
+    country: (parent, _args, context) =>
+      resolveCountry(parent.country_id, context),
   },
 };
 

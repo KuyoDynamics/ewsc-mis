@@ -550,7 +550,15 @@ function DistrictList() {
             variant="text"
             size="small"
             endIcon={<EditLocationOutlined />}
-            onClick={() => navigate(`/system/residences/${id}`)}
+            onClick={() =>
+              navigate('/system/residences', {
+                state: {
+                  countryId: selectedCountryId,
+                  provinceId: selectedProvinceId,
+                  districtId: id,
+                },
+              })
+            }
           >
             {residences && residences.length === 1
               ? residences[0].name

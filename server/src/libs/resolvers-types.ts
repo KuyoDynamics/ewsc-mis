@@ -813,7 +813,7 @@ export type District = {
   last_modified_by: Scalars['String'];
   name: Scalars['String'];
   organisations_in_district?: Maybe<Array<CatchmentDistrict>>;
-  province?: Maybe<ProvinceResult>;
+  province?: Maybe<Province>;
   province_id: Scalars['String'];
   residences?: Maybe<Array<Residence>>;
 };
@@ -2216,7 +2216,7 @@ export type Residence = {
   cost_classification: ResidenceClassification;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
-  district?: Maybe<DistrictResult>;
+  district?: Maybe<District>;
   district_id: Scalars['String'];
   id: Scalars['ID'];
   last_modified_at: Scalars['DateTime'];
@@ -2910,7 +2910,7 @@ export type ResolversTypes = ResolversObject<{
   DisaggregateResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Disaggregate'];
   DisaggregateType: DisaggregateType;
   DisaggregateUpdateInput: DisaggregateUpdateInput;
-  District: ResolverTypeWrapper<Omit<District, 'province'> & { province?: Maybe<ResolversTypes['ProvinceResult']> }>;
+  District: ResolverTypeWrapper<District>;
   DistrictResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['District'];
   DistrictUpdateInput: DistrictUpdateInput;
   DistrictUser: ResolverTypeWrapper<Omit<DistrictUser, 'catchment_district' | 'organisation_user'> & { catchment_district?: Maybe<ResolversTypes['CatchmentDistrictResult']>, organisation_user?: Maybe<ResolversTypes['OrganisationUserResult']> }>;
@@ -3008,7 +3008,7 @@ export type ResolversTypes = ResolversObject<{
   ReportTemplateUpdateInput: ReportTemplateUpdateInput;
   ReportUpdateInput: ReportUpdateInput;
   ReportingFrequency: ReportingFrequency;
-  Residence: ResolverTypeWrapper<Omit<Residence, 'district'> & { district?: Maybe<ResolversTypes['DistrictResult']> }>;
+  Residence: ResolverTypeWrapper<Residence>;
   ResidenceClassification: ResidenceClassification;
   ResidenceResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Residence'];
   ResidenceUpdateInput: ResidenceUpdateInput;
@@ -3214,7 +3214,7 @@ export type ResolversParentTypes = ResolversObject<{
   DisaggregateOptionResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['DisaggregateOption'];
   DisaggregateResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Disaggregate'];
   DisaggregateUpdateInput: DisaggregateUpdateInput;
-  District: Omit<District, 'province'> & { province?: Maybe<ResolversParentTypes['ProvinceResult']> };
+  District: District;
   DistrictResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['District'];
   DistrictUpdateInput: DistrictUpdateInput;
   DistrictUser: Omit<DistrictUser, 'catchment_district' | 'organisation_user'> & { catchment_district?: Maybe<ResolversParentTypes['CatchmentDistrictResult']>, organisation_user?: Maybe<ResolversParentTypes['OrganisationUserResult']> };
@@ -3306,7 +3306,7 @@ export type ResolversParentTypes = ResolversObject<{
   ReportTemplateResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['ReportTemplate'];
   ReportTemplateUpdateInput: ReportTemplateUpdateInput;
   ReportUpdateInput: ReportUpdateInput;
-  Residence: Omit<Residence, 'district'> & { district?: Maybe<ResolversParentTypes['DistrictResult']> };
+  Residence: Residence;
   ResidenceResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Residence'];
   ResidenceUpdateInput: ResidenceUpdateInput;
   RoutingNumber: Scalars['RoutingNumber'];
@@ -3677,7 +3677,7 @@ export type DistrictResolvers<ContextType = GraphQLContext, ParentType extends R
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   organisations_in_district?: Resolver<Maybe<Array<ResolversTypes['CatchmentDistrict']>>, ParentType, ContextType>;
-  province?: Resolver<Maybe<ResolversTypes['ProvinceResult']>, ParentType, ContextType>;
+  province?: Resolver<Maybe<ResolversTypes['Province']>, ParentType, ContextType>;
   province_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   residences?: Resolver<Maybe<Array<ResolversTypes['Residence']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -4359,7 +4359,7 @@ export type ResidenceResolvers<ContextType = GraphQLContext, ParentType extends 
   cost_classification?: Resolver<ResolversTypes['ResidenceClassification'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  district?: Resolver<Maybe<ResolversTypes['DistrictResult']>, ParentType, ContextType>;
+  district?: Resolver<Maybe<ResolversTypes['District']>, ParentType, ContextType>;
   district_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
