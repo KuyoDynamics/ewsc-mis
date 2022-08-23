@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createDisaggregate,
   createDisaggregateWithOptions,
@@ -8,7 +8,7 @@ import {
   getDisaggregates,
   getOptionsForDisaggregate,
   updateDisaggregate,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type Disaggregate {

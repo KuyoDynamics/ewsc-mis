@@ -5,17 +5,29 @@ import {
   Option,
   OptionResult,
   QueryOptionArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 import {
   getApiCreateError,
   getApiNotFoundError,
   getApiDeleteError,
   getApiUpdateError,
   GraphQLContext,
-} from "../../utils";
+} from '../../utils';
 
 async function getOptions(context: GraphQLContext): Promise<Option[]> {
   return context.prisma.option.findMany({});
+}
+
+async function resolveOption(
+  id: string,
+  context: GraphQLContext
+): Promise<Option | null> {
+  const option = await context.prisma.option.findUnique({
+    where: {
+      id,
+    },
+  });
+  return option as Option;
 }
 
 async function getOption(
@@ -28,14 +40,14 @@ async function getOption(
     });
 
     if (!option) {
-      return getApiNotFoundError("Option", args.id);
+      return getApiNotFoundError('Option', args.id);
     }
     return {
-      __typename: "Option",
+      __typename: 'Option',
       ...option,
     };
   } catch (error) {
-    return getApiNotFoundError("Option", args.id, error);
+    return getApiNotFoundError('Option', args.id, error);
   }
 }
 
@@ -53,11 +65,11 @@ async function createOption(
     });
 
     return {
-      __typename: "Option",
+      __typename: 'Option',
       ...disaggregate_option,
     };
   } catch (error) {
-    return getApiCreateError("Option", error);
+    return getApiCreateError('Option', error);
   }
 }
 
@@ -76,11 +88,11 @@ async function updateOption(
       },
     });
     return {
-      __typename: "Option",
+      __typename: 'Option',
       ...disaggregate_option,
     };
   } catch (error) {
-    return getApiUpdateError("Option", args.input.id);
+    return getApiUpdateError('Option', args.input.id);
   }
 }
 
@@ -95,12 +107,19 @@ async function deleteOption(
       },
     });
     return {
-      __typename: "Option",
+      __typename: 'Option',
       ...disaggregate_option,
     };
   } catch (error) {
-    return getApiDeleteError("Option", args.input.id);
+    return getApiDeleteError('Option', args.input.id);
   }
 }
 
-export { getOption, getOptions, createOption, updateOption, deleteOption };
+export {
+  getOption,
+  getOptions,
+  createOption,
+  updateOption,
+  deleteOption,
+  resolveOption,
+};

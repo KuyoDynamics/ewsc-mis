@@ -779,13 +779,13 @@ export type DisaggregateOption = {
   __typename?: 'DisaggregateOption';
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
-  disaggregate?: Maybe<DisaggregateResult>;
+  disaggregate?: Maybe<Disaggregate>;
   disaggregate_id: Scalars['ID'];
   id: Scalars['ID'];
   indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
-  option?: Maybe<OptionResult>;
+  option?: Maybe<Option>;
   option_id: Scalars['String'];
 };
 
@@ -2905,7 +2905,7 @@ export type ResolversTypes = ResolversObject<{
   DeleteWaterTreatmentPlantsInput: DeleteWaterTreatmentPlantsInput;
   DisableUserInput: DisableUserInput;
   Disaggregate: ResolverTypeWrapper<Disaggregate>;
-  DisaggregateOption: ResolverTypeWrapper<Omit<DisaggregateOption, 'disaggregate' | 'option'> & { disaggregate?: Maybe<ResolversTypes['DisaggregateResult']>, option?: Maybe<ResolversTypes['OptionResult']> }>;
+  DisaggregateOption: ResolverTypeWrapper<DisaggregateOption>;
   DisaggregateOptionResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['DisaggregateOption'];
   DisaggregateResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['Disaggregate'];
   DisaggregateType: DisaggregateType;
@@ -3210,7 +3210,7 @@ export type ResolversParentTypes = ResolversObject<{
   DeleteWaterTreatmentPlantsInput: DeleteWaterTreatmentPlantsInput;
   DisableUserInput: DisableUserInput;
   Disaggregate: Disaggregate;
-  DisaggregateOption: Omit<DisaggregateOption, 'disaggregate' | 'option'> & { disaggregate?: Maybe<ResolversParentTypes['DisaggregateResult']>, option?: Maybe<ResolversParentTypes['OptionResult']> };
+  DisaggregateOption: DisaggregateOption;
   DisaggregateOptionResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['DisaggregateOption'];
   DisaggregateResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['Disaggregate'];
   DisaggregateUpdateInput: DisaggregateUpdateInput;
@@ -3649,13 +3649,13 @@ export type DisaggregateResolvers<ContextType = GraphQLContext, ParentType exten
 export type DisaggregateOptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DisaggregateOption'] = ResolversParentTypes['DisaggregateOption']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  disaggregate?: Resolver<Maybe<ResolversTypes['DisaggregateResult']>, ParentType, ContextType>;
+  disaggregate?: Resolver<Maybe<ResolversTypes['Disaggregate']>, ParentType, ContextType>;
   disaggregate_id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   indicator_disaggregates?: Resolver<Maybe<Array<ResolversTypes['IndicatorDisaggregate']>>, ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  option?: Resolver<Maybe<ResolversTypes['OptionResult']>, ParentType, ContextType>;
+  option?: Resolver<Maybe<ResolversTypes['Option']>, ParentType, ContextType>;
   option_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
