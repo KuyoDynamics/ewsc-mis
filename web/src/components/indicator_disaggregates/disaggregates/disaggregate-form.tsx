@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -25,7 +25,6 @@ import {
   PaperProps,
   Typography,
 } from '@mui/material';
-import { Comment as CommentIcon } from '@mui/icons-material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useForm, useWatch } from 'react-hook-form';
 import {
@@ -49,10 +48,13 @@ import {
   useGetOptionsQuery,
   DisaggregateType,
 } from '../../../../graphql/generated';
-import MainCard from 'components/cards/main-card';
 
 const schema = Yup.object({
-  option_name: Yup.string().required().min(1).max(255),
+  name: Yup.string().required().min(1).max(255),
+  option_ids: Yup.array().notRequired().nullable().optional(),
+  type: Yup.mixed<DisaggregateType>()
+    .oneOf(INDICATOR_DISAGGREGATE_TYPE_OPTIONS as DisaggregateType[])
+    .required(),
 });
 
 export interface CustomToolbarProps {
@@ -86,13 +88,18 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
     fetchPolicy: 'network-only',
   });
 
-  const rows = optionsData?.options ?? [];
+  const rows = useMemo(() => optionsData?.options ?? [], [optionsData]);
+
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+
+  const [checked, setChecked] = useState<string[]>([]);
 
   const {
     handleSubmit,
     control,
     formState: { isValid, isSubmitting, isDirty, errors },
     setError,
+    setValue,
   } = useForm<CreateDisaggregateWithOptionsInput>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -102,6 +109,48 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
     control,
     name: 'type',
   });
+
+  const optionIds = useWatch({
+    control,
+    name: 'option_ids',
+    exact: true,
+    defaultValue: [],
+  });
+
+  const options = useMemo(
+    () => rows.filter((r) => [].concat(optionIds).indexOf(r.id) > -1),
+    [rows, optionIds]
+  );
+
+  const handleSelectionChanged = (selection: string[]) => {
+    const newOptions = rows.filter(
+      (r) => selection.indexOf(r.id) > -1
+    ) as Option[];
+    setSelectedOptions(newOptions);
+  };
+
+  const handleRightSelectionChanged = (option: Option) => {
+    if (checked.indexOf(option.id) > -1) {
+      setChecked(checked.filter((item) => item !== option.id));
+    } else {
+      setChecked([...new Set([...checked, option.id])]);
+    }
+  };
+
+  const handleAddToOptions = () => {
+    const newOptionIds = [
+      ...new Set([...optionIds, ...selectedOptions.map((item) => item.id)]),
+    ];
+    setValue('option_ids', newOptionIds);
+  };
+
+  const handleRemoveFromOptions = () => {
+    const newOptionIds = optionIds.filter(
+      (item) => checked.indexOf(item) === -1
+    );
+    setValue('option_ids', newOptionIds);
+    setChecked([]);
+  };
 
   const onSubmit = async ({
     name,
@@ -209,7 +258,7 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
       </DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-          <Grid container flexDirection="column">
+          <Grid container flexDirection="column" flexWrap="nowrap">
             <Grid item>
               <Grid
                 container
@@ -264,9 +313,15 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
                     <Box sx={{ height: 300 }}>
                       <DataGrid
                         rows={rows}
+                        isRowSelectable={(params) => {
+                          return options.indexOf(params.row) === -1;
+                        }}
                         columns={columns}
                         disableSelectionOnClick
                         checkboxSelection
+                        onSelectionModelChange={(params) => {
+                          handleSelectionChanged(params as string[]);
+                        }}
                         disableColumnFilter
                         disableColumnSelector
                         disableDensitySelector
@@ -300,15 +355,14 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
                       />
                     </Box>
                   </Grid>
-                  {/* Buttons */}
                   <Grid item>
                     <Grid container direction="column" alignItems="center">
                       <Button
                         sx={{ my: 0.5 }}
                         variant="outlined"
                         size="small"
-                        // onClick={handleCheckedRight}
-                        // disabled={leftChecked.length === 0}
+                        onClick={handleAddToOptions}
+                        disabled={selectedOptions.length === 0}
                         aria-label="move selected right"
                       >
                         &gt;
@@ -317,8 +371,8 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
                         sx={{ my: 0.5 }}
                         variant="outlined"
                         size="small"
-                        // onClick={handleCheckedLeft}
-                        // disabled={rightChecked.length === 0}
+                        onClick={handleRemoveFromOptions}
+                        disabled={checked.length === 0}
                         aria-label="move selected left"
                       >
                         &lt;
@@ -345,33 +399,36 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
                         </ListSubheader>
                       }
                     >
-                      {[0, 1, 2, 3].map((value) => {
-                        const labelId = `checkbox-list-label-${value}`;
+                      {options &&
+                        options.map((option) => {
+                          const labelId = `checkbox-list-label-${option.option_name}`;
 
-                        return (
-                          <ListItem key={value} disablePadding>
-                            <ListItemButton
-                              role={undefined}
-                              // onClick={handleToggle(value)}
-                              dense
-                            >
-                              <ListItemIcon>
-                                <Checkbox
-                                  edge="start"
-                                  // checked={checked.indexOf(value) !== -1}
-                                  tabIndex={-1}
-                                  disableRipple
-                                  inputProps={{ 'aria-labelledby': labelId }}
+                          return (
+                            <ListItem key={option.id} disablePadding>
+                              <ListItemButton
+                                role={undefined}
+                                onClick={() =>
+                                  handleRightSelectionChanged(option as Option)
+                                }
+                                dense
+                              >
+                                <ListItemIcon>
+                                  <Checkbox
+                                    edge="start"
+                                    checked={checked.indexOf(option.id) !== -1}
+                                    tabIndex={-1}
+                                    disableRipple
+                                    inputProps={{ 'aria-labelledby': labelId }}
+                                  />
+                                </ListItemIcon>
+                                <ListItemText
+                                  id={labelId}
+                                  primary={option.option_name}
                                 />
-                              </ListItemIcon>
-                              <ListItemText
-                                id={labelId}
-                                primary={`Line item ${value + 1}`}
-                              />
-                            </ListItemButton>
-                          </ListItem>
-                        );
-                      })}
+                              </ListItemButton>
+                            </ListItem>
+                          );
+                        })}
                     </List>
                   </Grid>
                 </Grid>

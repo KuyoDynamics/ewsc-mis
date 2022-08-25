@@ -316,9 +316,6 @@ function DisaggregateList() {
           </FormSelect>
         );
       },
-      // valueGetter: (params: GridValueGetterParams) => {
-      //   return (params.row as Disaggregate)?.name;
-      // },
     },
 
     {
