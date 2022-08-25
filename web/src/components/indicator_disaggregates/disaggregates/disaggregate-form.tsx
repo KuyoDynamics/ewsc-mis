@@ -157,11 +157,14 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
     option_ids,
     type,
   }: CreateDisaggregateWithOptionsInput) => {
+    console.log('onSubmit=>name', name);
+    console.log('onSubmit=>option_ids', option_ids);
+    console.log('onSubmit=>', type);
     createDisaggregateWithOptions({
       variables: {
         input: {
           name,
-          option_ids,
+          option_ids: option_ids ?? [],
           type,
         },
       },

@@ -24,6 +24,7 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridToolbarQuickFilter,
   GridValueGetterParams,
   MuiEvent,
 } from '@mui/x-data-grid';
@@ -55,7 +56,7 @@ export interface EditToolbarProps {
 
 const csvDisaggregates: GridCsvExportOptions = {
   delimiter: ';',
-  fileName: 'disaggregate options',
+  fileName: 'system indicator disaggregates',
 };
 export interface ICustomToolbarDataProps {
   name: string;
@@ -69,7 +70,10 @@ function CustomToolbar({ title }: CustomToolbarProps) {
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Box>
-        <Typography variant="h3">{title}</Typography>
+        <Typography variant="h3" sx={{ mb: '2px' }}>
+          {title}
+        </Typography>
+        <GridToolbarQuickFilter />
       </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem
@@ -117,6 +121,8 @@ function DisaggregateList() {
   });
 
   const rows = disaggregatesData?.disaggregates ?? [];
+
+  console.log('rows', rows);
 
   const [updateDisaggregate, { loading: updating }] =
     useUpdateDisaggregateMutation({
@@ -315,6 +321,20 @@ function DisaggregateList() {
               ))}
           </FormSelect>
         );
+      },
+    },
+    {
+      field: 'parameters',
+      headerName: 'Disaggregate Parameters',
+      type: 'number',
+      width: 180,
+      editable: false,
+      flex: 1,
+      resizable: true,
+      align: 'left',
+      headerAlign: 'left',
+      valueGetter: (params) => {
+        return (params.row as Disaggregate).disaggregate_options?.length;
       },
     },
 
