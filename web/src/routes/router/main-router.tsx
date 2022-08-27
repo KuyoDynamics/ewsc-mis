@@ -24,9 +24,11 @@ const Residences = Loadable(lazy(() => import('routes/system/residences')));
 const IndicatorDisaggregatesDashboard = Loadable(
   lazy(() => import('routes/system/indicator_disaggregates'))
 );
-
 const DisaggregateOptions = Loadable(
   lazy(() => import('routes/system/indicator_disaggregates/options'))
+);
+const Disaggregates = Loadable(
+  lazy(() => import('routes/system/indicator_disaggregates/disaggregates'))
 );
 
 const MainRouter: RouteObject = {
@@ -87,6 +89,10 @@ const MainRouter: RouteObject = {
             {
               path: 'options',
               element: <DisaggregateOptions />,
+            },
+            {
+              path: 'disaggregates',
+              element: <Disaggregates />,
             },
           ],
         },

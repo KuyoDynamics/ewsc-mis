@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createDisaggregateOption,
   createDisaggregateOptions,
@@ -9,17 +9,19 @@ import {
   getDisaggregateOptions,
   getIndicatorDisaggregatesByDisaggregateOptionId,
   getOption,
-} from "../queries";
+  resolveDisaggregate,
+  resolveOption,
+} from '../queries';
 
 const typeDefs = gql`
   type DisaggregateOption {
     id: ID!
 
     option_id: String!
-    option: OptionResult
+    option: Option
 
     disaggregate_id: ID!
-    disaggregate: DisaggregateResult
+    disaggregate: Disaggregate
 
     indicator_disaggregates: [IndicatorDisaggregate!]
 
@@ -85,9 +87,9 @@ const resolvers: Resolvers = {
   },
   DisaggregateOption: {
     disaggregate: (parent, _args, context) =>
-      getDisaggregate({ id: parent.disaggregate_id }, context),
+      resolveDisaggregate(parent.disaggregate_id, context),
     option: (parent, _args, context) =>
-      getOption({ id: parent.option_id }, context),
+      resolveOption(parent.option_id, context),
     indicator_disaggregates: (parent, _args, context) =>
       getIndicatorDisaggregatesByDisaggregateOptionId(parent.id, context),
   },

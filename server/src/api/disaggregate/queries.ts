@@ -1,4 +1,4 @@
-import { Prisma } from ".prisma/client";
+import { Prisma } from '.prisma/client';
 import {
   Disaggregate,
   DisaggregateOption,
@@ -8,14 +8,14 @@ import {
   MutationDeleteDisaggregateArgs,
   MutationUpdateDisaggregateArgs,
   QueryDisaggregateArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 import {
   getApiCreateError,
   getApiNotFoundError,
   getApiDeleteError,
   getApiUpdateError,
   GraphQLContext,
-} from "../../utils";
+} from '../../utils';
 
 async function getDisaggregates(
   context: GraphQLContext
@@ -36,6 +36,18 @@ async function getOptionsForDisaggregate(
   return options;
 }
 
+async function resolveDisaggregate(
+  id: string,
+  context: GraphQLContext
+): Promise<Disaggregate | null> {
+  const disaggregate = await context.prisma.disaggregate.findUnique({
+    where: {
+      id,
+    },
+  });
+  return disaggregate as Disaggregate;
+}
+
 async function getDisaggregate(
   args: QueryDisaggregateArgs,
   context: GraphQLContext
@@ -46,14 +58,14 @@ async function getDisaggregate(
     });
 
     if (!disaggregate) {
-      return getApiNotFoundError("Disaggregate", args.id);
+      return getApiNotFoundError('Disaggregate', args.id);
     }
     return {
-      __typename: "Disaggregate",
+      __typename: 'Disaggregate',
       ...disaggregate,
     } as DisaggregateResult;
   } catch (error) {
-    return getApiNotFoundError("Disaggregate", args.id, error);
+    return getApiNotFoundError('Disaggregate', args.id, error);
   }
 }
 
@@ -72,11 +84,11 @@ async function createDisaggregate(
     });
 
     return {
-      __typename: "Disaggregate",
+      __typename: 'Disaggregate',
       ...disaggregate,
     } as Disaggregate;
   } catch (error) {
-    return getApiCreateError("Disaggregate", error);
+    return getApiCreateError('Disaggregate', error);
   }
 }
 
@@ -104,11 +116,11 @@ async function createDisaggregateWithOptions(
     });
 
     return {
-      __typename: "Disaggregate",
+      __typename: 'Disaggregate',
       ...disaggregate,
     } as Disaggregate;
   } catch (error) {
-    return getApiCreateError("Disaggregate", error);
+    return getApiCreateError('Disaggregate', error);
   }
 }
 
@@ -128,11 +140,11 @@ async function updateDisaggregate(
       },
     });
     return {
-      __typename: "Disaggregate",
+      __typename: 'Disaggregate',
       ...disaggregate,
     } as Disaggregate;
   } catch (error) {
-    return getApiUpdateError("DisaggregateOption", args.input.id);
+    return getApiUpdateError('DisaggregateOption', args.input.id);
   }
 }
 
@@ -147,11 +159,12 @@ async function deleteDisaggregate(
       },
     });
     return {
-      __typename: "Disaggregate",
+      __typename: 'Disaggregate',
       ...disaggregate,
     } as Disaggregate;
   } catch (error) {
-    return getApiDeleteError("Disaggregate", args.input.id);
+    console.log('error', error);
+    return getApiDeleteError('Disaggregate', args.input.id);
   }
 }
 
@@ -163,4 +176,5 @@ export {
   updateDisaggregate,
   getOptionsForDisaggregate,
   createDisaggregateWithOptions,
+  resolveDisaggregate,
 };

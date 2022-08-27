@@ -32,6 +32,7 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridToolbarQuickFilter,
   GridValueGetterParams,
   gridVisibleColumnFieldsSelector,
   MuiEvent,
@@ -243,6 +244,7 @@ function CustomToolbar({
             size="small"
             name="province_id"
             // variant="outlined"
+            sx={{ mb: '2px' }}
           >
             {provinces?.length! <= 0 && (
               <MenuItem disabled value="">
@@ -255,6 +257,9 @@ function CustomToolbar({
               ))}
           </Select>
         </FormControl>
+        <Box>
+          <GridToolbarQuickFilter />
+        </Box>
       </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem />

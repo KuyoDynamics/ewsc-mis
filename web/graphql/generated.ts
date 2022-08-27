@@ -779,9 +779,9 @@ export type DisaggregateOption = {
   __typename?: 'DisaggregateOption';
   id: Scalars['ID'];
   option_id: Scalars['String'];
-  option?: Maybe<OptionResult>;
+  option?: Maybe<Option>;
   disaggregate_id: Scalars['ID'];
-  disaggregate?: Maybe<DisaggregateResult>;
+  disaggregate?: Maybe<Disaggregate>;
   indicator_disaggregates?: Maybe<Array<IndicatorDisaggregate>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2787,6 +2787,39 @@ export type DisableUserMutationVariables = Exact<{
 
 export type DisableUserMutation = { __typename?: 'Mutation', disableUser: { __typename?: 'User', id: string, disabled: boolean } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
+export type CreateDisaggregateWithOptionsMutationVariables = Exact<{
+  input: CreateDisaggregateWithOptionsInput;
+}>;
+
+
+export type CreateDisaggregateWithOptionsMutation = { __typename?: 'Mutation', createDisaggregateWithOptions: { __typename?: 'Disaggregate', id: string, name: string, type: DisaggregateType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_options?: Array<{ __typename?: 'DisaggregateOption', id: string, option_id: string, option?: { __typename?: 'Option', id: string, option_name: string } | null }> | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type CreateDisaggregateMutationVariables = Exact<{
+  input: CreateDisaggregateInput;
+}>;
+
+
+export type CreateDisaggregateMutation = { __typename?: 'Mutation', createDisaggregate: { __typename?: 'Disaggregate', id: string, name: string, type: DisaggregateType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_options?: Array<{ __typename?: 'DisaggregateOption', id: string, option_id: string, option?: { __typename?: 'Option', id: string, option_name: string } | null }> | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type DeleteDisaggregateMutationVariables = Exact<{
+  input: DeleteDisaggregateInput;
+}>;
+
+
+export type DeleteDisaggregateMutation = { __typename?: 'Mutation', deleteDisaggregate: { __typename?: 'Disaggregate', id: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type GetDisaggregateQueryVariables = Exact<{
+  disaggregateId: Scalars['ID'];
+}>;
+
+
+export type GetDisaggregateQuery = { __typename?: 'Query', disaggregate: { __typename?: 'Disaggregate', id: string, name: string, type: DisaggregateType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_options?: Array<{ __typename?: 'DisaggregateOption', id: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_id: string, option?: { __typename?: 'Option', id: string, option_name: string, created_at: any, created_by: string } | null }> | null } | { __typename?: 'ApiNotFoundError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetDisaggregatesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDisaggregatesQuery = { __typename?: 'Query', disaggregates?: Array<{ __typename?: 'Disaggregate', id: string, name: string, type: DisaggregateType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_options?: Array<{ __typename?: 'DisaggregateOption', id: string, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, disaggregate_id: string, option?: { __typename?: 'Option', id: string, option_name: string, created_at: any, created_by: string } | null }> | null }> | null };
+
 export type CreateOptionMutationVariables = Exact<{
   input: CreateOptionInput;
 }>;
@@ -2819,6 +2852,13 @@ export type UpdateOptionMutationVariables = Exact<{
 
 
 export type UpdateOptionMutation = { __typename?: 'Mutation', updateOption: { __typename?: 'Option', id: string, option_name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
+export type UpdateDisaggregateMutationVariables = Exact<{
+  input: UpdateDisaggregateInput;
+}>;
+
+
+export type UpdateDisaggregateMutation = { __typename?: 'Mutation', updateDisaggregate: { __typename?: 'Disaggregate', id: string, type: DisaggregateType, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
 
 export type CreateDistrictMutationVariables = Exact<{
   input: CreateDistrictInput;
@@ -3382,6 +3422,292 @@ export function useDisableUserMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DisableUserMutationHookResult = ReturnType<typeof useDisableUserMutation>;
 export type DisableUserMutationResult = Apollo.MutationResult<DisableUserMutation>;
 export type DisableUserMutationOptions = Apollo.BaseMutationOptions<DisableUserMutation, DisableUserMutationVariables>;
+export const CreateDisaggregateWithOptionsDocument = gql`
+    mutation CreateDisaggregateWithOptions($input: CreateDisaggregateWithOptionsInput!) {
+  createDisaggregateWithOptions(input: $input) {
+    ... on Disaggregate {
+      id
+      name
+      type
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      disaggregate_options {
+        id
+        option_id
+        option {
+          id
+          option_name
+        }
+      }
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateDisaggregateWithOptionsMutationFn = Apollo.MutationFunction<CreateDisaggregateWithOptionsMutation, CreateDisaggregateWithOptionsMutationVariables>;
+
+/**
+ * __useCreateDisaggregateWithOptionsMutation__
+ *
+ * To run a mutation, you first call `useCreateDisaggregateWithOptionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDisaggregateWithOptionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDisaggregateWithOptionsMutation, { data, loading, error }] = useCreateDisaggregateWithOptionsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDisaggregateWithOptionsMutation(baseOptions?: Apollo.MutationHookOptions<CreateDisaggregateWithOptionsMutation, CreateDisaggregateWithOptionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDisaggregateWithOptionsMutation, CreateDisaggregateWithOptionsMutationVariables>(CreateDisaggregateWithOptionsDocument, options);
+      }
+export type CreateDisaggregateWithOptionsMutationHookResult = ReturnType<typeof useCreateDisaggregateWithOptionsMutation>;
+export type CreateDisaggregateWithOptionsMutationResult = Apollo.MutationResult<CreateDisaggregateWithOptionsMutation>;
+export type CreateDisaggregateWithOptionsMutationOptions = Apollo.BaseMutationOptions<CreateDisaggregateWithOptionsMutation, CreateDisaggregateWithOptionsMutationVariables>;
+export const CreateDisaggregateDocument = gql`
+    mutation CreateDisaggregate($input: CreateDisaggregateInput!) {
+  createDisaggregate(input: $input) {
+    ... on Disaggregate {
+      id
+      name
+      type
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      disaggregate_options {
+        id
+        option_id
+        option {
+          id
+          option_name
+        }
+      }
+    }
+    ... on ApiCreateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type CreateDisaggregateMutationFn = Apollo.MutationFunction<CreateDisaggregateMutation, CreateDisaggregateMutationVariables>;
+
+/**
+ * __useCreateDisaggregateMutation__
+ *
+ * To run a mutation, you first call `useCreateDisaggregateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDisaggregateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDisaggregateMutation, { data, loading, error }] = useCreateDisaggregateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateDisaggregateMutation(baseOptions?: Apollo.MutationHookOptions<CreateDisaggregateMutation, CreateDisaggregateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDisaggregateMutation, CreateDisaggregateMutationVariables>(CreateDisaggregateDocument, options);
+      }
+export type CreateDisaggregateMutationHookResult = ReturnType<typeof useCreateDisaggregateMutation>;
+export type CreateDisaggregateMutationResult = Apollo.MutationResult<CreateDisaggregateMutation>;
+export type CreateDisaggregateMutationOptions = Apollo.BaseMutationOptions<CreateDisaggregateMutation, CreateDisaggregateMutationVariables>;
+export const DeleteDisaggregateDocument = gql`
+    mutation DeleteDisaggregate($input: DeleteDisaggregateInput!) {
+  deleteDisaggregate(input: $input) {
+    ... on Disaggregate {
+      id
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteDisaggregateMutationFn = Apollo.MutationFunction<DeleteDisaggregateMutation, DeleteDisaggregateMutationVariables>;
+
+/**
+ * __useDeleteDisaggregateMutation__
+ *
+ * To run a mutation, you first call `useDeleteDisaggregateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteDisaggregateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteDisaggregateMutation, { data, loading, error }] = useDeleteDisaggregateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteDisaggregateMutation(baseOptions?: Apollo.MutationHookOptions<DeleteDisaggregateMutation, DeleteDisaggregateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteDisaggregateMutation, DeleteDisaggregateMutationVariables>(DeleteDisaggregateDocument, options);
+      }
+export type DeleteDisaggregateMutationHookResult = ReturnType<typeof useDeleteDisaggregateMutation>;
+export type DeleteDisaggregateMutationResult = Apollo.MutationResult<DeleteDisaggregateMutation>;
+export type DeleteDisaggregateMutationOptions = Apollo.BaseMutationOptions<DeleteDisaggregateMutation, DeleteDisaggregateMutationVariables>;
+export const GetDisaggregateDocument = gql`
+    query GetDisaggregate($disaggregateId: ID!) {
+  disaggregate(id: $disaggregateId) {
+    ... on Disaggregate {
+      id
+      name
+      type
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      disaggregate_options {
+        id
+        created_at
+        created_by
+        last_modified_at
+        last_modified_by
+        disaggregate_id
+        option {
+          id
+          option_name
+          created_at
+          created_by
+        }
+      }
+    }
+    ... on ApiNotFoundError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDisaggregateQuery__
+ *
+ * To run a query within a React component, call `useGetDisaggregateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDisaggregateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDisaggregateQuery({
+ *   variables: {
+ *      disaggregateId: // value for 'disaggregateId'
+ *   },
+ * });
+ */
+export function useGetDisaggregateQuery(baseOptions: Apollo.QueryHookOptions<GetDisaggregateQuery, GetDisaggregateQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDisaggregateQuery, GetDisaggregateQueryVariables>(GetDisaggregateDocument, options);
+      }
+export function useGetDisaggregateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDisaggregateQuery, GetDisaggregateQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDisaggregateQuery, GetDisaggregateQueryVariables>(GetDisaggregateDocument, options);
+        }
+export type GetDisaggregateQueryHookResult = ReturnType<typeof useGetDisaggregateQuery>;
+export type GetDisaggregateLazyQueryHookResult = ReturnType<typeof useGetDisaggregateLazyQuery>;
+export type GetDisaggregateQueryResult = Apollo.QueryResult<GetDisaggregateQuery, GetDisaggregateQueryVariables>;
+export const GetDisaggregatesDocument = gql`
+    query GetDisaggregates {
+  disaggregates {
+    id
+    name
+    type
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    disaggregate_options {
+      id
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      disaggregate_id
+      option {
+        id
+        option_name
+        created_at
+        created_by
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetDisaggregatesQuery__
+ *
+ * To run a query within a React component, call `useGetDisaggregatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDisaggregatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDisaggregatesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDisaggregatesQuery(baseOptions?: Apollo.QueryHookOptions<GetDisaggregatesQuery, GetDisaggregatesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetDisaggregatesQuery, GetDisaggregatesQueryVariables>(GetDisaggregatesDocument, options);
+      }
+export function useGetDisaggregatesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDisaggregatesQuery, GetDisaggregatesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetDisaggregatesQuery, GetDisaggregatesQueryVariables>(GetDisaggregatesDocument, options);
+        }
+export type GetDisaggregatesQueryHookResult = ReturnType<typeof useGetDisaggregatesQuery>;
+export type GetDisaggregatesLazyQueryHookResult = ReturnType<typeof useGetDisaggregatesLazyQuery>;
+export type GetDisaggregatesQueryResult = Apollo.QueryResult<GetDisaggregatesQuery, GetDisaggregatesQueryVariables>;
 export const CreateOptionDocument = gql`
     mutation CreateOption($input: CreateOptionInput!) {
   createOption(input: $input) {
@@ -3622,6 +3948,55 @@ export function useUpdateOptionMutation(baseOptions?: Apollo.MutationHookOptions
 export type UpdateOptionMutationHookResult = ReturnType<typeof useUpdateOptionMutation>;
 export type UpdateOptionMutationResult = Apollo.MutationResult<UpdateOptionMutation>;
 export type UpdateOptionMutationOptions = Apollo.BaseMutationOptions<UpdateOptionMutation, UpdateOptionMutationVariables>;
+export const UpdateDisaggregateDocument = gql`
+    mutation UpdateDisaggregate($input: UpdateDisaggregateInput!) {
+  updateDisaggregate(input: $input) {
+    ... on Disaggregate {
+      id
+      type
+      name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateDisaggregateMutationFn = Apollo.MutationFunction<UpdateDisaggregateMutation, UpdateDisaggregateMutationVariables>;
+
+/**
+ * __useUpdateDisaggregateMutation__
+ *
+ * To run a mutation, you first call `useUpdateDisaggregateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDisaggregateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDisaggregateMutation, { data, loading, error }] = useUpdateDisaggregateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateDisaggregateMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDisaggregateMutation, UpdateDisaggregateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDisaggregateMutation, UpdateDisaggregateMutationVariables>(UpdateDisaggregateDocument, options);
+      }
+export type UpdateDisaggregateMutationHookResult = ReturnType<typeof useUpdateDisaggregateMutation>;
+export type UpdateDisaggregateMutationResult = Apollo.MutationResult<UpdateDisaggregateMutation>;
+export type UpdateDisaggregateMutationOptions = Apollo.BaseMutationOptions<UpdateDisaggregateMutation, UpdateDisaggregateMutationVariables>;
 export const CreateDistrictDocument = gql`
     mutation CreateDistrict($input: CreateDistrictInput!) {
   createDistrict(input: $input) {

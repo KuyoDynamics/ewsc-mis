@@ -49,7 +49,7 @@ const systemTables: IMenuItem = {
           title: 'Disaggregates',
           caption: 'System Disaggregates',
           type: 'item',
-          url: '/system/indicator_disaggregates/disaggregate',
+          url: '/system/indicator_disaggregates/disaggregates',
           icon: RoomPreferencesIcon,
         },
         {

@@ -24,6 +24,7 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridToolbarQuickFilter,
   GridValueGetterParams,
   MuiEvent,
 } from '@mui/x-data-grid';
@@ -66,7 +67,10 @@ function CustomToolbar({ title }: CustomToolbarProps) {
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Box>
-        <Typography variant="h3">{title}</Typography>
+        <Typography variant="h3" sx={{ mb: '2px' }}>
+          {title}
+        </Typography>
+        <GridToolbarQuickFilter />
       </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem
@@ -424,7 +428,7 @@ function OptionList() {
               title: 'Add Option',
             },
             toolbar: {
-              title: 'Diaggregate Options',
+              title: 'Disaggregate Options',
             },
           }}
           loading={loading || deleting}

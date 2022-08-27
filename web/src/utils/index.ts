@@ -9,6 +9,7 @@ import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { utils, writeFile } from 'xlsx';
 import {
   CatchmentDistrictInput,
+  DisaggregateType,
   DistrictUserRoleType,
   OrganisationUserRoleType,
   ResidenceClassification,
@@ -31,6 +32,9 @@ const USER_DISTRICT_ROLE_OPTIONS: string[] =
 const COST_CLASSIFICATION_OPTIONS: string[] = Object.values(
   ResidenceClassification
 );
+
+const INDICATOR_DISAGGREGATE_TYPE_OPTIONS: string[] =
+  Object.values(DisaggregateType);
 
 const USER_ORGANISATION_ROLE_OPTIONS: string[] = Object.values(
   OrganisationUserRoleType
@@ -160,5 +164,6 @@ export {
   USER_ORGANISATION_ROLE_OPTIONS,
   USER_THEME_OPTIONS,
   COST_CLASSIFICATION_OPTIONS,
+  INDICATOR_DISAGGREGATE_TYPE_OPTIONS,
   getNameInitials,
 };

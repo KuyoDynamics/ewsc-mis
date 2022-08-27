@@ -1,7 +1,7 @@
 /* eslint-disable react/require-default-props */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable no-param-reassign */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -9,23 +9,16 @@ import {
   DeleteOutline as DeleteIcon,
   Save as SaveIcon,
   Close as CancelIcon,
-  EditLocationOutlined,
+  ViewList,
 } from '@mui/icons-material';
 
 import {
   DataGrid,
   GridActionsCellItem,
-  GridApi,
-  gridColumnDefinitionsSelector,
   GridColumns,
   GridCsvExportMenuItem,
   GridCsvExportOptions,
   GridEventListener,
-  GridExportMenuItemProps,
-  gridFilteredSortedRowIdsSelector,
-  GridFooter,
-  GridFooterContainer,
-  GridRenderCellParams,
   GridRowId,
   GridRowModes,
   GridRowModesModel,
@@ -33,11 +26,7 @@ import {
   GridToolbarContainer,
   GridToolbarExportContainer,
   GridToolbarQuickFilter,
-  GridValueFormatterParams,
-  GridValueGetterParams,
-  gridVisibleColumnFieldsSelector,
   MuiEvent,
-  useGridApiContext,
 } from '@mui/x-data-grid';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -45,260 +34,124 @@ import {
   Box,
   Button,
   Collapse,
-  Fab,
   MenuItem,
-  Select,
-  SelectChangeEvent,
-  TableFooterProps,
-  Tooltip,
   Typography,
 } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { utils, writeFile } from 'xlsx';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import AddIcon from '@mui/icons-material/Add';
+import { INDICATOR_DISAGGREGATE_TYPE_OPTIONS } from 'utils';
+import FormSelect from 'components/form-input-helpers/form-select';
+import CustomFooterWithFab from 'components/data-grid-helpers/customer-footer-with-fab';
 import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
-import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
-import ProvinceForm from './province-form';
+import ExcelExportMenuItem from 'components/data-grid-helpers/excel-export-menu-item';
+import JsonExportMenuItem from 'components/data-grid-helpers/json-export-menu-item';
+import DisaggregateForm from './disaggregate-form';
 import {
-  Province,
-  GetProvincesDocument,
-  useDeleteProvinceMutation,
-  useGetProvincesQuery,
-  useUpdateProvinceMutation,
-  useGetCountriesQuery,
-  District,
-} from '../../../graphql/generated';
+  GetDisaggregatesDocument,
+  useDeleteDisaggregateMutation,
+  useGetDisaggregatesQuery,
+  useUpdateDisaggregateMutation,
+  Disaggregate,
+  DisaggregateType,
+} from '../../../../graphql/generated';
+import DisaggregateDetail from './disaggregate-detail';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
   setRowModesModel: (newModel: any) => void;
 }
 
-type CustomFooterProps = {
-  onClick: () => void;
-} & TableFooterProps;
-
-const getJson = (apiRef: React.MutableRefObject<GridApi>) => {
-  const filteredSortedRowIds = gridFilteredSortedRowIdsSelector(apiRef);
-
-  const visibleColumnsField = gridVisibleColumnFieldsSelector(apiRef);
-
-  const disableExportCols = gridColumnDefinitionsSelector(apiRef)
-    .filter((col) => col.disableExport)
-    .map((col) => col.field);
-
-  const exportableVisibleColumnsField = visibleColumnsField.filter(
-    (field) => disableExportCols.indexOf(field) === -1
-  );
-
-  const data = filteredSortedRowIds.map((id) => {
-    const row: Record<string, any> = {};
-    exportableVisibleColumnsField.forEach((field) => {
-      row[field] = apiRef.current.getCellParams(id, field).value;
-    });
-    return row;
-  });
-
-  return { jsonString: JSON.stringify(data, null, 2), json: data };
+const csvDisaggregates: GridCsvExportOptions = {
+  delimiter: ';',
+  fileName: 'system indicator disaggregates',
 };
-
-const exportBlob = (blob: Blob, filename: string) => {
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  });
-};
-
-function saveExcelFile(
-  fileName: string,
-  worksheetName: string,
-  ext: string,
-  rows: Record<string, any>[]
-): void {
-  const wb = utils.book_new();
-
-  const worksheet = utils.json_to_sheet(rows);
-
-  utils.book_append_sheet(wb, worksheet, worksheetName);
-
-  writeFile(wb, `${fileName}.${ext}`);
+export interface ICustomToolbarDataProps {
+  name: string;
+  id: string;
 }
-
-function ExcelExportMenuItem(props: GridExportMenuItemProps<{}>) {
-  const apiRef = useGridApiContext();
-
-  const { hideMenu } = props;
-
-  return (
-    <MenuItem
-      onClick={() => {
-        const { json } = getJson(apiRef);
-
-        saveExcelFile('provinces', 'provinces', 'xlsx', json);
-
-        hideMenu?.();
-      }}
-    >
-      Download as Excel(xlsx)
-    </MenuItem>
-  );
-}
-
-function JsonExportMenuItem(props: GridExportMenuItemProps<{}>) {
-  const apiRef = useGridApiContext();
-
-  const { hideMenu } = props;
-  return (
-    <MenuItem
-      onClick={() => {
-        const { jsonString } = getJson(apiRef);
-        const blob = new Blob([jsonString], {
-          type: 'text/json',
-        });
-        exportBlob(blob, 'provinces.json');
-
-        hideMenu?.();
-      }}
-    >
-      Download as JSON
-    </MenuItem>
-  );
-}
-
-const csvOptions: GridCsvExportOptions = { delimiter: ';' };
-
 export interface CustomToolbarProps {
   title: string;
-  handleChange: () => void;
-  selectedCountryId: string;
 }
 
-function CustomToolbar({
-  title,
-  handleChange,
-  selectedCountryId,
-}: CustomToolbarProps) {
-  const { data } = useGetCountriesQuery();
-
-  const countries = useMemo(
-    () => data?.countries?.map((c) => ({ name: c.name, id: c.id })),
-    [data]
-  );
-
+function CustomToolbar({ title }: CustomToolbarProps) {
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
       <Box>
-        <Typography variant="h3">{title}</Typography>
-        <Select
-          value={selectedCountryId}
-          onChange={handleChange}
-          fullWidth
-          size="small"
-          name="theme"
-          variant="outlined"
-          sx={{ mb: '2px' }}
-        >
-          {countries &&
-            countries.map((country) => (
-              <MenuItem value={country.id}>{country.name}</MenuItem>
-            ))}
-        </Select>
+        <Typography variant="h3" sx={{ mb: '2px' }}>
+          {title}
+        </Typography>
         <GridToolbarQuickFilter />
       </Box>
       <GridToolbarExportContainer>
-        <ExcelExportMenuItem />
-        <GridCsvExportMenuItem options={csvOptions} />
-        <JsonExportMenuItem />
+        <ExcelExportMenuItem
+          fileName={csvDisaggregates.fileName}
+          worksheetName={csvDisaggregates.fileName}
+          ext="xlsx"
+        />
+        <GridCsvExportMenuItem options={csvDisaggregates} />
+        <JsonExportMenuItem fileName={csvDisaggregates.fileName} />
       </GridToolbarExportContainer>
     </GridToolbarContainer>
   );
 }
 
-function CustomFooter({ onClick, ...props }: CustomFooterProps) {
-  return (
-    <GridFooterContainer>
-      <GridFooter {...props} />
-      <Tooltip title="Add Province">
-        <Fab
-          size="small"
-          color="primary"
-          aria-label="add province"
-          sx={{ mr: '20px', ml: '20px' }}
-          onClick={onClick}
-        >
-          <AddIcon />
-        </Fab>
-      </Tooltip>
-    </GridFooterContainer>
-  );
-}
-
-interface IProvinceFormInputs {
-  name: string;
-  code: string;
+interface IDisaggregateFormInputs {
+  name?: string;
+  type: DisaggregateType;
   id: string;
 }
 
 const schema = Yup.object({
-  name: Yup.string().required().min(4).max(255),
-  code: Yup.string().required().min(5).max(5),
+  name: Yup.string().required().min(1).max(255),
+  id: Yup.string().uuid().required(),
 });
 
 const initialRowModesModel: GridRowModesModel = {};
 
-function ProvinceList() {
+function DisaggregateList() {
   const navigate = useNavigate();
 
   const [pageSize, setPageSize] = React.useState<number>(5);
 
   const renderId = uuidv4();
 
-  const { country_id: countryId } = useGetDefaultOrganisation();
-
-  const { state } = useLocation();
-
-  const [selectedCountryId, setSelectedCountryId] = useState(
-    (state as { countryId: string })?.countryId || countryId
-  );
-
   const [openAlert, setOpenAlert] = useState(false);
 
-  const [openCreateProvinceModal, setOpenCreateProvinceModal] = useState(false);
+  const [disaggregate, setDisaggregate] = useState<Disaggregate>();
 
-  const [selectedRow, setSelectedRow] = useState<IProvinceFormInputs | null>(
-    null
-  );
+  const [openCreateDisaggregateModal, setOpenCreateDisaggregateModal] =
+    useState(false);
 
-  const { data, loading } = useGetProvincesQuery({
+  const [openDisaggregateDetailModal, setOpenDisaggregateDetailModal] =
+    useState(false);
+
+  const [selectedRow, setSelectedRow] =
+    useState<IDisaggregateFormInputs | null>(null);
+
+  const { data: disaggregatesData, loading } = useGetDisaggregatesQuery({
     fetchPolicy: 'network-only',
-    variables: {
-      countryId: selectedCountryId,
-    },
   });
 
-  const [updateProvince, { data: updatedProvinceResponse, loading: updating }] =
-    useUpdateProvinceMutation({
-      refetchQueries: [GetProvincesDocument],
+  const rows = disaggregatesData?.disaggregates ?? [];
+
+  const [updateDisaggregate, { loading: updating }] =
+    useUpdateDisaggregateMutation({
+      refetchQueries: [GetDisaggregatesDocument],
     });
 
-  const [deleteProvince, { data: deleteProvinceResponse, loading: deleting }] =
-    useDeleteProvinceMutation({
-      refetchQueries: [GetProvincesDocument],
-    });
+  const [
+    deleteDisaggregate,
+    { data: deleteDisaggregateResponse, loading: deleting },
+  ] = useDeleteDisaggregateMutation({
+    refetchQueries: [GetDisaggregatesDocument],
+  });
 
   const deleteErrors =
-    deleteProvinceResponse?.deleteProvince.__typename === 'ApiDeleteError'
-      ? deleteProvinceResponse.deleteProvince
+    deleteDisaggregateResponse?.deleteDisaggregate.__typename ===
+    'ApiDeleteError'
+      ? deleteDisaggregateResponse.deleteDisaggregate
       : null;
-  const rows = data?.provinces ?? [];
 
   const {
     formState: { isDirty, isValid, errors },
@@ -308,7 +161,7 @@ function ProvinceList() {
     setError,
     handleSubmit,
     reset: resetForm,
-  } = useForm<IProvinceFormInputs>({
+  } = useForm<IDisaggregateFormInputs>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
@@ -316,40 +169,43 @@ function ProvinceList() {
   const [rowModesModel, setRowModesModel] =
     React.useState<GridRowModesModel>(initialRowModesModel);
 
-  const onSubmit = async ({ code, name, id }: IProvinceFormInputs) => {
-    updateProvince({
+  const onSubmit = async ({ name, type, id }: IDisaggregateFormInputs) => {
+    updateDisaggregate({
       variables: {
         input: {
           id,
           update: {
-            code,
             name,
+            type,
           },
         },
       },
       onCompleted: (result) => {
-        if (result.updateProvince.__typename === 'Province') {
+        if (result.updateDisaggregate.__typename === 'Disaggregate') {
           setRowModesModel({
             ...rowModesModel,
             [id]: { mode: GridRowModes.View },
           });
-        } else if (result.updateProvince.__typename === 'ApiUpdateError') {
-          if (result.updateProvince.field) {
-            setError(result.updateProvince.field as keyof IProvinceFormInputs, {
-              type: 'server',
-              message: result.updateProvince.message,
-            });
+        } else if (result.updateDisaggregate.__typename === 'ApiUpdateError') {
+          if (result.updateDisaggregate.field) {
+            setError(
+              result.updateDisaggregate.field as keyof IDisaggregateFormInputs,
+              {
+                type: 'server',
+                message: result.updateDisaggregate.message,
+              }
+            );
           } else if (
-            !result.updateProvince.errors &&
-            !result.updateProvince.field
+            !result.updateDisaggregate.errors &&
+            !result.updateDisaggregate.field
           ) {
-            setError('unknown' as keyof IProvinceFormInputs, {
+            setError('unknown' as keyof IDisaggregateFormInputs, {
               type: 'server',
-              message: result.updateProvince.message,
+              message: result.updateDisaggregate.message,
             });
           } else {
-            result.updateProvince.errors?.forEach((err) =>
-              setError(err.field as keyof IProvinceFormInputs, {
+            result.updateDisaggregate.errors?.forEach((err) =>
+              setError(err.field as keyof IDisaggregateFormInputs, {
                 type: 'server',
                 message: err.message,
               })
@@ -364,19 +220,22 @@ function ProvinceList() {
     });
   };
 
-  const handleCountrySelectionChange = (event: SelectChangeEvent) => {
-    setSelectedCountryId(event.target.value);
-  };
-
   const handleClose = () => {
     setOpenAlert(false);
   };
 
   const handleEditClick = (id: GridRowId) => () => {
     const item = rows.find((row) => row.id === id);
+
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setSelectedRow(() =>
-      item ? { id: item.id, code: item.code, name: item.name } : null
+      item
+        ? {
+            id: item.id,
+            name: item.name,
+            type: item.type,
+          }
+        : null
     );
   };
 
@@ -386,14 +245,14 @@ function ProvinceList() {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    deleteProvince({
+    deleteDisaggregate({
       variables: {
         input: {
           id: id as string,
         },
       },
       onCompleted: (result) => {
-        if (result.deleteProvince.__typename === 'ApiDeleteError') {
+        if (result.deleteDisaggregate.__typename === 'ApiDeleteError') {
           setOpenAlert(true);
         }
       },
@@ -414,6 +273,11 @@ function ProvinceList() {
     event.defaultMuiPrevented = true;
   };
 
+  const handleShowDisaggregateDetailModal = (params: Disaggregate) => {
+    setDisaggregate(params);
+    setOpenDisaggregateDetailModal(true);
+  };
+
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (
     _params,
     event
@@ -424,7 +288,7 @@ function ProvinceList() {
   const columns: GridColumns = [
     {
       field: 'name',
-      headerName: 'Province Name',
+      headerName: 'Disaggregate Name',
       type: 'string',
       width: 180,
       editable: true,
@@ -449,76 +313,73 @@ function ProvinceList() {
       },
     },
     {
-      field: 'code',
-      headerName: 'Province Code',
+      field: 'type',
+      headerName: 'Disaggregate Type',
       type: 'string',
       width: 180,
-      editable: true,
+      editable: false,
+      hideable: false,
       flex: 1,
       resizable: true,
       renderEditCell: () => {
         return (
-          <FormInput
+          <FormSelect
             control={control}
-            name="code"
+            name="type"
+            errors={errors}
             fullWidth
-            label="Code"
-            margin="none"
             size="small"
+            margin="dense"
             variant="outlined"
-            inputProps={{
-              style: { textTransform: 'uppercase' },
-            }}
-          />
+          >
+            {INDICATOR_DISAGGREGATE_TYPE_OPTIONS &&
+              INDICATOR_DISAGGREGATE_TYPE_OPTIONS.map((c) => (
+                <MenuItem value={c}>{c}</MenuItem>
+              ))}
+          </FormSelect>
         );
       },
     },
     {
-      field: 'districts',
-      headerName: 'districts',
+      field: 'parameters',
+      headerName: 'Disaggregate Parameters',
       type: 'number',
       width: 180,
       editable: false,
       flex: 1,
       resizable: true,
-      headerAlign: 'left',
       align: 'left',
-      renderCell: (params: GridRenderCellParams) => {
-        const { districts, id } = params.row as Province;
+      headerAlign: 'left',
+      valueGetter: (params) => {
+        return (params.row as Disaggregate).disaggregate_options?.length;
+      },
+      renderCell: (params) => {
+        const parameters = (params.row as Disaggregate).disaggregate_options;
         return (
           <Button
             variant="text"
             size="small"
-            endIcon={<EditLocationOutlined />}
+            endIcon={<ViewList />}
+            disabled={parameters?.length === 0}
             onClick={() =>
-              navigate('/system/districts', {
-                state: {
-                  countryId: selectedCountryId,
-                  provinceId: id,
-                },
-              })
+              handleShowDisaggregateDetailModal(params.row as Disaggregate)
             }
           >
-            {districts && districts.length === 1
-              ? districts[0].name
-              : `${districts?.length} districts`}
+            {parameters?.length}
           </Button>
         );
       },
-      valueGetter: (params: GridValueGetterParams) => {
-        return (params.value as District[]).length;
-      },
     },
+
     {
       field: 'id',
-      headerName: 'ID',
+      headerName: 'Disaggregate ID',
       type: 'string',
       width: 180,
       editable: false,
       flex: 1,
       resizable: true,
     },
-
     {
       field: 'created_at',
       headerName: 'Created At',
@@ -625,11 +486,11 @@ function ProvinceList() {
           </Collapse>
         </Box>
       )}
-      {errors['unknown' as keyof IProvinceFormInputs] && (
+      {errors['unknown' as keyof IDisaggregateFormInputs] && (
         <Box>
           <Alert severity="error">
-            {errors['unknown' as keyof IProvinceFormInputs]?.message}. Please
-            contact support or try again!
+            {errors['unknown' as keyof IDisaggregateFormInputs]?.message}.
+            Please contact support or try again!
           </Alert>
         </Box>
       )}
@@ -646,20 +507,25 @@ function ProvinceList() {
           onRowEditStart={handleRowEditStart}
           onRowEditStop={handleRowEditStop}
           components={{
-            Footer: CustomFooter,
+            Footer: CustomFooterWithFab,
             Toolbar: CustomToolbar,
           }}
           componentsProps={{
-            footer: { onClick: () => setOpenCreateProvinceModal(true) },
+            footer: {
+              onClick: () => setOpenCreateDisaggregateModal(true),
+              title: 'Add Disaggregate',
+            },
             toolbar: {
-              title: 'Provinces',
-              handleChange: handleCountrySelectionChange,
-              selectedCountryId,
+              title: 'Disaggregates',
             },
           }}
           loading={loading || deleting}
           experimentalFeatures={{ newEditingApi: true }}
           initialState={{
+            sorting: {
+              sortModel: [{ field: 'name', sort: 'asc' }],
+            },
+            // rowGrouping:
             columns: {
               columnVisibilityModel: {
                 created_at: false,
@@ -676,15 +542,19 @@ function ProvinceList() {
           }}
         />
       </Box>
-      <ProvinceForm
+      <DisaggregateForm
         key={renderId}
-        open={openCreateProvinceModal}
-        onClose={() => setOpenCreateProvinceModal(false)}
-        selectedCountryId={selectedCountryId}
+        open={openCreateDisaggregateModal}
+        onClose={() => setOpenCreateDisaggregateModal(false)}
+      />
+      <DisaggregateDetail
+        open={openDisaggregateDetailModal}
+        onClose={() => setOpenDisaggregateDetailModal(false)}
+        disaggregate={disaggregate}
       />
       <input id="id" type="hidden" required {...register('id')} />
     </MainCard>
   );
 }
 
-export default ProvinceList;
+export default DisaggregateList;
