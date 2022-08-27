@@ -57,6 +57,7 @@ const typeDefs = gql`
   input DisaggregateUpdateInput {
     name: String
     type: DisaggregateType
+    option_ids: [ID!]
   }
 
   input DeleteDisaggregateInput {

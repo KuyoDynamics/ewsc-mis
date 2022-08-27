@@ -6,15 +6,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Checkbox,
   Dialog,
   DialogContent,
   DialogTitle,
   Grid,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -39,14 +35,13 @@ import DraggablePaper from 'components/draggable-paper';
 import FormInput from 'components/form-input-helpers/form-input';
 import FormSelect from 'components/form-input-helpers/form-select';
 import {
-  CreateDisaggregateInput,
   CreateDisaggregateWithOptionsInput,
   GetDisaggregatesDocument,
-  useCreateDisaggregateMutation,
   useCreateDisaggregateWithOptionsMutation,
   Option,
   useGetOptionsQuery,
   DisaggregateType,
+  Disaggregate,
 } from '../../../../graphql/generated';
 
 const schema = Yup.object({
@@ -113,12 +108,11 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
   const optionIds = useWatch({
     control,
     name: 'option_ids',
-    exact: true,
     defaultValue: [],
   });
 
   const options = useMemo(
-    () => rows.filter((r) => [].concat(optionIds).indexOf(r.id) > -1),
+    () => rows.filter((r) => optionIds?.indexOf(r.id) > -1),
     [rows, optionIds]
   );
 
@@ -157,9 +151,6 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
     option_ids,
     type,
   }: CreateDisaggregateWithOptionsInput) => {
-    console.log('onSubmit=>name', name);
-    console.log('onSubmit=>option_ids', option_ids);
-    console.log('onSubmit=>', type);
     createDisaggregateWithOptions({
       variables: {
         input: {
@@ -295,7 +286,9 @@ function DisaggregateForm({ open, onClose }: IDisaggregateFormProps) {
                   >
                     {INDICATOR_DISAGGREGATE_TYPE_OPTIONS &&
                       INDICATOR_DISAGGREGATE_TYPE_OPTIONS.map((c) => (
-                        <MenuItem value={c}>{c}</MenuItem>
+                        <MenuItem key={c} value={c}>
+                          {c}
+                        </MenuItem>
                       ))}
                   </FormSelect>
                 </Box>

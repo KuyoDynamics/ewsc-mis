@@ -163,6 +163,7 @@ async function deleteDisaggregate(
       ...disaggregate,
     } as Disaggregate;
   } catch (error) {
+    console.log('error', error);
     return getApiDeleteError('Disaggregate', args.input.id);
   }
 }

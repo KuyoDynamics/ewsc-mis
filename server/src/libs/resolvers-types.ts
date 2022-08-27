@@ -800,6 +800,7 @@ export enum DisaggregateType {
 
 export type DisaggregateUpdateInput = {
   name?: InputMaybe<Scalars['String']>;
+  option_ids?: InputMaybe<Array<Scalars['ID']>>;
   type?: InputMaybe<DisaggregateType>;
 };
 

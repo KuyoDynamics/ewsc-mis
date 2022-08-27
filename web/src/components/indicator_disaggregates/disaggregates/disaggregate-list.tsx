@@ -135,8 +135,6 @@ function DisaggregateList() {
 
   const rows = disaggregatesData?.disaggregates ?? [];
 
-  console.log('rows', rows);
-
   const [updateDisaggregate, { loading: updating }] =
     useUpdateDisaggregateMutation({
       refetchQueries: [GetDisaggregatesDocument],
@@ -228,6 +226,7 @@ function DisaggregateList() {
 
   const handleEditClick = (id: GridRowId) => () => {
     const item = rows.find((row) => row.id === id);
+
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
     setSelectedRow(() =>
       item
@@ -318,7 +317,7 @@ function DisaggregateList() {
       headerName: 'Disaggregate Type',
       type: 'string',
       width: 180,
-      editable: true,
+      editable: false,
       hideable: false,
       flex: 1,
       resizable: true,
