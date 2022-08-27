@@ -9,6 +9,7 @@ import {
   DeleteOutline as DeleteIcon,
   Save as SaveIcon,
   Close as CancelIcon,
+  ViewList,
 } from '@mui/icons-material';
 
 import {
@@ -25,11 +26,17 @@ import {
   GridToolbarContainer,
   GridToolbarExportContainer,
   GridToolbarQuickFilter,
-  GridValueGetterParams,
   MuiEvent,
 } from '@mui/x-data-grid';
 import { v4 as uuidv4 } from 'uuid';
-import { Alert, Box, Collapse, MenuItem, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  Collapse,
+  MenuItem,
+  Typography,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { INDICATOR_DISAGGREGATE_TYPE_OPTIONS } from 'utils';
@@ -48,6 +55,7 @@ import {
   Disaggregate,
   DisaggregateType,
 } from '../../../../graphql/generated';
+import DisaggregateDetail from './disaggregate-detail';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
@@ -110,7 +118,12 @@ function DisaggregateList() {
 
   const [openAlert, setOpenAlert] = useState(false);
 
+  const [disaggregate, setDisaggregate] = useState<Disaggregate>();
+
   const [openCreateDisaggregateModal, setOpenCreateDisaggregateModal] =
+    useState(false);
+
+  const [openDisaggregateDetailModal, setOpenDisaggregateDetailModal] =
     useState(false);
 
   const [selectedRow, setSelectedRow] =
@@ -261,6 +274,11 @@ function DisaggregateList() {
     event.defaultMuiPrevented = true;
   };
 
+  const handleShowDisaggregateDetailModal = (params: Disaggregate) => {
+    setDisaggregate(params);
+    setOpenDisaggregateDetailModal(true);
+  };
+
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (
     _params,
     event
@@ -335,6 +353,22 @@ function DisaggregateList() {
       headerAlign: 'left',
       valueGetter: (params) => {
         return (params.row as Disaggregate).disaggregate_options?.length;
+      },
+      renderCell: (params) => {
+        const parameters = (params.row as Disaggregate).disaggregate_options;
+        return (
+          <Button
+            variant="text"
+            size="small"
+            endIcon={<ViewList />}
+            disabled={parameters?.length === 0}
+            onClick={() =>
+              handleShowDisaggregateDetailModal(params.row as Disaggregate)
+            }
+          >
+            {parameters?.length}
+          </Button>
+        );
       },
     },
 
@@ -492,6 +526,7 @@ function DisaggregateList() {
             sorting: {
               sortModel: [{ field: 'name', sort: 'asc' }],
             },
+            // rowGrouping:
             columns: {
               columnVisibilityModel: {
                 created_at: false,
@@ -512,6 +547,11 @@ function DisaggregateList() {
         key={renderId}
         open={openCreateDisaggregateModal}
         onClose={() => setOpenCreateDisaggregateModal(false)}
+      />
+      <DisaggregateDetail
+        open={openDisaggregateDetailModal}
+        onClose={() => setOpenDisaggregateDetailModal(false)}
+        disaggregate={disaggregate}
       />
       <input id="id" type="hidden" required {...register('id')} />
     </MainCard>

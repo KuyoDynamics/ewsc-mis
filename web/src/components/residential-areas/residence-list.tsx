@@ -24,6 +24,7 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridToolbarQuickFilter,
   GridValueGetterParams,
   MuiEvent,
 } from '@mui/x-data-grid';
@@ -138,6 +139,9 @@ function CustomToolbar({
             {districtOptions}
           </Select>
         </FormControl>
+        <Box>
+          <GridToolbarQuickFilter />
+        </Box>
       </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem
@@ -669,7 +673,7 @@ function ResidenceList() {
               title: 'Add Residence',
             },
             toolbar: {
-              title: 'Residences',
+              title: 'Residential Area',
               handleCountrySelectionChange,
               handleProvinceSelectionChange,
               handleDistrictSelectionChange,

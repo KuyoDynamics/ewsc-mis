@@ -32,6 +32,7 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridToolbarQuickFilter,
   GridValueFormatterParams,
   GridValueGetterParams,
   gridVisibleColumnFieldsSelector,
@@ -203,12 +204,14 @@ function CustomToolbar({
           size="small"
           name="theme"
           variant="outlined"
+          sx={{ mb: '2px' }}
         >
           {countries &&
             countries.map((country) => (
               <MenuItem value={country.id}>{country.name}</MenuItem>
             ))}
         </Select>
+        <GridToolbarQuickFilter />
       </Box>
       <GridToolbarExportContainer>
         <ExcelExportMenuItem />

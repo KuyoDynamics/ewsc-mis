@@ -32,6 +32,7 @@ import {
   GridRowParams,
   GridToolbarContainer,
   GridToolbarExportContainer,
+  GridToolbarQuickFilter,
   GridValueFormatterParams,
   gridVisibleColumnFieldsSelector,
   MuiEvent,
@@ -182,7 +183,13 @@ const csvOptions: GridCsvExportOptions = { delimiter: ';' };
 function CustomToolbar({ title }: CustomToolbarProps) {
   return (
     <GridToolbarContainer sx={{ justifyContent: 'space-between' }}>
-      <Typography variant="h3">{title}</Typography>
+      <Box>
+        <Typography variant="h3" sx={{ mb: '2px' }}>
+          {title}
+        </Typography>
+        <GridToolbarQuickFilter />
+      </Box>
+
       <GridToolbarExportContainer>
         <ExcelExportMenuItem />
         <GridCsvExportMenuItem options={csvOptions} />
