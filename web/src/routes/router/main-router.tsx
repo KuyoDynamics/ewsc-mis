@@ -31,6 +31,14 @@ const Disaggregates = Loadable(
   lazy(() => import('routes/system/indicator_disaggregates/disaggregates'))
 );
 
+const TemplatesDashboard = Loadable(
+  lazy(() => import('routes/system/templates'))
+);
+
+const IndicatorUnits = Loadable(
+  lazy(() => import('routes/system/templates/indicator_units'))
+);
+
 const MainRouter: RouteObject = {
   path: '/',
   element: (
@@ -93,6 +101,16 @@ const MainRouter: RouteObject = {
             {
               path: 'disaggregates',
               element: <Disaggregates />,
+            },
+          ],
+        },
+        {
+          path: 'templates',
+          element: <TemplatesDashboard />,
+          children: [
+            {
+              path: 'indicator_units',
+              element: <IndicatorUnits />,
             },
           ],
         },

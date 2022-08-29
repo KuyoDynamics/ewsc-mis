@@ -35,6 +35,14 @@ const systemTables: IMenuItem = {
           url: '/system/templates/indicators',
           icon: RoomPreferencesIcon,
         },
+        {
+          id: 'indicator_units',
+          title: 'Indicator Units',
+          caption: 'System Indicator Units',
+          type: 'item',
+          url: '/system/templates/indicator_units',
+          icon: RoomPreferencesIcon,
+        },
       ],
     },
     {

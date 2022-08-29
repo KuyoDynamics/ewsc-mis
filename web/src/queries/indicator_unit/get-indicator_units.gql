@@ -1,0 +1,14 @@
+query GetIndicatorUnits {
+  indicator_units {
+    id
+    unit
+    display_name
+    created_at
+    created_by
+    last_modified_by
+    last_modified_at
+    indicators {
+      id
+    }
+  }
+}
