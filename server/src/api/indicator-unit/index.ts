@@ -1,19 +1,20 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createIndicatorUnit,
   deleteIndicatorUnit,
   getIndicatorUnit,
   getIndicatorUnits,
+  resolveIndicatorsForUnit,
   updateIndicatorUnit,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type IndicatorUnit {
     id: ID!
     unit: String!
     display_name: String!
-    # indicators: [Indicators!]
+    indicators: [Indicator!]
     created_at: DateTime!
     created_by: String!
     last_modified_at: DateTime!
@@ -70,6 +71,10 @@ const resolvers: Resolvers = {
       updateIndicatorUnit(args, context),
     deleteIndicatorUnit: (_, args, context) =>
       deleteIndicatorUnit(args, context),
+  },
+  IndicatorUnit: {
+    indicators: (parent, _args, context) =>
+      resolveIndicatorsForUnit(parent.id, context),
   },
 };
 

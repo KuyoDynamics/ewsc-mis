@@ -1,18 +1,35 @@
 import {
   IndicatorUnit,
   IndicatorUnitResult,
+  Indicator,
   MutationCreateIndicatorUnitArgs,
   MutationDeleteIndicatorUnitArgs,
   MutationUpdateIndicatorUnitArgs,
   QueryDisaggregate_OptionArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 import {
   getApiCreateError,
   getApiNotFoundError,
   getApiDeleteError,
   getApiUpdateError,
   GraphQLContext,
-} from "../../utils";
+} from '../../utils';
+
+async function resolveIndicatorsForUnit(
+  indicator_unit_id: string,
+  context: GraphQLContext
+): Promise<Indicator[]> {
+  const response = await context.prisma.indicatorUnit.findUnique({
+    where: {
+      id: indicator_unit_id,
+    },
+    include: {
+      indicators: true,
+    },
+  });
+
+  return response?.indicators as Indicator[];
+}
 
 async function getIndicatorUnits(
   context: GraphQLContext
@@ -30,14 +47,14 @@ async function getIndicatorUnit(
     });
 
     if (!indicator_unit) {
-      return getApiNotFoundError("IndicatorUnit", args.id);
+      return getApiNotFoundError('IndicatorUnit', args.id);
     }
     return {
-      __typename: "IndicatorUnit",
+      __typename: 'IndicatorUnit',
       ...indicator_unit,
     };
   } catch (error) {
-    return getApiNotFoundError("IndicatorUnit", args.id, error);
+    return getApiNotFoundError('IndicatorUnit', args.id, error);
   }
 }
 
@@ -56,11 +73,11 @@ async function createIndicatorUnit(
     });
 
     return {
-      __typename: "IndicatorUnit",
+      __typename: 'IndicatorUnit',
       ...indicator_unit,
     };
   } catch (error) {
-    return getApiCreateError("IndicatorUnit", error);
+    return getApiCreateError('IndicatorUnit', error);
   }
 }
 
@@ -75,16 +92,16 @@ async function updateIndicatorUnit(
       },
       data: {
         unit: args.input.update.unit || undefined,
-        display_name: args.input.update.unit || undefined,
+        display_name: args.input.update.display_name || undefined,
         last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
     return {
-      __typename: "IndicatorUnit",
+      __typename: 'IndicatorUnit',
       ...indicator_unit,
     };
   } catch (error) {
-    return getApiUpdateError("IndicatorUnit", args.input.id);
+    return getApiUpdateError('IndicatorUnit', args.input.id);
   }
 }
 
@@ -99,11 +116,11 @@ async function deleteIndicatorUnit(
       },
     });
     return {
-      __typename: "IndicatorUnit",
+      __typename: 'IndicatorUnit',
       ...indicator_unit,
     };
   } catch (error) {
-    return getApiDeleteError("IndicatorUnit", args.input.id);
+    return getApiDeleteError('IndicatorUnit', args.input.id);
   }
 }
 
@@ -113,4 +130,5 @@ export {
   createIndicatorUnit,
   updateIndicatorUnit,
   deleteIndicatorUnit,
+  resolveIndicatorsForUnit,
 };

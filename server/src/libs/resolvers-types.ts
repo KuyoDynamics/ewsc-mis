@@ -936,6 +936,7 @@ export type IndicatorUnit = {
   created_by: Scalars['String'];
   display_name: Scalars['String'];
   id: Scalars['ID'];
+  indicators?: Maybe<Array<Indicator>>;
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
   unit: Scalars['String'];
@@ -3828,6 +3829,7 @@ export type IndicatorUnitResolvers<ContextType = GraphQLContext, ParentType exte
   created_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   display_name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  indicators?: Resolver<Maybe<Array<ResolversTypes['Indicator']>>, ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   unit?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

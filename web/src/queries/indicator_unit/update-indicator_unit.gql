@@ -1,0 +1,21 @@
+mutation UpdateIndicatorUnit($input: UpdateIndicatorUnitInput!) {
+  updateIndicatorUnit(input: $input) {
+    ... on IndicatorUnit {
+      id
+      unit
+      display_name
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiUpdateError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}

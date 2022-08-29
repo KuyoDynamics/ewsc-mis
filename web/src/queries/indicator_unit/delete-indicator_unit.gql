@@ -1,0 +1,20 @@
+mutation DeleteIndicatorUnit($input: DeleteIndicatorUnitInput!) {
+  deleteIndicatorUnit(input: $input) {
+    ... on IndicatorUnit {
+      id
+      last_modified_by
+      last_modified_at
+    }
+
+    ... on ApiDeleteError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
