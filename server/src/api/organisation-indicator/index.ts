@@ -115,8 +115,8 @@ const resolvers: Resolvers = {
     //   deleteOrganisationIndicator(args, context),
   },
   OrganisationIndicator: {
-    indicator: (parent, _args, context) =>
-      getIndicator({ id: parent.indicator_id }, context),
+    // indicator: (parent, _args, context) =>
+    //   getIndicator({ id: parent.indicator_id }, context),
   },
 };
 

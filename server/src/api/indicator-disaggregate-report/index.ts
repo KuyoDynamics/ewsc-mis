@@ -93,7 +93,7 @@ const resolvers: Resolvers = {
     //   deleteIndicatorDisaggregateReport(args, context),
   },
   IndicatorDisaggregateReport: {
-    report: (parent, _args, context) => getReport({ id: parent.id }, context),
+    // report: (parent, _args, context) => getReport({ id: parent.id }, context),
   },
 };
 
