@@ -5,19 +5,31 @@ import {
   MutationCreateReportTemplateArgs,
   MutationUpdateReportTemplateArgs,
   MutationDeleteReportTemplateArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 import {
   getApiCreateError,
   getApiNotFoundError,
   getApiDeleteError,
   getApiUpdateError,
   GraphQLContext,
-} from "../../utils";
+} from '../../utils';
 
 async function getReportTemplates(
   context: GraphQLContext
 ): Promise<ReportTemplate[]> {
   return (await context.prisma.reportTemplate.findMany({})) as ReportTemplate[];
+}
+
+async function resolveReportTemplate(
+  id: string,
+  context: GraphQLContext
+): Promise<ReportTemplate | null> {
+  const report_template = await context.prisma.reportTemplate.findUnique({
+    where: {
+      id,
+    },
+  });
+  return report_template as ReportTemplate;
 }
 
 async function getReportTemplate(
@@ -30,14 +42,14 @@ async function getReportTemplate(
     });
 
     if (!report_template) {
-      return getApiNotFoundError("ReportTemplate", args.id);
+      return getApiNotFoundError('ReportTemplate', args.id);
     }
     return {
-      __typename: "ReportTemplate",
+      __typename: 'ReportTemplate',
       ...report_template,
     } as ReportTemplateResult;
   } catch (error) {
-    return getApiNotFoundError("ReportTemplate", args.id, error);
+    return getApiNotFoundError('ReportTemplate', args.id, error);
   }
 }
 
@@ -59,11 +71,11 @@ async function createReportTemplate(
     });
 
     return {
-      __typename: "ReportTemplate",
+      __typename: 'ReportTemplate',
       ...report_template,
     } as ReportTemplateResult;
   } catch (error) {
-    return getApiCreateError("ReportTemplate", error);
+    return getApiCreateError('ReportTemplate', error);
   }
 }
 
@@ -86,11 +98,11 @@ async function updateReportTemplate(
       },
     });
     return {
-      __typename: "ReportTemplate",
+      __typename: 'ReportTemplate',
       ...report_template,
     } as ReportTemplateResult;
   } catch (error) {
-    return getApiUpdateError("ReportTemplate", args.input.id);
+    return getApiUpdateError('ReportTemplate', args.input.id);
   }
 }
 
@@ -105,11 +117,11 @@ async function deleteReportTemplate(
       },
     });
     return {
-      __typename: "ReportTemplate",
+      __typename: 'ReportTemplate',
       ...report_template,
     } as ReportTemplateResult;
   } catch (error) {
-    return getApiDeleteError("ReportTemplate", args.input.id);
+    return getApiDeleteError('ReportTemplate', args.input.id);
   }
 }
 
@@ -119,4 +131,5 @@ export {
   createReportTemplate,
   updateReportTemplate,
   deleteReportTemplate,
+  resolveReportTemplate,
 };

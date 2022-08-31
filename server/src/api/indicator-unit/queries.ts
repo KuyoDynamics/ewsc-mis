@@ -31,6 +31,19 @@ async function resolveIndicatorsForUnit(
   return response?.indicators as Indicator[];
 }
 
+async function resolveIndicatorUnit(
+  id: string,
+  context: GraphQLContext
+): Promise<IndicatorUnit | null> {
+  const response = await context.prisma.indicatorUnit.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return response as IndicatorUnit;
+}
+
 async function getIndicatorUnits(
   context: GraphQLContext
 ): Promise<IndicatorUnit[]> {
@@ -131,4 +144,5 @@ export {
   updateIndicatorUnit,
   deleteIndicatorUnit,
   resolveIndicatorsForUnit,
+  resolveIndicatorUnit,
 };

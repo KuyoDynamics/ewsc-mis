@@ -1,0 +1,20 @@
+query GetReportTemplates {
+  report_templates {
+    id
+    name
+    type
+    window
+    frequency
+    icon
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    indicators {
+      id
+    }
+    organisation_report_templates {
+      id
+    }
+  }
+}

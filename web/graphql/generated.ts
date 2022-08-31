@@ -873,9 +873,9 @@ export type Indicator = {
   type: IndicatorType;
   contributing_organisation: Scalars['String'];
   report_template_id: Scalars['String'];
-  report_template?: Maybe<ReportTemplateResult>;
+  report_template?: Maybe<ReportTemplate>;
   indicator_unit_id: Scalars['String'];
-  indicator_unit?: Maybe<IndicatorUnitResult>;
+  indicator_unit?: Maybe<IndicatorUnit>;
   indicator_organisations?: Maybe<Array<OrganisationIndicator>>;
   created_at: Scalars['DateTime'];
   created_by: Scalars['String'];
@@ -2959,6 +2959,39 @@ export type UpdateIndicatorUnitMutationVariables = Exact<{
 
 export type UpdateIndicatorUnitMutation = { __typename?: 'Mutation', updateIndicatorUnit: { __typename?: 'IndicatorUnit', id: string, unit: string, display_name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
 
+export type CreateIndicatorMutationVariables = Exact<{
+  input: CreateIndicatorInput;
+}>;
+
+
+export type CreateIndicatorMutation = { __typename?: 'Mutation', createIndicator: { __typename: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename: 'ApiNotFoundError' } | { __typename: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename: 'ApiUpdateError' } | { __typename: 'ApiDeleteError' } };
+
+export type DeleteIndicatorMutationVariables = Exact<{
+  input: DeleteIndicatorInput;
+}>;
+
+
+export type DeleteIndicatorMutation = { __typename?: 'Mutation', deleteIndicator: { __typename?: 'Indicator', id: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } };
+
+export type GetIndicatorQueryVariables = Exact<{
+  indicatorId: Scalars['ID'];
+}>;
+
+
+export type GetIndicatorQuery = { __typename?: 'Query', indicator: { __typename?: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename?: 'ApiNotFoundError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+
+export type GetIndicatorsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetIndicatorsQuery = { __typename?: 'Query', indicators?: Array<{ __typename?: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null }> | null };
+
+export type UpdateIndicatorMutationVariables = Exact<{
+  input: UpdateIndicatorInput;
+}>;
+
+
+export type UpdateIndicatorMutation = { __typename?: 'Mutation', updateIndicator: { __typename?: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
@@ -3003,6 +3036,11 @@ export type UpdateProvinceMutationVariables = Exact<{
 
 
 export type UpdateProvinceMutation = { __typename?: 'Mutation', updateProvince: { __typename?: 'Province', id: string, code: string, name: string, last_modified_at: any, last_modified_by: string } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+
+export type GetReportTemplatesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetReportTemplatesQuery = { __typename?: 'Query', report_templates?: Array<{ __typename?: 'ReportTemplate', id: string, name: string, type: IndicatorType, window: number, frequency: ReportingFrequency, icon?: any | null, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicators?: Array<{ __typename?: 'Indicator', id: string }> | null, organisation_report_templates?: Array<{ __typename?: 'OrganisationReportTemplate', id: string }> | null }> | null };
 
 export type RequestPasswordResetMutationVariables = Exact<{
   input: PasswordResetRequestInput;
@@ -4863,6 +4901,300 @@ export function useUpdateIndicatorUnitMutation(baseOptions?: Apollo.MutationHook
 export type UpdateIndicatorUnitMutationHookResult = ReturnType<typeof useUpdateIndicatorUnitMutation>;
 export type UpdateIndicatorUnitMutationResult = Apollo.MutationResult<UpdateIndicatorUnitMutation>;
 export type UpdateIndicatorUnitMutationOptions = Apollo.BaseMutationOptions<UpdateIndicatorUnitMutation, UpdateIndicatorUnitMutationVariables>;
+export const CreateIndicatorDocument = gql`
+    mutation CreateIndicator($input: CreateIndicatorInput!) {
+  createIndicator(input: $input) {
+    __typename
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        value
+        message
+      }
+    }
+    ... on Indicator {
+      id
+      description
+      category
+      contributing_organisation
+      indicator_number
+      type
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      indicator_unit_id
+      indicator_unit {
+        id
+      }
+      indicator_organisations {
+        id
+      }
+      report_template_id
+      report_template {
+        id
+      }
+    }
+  }
+}
+    `;
+export type CreateIndicatorMutationFn = Apollo.MutationFunction<CreateIndicatorMutation, CreateIndicatorMutationVariables>;
+
+/**
+ * __useCreateIndicatorMutation__
+ *
+ * To run a mutation, you first call `useCreateIndicatorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateIndicatorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createIndicatorMutation, { data, loading, error }] = useCreateIndicatorMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateIndicatorMutation(baseOptions?: Apollo.MutationHookOptions<CreateIndicatorMutation, CreateIndicatorMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateIndicatorMutation, CreateIndicatorMutationVariables>(CreateIndicatorDocument, options);
+      }
+export type CreateIndicatorMutationHookResult = ReturnType<typeof useCreateIndicatorMutation>;
+export type CreateIndicatorMutationResult = Apollo.MutationResult<CreateIndicatorMutation>;
+export type CreateIndicatorMutationOptions = Apollo.BaseMutationOptions<CreateIndicatorMutation, CreateIndicatorMutationVariables>;
+export const DeleteIndicatorDocument = gql`
+    mutation DeleteIndicator($input: DeleteIndicatorInput!) {
+  deleteIndicator(input: $input) {
+    ... on Indicator {
+      id
+      last_modified_at
+      last_modified_by
+    }
+    ... on ApiDeleteError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type DeleteIndicatorMutationFn = Apollo.MutationFunction<DeleteIndicatorMutation, DeleteIndicatorMutationVariables>;
+
+/**
+ * __useDeleteIndicatorMutation__
+ *
+ * To run a mutation, you first call `useDeleteIndicatorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteIndicatorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteIndicatorMutation, { data, loading, error }] = useDeleteIndicatorMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteIndicatorMutation(baseOptions?: Apollo.MutationHookOptions<DeleteIndicatorMutation, DeleteIndicatorMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteIndicatorMutation, DeleteIndicatorMutationVariables>(DeleteIndicatorDocument, options);
+      }
+export type DeleteIndicatorMutationHookResult = ReturnType<typeof useDeleteIndicatorMutation>;
+export type DeleteIndicatorMutationResult = Apollo.MutationResult<DeleteIndicatorMutation>;
+export type DeleteIndicatorMutationOptions = Apollo.BaseMutationOptions<DeleteIndicatorMutation, DeleteIndicatorMutationVariables>;
+export const GetIndicatorDocument = gql`
+    query GetIndicator($indicatorId: ID!) {
+  indicator(id: $indicatorId) {
+    ... on Indicator {
+      id
+      description
+      category
+      contributing_organisation
+      indicator_number
+      type
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      indicator_unit_id
+      indicator_unit {
+        id
+      }
+      indicator_organisations {
+        id
+      }
+      report_template_id
+      report_template {
+        id
+      }
+    }
+    ... on ApiNotFoundError {
+      message
+      value
+      field
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetIndicatorQuery__
+ *
+ * To run a query within a React component, call `useGetIndicatorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetIndicatorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetIndicatorQuery({
+ *   variables: {
+ *      indicatorId: // value for 'indicatorId'
+ *   },
+ * });
+ */
+export function useGetIndicatorQuery(baseOptions: Apollo.QueryHookOptions<GetIndicatorQuery, GetIndicatorQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetIndicatorQuery, GetIndicatorQueryVariables>(GetIndicatorDocument, options);
+      }
+export function useGetIndicatorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetIndicatorQuery, GetIndicatorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetIndicatorQuery, GetIndicatorQueryVariables>(GetIndicatorDocument, options);
+        }
+export type GetIndicatorQueryHookResult = ReturnType<typeof useGetIndicatorQuery>;
+export type GetIndicatorLazyQueryHookResult = ReturnType<typeof useGetIndicatorLazyQuery>;
+export type GetIndicatorQueryResult = Apollo.QueryResult<GetIndicatorQuery, GetIndicatorQueryVariables>;
+export const GetIndicatorsDocument = gql`
+    query GetIndicators {
+  indicators {
+    id
+    description
+    category
+    contributing_organisation
+    indicator_number
+    type
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    indicator_unit_id
+    indicator_unit {
+      id
+    }
+    indicator_organisations {
+      id
+    }
+    report_template_id
+    report_template {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetIndicatorsQuery__
+ *
+ * To run a query within a React component, call `useGetIndicatorsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetIndicatorsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetIndicatorsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetIndicatorsQuery(baseOptions?: Apollo.QueryHookOptions<GetIndicatorsQuery, GetIndicatorsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetIndicatorsQuery, GetIndicatorsQueryVariables>(GetIndicatorsDocument, options);
+      }
+export function useGetIndicatorsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetIndicatorsQuery, GetIndicatorsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetIndicatorsQuery, GetIndicatorsQueryVariables>(GetIndicatorsDocument, options);
+        }
+export type GetIndicatorsQueryHookResult = ReturnType<typeof useGetIndicatorsQuery>;
+export type GetIndicatorsLazyQueryHookResult = ReturnType<typeof useGetIndicatorsLazyQuery>;
+export type GetIndicatorsQueryResult = Apollo.QueryResult<GetIndicatorsQuery, GetIndicatorsQueryVariables>;
+export const UpdateIndicatorDocument = gql`
+    mutation UpdateIndicator($input: UpdateIndicatorInput!) {
+  updateIndicator(input: $input) {
+    ... on Indicator {
+      id
+      description
+      category
+      contributing_organisation
+      indicator_number
+      type
+      last_modified_at
+      last_modified_by
+      indicator_unit_id
+      indicator_unit {
+        id
+      }
+      report_template_id
+      report_template {
+        id
+      }
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}
+    `;
+export type UpdateIndicatorMutationFn = Apollo.MutationFunction<UpdateIndicatorMutation, UpdateIndicatorMutationVariables>;
+
+/**
+ * __useUpdateIndicatorMutation__
+ *
+ * To run a mutation, you first call `useUpdateIndicatorMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateIndicatorMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateIndicatorMutation, { data, loading, error }] = useUpdateIndicatorMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateIndicatorMutation(baseOptions?: Apollo.MutationHookOptions<UpdateIndicatorMutation, UpdateIndicatorMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateIndicatorMutation, UpdateIndicatorMutationVariables>(UpdateIndicatorDocument, options);
+      }
+export type UpdateIndicatorMutationHookResult = ReturnType<typeof useUpdateIndicatorMutation>;
+export type UpdateIndicatorMutationResult = Apollo.MutationResult<UpdateIndicatorMutation>;
+export type UpdateIndicatorMutationOptions = Apollo.BaseMutationOptions<UpdateIndicatorMutation, UpdateIndicatorMutationVariables>;
 export const LoginDocument = gql`
     mutation login($input: LoginInput!) {
   login(input: $input) {
@@ -5171,6 +5503,55 @@ export function useUpdateProvinceMutation(baseOptions?: Apollo.MutationHookOptio
 export type UpdateProvinceMutationHookResult = ReturnType<typeof useUpdateProvinceMutation>;
 export type UpdateProvinceMutationResult = Apollo.MutationResult<UpdateProvinceMutation>;
 export type UpdateProvinceMutationOptions = Apollo.BaseMutationOptions<UpdateProvinceMutation, UpdateProvinceMutationVariables>;
+export const GetReportTemplatesDocument = gql`
+    query GetReportTemplates {
+  report_templates {
+    id
+    name
+    type
+    window
+    frequency
+    icon
+    created_at
+    created_by
+    last_modified_at
+    last_modified_by
+    indicators {
+      id
+    }
+    organisation_report_templates {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetReportTemplatesQuery__
+ *
+ * To run a query within a React component, call `useGetReportTemplatesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReportTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReportTemplatesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetReportTemplatesQuery(baseOptions?: Apollo.QueryHookOptions<GetReportTemplatesQuery, GetReportTemplatesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetReportTemplatesQuery, GetReportTemplatesQueryVariables>(GetReportTemplatesDocument, options);
+      }
+export function useGetReportTemplatesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetReportTemplatesQuery, GetReportTemplatesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetReportTemplatesQuery, GetReportTemplatesQueryVariables>(GetReportTemplatesDocument, options);
+        }
+export type GetReportTemplatesQueryHookResult = ReturnType<typeof useGetReportTemplatesQuery>;
+export type GetReportTemplatesLazyQueryHookResult = ReturnType<typeof useGetReportTemplatesLazyQuery>;
+export type GetReportTemplatesQueryResult = Apollo.QueryResult<GetReportTemplatesQuery, GetReportTemplatesQueryVariables>;
 export const RequestPasswordResetDocument = gql`
     mutation RequestPasswordReset($input: PasswordResetRequestInput!) {
   requestPasswordReset(input: $input) {

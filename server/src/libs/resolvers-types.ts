@@ -874,11 +874,11 @@ export type Indicator = {
   id: Scalars['ID'];
   indicator_number: Scalars['String'];
   indicator_organisations?: Maybe<Array<OrganisationIndicator>>;
-  indicator_unit?: Maybe<IndicatorUnitResult>;
+  indicator_unit?: Maybe<IndicatorUnit>;
   indicator_unit_id: Scalars['String'];
   last_modified_at: Scalars['DateTime'];
   last_modified_by: Scalars['String'];
-  report_template?: Maybe<ReportTemplateResult>;
+  report_template?: Maybe<ReportTemplate>;
   report_template_id: Scalars['String'];
   type: IndicatorType;
 };
@@ -2934,7 +2934,7 @@ export type ResolversTypes = ResolversObject<{
   IPv6: ResolverTypeWrapper<Scalars['IPv6']>;
   ISBN: ResolverTypeWrapper<Scalars['ISBN']>;
   ISO8601Duration: ResolverTypeWrapper<Scalars['ISO8601Duration']>;
-  Indicator: ResolverTypeWrapper<Omit<Indicator, 'indicator_unit' | 'report_template'> & { indicator_unit?: Maybe<ResolversTypes['IndicatorUnitResult']>, report_template?: Maybe<ResolversTypes['ReportTemplateResult']> }>;
+  Indicator: ResolverTypeWrapper<Indicator>;
   IndicatorDisaggregate: ResolverTypeWrapper<Omit<IndicatorDisaggregate, 'disaggregate_option' | 'organisation_indicator'> & { disaggregate_option?: Maybe<ResolversTypes['DisaggregateOptionResult']>, organisation_indicator?: Maybe<ResolversTypes['OrganisationIndicatorResult']> }>;
   IndicatorDisaggregateReport: ResolverTypeWrapper<Omit<IndicatorDisaggregateReport, 'indicator_disaggregate' | 'report'> & { indicator_disaggregate?: Maybe<ResolversTypes['IndicatorDisaggregateResult']>, report?: Maybe<ResolversTypes['ReportResult']> }>;
   IndicatorDisaggregateReportResult: ResolversTypes['ApiCreateError'] | ResolversTypes['ApiDeleteError'] | ResolversTypes['ApiNotFoundError'] | ResolversTypes['ApiUpdateError'] | ResolversTypes['IndicatorDisaggregateReport'];
@@ -3236,7 +3236,7 @@ export type ResolversParentTypes = ResolversObject<{
   IPv6: Scalars['IPv6'];
   ISBN: Scalars['ISBN'];
   ISO8601Duration: Scalars['ISO8601Duration'];
-  Indicator: Omit<Indicator, 'indicator_unit' | 'report_template'> & { indicator_unit?: Maybe<ResolversParentTypes['IndicatorUnitResult']>, report_template?: Maybe<ResolversParentTypes['ReportTemplateResult']> };
+  Indicator: Indicator;
   IndicatorDisaggregate: Omit<IndicatorDisaggregate, 'disaggregate_option' | 'organisation_indicator'> & { disaggregate_option?: Maybe<ResolversParentTypes['DisaggregateOptionResult']>, organisation_indicator?: Maybe<ResolversParentTypes['OrganisationIndicatorResult']> };
   IndicatorDisaggregateReport: Omit<IndicatorDisaggregateReport, 'indicator_disaggregate' | 'report'> & { indicator_disaggregate?: Maybe<ResolversParentTypes['IndicatorDisaggregateResult']>, report?: Maybe<ResolversParentTypes['ReportResult']> };
   IndicatorDisaggregateReportResult: ResolversParentTypes['ApiCreateError'] | ResolversParentTypes['ApiDeleteError'] | ResolversParentTypes['ApiNotFoundError'] | ResolversParentTypes['ApiUpdateError'] | ResolversParentTypes['IndicatorDisaggregateReport'];
@@ -3772,11 +3772,11 @@ export type IndicatorResolvers<ContextType = GraphQLContext, ParentType extends 
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   indicator_number?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   indicator_organisations?: Resolver<Maybe<Array<ResolversTypes['OrganisationIndicator']>>, ParentType, ContextType>;
-  indicator_unit?: Resolver<Maybe<ResolversTypes['IndicatorUnitResult']>, ParentType, ContextType>;
+  indicator_unit?: Resolver<Maybe<ResolversTypes['IndicatorUnit']>, ParentType, ContextType>;
   indicator_unit_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   last_modified_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   last_modified_by?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  report_template?: Resolver<Maybe<ResolversTypes['ReportTemplateResult']>, ParentType, ContextType>;
+  report_template?: Resolver<Maybe<ResolversTypes['ReportTemplate']>, ParentType, ContextType>;
   report_template_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['IndicatorType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

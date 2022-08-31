@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createIndicator,
   deleteIndicator,
@@ -9,7 +9,9 @@ import {
   getIndicatorUnit,
   getReportTemplate,
   getIndicatorOrganisations,
-} from "../queries";
+  resolveReportTemplate,
+  resolveIndicatorUnit,
+} from '../queries';
 
 const typeDefs = gql`
   type Indicator {
@@ -21,10 +23,10 @@ const typeDefs = gql`
     contributing_organisation: String!
 
     report_template_id: String!
-    report_template: ReportTemplateResult
+    report_template: ReportTemplate
 
     indicator_unit_id: String!
-    indicator_unit: IndicatorUnitResult
+    indicator_unit: IndicatorUnit
 
     indicator_organisations: [OrganisationIndicator!]
 
@@ -97,10 +99,10 @@ const resolvers: Resolvers = {
   },
   Indicator: {
     report_template: (parent, _args, context) =>
-      getReportTemplate({ id: parent.report_template_id }, context),
+      resolveReportTemplate(parent.report_template_id, context),
 
     indicator_unit: (parent, _args, context) =>
-      getIndicatorUnit({ id: parent.indicator_unit_id }, context),
+      resolveIndicatorUnit(parent.indicator_unit_id, context),
 
     indicator_organisations: (parent, _args, context) =>
       getIndicatorOrganisations(parent.id, context),

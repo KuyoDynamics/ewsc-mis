@@ -11,6 +11,7 @@ import {
   CatchmentDistrictInput,
   DisaggregateType,
   DistrictUserRoleType,
+  IndicatorType,
   OrganisationUserRoleType,
   ResidenceClassification,
   User,
@@ -32,6 +33,8 @@ const USER_DISTRICT_ROLE_OPTIONS: string[] =
 const COST_CLASSIFICATION_OPTIONS: string[] = Object.values(
   ResidenceClassification
 );
+
+const INDICATOR_TYPE_OPTIONS: string[] = Object.values(IndicatorType);
 
 const INDICATOR_DISAGGREGATE_TYPE_OPTIONS: string[] =
   Object.values(DisaggregateType);
@@ -166,4 +169,5 @@ export {
   COST_CLASSIFICATION_OPTIONS,
   INDICATOR_DISAGGREGATE_TYPE_OPTIONS,
   getNameInitials,
+  INDICATOR_TYPE_OPTIONS,
 };

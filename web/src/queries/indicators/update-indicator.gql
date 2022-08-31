@@ -1,0 +1,32 @@
+mutation UpdateIndicator($input: UpdateIndicatorInput!) {
+  updateIndicator(input: $input) {
+    ... on Indicator {
+      id
+      description
+      category
+      contributing_organisation
+      indicator_number
+      type
+      last_modified_at
+      last_modified_by
+      indicator_unit_id
+      indicator_unit {
+        id
+      }
+      report_template_id
+      report_template {
+        id
+      }
+    }
+    ... on ApiUpdateError {
+      message
+      field
+      value
+      errors {
+        field
+        message
+        value
+      }
+    }
+  }
+}

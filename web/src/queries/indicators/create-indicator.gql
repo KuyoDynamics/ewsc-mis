@@ -1,0 +1,38 @@
+mutation CreateIndicator($input: CreateIndicatorInput!) {
+  createIndicator(input: $input) {
+    __typename
+    ... on ApiCreateError {
+      message
+      field
+      value
+      errors {
+        field
+        value
+        message
+      }
+    }
+    ... on Indicator {
+      id
+      description
+      category
+      contributing_organisation
+      indicator_number
+      type
+      created_at
+      created_by
+      last_modified_at
+      last_modified_by
+      indicator_unit_id
+      indicator_unit {
+        id
+      }
+      indicator_organisations {
+        id
+      }
+      report_template_id
+      report_template {
+        id
+      }
+    }
+  }
+}
