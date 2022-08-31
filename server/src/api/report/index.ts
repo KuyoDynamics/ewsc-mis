@@ -1,5 +1,5 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
 import {
   createReport,
   deleteReport,
@@ -7,10 +7,9 @@ import {
   getReports,
   updateReport,
   getCatchmentDistrict,
-  getIndicatorDisaggregateReports,
   getOrganisationReportTemplate,
   getReportsByOrganisation,
-} from "../queries";
+} from '../queries';
 
 const typeDefs = gql`
   type Report {
@@ -101,8 +100,8 @@ const resolvers: Resolvers = {
       ),
     catchment_district: (parent, _args, context) =>
       getCatchmentDistrict(parent.catchment_district_id, context),
-    indicator_disaggregate_reports: (parent, _args, context) =>
-      getIndicatorDisaggregateReports({ report_id: parent.id }, context),
+    // indicator_disaggregate_reports: (parent, _args, context) =>
+    //   getIndicatorDisaggregateReports({ report_id: parent.id }, context),
   },
 };
 

@@ -1,9 +1,10 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useEffect } from 'react';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Alert,
   Box,
   Dialog,
   DialogContent,
@@ -13,11 +14,12 @@ import {
   Typography,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import DraggablePaper from 'components/draggable-paper';
 import FormInput from 'components/form-input-helpers/form-input';
 import FormSelect from 'components/form-input-helpers/form-select';
 import { INDICATOR_TYPE_OPTIONS } from 'utils';
+import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
 import {
   CreateIndicatorInput,
   GetIndicatorsDocument,
@@ -30,12 +32,11 @@ import {
 const schema = Yup.object({
   indicator_number: Yup.string().required(),
   description: Yup.string().required(),
-  // category: Yup.string().required(),
+  indicator_unit_id: Yup.string().uuid().required(),
+  contributing_organisation: Yup.string().required(),
   type: Yup.mixed<IndicatorType>()
     .oneOf(INDICATOR_TYPE_OPTIONS as IndicatorType[])
     .required(),
-  indicator_unit_id: Yup.string().uuid().required(),
-  report_template_id: Yup.string().uuid().required(),
 });
 
 function DraggableIndicatorForm(props: PaperProps) {
@@ -48,11 +49,14 @@ interface IIndicatorFormProps {
 }
 
 function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
-  const [createIndicator, { loading: creating }] = useCreateIndicatorMutation({
-    refetchQueries: [GetIndicatorsDocument],
-  });
+  const [createIndicator, { loading: creating, error: exception }] =
+    useCreateIndicatorMutation({
+      refetchQueries: [GetIndicatorsDocument],
+    });
 
   const { data: indicatorUnitsData } = useGetIndicatorUnitsQuery();
+
+  const defaultOrganisation = useGetDefaultOrganisation();
 
   const indicatorUnits = indicatorUnitsData?.indicator_units ?? null;
 
@@ -65,9 +69,16 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
     control,
     formState: { isValid, isSubmitting, errors, isDirty },
     setError,
+    register,
+    setValue,
   } = useForm<CreateIndicatorInput>({
     resolver: yupResolver(schema),
     mode: 'onChange',
+  });
+
+  const indicatorType = useWatch({
+    control,
+    name: 'type',
   });
 
   const onSubmit = async ({
@@ -77,7 +88,18 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
     type,
     indicator_unit_id,
     report_template_id,
+    contributing_organisation,
   }: CreateIndicatorInput) => {
+    console.log(
+      'indicator_number,description,category,type,indicator_unit_id,report_template_id,contributing_organisation',
+      indicator_number,
+      description,
+      category,
+      type,
+      indicator_unit_id,
+      report_template_id,
+      contributing_organisation
+    );
     createIndicator({
       variables: {
         input: {
@@ -87,6 +109,7 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
           type,
           indicator_unit_id,
           report_template_id,
+          contributing_organisation,
         },
       },
       onCompleted: (result) => {
@@ -120,12 +143,20 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
           }
         }
       },
-      onError: (err) => {
-        // throw it and let it be handled by the Error Boundary
-        console.log('Chaiwa, something bad happened', err);
-      },
+      // onError: (err) => {
+      //   // throw it and let it be handled by the Error Boundary
+      //   console.log('Chaiwa, something bad happened', err);
+      // },
     });
   };
+
+  useEffect(() => {
+    if (indicatorType === IndicatorType.Custom) {
+      setValue('contributing_organisation', defaultOrganisation.name);
+    } else {
+      setValue('contributing_organisation', 'nis');
+    }
+  }, [indicatorType, setValue, defaultOrganisation.name]);
 
   return (
     <Dialog
@@ -142,6 +173,15 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
         },
       }}
     >
+      {(exception || errors['unknown' as keyof CreateIndicatorInput]) && (
+        <Box>
+          <Alert severity="error">
+            {errors['unknown' as keyof CreateIndicatorInput]?.message ||
+              exception?.message}
+            . Please contact support or try again!
+          </Alert>
+        </Box>
+      )}
       <DialogTitle id="user-inivation-dialog-title">
         <Typography color="textPrimary" variant="h4">
           New Indicator Form
@@ -181,11 +221,14 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
             control={control}
             name="category"
             fullWidth
-            label="Category"
+            label="Category Description(Optional)"
             margin="normal"
             variant="outlined"
             inputProps={{
               autoComplete: 'off',
+            }}
+            sx={{
+              mb: '15px',
             }}
           />
 
@@ -194,13 +237,20 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
             name="indicator_unit_id"
             errors={errors}
             fullWidth
+            label="Unit"
             size="small"
-            margin="dense"
+            margin="none"
             variant="outlined"
+            sx={{
+              mt: '15px',
+              mb: '15px',
+            }}
           >
             {indicatorUnits &&
               indicatorUnits.map((unit) => (
-                <MenuItem value={unit.id}>{unit.display_name}</MenuItem>
+                <MenuItem key={unit.id} value={unit.id}>
+                  {unit.display_name}
+                </MenuItem>
               ))}
           </FormSelect>
 
@@ -209,13 +259,21 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
             name="type"
             errors={errors}
             fullWidth
+            defaultValue={IndicatorType.Nis}
+            label="Type"
             size="small"
-            margin="dense"
+            margin="none"
             variant="outlined"
+            sx={{
+              mt: '15px',
+              mb: '15px',
+            }}
           >
             {INDICATOR_TYPE_OPTIONS &&
               INDICATOR_TYPE_OPTIONS.map((type) => (
-                <MenuItem value={type}>{type}</MenuItem>
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
               ))}
           </FormSelect>
 
@@ -225,12 +283,19 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
             errors={errors}
             fullWidth
             size="small"
-            margin="dense"
+            label="Report Template(Optional)"
+            margin="none"
             variant="outlined"
+            sx={{
+              mt: '15px',
+              mb: '15px',
+            }}
           >
             {reportTemplates &&
               reportTemplates.map((template) => (
-                <MenuItem value={template.id}>{template.name}</MenuItem>
+                <MenuItem key={template.id} value={template.id}>
+                  {template.name}
+                </MenuItem>
               ))}
           </FormSelect>
 
@@ -243,11 +308,17 @@ function IndicatorForm({ open, onClose }: IIndicatorFormProps) {
               type="submit"
               variant="contained"
               loading={isSubmitting || creating}
-              loadingPosition="end"
+              // loadingPosition="end"
             >
               {isSubmitting || creating ? 'Saving...' : 'Create'}
             </LoadingButton>
           </Box>
+          <input
+            id="contributing_organisation"
+            type="hidden"
+            required
+            {...register('contributing_organisation')}
+          />
         </form>
       </DialogContent>
     </Dialog>

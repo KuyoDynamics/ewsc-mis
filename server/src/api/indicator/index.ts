@@ -8,7 +8,6 @@ import {
   updateIndicator,
   getIndicatorUnit,
   getReportTemplate,
-  getIndicatorOrganisations,
   resolveReportTemplate,
   resolveIndicatorUnit,
 } from '../queries';
@@ -18,17 +17,20 @@ const typeDefs = gql`
     id: ID!
     indicator_number: String!
     description: String!
-    category: String!
+    category: String
     type: IndicatorType!
     contributing_organisation: String!
 
-    report_template_id: String!
+    report_template_id: String
     report_template: ReportTemplate
 
     indicator_unit_id: String!
     indicator_unit: IndicatorUnit
 
     indicator_organisations: [OrganisationIndicator!]
+
+    disaggregate_id: String!
+    disaggregate: Disaggregate
 
     created_at: DateTime!
     created_by: String!
@@ -50,10 +52,11 @@ const typeDefs = gql`
   input CreateIndicatorInput {
     indicator_number: String!
     description: String!
-    category: String!
+    category: String
     type: IndicatorType!
     indicator_unit_id: String!
-    report_template_id: String!
+    report_template_id: String
+    contributing_organisation: String!
   }
 
   input UpdateIndicatorInput {
@@ -68,6 +71,7 @@ const typeDefs = gql`
     type: IndicatorType
     indicator_unit_id: String
     report_template_id: String
+    contributing_organisation: String
   }
 
   input DeleteIndicatorInput {
@@ -99,13 +103,13 @@ const resolvers: Resolvers = {
   },
   Indicator: {
     report_template: (parent, _args, context) =>
-      resolveReportTemplate(parent.report_template_id, context),
+      resolveReportTemplate(parent.report_template_id || '', context),
 
     indicator_unit: (parent, _args, context) =>
       resolveIndicatorUnit(parent.indicator_unit_id, context),
 
-    indicator_organisations: (parent, _args, context) =>
-      getIndicatorOrganisations(parent.id, context),
+    // indicator_organisations: (parent, _args, context) =>
+    //   getIndicatorOrganisations(parent.id, context),
   },
 };
 

@@ -433,10 +433,11 @@ export type CreateIndicatorDisaggregatesInput = {
 export type CreateIndicatorInput = {
   indicator_number: Scalars['String'];
   description: Scalars['String'];
-  category: Scalars['String'];
+  category?: InputMaybe<Scalars['String']>;
   type: IndicatorType;
   indicator_unit_id: Scalars['String'];
-  report_template_id: Scalars['String'];
+  report_template_id?: InputMaybe<Scalars['String']>;
+  contributing_organisation: Scalars['String'];
 };
 
 export type CreateIndicatorUnitInput = {
@@ -869,10 +870,10 @@ export type Indicator = {
   id: Scalars['ID'];
   indicator_number: Scalars['String'];
   description: Scalars['String'];
-  category: Scalars['String'];
+  category?: Maybe<Scalars['String']>;
   type: IndicatorType;
   contributing_organisation: Scalars['String'];
-  report_template_id: Scalars['String'];
+  report_template_id?: Maybe<Scalars['String']>;
   report_template?: Maybe<ReportTemplate>;
   indicator_unit_id: Scalars['String'];
   indicator_unit?: Maybe<IndicatorUnit>;
@@ -956,6 +957,7 @@ export type IndicatorUpdateInput = {
   type?: InputMaybe<IndicatorType>;
   indicator_unit_id?: InputMaybe<Scalars['String']>;
   report_template_id?: InputMaybe<Scalars['String']>;
+  contributing_organisation?: InputMaybe<Scalars['String']>;
 };
 
 export type LoginInput = {
@@ -2964,7 +2966,7 @@ export type CreateIndicatorMutationVariables = Exact<{
 }>;
 
 
-export type CreateIndicatorMutation = { __typename?: 'Mutation', createIndicator: { __typename: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename: 'ApiNotFoundError' } | { __typename: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename: 'ApiUpdateError' } | { __typename: 'ApiDeleteError' } };
+export type CreateIndicatorMutation = { __typename?: 'Mutation', createIndicator: { __typename: 'Indicator', id: string, description: string, category?: string | null, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id?: string | null, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename: 'ApiNotFoundError' } | { __typename: 'ApiCreateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, value?: string | null, message: string }> | null } | { __typename: 'ApiUpdateError' } | { __typename: 'ApiDeleteError' } };
 
 export type DeleteIndicatorMutationVariables = Exact<{
   input: DeleteIndicatorInput;
@@ -2978,19 +2980,19 @@ export type GetIndicatorQueryVariables = Exact<{
 }>;
 
 
-export type GetIndicatorQuery = { __typename?: 'Query', indicator: { __typename?: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename?: 'ApiNotFoundError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
+export type GetIndicatorQuery = { __typename?: 'Query', indicator: { __typename?: 'Indicator', id: string, description: string, category?: string | null, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id?: string | null, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename?: 'ApiNotFoundError', message: string, value?: string | null, field?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError' } | { __typename?: 'ApiDeleteError' } };
 
 export type GetIndicatorsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetIndicatorsQuery = { __typename?: 'Query', indicators?: Array<{ __typename?: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null }> | null };
+export type GetIndicatorsQuery = { __typename?: 'Query', indicators?: Array<{ __typename?: 'Indicator', id: string, description: string, category?: string | null, contributing_organisation: string, indicator_number: string, type: IndicatorType, created_at: any, created_by: string, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id?: string | null, indicator_unit?: { __typename?: 'IndicatorUnit', id: string, display_name: string } | null, indicator_organisations?: Array<{ __typename?: 'OrganisationIndicator', id: string }> | null, report_template?: { __typename?: 'ReportTemplate', id: string, name: string } | null }> | null };
 
 export type UpdateIndicatorMutationVariables = Exact<{
   input: UpdateIndicatorInput;
 }>;
 
 
-export type UpdateIndicatorMutation = { __typename?: 'Mutation', updateIndicator: { __typename?: 'Indicator', id: string, description: string, category: string, contributing_organisation: string, indicator_number: string, type: IndicatorType, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id: string, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
+export type UpdateIndicatorMutation = { __typename?: 'Mutation', updateIndicator: { __typename?: 'Indicator', id: string, description: string, category?: string | null, contributing_organisation: string, indicator_number: string, type: IndicatorType, last_modified_at: any, last_modified_by: string, indicator_unit_id: string, report_template_id?: string | null, indicator_unit?: { __typename?: 'IndicatorUnit', id: string } | null, report_template?: { __typename?: 'ReportTemplate', id: string } | null } | { __typename?: 'ApiNotFoundError' } | { __typename?: 'ApiCreateError' } | { __typename?: 'ApiUpdateError', message: string, field?: string | null, value?: string | null, errors?: Array<{ __typename?: 'ErrorField', field: string, message: string, value?: string | null }> | null } | { __typename?: 'ApiDeleteError' } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -5097,6 +5099,7 @@ export const GetIndicatorsDocument = gql`
     indicator_unit_id
     indicator_unit {
       id
+      display_name
     }
     indicator_organisations {
       id
@@ -5104,6 +5107,7 @@ export const GetIndicatorsDocument = gql`
     report_template_id
     report_template {
       id
+      name
     }
   }
 }

@@ -258,6 +258,7 @@ function generateClientErrors<T>(error: T, field_name?: string): ErrorField[] {
 }
 
 function getApiErrors<T>(error?: T, field_name?: string) {
+  console.log('Error: ', error);
   return {
     errors: error ? generateClientErrors(error, field_name) : undefined,
   };

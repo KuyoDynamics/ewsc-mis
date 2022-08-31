@@ -24,6 +24,7 @@ async function resolveReportTemplate(
   id: string,
   context: GraphQLContext
 ): Promise<ReportTemplate | null> {
+  if (!id) return null;
   const report_template = await context.prisma.reportTemplate.findUnique({
     where: {
       id,

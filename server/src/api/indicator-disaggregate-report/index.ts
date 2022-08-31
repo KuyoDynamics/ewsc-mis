@@ -1,13 +1,12 @@
-import { gql } from "apollo-server-express";
-import { Resolvers } from "../../libs/resolvers-types";
-import { getIndicatorDisaggregate, getReport } from "../queries";
-import {
-  createIndicatorDisaggregateReport,
-  deleteIndicatorDisaggregateReport,
-  getIndicatorDisaggregateReport,
-  getIndicatorDisaggregateReports,
-  updateIndicatorDisaggregateReport,
-} from "./queries";
+import { gql } from 'apollo-server-express';
+import { Resolvers } from '../../libs/resolvers-types';
+import { getReport } from '../queries';
+import // createIndicatorDisaggregateReport,
+// deleteIndicatorDisaggregateReport,
+// getIndicatorDisaggregateReport,
+// getIndicatorDisaggregateReports,
+// updateIndicatorDisaggregateReport,
+'./queries';
 
 const typeDefs = gql`
   type IndicatorDisaggregateReport {
@@ -17,10 +16,10 @@ const typeDefs = gql`
     comment: String
 
     report_id: String!
-    report: ReportResult
+    report: Report
 
-    indicator_disaggregate_id: String!
-    indicator_disaggregate: IndicatorDisaggregateResult
+    disaggregate_option_id: String!
+    disaggregate_option: DisaggregateOption
 
     created_at: DateTime!
     created_by: String!
@@ -80,25 +79,20 @@ const typeDefs = gql`
 
 const resolvers: Resolvers = {
   Query: {
-    indicator_disaggregate_reports: (_, args, context) =>
-      getIndicatorDisaggregateReports(args, context),
-    indicator_disaggregate_report: (_, args, context) =>
-      getIndicatorDisaggregateReport(args, context),
+    // indicator_disaggregate_reports: (_, args, context) =>
+    //   getIndicatorDisaggregateReports(args, context),
+    // indicator_disaggregate_report: (_, args, context) =>
+    //   getIndicatorDisaggregateReport(args, context),
   },
   Mutation: {
-    createIndicatorDisaggregateReport: (_, args, context) =>
-      createIndicatorDisaggregateReport(args, context),
-    updateIndicatorDisaggregateReport: (_, args, context) =>
-      updateIndicatorDisaggregateReport(args, context),
-    deleteIndicatorDisaggregateReport: (_, args, context) =>
-      deleteIndicatorDisaggregateReport(args, context),
+    // createIndicatorDisaggregateReport: (_, args, context) =>
+    //   createIndicatorDisaggregateReport(args, context),
+    // updateIndicatorDisaggregateReport: (_, args, context) =>
+    //   updateIndicatorDisaggregateReport(args, context),
+    // deleteIndicatorDisaggregateReport: (_, args, context) =>
+    //   deleteIndicatorDisaggregateReport(args, context),
   },
   IndicatorDisaggregateReport: {
-    indicator_disaggregate: (parent, _args, context) =>
-      getIndicatorDisaggregate(
-        { id: parent.indicator_disaggregate_id },
-        context
-      ),
     report: (parent, _args, context) => getReport({ id: parent.id }, context),
   },
 };

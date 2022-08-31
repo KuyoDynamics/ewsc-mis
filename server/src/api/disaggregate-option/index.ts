@@ -7,7 +7,6 @@ import {
   getDisaggregate,
   getDisaggregateOption,
   getDisaggregateOptions,
-  getIndicatorDisaggregatesByDisaggregateOptionId,
   getOption,
   resolveDisaggregate,
   resolveOption,
@@ -23,7 +22,7 @@ const typeDefs = gql`
     disaggregate_id: ID!
     disaggregate: Disaggregate
 
-    indicator_disaggregates: [IndicatorDisaggregate!]
+    indicator_disaggregate_reports: [IndicatorDisaggregateReport!]
 
     created_at: DateTime!
     created_by: String!
@@ -90,8 +89,6 @@ const resolvers: Resolvers = {
       resolveDisaggregate(parent.disaggregate_id, context),
     option: (parent, _args, context) =>
       resolveOption(parent.option_id, context),
-    indicator_disaggregates: (parent, _args, context) =>
-      getIndicatorDisaggregatesByDisaggregateOptionId(parent.id, context),
   },
 };
 

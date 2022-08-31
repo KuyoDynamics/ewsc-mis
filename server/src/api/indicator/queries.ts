@@ -5,17 +5,18 @@ import {
   MutationDeleteIndicatorArgs,
   MutationUpdateIndicatorArgs,
   QueryIndicatorArgs,
-} from "../../libs/resolvers-types";
+} from '../../libs/resolvers-types';
 import {
   getApiCreateError,
   getApiNotFoundError,
   getApiDeleteError,
   getApiUpdateError,
   GraphQLContext,
-} from "../../utils";
+} from '../../utils';
 
 async function getIndicators(context: GraphQLContext): Promise<Indicator[]> {
-  return (await context.prisma.indicator.findMany({})) as Indicator[];
+  const result = await context.prisma.indicator.findMany({});
+  return result as Indicator[];
 }
 
 async function getIndicatorsByTemplateId(
@@ -39,14 +40,14 @@ async function getIndicator(
     });
 
     if (!indicator) {
-      return getApiNotFoundError("Indicator", args.id);
+      return getApiNotFoundError('Indicator', args.id);
     }
     return {
-      __typename: "Indicator",
+      __typename: 'Indicator',
       ...indicator,
     } as IndicatorResult;
   } catch (error) {
-    return getApiNotFoundError("Indicator", args.id, error);
+    return getApiNotFoundError('Indicator', args.id, error);
   }
 }
 
@@ -60,8 +61,10 @@ async function createIndicator(
         indicator_number: args.input.indicator_number,
         description: args.input.description,
         category: args.input.category,
+        disaggregate_id: '', // TODO
         report_template_id: args.input.report_template_id,
         indicator_unit_id: args.input.indicator_unit_id,
+        contributing_organisation: args.input.contributing_organisation,
         type: args.input.type,
         created_by: context.user.email,
         last_modified_by: context.user.email,
@@ -69,11 +72,11 @@ async function createIndicator(
     });
 
     return {
-      __typename: "Indicator",
+      __typename: 'Indicator',
       ...indicator,
     } as IndicatorResult;
   } catch (error) {
-    return getApiCreateError("Indicator", error);
+    return getApiCreateError('Indicator', error);
   }
 }
 
@@ -91,17 +94,20 @@ async function updateIndicator(
         description: args.input.update.description || undefined,
         category: args.input.update.category || undefined,
         report_template_id: args.input.update.report_template_id || undefined,
+        disaggregate_id: '', // TODO
         indicator_unit_id: args.input.update.indicator_unit_id || undefined,
         type: args.input.update.type || undefined,
+        contributing_organisation:
+          args.input.update.contributing_organisation || undefined,
         last_modified_by: args.input.update ? context.user.email : undefined,
       },
     });
     return {
-      __typename: "Indicator",
+      __typename: 'Indicator',
       ...indicator,
     } as IndicatorResult;
   } catch (error) {
-    return getApiUpdateError("Indicator", args.input.id);
+    return getApiUpdateError('Indicator', args.input.id);
   }
 }
 
@@ -116,11 +122,11 @@ async function deleteIndicator(
       },
     });
     return {
-      __typename: "Indicator",
+      __typename: 'Indicator',
       ...indicator,
     } as IndicatorResult;
   } catch (error) {
-    return getApiDeleteError("Indicator", args.input.id);
+    return getApiDeleteError('Indicator', args.input.id);
   }
 }
 

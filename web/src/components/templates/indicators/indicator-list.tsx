@@ -28,25 +28,31 @@ import {
   MuiEvent,
 } from '@mui/x-data-grid';
 import { v4 as uuidv4 } from 'uuid';
-import { Alert, Box, Collapse, Typography } from '@mui/material';
+import { Alert, Box, Collapse, MenuItem, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import CustomFooterWithFab from 'components/data-grid-helpers/customer-footer-with-fab';
 import FormInput from 'components/form-input-helpers/form-input';
 import MainCard from 'components/cards/main-card';
 import ExcelExportMenuItem from 'components/data-grid-helpers/excel-export-menu-item';
 import JsonExportMenuItem from 'components/data-grid-helpers/json-export-menu-item';
 import { INDICATOR_TYPE_OPTIONS } from 'utils';
+import FormSelect from 'components/form-input-helpers/form-select';
+import useGetIndicatorUnits from 'utils/hooks/use-get-indicator-units';
+import useGetReportTemplates from 'utils/hooks/use-get-report-templates';
 import IndicatorForm from './indicator-form';
 import {
   GetIndicatorsDocument,
   Indicator,
   IndicatorType,
+  IndicatorUnit,
+  OrganisationIndicator,
   ReportTemplate,
   useDeleteIndicatorMutation,
   useGetIndicatorsQuery,
   useUpdateIndicatorMutation,
 } from '../../../../graphql/generated';
+import useGetDefaultOrganisation from 'utils/hooks/use-get-default-organisation';
 
 export interface EditToolbarProps {
   setRows: (newRows: any) => void;
@@ -95,17 +101,19 @@ interface IIndicatorFormInputs {
   type: IndicatorType;
   indicator_unit_id: string;
   report_template_id: string;
+  contributing_organisation: string;
 }
 
 const schema = Yup.object({
   indicator_number: Yup.string().required(),
   id: Yup.string().required(),
-  name: Yup.string().required(),
+  name: Yup.string().required(), // this is mapped to description
   type: Yup.mixed<IndicatorType>()
     .oneOf(INDICATOR_TYPE_OPTIONS as IndicatorType[])
     .required(),
   indicator_unit_id: Yup.string().uuid().required(),
-  report_template_id: Yup.string().uuid().required(),
+  contributing_organisation: Yup.string().required(),
+  // report_template_id: Yup.string().uuid().required(),
 });
 
 const initialRowModesModel: GridRowModesModel = {};
@@ -126,11 +134,23 @@ function IndicatorList() {
     null
   );
 
-  const { data: indicatorUnitsData, loading } = useGetIndicatorsQuery({
+  const { data, loading, error } = useGetIndicatorsQuery({
     fetchPolicy: 'network-only',
   });
 
-  const rows = indicatorUnitsData?.indicators ?? [];
+  const indicatorUnits = useGetIndicatorUnits();
+
+  const reportTemplates = useGetReportTemplates();
+
+  const defaultOrganisation = useGetDefaultOrganisation();
+
+  console.log('indicatorData', data);
+
+  console.log('indicatorData error', error);
+
+  const rows = data?.indicators ?? [];
+
+  console.log('rows', rows);
 
   const [updateIndicator, { loading: updating }] = useUpdateIndicatorMutation({
     refetchQueries: [GetIndicatorsDocument],
@@ -161,6 +181,11 @@ function IndicatorList() {
     mode: 'onChange',
   });
 
+  const indicatorType = useWatch({
+    control,
+    name: 'type',
+  });
+
   const [rowModesModel, setRowModesModel] =
     React.useState<GridRowModesModel>(initialRowModesModel);
 
@@ -172,6 +197,7 @@ function IndicatorList() {
     indicator_unit_id,
     report_template_id,
     type,
+    contributing_organisation,
   }: IIndicatorFormInputs) => {
     updateIndicator({
       variables: {
@@ -184,6 +210,7 @@ function IndicatorList() {
             indicator_unit_id,
             report_template_id,
             type,
+            contributing_organisation,
           },
         },
       },
@@ -244,6 +271,7 @@ function IndicatorList() {
             indicator_unit_id: item.indicator_unit_id,
             report_template_id: item.report_template_id,
             type: item.type,
+            contributing_organisation: item.contributing_organisation,
           }
         : null
     );
@@ -307,7 +335,6 @@ function IndicatorList() {
       editable: true,
       hideable: false,
       flex: 1,
-      resizable: true,
       renderEditCell: () => {
         return (
           <FormInput
@@ -326,13 +353,36 @@ function IndicatorList() {
       },
     },
     {
+      field: 'category',
+      headerName: 'Category Description',
+      type: 'string',
+      width: 180,
+      editable: true,
+      flex: 1,
+      renderEditCell: () => {
+        return (
+          <FormInput
+            control={control}
+            name="category"
+            fullWidth
+            label="Category"
+            margin="none"
+            size="small"
+            variant="outlined"
+            inputProps={{
+              autoCapitalize: 'on',
+            }}
+          />
+        );
+      },
+    },
+    {
       field: 'id',
       headerName: 'Indicator ID',
       type: 'string',
       width: 180,
       editable: false,
       flex: 1,
-      resizable: true,
     },
     {
       field: 'indicator_number',
@@ -342,7 +392,6 @@ function IndicatorList() {
       editable: true,
       hideable: false,
       flex: 1,
-      resizable: true,
       renderEditCell: () => {
         return (
           <FormInput
@@ -361,15 +410,62 @@ function IndicatorList() {
       },
     },
     {
-      field: 'report_template',
-      headerName: 'Report Template',
+      field: 'indicator_unit',
+      headerName: 'Unit of measurement',
       type: 'string',
       width: 180,
-      editable: false,
+      editable: true,
       flex: 1,
-      resizable: true,
       valueGetter: (params) => {
-        return (params.value as ReportTemplate)?.name ?? '---';
+        return (params.value as IndicatorUnit)?.display_name;
+      },
+      renderEditCell: () => {
+        return (
+          <FormSelect
+            control={control}
+            name="indicator_unit_id"
+            errors={errors}
+            fullWidth
+            size="small"
+            margin="dense"
+            variant="outlined"
+          >
+            {indicatorUnits &&
+              indicatorUnits.map((i) => (
+                <MenuItem key={i.id} value={i.id}>
+                  {i.display_name}
+                </MenuItem>
+              ))}
+          </FormSelect>
+        );
+      },
+    },
+    {
+      field: 'type',
+      headerName: 'Indicator Type',
+      type: 'string',
+      width: 180,
+      editable: true,
+      flex: 1,
+      renderEditCell: () => {
+        return (
+          <FormSelect
+            control={control}
+            name="type"
+            errors={errors}
+            fullWidth
+            size="small"
+            margin="dense"
+            variant="outlined"
+          >
+            {INDICATOR_TYPE_OPTIONS &&
+              INDICATOR_TYPE_OPTIONS.map((t) => (
+                <MenuItem key={t} value={t}>
+                  {t}
+                </MenuItem>
+              ))}
+          </FormSelect>
+        );
       },
     },
     {
@@ -377,11 +473,52 @@ function IndicatorList() {
       headerName: 'Report Template',
       type: 'string',
       width: 180,
-      editable: false,
+      editable: true,
       flex: 1,
-      resizable: true,
       valueGetter: (params) => {
         return (params.value as ReportTemplate)?.name ?? '---';
+      },
+      renderEditCell: () => {
+        return (
+          <FormSelect
+            control={control}
+            name="type"
+            errors={errors}
+            fullWidth
+            size="small"
+            margin="dense"
+            variant="outlined"
+          >
+            {reportTemplates &&
+              reportTemplates.map((t) => (
+                <MenuItem key={t.id} value={t.id}>
+                  {t.name}
+                </MenuItem>
+              ))}
+          </FormSelect>
+        );
+      },
+    },
+    {
+      field: 'contributing_organisation',
+      headerName: 'Contributing Organisation',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+    },
+    {
+      field: 'indicator_organisations',
+      headerName: 'Used By',
+      type: 'string',
+      width: 180,
+      editable: false,
+      flex: 1,
+      valueGetter: (params) => {
+        return (params.value as OrganisationIndicator[])?.length;
+      },
+      valueFormatter(params) {
+        return `${params.value} organisations`;
       },
     },
     {
@@ -391,7 +528,6 @@ function IndicatorList() {
       width: 180,
       editable: false,
       flex: 1,
-      resizable: true,
     },
     {
       field: 'created_by',
@@ -400,7 +536,6 @@ function IndicatorList() {
       width: 180,
       editable: false,
       flex: 1,
-      resizable: true,
     },
     {
       field: 'last_modified_at',
@@ -409,7 +544,6 @@ function IndicatorList() {
       width: 180,
       editable: false,
       flex: 1,
-      resizable: true,
     },
     {
       field: 'last_modified_by',
@@ -418,7 +552,6 @@ function IndicatorList() {
       width: 180,
       editable: false,
       flex: 1,
-      resizable: true,
     },
     {
       field: 'actions',
@@ -468,6 +601,14 @@ function IndicatorList() {
       },
     },
   ];
+
+  useEffect(() => {
+    if (indicatorType === IndicatorType.Custom) {
+      setValue('contributing_organisation', defaultOrganisation.name);
+    } else {
+      setValue('contributing_organisation', 'nis');
+    }
+  }, [indicatorType, setValue, defaultOrganisation.name]);
 
   useEffect(() => {
     resetForm(selectedRow!);
@@ -520,7 +661,7 @@ function IndicatorList() {
               title: 'Add Indicator',
             },
             toolbar: {
-              title: 'Indicator Unit',
+              title: 'Indicators',
             },
           }}
           loading={loading || deleting}
@@ -534,9 +675,9 @@ function IndicatorList() {
                 last_modified_at: false,
                 last_modified_by: false,
                 id: false,
-                district_id: false,
-                country_id: false,
-                province_id: false,
+                category: false,
+                contributing_organisation: false,
+                indicator_organisations: false,
               },
             },
           }}

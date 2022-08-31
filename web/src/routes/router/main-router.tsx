@@ -39,6 +39,10 @@ const IndicatorUnits = Loadable(
   lazy(() => import('routes/system/templates/indicator_units'))
 );
 
+const Indicators = Loadable(
+  lazy(() => import('routes/system/templates/indicators'))
+);
+
 const MainRouter: RouteObject = {
   path: '/',
   element: (
@@ -108,6 +112,10 @@ const MainRouter: RouteObject = {
           path: 'templates',
           element: <TemplatesDashboard />,
           children: [
+            {
+              path: 'indicators',
+              element: <Indicators />,
+            },
             {
               path: 'indicator_units',
               element: <IndicatorUnits />,
